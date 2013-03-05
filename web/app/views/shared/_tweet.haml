@@ -1,0 +1,35 @@
+.item
+  .tweet
+    .icon
+      %img{:src => item.user.profile_image_url}
+    .right
+      .user
+        %span
+          = item.user.name
+        %span
+          = "@#{item.user.screen_name}"
+      .text
+        = raw format_tweet_text(item.text)
+      .meta
+        %span.created_at
+          = format_tweet_created_at(item.tweeted_at)
+        %span.source
+          = raw item.source
+  .data
+    .favorites
+      FAV
+      - item.favorites.map{|m| m.user}.each_slice(10) do |row|
+        .users_row
+        - row.each do |u|
+          %a{:href => "/#{u.screen_name}", :title => u.screen_name}
+            %img{:src => u.profile_image_url}
+    .retweets
+      RETWEET
+      - item.retweets.map{|m| m.user}.each_slice(10) do |row|
+        .users_row
+        - row.each do |u|
+          %a{:href => "/#{u.screen_name}", :title => u.screen_name}
+            %img{:src => u.profile_image_url}
+
+
+

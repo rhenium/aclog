@@ -1,8 +1,20 @@
 !!! xml
 %html{xmlns: "http://www.w3.org/1999/xhtml"}
   %head
-    %title Aclog
+    %title= @title
     = stylesheet_link_tag "application"
-    /= javascript_include_tag "application"
   %body
-    = yield
+    .container
+      .left
+        %h1><
+          Aclog
+        %span.version beta
+        %div
+          - if session[:screen_name]
+            %span= link_to "@#{session[:screen_name]}", :controller => "users", :action => "best", :screen_name => session[:screen_name]
+            %span= link_to "Logout", :controller => "sessions", :action => "destroy"
+          - else
+            %span= link_to "Login", "/i/login"
+      .body
+        %h2= @title
+        = yield

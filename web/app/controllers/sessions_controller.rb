@@ -5,6 +5,7 @@ class SessionsController < ApplicationController
     user.update_attributes(:oauth_token => auth["credentials"]["token"],
                            :oauth_token_secret => auth["credentials"]["secret"])
     session[:user_id] = user.id
+    session[:screen_name] = auth["info"]["nickname"]
     EM.defer do
       EM.connect("127.0.0.1", Settings.worker_port) do |client|
         def client.post_init

@@ -11,6 +11,7 @@ class UsersController < ApplicationController
     else
       @items = []
     end
+    @user_cache = get_user_cache(@items)
   end
 
    def recent
@@ -25,6 +26,7 @@ class UsersController < ApplicationController
     else
       @items = []
     end
+    @user_cache = get_user_cache(@items)
   end
 
   def timeline
@@ -38,6 +40,7 @@ class UsersController < ApplicationController
     else
       @items = []
     end
+    @user_cache = get_user_cache(@items)
   end
 
   def my
@@ -63,6 +66,7 @@ class UsersController < ApplicationController
     else
       @items = []
     end
+    @user_cache = get_user_cache(@items)
   end
 
   def info

@@ -11,8 +11,8 @@
 web/db/*.sqlite3
 
 # Ignore all logfiles and tempfiles.
-log/*.log
-tmp
+web/log/*.log
+web/tmp
 
 web/config/settings.local.yml
 web/config/settings/*.local.yml

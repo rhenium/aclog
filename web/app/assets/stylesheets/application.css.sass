@@ -1,20 +1,16 @@
-.item
-  :border-bottom 1px solid #999999
-  .tweet
-    :width 800px
-    .icon
-      :width 100px
-      :float left
-    .right
-      :float left
-      .meta
-        .created_at
-          :display block
-          :float left
-        .source
-          :display block
-          :float right
-  .data
-    :width 800px
-    :clear both
+@import "tweets"
+
+*
+  :vertical-align baseline
+  :margin 0
+  :padding 0
+a
+  :text-decoration none
+  :color inherit
+.clearfix:after
+  :content "."
+  :visibility hidden
+  :display block
+  :height 0
+  :clear both
 

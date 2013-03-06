@@ -1,35 +1,32 @@
 .item
   .tweet
-    .icon
-      %img{:src => item.user.profile_image_url}
-    .right
+    .avatar
+      %a{href: user_url(item.user)}
+        %img{src: item.user.profile_image_url}
+    .tweet_content_fix
+    .tweet_content
       .user
-        %span
-          = item.user.name
-        %span
-          = "@#{item.user.screen_name}"
+        %span.name
+          = link_to item.user.name, user_url(item.user)
+        %span.screen_name
+          = link_to "@#{item.user.screen_name}", user_url(item.user)
       .text
         = raw format_tweet_text(item.text)
-      .meta
+      .meta.clearfix
         %span.created_at
-          = format_tweet_created_at(item.tweeted_at)
+          = link_to format_tweet_created_at(item.tweeted_at), status_url(item)
         %span.source
-          = raw item.source
-  .data
-    .favorites
-      FAV
-      - item.favorites.map{|m| m.user}.each_slice(10) do |row|
-        .users_row
-        - row.each do |u|
-          %a{:href => "/#{u.screen_name}", :title => u.screen_name}
-            %img{:src => u.profile_image_url}
-    .retweets
-      RETWEET
-      - item.retweets.map{|m| m.user}.each_slice(10) do |row|
-        .users_row
-        - row.each do |u|
-          %a{:href => "/#{u.screen_name}", :title => u.screen_name}
-            %img{:src => u.profile_image_url}
-
-
+          = raw format_source_text(item.source)
+  .stats
+    - [["FAVS", item.favorites], ["RETWEETS", item.retweets]].each do |type, data|
+      .type_row.clearfix
+        .info
+          %span.count= data.length
+          %span.type= type
+        - data.map{|m| @user_cache[m.user_id]}.each_slice(10) do |row|
+          %ul.users_row.clearfix
+            - row.each do |u|
+              %li
+                %a{href: user_url(u)}><
+                  %img{src: u.profile_image_url}
 

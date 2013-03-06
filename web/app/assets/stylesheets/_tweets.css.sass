@@ -18,12 +18,13 @@
           :height 48px
       .tweet_content_fix
         :float left
-        :width 1px
+        :width 0
         :height 85px
       .tweet_content
         :float left
         :width 473px
         .user
+          :padding 0 5px 15px
           :font-weight bold
           :color #666666
           .name
@@ -36,6 +37,7 @@
           :padding 0 5px 15px
           :word-wrap break-word
         .meta
+          :padding 0 5px 15px
           :color #666666
           :font-size 12px
           .created_at
@@ -52,6 +54,7 @@
       :padding 15px
       //:background #edf0f4
       .type_row
+        :margin-bottom 3px
         .info
           :width 60px
           :float left
@@ -64,12 +67,18 @@
             :font-size 14px
           .type
             :font-size 10px
-        ul.users_row
-          :list-style none
+        .users_content_fix
           :float left
-          li
-            :float left
-            img
-              :width 48px
-              :height 48px
+          :height 48px
+          :width 0
+        .users_content
+          :float left
+          ul.users_row
+            :list-style none
+            li
+              :float left
+              img
+                :width 48px
+                :height 48px
+                :vertical-align bottom
 

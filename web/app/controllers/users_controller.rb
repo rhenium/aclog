@@ -55,11 +55,11 @@ class UsersController < ApplicationController
         "SELECT * FROM (" +
         "SELECT tweet_id FROM favorites WHERE user_id = #{user.id} " +
         "UNION " +
-        "SELECT tweet_id FROM retweets WHERE user_id = #{user.id} " +
+        "SELECT tweet_id FROM retweets WHERE user_id = #{user.id}" +
         ") rf " +
         "ORDER BY 1 DESC " +
         "LIMIT #{Settings.page_per} " +
-        "OFFSET #{Settings.page_per * (page - 1)}")
+        "OFFSET #{Settings.page_per * (page - 1)};")
       tweet_ids.map!{|m| m.values[0]}
       if tweet_ids && tweet_ids.size > 0
         @items = Tweet.find(tweet_ids, :order => "id DESC")

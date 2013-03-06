@@ -114,14 +114,17 @@ class Receiver::Worker
 
         con.on_unauthorized do
           @logger.error("Unauthorized: #{con.options[:user_id]}")
+          @connections.delete(con)
         end
 
         con.on_forbidden do
           @logger.error("Forbidden: #{con.options[:user_id]}")
+          @connections.delete(con)
         end
 
         con.on_not_found do
           @logger.error("Not Found: #{con.options[:user_id]}")
+          @connections.delete(con)
         end
 
         con.on_not_acceptable do

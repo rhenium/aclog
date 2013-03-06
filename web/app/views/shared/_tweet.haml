@@ -23,10 +23,12 @@
         .info
           %span.count= data.length
           %span.type= type
-        - data.map{|m| @user_cache[m.user_id]}.each_slice(10) do |row|
-          %ul.users_row.clearfix
-            - row.each do |u|
-              %li
-                %a{href: user_url(u)}><
-                  %img{src: u.profile_image_url}
+        .users_content_fix
+        .users_content
+          - data.map{|m| @user_cache[m.user_id]}.each_slice(10) do |row|
+            %ul.users_row.clearfix
+              - row.each do |u|
+                %li
+                  %a{href: user_url(u)}><
+                    %img{src: u.profile_image_url}
 

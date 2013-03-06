@@ -18,7 +18,7 @@ class Receiver::Logger
   end
 
   def log(out, type, msg)
-    out.puts Time.now.utc.iso8601(3) + " " + type + ": " + msg
+    out.puts Time.now.utc.iso8601(3) + " " + type + ": " + msg.to_s
   end
 
   def initialize

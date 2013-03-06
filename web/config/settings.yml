@@ -1,4 +1,4 @@
 consumer_key: <%= ENV["CONSUMER_KEY"] %>
 consumer_secret: <%= ENV["CONSUMER_SECRET"] %>
 worker_port: 46607
-page_per: 3
+page_per: 10

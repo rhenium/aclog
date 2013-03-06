@@ -14,7 +14,7 @@ module ApplicationHelper
   end
 
   def format_source_text(text)
-    text
+    text.gsub("&", "&amp;")
   end
 
   def status_url(tweet)

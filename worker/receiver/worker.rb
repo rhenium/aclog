@@ -199,31 +199,31 @@ class Receiver::Worker
       end
 
       # EventReceiver
-      EM.start_server("127.0.0.1", Settings.worker_port) do |server|
-        def server.receive_data(data)
-          d = data.split(/ /)
+      #EM.start_server("127.0.0.1", Settings.worker_port) do |server|
+      #  def server.receive_data(data)
+      #    d = data.split(/ /)
 
-          if handle_event(d[0].to_sym, s[1].to_i)
-            send_data "Accepted\r\n"
-          else
-            send_data "Denied\r\n"
-          end
+      #    if handle_event(d[0].to_sym, s[1].to_i)
+      #      send_data "Accepted\r\n"
+      #    else
+      #      send_data "Denied\r\n"
+      #    end
 
-          close_connection_after_writing
-        end
+      #    close_connection_after_writing
+      #  end
 
-        def handle_event(command, id)
-          case command
-          when :REGISTER
-            if account = Account.find_by(:id => id)
-              register.call(account)
-              return true
-            else
-              return false
-            end
-          end
-        end
-      end
+      #  def handle_event(command, id)
+      #    case command
+      #    when :REGISTER
+      #      if account = Account.find_by(:id => id)
+      #        register.call(account)
+      #        return true
+      #      else
+      #        return false
+      #      end
+      #    end
+      #  end
+      #end
 
       reconnect = -> do
         Account.all.each do |account|

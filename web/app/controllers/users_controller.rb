@@ -12,6 +12,7 @@ class UsersController < ApplicationController
       @items = []
     end
     @user_cache = get_user_cache(@items)
+    @title = "Best tweets of #{screen_name} page #{page}"
   end
 
    def recent
@@ -27,6 +28,7 @@ class UsersController < ApplicationController
       @items = []
     end
     @user_cache = get_user_cache(@items)
+    @title = "Recent faved of #{screen_name} page #{page}"
   end
 
   def timeline
@@ -41,6 +43,7 @@ class UsersController < ApplicationController
       @items = []
     end
     @user_cache = get_user_cache(@items)
+    @title = "User timeline of #{screen_name} page #{page}"
   end
 
   def my
@@ -67,6 +70,7 @@ class UsersController < ApplicationController
       @items = []
     end
     @user_cache = get_user_cache(@items)
+    @title = "Favs from #{screen_name} page #{page}"
   end
 
   def info

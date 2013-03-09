@@ -1,0 +1,12 @@
+<%
+# dotCloud
+env_file = "/home/dotcloud/environment.json"
+if File.exists?(env_file)
+  ENV.update(Hash[JSON.parse(File.read(env_file)).map{|k, v| [k.to_s, v.to_s]}])
+end
+%>
+consumer_key: <%= ENV["CONSUMER_KEY"] %>
+consumer_secret: <%= ENV["CONSUMER_SECRET"] %>
+worker_count: <%= ENV["WORKER_COUNT"] %>
+dotcloud_service_name: <%= ENV["DOTCLOUD_SERVICE_NAME"] %>
+page_per: 10

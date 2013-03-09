@@ -1,0 +1,105 @@
+.items {
+  width: 572px;
+  margin: 15px 0 15px 18px; }
+  .items .item {
+    margin: 15px 0; }
+    .items .item .tweet {
+      overflow: hidden;
+      background: white;
+      border: 1px solid #c1c5cb;
+      border-width: 1px 0;
+      padding: 15px; }
+      .items .item .tweet .avatar {
+        width: 60px;
+        float: left; }
+        .items .item .tweet .avatar img {
+          width: 48px;
+          height: 48px; }
+      .items .item .tweet .tweet_content_fix {
+        float: left;
+        width: 0;
+        height: 85px; }
+      .items .item .tweet .tweet_content {
+        float: left;
+        width: 473px; }
+        .items .item .tweet .tweet_content .user {
+          padding: 0 5px 15px;
+          font-weight: bold; }
+          .items .item .tweet .tweet_content .user .name {
+            font-size: 14px; }
+          .items .item .tweet .tweet_content .user .screen_name {
+            font-size: 12px; }
+          .items .item .tweet .tweet_content .user a {
+            color: #666666; }
+        .items .item .tweet .tweet_content .text {
+          font-size: 18px;
+          line-height: 25px;
+          padding: 0 5px 15px;
+          word-wrap: break-word; }
+        .items .item .tweet .tweet_content .meta {
+          padding: 0 5px 15px;
+          color: #666666;
+          font-size: 12px; }
+          .items .item .tweet .tweet_content .meta .twitter_bird {
+            display: block;
+            float: left; }
+            .items .item .tweet .tweet_content .meta .twitter_bird img {
+              vertical-align: top;
+              margin-right: 2px;
+              margin-top: 1px; }
+          .items .item .tweet .tweet_content .meta .created_at {
+            display: block;
+            float: left; }
+          .items .item .tweet .tweet_content .meta .source {
+            display: block;
+            float: right; }
+    .items .item .stats {
+      clear: both;
+      padding: 15px; }
+      .items .item .stats .type_row {
+        margin-bottom: 3px; }
+        .items .item .stats .type_row .info {
+          width: 60px;
+          float: left; }
+          .items .item .stats .type_row .info .count,
+          .items .item .stats .type_row .info .type {
+            color: #666666;
+            display: block; }
+          .items .item .stats .type_row .info .count {
+            font-weight: bold;
+            font-size: 14px; }
+          .items .item .stats .type_row .info .type {
+            font-size: 10px; }
+        .items .item .stats .type_row .users_content_fix {
+          float: left;
+          height: 48px;
+          width: 0; }
+        .items .item .stats .type_row .users_content {
+          float: left; }
+          .items .item .stats .type_row .users_content ul.users_row {
+            list-style: none; }
+            .items .item .stats .type_row .users_content ul.users_row li {
+              float: left; }
+              .items .item .stats .type_row .users_content ul.users_row li img {
+                width: 48px;
+                height: 48px;
+                vertical-align: bottom; }
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Ubuntu", sans-serif; }
+
+a {
+  text-decoration: none;
+  color: #3b5998; }
+
+img {
+  border: none; }
+
+.clearfix:after {
+  content: ".";
+  visibility: hidden;
+  display: block;
+  height: 0;
+  clear: both; }

@@ -1,0 +1,16 @@
+<% #development:
+
+  #test:
+%>
+
+production:
+  adapter: mysql2
+  encoding: utf8
+  reconnect: true
+  database: production
+  pool: 5
+  username: <%= ENV["DOTCLOUD_DB_MYSQL_LOGIN"] %>
+  password: <%= ENV["DOTCLOUD_DB_MYSQL_PASSWORD"] %>
+  host: <%= ENV["DOTCLOUD_DB_MYSQL_HOST"] %>
+  port: <%= ENV["DOTCLOUD_DB_MYSQL_PORT"] %>
+

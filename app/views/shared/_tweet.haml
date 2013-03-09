@@ -1,0 +1,34 @@
+.item
+  .tweet
+    .avatar
+      %a{href: user_url(item.user_id)}
+        %img{src: user_cache[item.user_id].profile_image_url}
+    .tweet_content_fix
+    .tweet_content
+      .user
+        %span.name
+          = link_to user_cache[item.user_id].name, user_url(item.user_id)
+        %span.screen_name
+          = link_to "@#{user_cache[item.user_id].screen_name}", user_url(item.user_id)
+      .text
+        = raw format_tweet_text(item.text)
+      .meta.clearfix
+        = link_to image_tag("bird_gray_16.png"), twitter_status_url(item), :target => "_blank", :class => "twitter_bird"
+        = link_to format_tweet_created_at(item.tweeted_at), status_url(item), :class => "created_at"
+        %span.source
+          = raw format_source_text(item.source)
+  .stats
+    - [["FAVS", item.favorites], ["RETWEETS", item.retweets]].each do |type, data|
+      .type_row.clearfix
+        .info
+          %span.count= data.length
+          %span.type= type
+        .users_content_fix
+        .users_content
+          - data.map{|m| user_cache[m.user_id]}.each_slice(10) do |row|
+            %ul.users_row.clearfix
+              - row.each do |u|
+                %li
+                  %a{href: user_url(u.id)}><
+                    %img{src: u.profile_image_url}
+

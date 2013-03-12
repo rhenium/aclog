@@ -1,252 +1,204 @@
 require "time"
 
+module EM
+  class Connection
+    def send_chunk(data)
+      send_data(data + "\r\n")
+    end
+  end
+end
+
 class Receiver::Worker
-  def initialize
-    @logger = Receiver::Logger.new(:info)
-    @connections = []
-
-    _tm = Settings.dotcloud_service_name.split(/_/).last
-    if _tm =~ /^[0-9]+$/
-      @worker_number = Integer(_tm)
-    else
-      exit(0)
-    end
-  end
-
-  # Create Aclog format text from Twitter Status Hash
-  def format_text_from_hash(hash)
-    text = hash[:text]
-    entities = hash[:entities]
-
-    return text unless entities
-
-    gaps = {}
-    replace = -> ents, bl do
-      ents.each do |entity|
-        starts = entity[:indices].first
-        ends = entity[:indices].last
-        rep = bl.call(entity)
-        gaps[starts] = rep.size - (ends - starts)
-        bgap = gaps.select{|k, v| k < starts}.values.inject(0){|s, m| s += m}
-        text[starts + bgap...ends + bgap] = rep
+  class DBProxyServer < EM::Connection
+    $worker_count = nil
+    @@wq = EM::WorkQueue::WorkQueue.new do |arg|
+      begin
+        json = ::Yajl::Parser.parse(arg.last, :symbolize_keys => true)
+      rescue ::Yajl::ParseError
+        # JSON parse error....??
+        p $!
       end
-    end
 
-    replace.call((entities[:media] || []) + (entities[:urls] || []),
-                 -> entity {"<url:#{CGI.escapeHTML(entity[:expanded_url])}:#{CGI.escapeHTML(entity[:display_url])}>"})
-    replace.call(entities[:hashtags] || [],
-                 -> entity {"<hashtag:#{CGI.escapeHTML(URI.encode(entity[:text]))}>"})
-    replace.call(entities[:user_mentions] || [],
-                 -> entity {"<mention:#{CGI.escapeHTML(URI.encode(entity[:screen_name]))}>"})
-
-    return text
-  end
-
-  def rescue_duplicate(&proc)
-    begin
-      return proc.call
-    rescue ActiveRecord::StatementInvalid => e
-      if e.to_s =~ /^Mysql2::Error: Duplicate entry /
-        @logger.info("Duplicate entry..")
+      case arg.first
+      when "USER"
+        $logger.debug("Received User")
+        rec = User.find_or_initialize_by(:id => json[:id])
+        rec.screen_name = json[:screen_name]
+        rec.name = json[:name]
+        rec.profile_image_url = json[:profile_image_url]
+        rec.save! if rec.changed?
+      when "TWEET"
+        $logger.debug("Received Tweet")
+        begin
+          Tweet.create!(:id => json[:id],
+                        :text => json[:text],
+                        :source => json[:source],
+                        :tweeted_at => Time.parse(json[:tweeted_at]),
+                        :user_id => json[:user_id])
+          $logger.debug("Saved Tweet")
+        rescue ActiveRecord::RecordNotUnique
+          $logger.info("Can't Save Tweet: Duplicate")
+        end
+      when "FAVORITE"
+        $logger.debug("Received Favorite")
+        begin
+          Favorite.create!(:tweet_id => json[:tweet_id],
+                           :user_id => json[:user_id])
+          $logger.debug("Saved Favorite")
+        rescue ActiveRecord::RecordNotUnique
+          $logger.info("Can't Save Tweet: Duplicate")
+        end
+      when "UNFAVORITE"
+        Favorite.delete_all("tweet_id = #{json[:tweet_id]} AND user_id = #{json[:user_id]}")
+      when "RETWEET"
+        $logger.debug("Received Retweet")
+        begin
+          Retweet.create!(:id => json[:id],
+                          :tweet_id => json[:tweet_id],
+                          :user_id => json[:user_id])
+          $logger.debug("Saved Retweet")
+        rescue ActiveRecord::RecordNotUnique
+          $logger.info("Can't Save Retweet: Duplicate")
+        end
+      when "DELETE"
+        tweet = Tweet.find_by(:id => json[:id]) || Retweet.find_by(:id => json[:id])
+        if tweet
+          tweet.destroy
+        end
       else
-        raise e
+        # ???
+        puts "???????"
+      end
+    end
+    @@wq.start
+
+    def initialize
+      @worker_number = nil
+      @receive_buf = ""
+    end
+
+    def post_init
+      # なにもしない。クライアントが
+    end
+
+    def unbind
+      $connections.delete_if{|k, v| v == self}
+      $logger.info("Connection closed")
+    end
+
+    def send_account_all
+      Account.where("user_id % ? = ?", $worker_count, @worker_number).each do |account|
+        puts "Sent #{account.id}/#{account.user_id}"
+        send_account(account)
+      end
+    end
+
+    def send_account(account)
+      send_chunk("ACCOUNT #{Yajl::Encoder.encode(account.attributes)}")
+    end
+
+    def receive_data(data)
+      @receive_buf << data
+      while line = @receive_buf.slice!(/.+?\r\n/)
+        line.chomp!
+        next if line == ""
+        p line
+        arg = line.split(/ /, 2)
+        case arg.first
+        when "CONNECT"
+          ff = arg.last.split(/&/)
+          secret_token = ff[0]
+          worker_number = ff[1].to_i
+          worker_count = ff[2].to_i
+          if secret_token == Settings.secret_key
+            if $worker_count != worker_count && $connections.size > 0
+              $logger.error("Error: Worker Count Difference: $worker_count=#{$worker_count}, worker_count=#{worker_count}")
+              send_chunk("ERROR Invalid Worker Count")
+              close_connection_after_writing
+            else
+              $worker_count = worker_count
+              $connections[worker_number] = self
+              @worker_number = worker_number
+              $logger.info("Connected: #{worker_number}")
+              send_chunk("OK Connected")
+              send_account_all
+            end
+          else
+            $logger.error("Error: Invalid Secret Key")
+            send_chunk("ERROR Invalid Secret Token")
+            close_connection_after_writing
+          end
+        when "QUIT"
+          send_chunk("BYE")
+          close_connection_after_writing
+        else
+          @@wq.push arg
+        end
       end
     end
   end
 
-  # Create or Update user by Twitter User Hash
-  def create_user_from_hash(user)
-    rescue_duplicate do
-      rec = User.find_or_initialize_by(:id => user[:id])
-      rec.screen_name = user[:screen_name]
-      rec.name = user[:name]
-      rec.profile_image_url = user[:profile_image_url_https]
-      rec.save! if rec.changed?
+  class RegisterServer < EM::Connection
+    def initialize
+      @receive_buf = ""
+    end
 
-      return rec
+    def post_init
+      p "connected"
+    end
+
+    def receive_data(data)
+      @receive_buf << data
+      while line = @receive_buf.slice!(/.+?\r\n/)
+        line.chomp!
+        next if line == ""
+        p line
+        sp = line.split(/ /, 2)
+        if sp.first == "REGISTER"
+          if sp.last =~ /^[0-9]+$/
+            account = Account.find_by(:id => sp.last.to_i)
+            if account
+              if con = $connections[account.id % $worker_count]
+                con.send_account(account)
+                send_chunk("OK Registered")
+              else
+                send_chunk("OK Worker not found")
+              end
+            else
+              $logger.error("Unknown account: #{sp.last}")
+              send_chunk("ERROR Unknown Account")
+            end
+          else
+            $logger.error("Invalid User ID")
+            send_chunk("ERROR Invalid User ID")
+          end
+        else
+          $logger.error("Unknown Command: #{sp})")
+          send_chunk("ERROR Unknown command")
+        end
+        close_connection_after_writing
+        return
+      end
     end
   end
 
-  # Create tweet by Twitter Status Hash
-  def create_tweet_from_hash(status)
-    rescue_duplicate do
-      Tweet.find_by(:id => status[:id]) ||
-      Tweet.create!(:id => status[:id],
-                    :text => format_text_from_hash(status),
-                    :source => status[:source],
-                    :tweeted_at => Time.parse(status[:created_at]),
-                    :user => create_user_from_hash(status[:user]))
-    end
-  end
-
-  def destroy_tweet_from_hash(status)
-    Tweet.delete(status[:delete][:status][:id]) ||
-    Retweet.delete(status[:delete][:status][:id])
-  end
-
-  # Create Retweet by Twitter Status Hash
-  def create_retweet_from_hash(status)
-    rescue_duplicate do
-      Retweet.find_by(:id => status[:id]) ||
-      Retweet.create!(:id => status[:id],
-                      :tweet => create_tweet_from_hash(status[:retweeted_status]),
-                      :user => create_user_from_hash(status[:user]))
-    end
-  end
-
-  # Create Favorite by Streaming Event Hash
-  def create_favorite_from_hash(status)
-    rescue_duplicate do
-      user = create_user_from_hash(status[:source])
-      user.favorites.find_by(:tweet_id => status[:target_object][:id]) ||
-      user.favorites.create!(:tweet => create_tweet_from_hash(status[:target_object]))
-    end
-  end
-
-  def destroy_favorite_from_hash(status)
-    create_tweet_from_hash(status[:target_object])
-      .favorites.where(:user_id => status[:source][:id]).delete_all
+  def initialize
+    $logger = Receiver::Logger.new(:info)
+    $connections = {}
   end
 
   def start
-    @logger.info("Worker ##{@worker_number} started")
+    $logger.info("Database Proxy Started")
     EM.run do
       stop = Proc.new do
-        @connections.map(&:stop)
         EM.stop
       end
       Signal.trap(:INT, &stop)
       Signal.trap(:TERM, &stop)
 
-      register = -> account do
-        con = EM::Twitter::Client.connect({
-          :host => "userstream.twitter.com",
-          :path => "/1.1/user.json",
-          :oauth => {:consumer_key => Settings.consumer_key,
-                     :consumer_secret => Settings.consumer_secret,
-                     :token => account.oauth_token,
-                     :token_secret => account.oauth_token_secret},
-          :method => "GET",
-          # user data
-          :user_id => account.id
-        })
-
-        con.on_reconnect do |timeout, count|
-          @logger.warn("Reconnected: #{con.options[:user_id]}/#{count}")
-        end
-
-        con.on_max_reconnects do |timeout, count|
-          @logger.error("Reached Max Reconnects: #{con.options[:user_id]}")
-        end
-
-        con.on_unauthorized do
-          @logger.error("Unauthorized: #{con.options[:user_id]}")
-          @connections.delete(con)
-        end
-
-        con.on_forbidden do
-          @logger.error("Forbidden: #{con.options[:user_id]}")
-          @connections.delete(con)
-        end
-
-        con.on_not_found do
-          @logger.error("Not Found: #{con.options[:user_id]}")
-          @connections.delete(con)
-        end
-
-        con.on_not_acceptable do
-          @logger.error("Not Acceptable: #{con.options[:user_id]}")
-        end
-
-        con.on_too_long do
-          @logger.error("Too Long: #{con.options[:user_id]}")
-        end
-
-        con.on_range_unacceptable do
-          @logger.error("Range Unacceptable: #{con.options[:user_id]}")
-        end
-
-        con.on_enhance_your_calm do
-          @logger.error("Enhance Your Calm: #{con.options[:user_id]}")
-          @connections.delete(con)
-        end
-
-        con.on_error do |message|
-          @logger.error("Unknown: #{con.options[:user_id]}/#{message}")
-        end
-
-        con.each do |json|
-          begin # convert error
-            begin
-              status = ::Yajl::Parser.parse(json, :symbolize_keys => true)
-            rescue ::Yajl::ParseError
-              @logger.warn("::Yajl::ParseError in stream: #{json}")
-              next
-            end
-
-            if status.is_a?(::Hash)
-              if status.key?(:user)
-                # Tweet or Retweet
-                if status[:user][:id] == con.options[:user_id] &&
-                   !status.key?(:retweeted_status)
-                  # Tweet
-                  create_tweet_from_hash(status)
-                  @logger.debug("Created Tweet")
-                elsif status.key?(:retweeted_status) &&
-                      (status[:retweeted_status][:user][:id] == con.options[:user_id] ||
-                       status[:user][:id] == con.options[:user_id])
-                  # Retweet
-                  create_retweet_from_hash(status)
-                  @logger.debug("Created Retweet")
-                end
-              elsif status[:event] == "favorite"
-                # Favorite
-                create_favorite_from_hash(status)
-                @logger.debug("Created Favorite")
-              elsif status[:event] == "unfavorite"
-                # Unfavorite
-                destroy_favorite_from_hash(status)
-                @logger.debug("Destroyed Favorite")
-              elsif status.key?(:delete) && status[:delete].key?(:status)
-                # Delete
-                destroy_tweet_from_hash(status)
-                @logger.debug("Destroyed Tweet")
-              else
-                # Else - do nothing
-                # p status
-              end
-            else
-              @logger.warn("Unexpected object in stream: #{status}")
-              next
-            end
-          rescue # debug
-            @logger.error($!)
-            @logger.error($@)
-          end
-        end
-
-        @logger.info("User connected: #{con.options[:user_id]}")
-        @connections << con
-      end
-
-      reconnect = -> do
-        Account.where("id % #{Settings.worker_count} = #{@worker_number}").each do |account|
-        #Account.find_by_sql("SELECT * FROM accounts WHERE id % #{Settings.worker_count} = #{@worker_number}").each do |account|
-          if con = @connections.find{|m| m.options[:user_id] == account.id}
-            con.immediate_reconnect
-          else
-            register.call(account)
-          end
-        end
-      end
-
-      EM.add_periodic_timer(30 * 60) do
-        reconnect.call
-      end
-
-      reconnect.call
+      EM.start_server("0.0.0.0", Settings.db_proxy_port, DBProxyServer)
+      EM.start_unix_domain_server(Settings.register_server_path, RegisterServer)
     end
   end
 end
-
 

@@ -7,7 +7,8 @@ class UsersController < ApplicationController
       @items = user.tweets
         .where("favorites_count > 0 or retweets_count > 0")
         .order("COALESCE(favorites_count, 0) + COALESCE(retweets_count, 0) DESC")
-        .paginate(:page => page, :per_page => Settings.page_per)
+        .page(page)
+        .per(Settings.page_per)
     else
       @items = []
     end
@@ -23,7 +24,8 @@ class UsersController < ApplicationController
       @items = user.tweets
         .where("favorites_count > 0 or retweets_count > 0")
         .order("id DESC")
-        .paginate(:page => page, :per_page => Settings.page_per)
+        .page(page)
+        .per(Settings.page_per)
     else
       @items = []
     end
@@ -38,7 +40,8 @@ class UsersController < ApplicationController
     if user
       @items = user.tweets
         .order("id DESC")
-        .paginate(:page => page, :per_page => Settings.page_per)
+        .page(page)
+        .per(Settings.page_per)
     else
       @items = []
     end
@@ -58,7 +61,8 @@ class UsersController < ApplicationController
           "SELECT tweet_id FROM retweets WHERE user_id = #{user.id}" +
           ") AS rf)")
         .order("id DESC")
-        .paginate(:page => page, :per_page => Settings.page_per)
+        .page(page)
+        .per(Settings.page_per)
 
     else
       @items = []

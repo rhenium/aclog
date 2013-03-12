@@ -22,7 +22,8 @@
 /config/environments/*.local.yml
 /config/initializers/secret_token.local.rb
 
-# dotcloud
-/dotcloud.yml
-/supervisord.conf
+# local scripts
+/client/worker.sh
+/client/settings.yml
+/server.sh
 

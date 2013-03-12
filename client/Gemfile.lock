@@ -1,0 +1,20 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    em-twitter (0.2.1)
+      eventmachine (~> 1.0)
+      http_parser.rb (~> 0.5)
+      simple_oauth (~> 0.1)
+    eventmachine (1.0.3)
+    http_parser.rb (0.5.3)
+    settingslogic (2.0.9)
+    simple_oauth (0.2.0)
+    yajl-ruby (1.1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  em-twitter
+  settingslogic
+  yajl-ruby

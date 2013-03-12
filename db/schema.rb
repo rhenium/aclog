@@ -14,29 +14,37 @@
 ActiveRecord::Schema.define(version: 20130226151042) do
 
   create_table "accounts", force: true do |t|
-    t.string   "oauth_token"
-    t.string   "oauth_token_secret"
+    t.integer  "user_id",            limit: 8, null: false
+    t.string   "oauth_token",                  null: false
+    t.string   "oauth_token_secret",           null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
+  add_index "accounts", ["user_id"], name: "index_accounts_on_user_id", unique: true
+
   create_table "favorites", force: true do |t|
-    t.integer "tweet_id", limit: 8
-    t.integer "user_id",  limit: 8
+    t.integer "tweet_id", limit: 8, null: false
+    t.integer "user_id",  limit: 8, null: false
   end
+
+  add_index "favorites", ["tweet_id", "user_id"], name: "index_favorites_on_tweet_id_and_user_id", unique: true
+  add_index "favorites", ["tweet_id"], name: "index_favorites_on_tweet_id"
 
   create_table "retweets", force: true do |t|
-    t.integer "tweet_id", limit: 8
-    t.integer "user_id",  limit: 8
+    t.integer "tweet_id", limit: 8, null: false
+    t.integer "user_id",  limit: 8, null: false
   end
 
+  add_index "retweets", ["tweet_id"], name: "index_retweets_on_tweet_id"
+
   create_table "tweets", force: true do |t|
-    t.text     "text"
+    t.text     "text",                                  null: false
     t.text     "source"
-    t.integer  "user_id",         limit: 8
+    t.integer  "user_id",         limit: 8,             null: false
     t.datetime "tweeted_at"
-    t.integer  "favorites_count"
-    t.integer  "retweets_count"
+    t.integer  "favorites_count",           default: 0
+    t.integer  "retweets_count",            default: 0
   end
 
   create_table "users", force: true do |t|

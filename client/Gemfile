@@ -1,0 +1,6 @@
+ruby '1.9.3'
+source 'https://rubygems.org'
+
+gem 'settingslogic'
+gem 'em-twitter'
+gem 'yajl-ruby', :require => "yajl"

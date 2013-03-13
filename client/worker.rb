@@ -219,6 +219,10 @@ class Worker
             $logger.info("Connected(##{client.user_id})")
           rescue ::Yajl::ParseError
             $logger.error("JSON Parse Error: #{json}")
+          rescue TweetStream::ReconnectError
+            $logger.warn("TweetStream::ReconnectError: #{client.row_id}/#{client.user_id}")
+            client.stop_stream
+            @clients.delete(client)
           end
         end
       end

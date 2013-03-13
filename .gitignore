@@ -24,6 +24,7 @@
 
 # local scripts
 /client/worker.sh
+/client/Procfile
 /client/settings.yml
 /server.sh
 

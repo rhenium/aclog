@@ -10,12 +10,12 @@ Aclog::Application.routes.draw do
   get "i/logout" => "sessions#destroy"
 
   get "i/:id" => "i#show", :constraints => constraints
-  get "(users)/:screen_name/status(es)/:id" => "i#show", :constraints => constraints
+  get ":screen_name/status(es)/:id" => "i#show", :constraints => constraints
 
-  get "(users)/:screen_name(/:page)" => "users#best", :constraints => constraints
-  get "(users)/:screen_name/my(/:page)" => "users#my", :constraints => constraints
-  get "(users)/:screen_name/discovered(/:page)" => "users#my", :constraints => constraints
-  get "(users)/:screen_name/timeline(/:page)" => "users#timeline", :constraints => constraints
-  get "(users)/:screen_name/recent(/:page)" => "users#recent", :constraints => constraints
-  get "(users)/:screen_name/info(/:page)" => "users#info", :constraints => constraints
+  get ":screen_name(/:page)" => "users#best", :constraints => constraints
+  get ":screen_name/my(/:page)" => "users#my", :constraints => constraints
+  get ":screen_name/discovered(/:page)" => "users#my", :constraints => constraints
+  get ":screen_name/timeline(/:page)" => "users#timeline", :constraints => constraints
+  get ":screen_name/recent(/:page)" => "users#recent", :constraints => constraints
+  get ":screen_name/info(/:page)" => "users#info", :constraints => constraints
 end

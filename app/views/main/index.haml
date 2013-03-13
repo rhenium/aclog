@@ -3,21 +3,27 @@
 %p
   Favstar クローンです。UserStreams つかってます。
   = link_to "@KOBA789", "https://twitter.com/KOBA789"
-  さんにサーバーを貸していただけることになりました…！！
+  さんにサーバーを貸していただけることになりました…！！ありがとうございます！
 %strong まだ開発途中段階のものですがとりあえず動いています。登録後接続まで最大30分かかります。
 %strong 動作のテスト中ですので、途中で登録をうちきったりあまりにふぁぼられ・ふぁぼりが多いユーザーの登録を削除する可能性もあります。
 %div
   URLとかについて
   %div
     best:
-    = link_to "(/users)/re4k", "/re4k"
+    = link_to "/cat", "/cat"
   %div
     recent:
-    = link_to "(/users)/re4k/recent", "/re4k/recent"
+    = link_to "/cat/recent", "/cat/recent"
+  %div
+    timeline(exclude RTs):
+    = link_to "/cat/timeline", "/cat/timeline"
+  %div
+    discovery:
+    = link_to "/cat/my", "/cat/my"
   %div
     こんどほかのところもFavstar互換にする
 %div
   デザインなんとかしないと...
 %div
-  = link_to "@re4k", "https://twitter.com/re4k"
+  = link_to "@cat", "https://twitter.com/cat"
 

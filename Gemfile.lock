@@ -43,6 +43,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.6.1)
+    daemon-spawn (0.4.2)
     em-twitter (0.2.1)
       eventmachine (~> 1.0)
       http_parser.rb (~> 0.5)
@@ -153,6 +154,7 @@ PLATFORMS
 
 DEPENDENCIES
   coffee-rails (~> 4.0.0.beta1)
+  daemon-spawn
   em-twitter
   em-work_queue
   haml-rails

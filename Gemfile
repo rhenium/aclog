@@ -5,6 +5,7 @@ gem 'rails', '4.0.0.beta1'
 gem 'mysql2'
 
 gem 'unicorn'
+gem 'daemon-spawn', :require => 'daemon_spawn'
 
 gem 'rails_config'
 gem 'kaminari'

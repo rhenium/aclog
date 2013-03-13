@@ -7,14 +7,15 @@ module ApplicationHelper
 
   def format_tweet_text(text)
     text
-      .gsub(/<url:((?:https?|ftp).+?):(.+?)>/){link_to($2, $1, :target => "_blank")}
-      .gsub(/<hashtag:(.+?)>/){link_to("##{URI.decode($1)}", "https://twitter.com/search?q=%23#{$1}")}
-      .gsub(/<mention:(.+?)>/){link_to("@#{$1}", "/#{$1}")}
+      .gsub(/<url:(.+?):(.+?)>/){link_to(CGI.unescape($2), CGI.unescape($1), :target => "_blank")}
+      .gsub(/<hashtag:(.+?)>/){link_to("##{CGI.unescape($1)}", "https://twitter.com/search?q=%23#{$1}")}
+      .gsub(/<cashtag:(.+?)>/){link_to("$#{CGI.unescape($1)}", "https://twitter.com/search?q=%23#{$1}")}
+      .gsub(/<mention:(.+?)>/){link_to("@#{CGI.unescape($1)}", "/#{$1}")}
       .gsub(/\r\n|\r|\n/, "<br />")
   end
 
   def format_source_text(text)
-    text.gsub("&", "&amp;")
+    format_tweet_text(text)
   end
 
   def status_url(tweet)

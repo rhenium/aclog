@@ -8,10 +8,11 @@ module EM
   end
 end
 
-class Receiver::Worker
+class Receiver::Worker < DaemonSpawn::Base
   class DBProxyServer < EM::Connection
     $worker_count = nil
     @@wq = EM::WorkQueue::WorkQueue.new do |arg|
+      begin
       begin
         json = ::Yajl::Parser.parse(arg.last, :symbolize_keys => true)
       rescue ::Yajl::ParseError
@@ -69,6 +70,10 @@ class Receiver::Worker
         # ???
         puts "???????"
       end
+      rescue
+        $logger.error($!)
+        $logger.error($@)
+      end
     end
     @@wq.start
 
@@ -102,7 +107,6 @@ class Receiver::Worker
       while line = @receive_buf.slice!(/.+?\r\n/)
         line.chomp!
         next if line == ""
-        p line
         arg = line.split(/ /, 2)
         case arg.first
         when "CONNECT"
@@ -129,6 +133,7 @@ class Receiver::Worker
             close_connection_after_writing
           end
         when "QUIT"
+          $logger.info("Quit: #{@worker_number}")
           send_chunk("BYE")
           close_connection_after_writing
         else
@@ -144,7 +149,6 @@ class Receiver::Worker
     end
 
     def post_init
-      p "connected"
     end
 
     def receive_data(data)
@@ -182,23 +186,30 @@ class Receiver::Worker
     end
   end
 
-  def initialize
-    $logger = Receiver::Logger.new(:info)
+  def initialize(opts = {})
+    super(opts)
+    $logger = Receiver::Logger.new(:warn)
     $connections = {}
   end
 
-  def start
+  def start(args)
     $logger.info("Database Proxy Started")
     EM.run do
       stop = Proc.new do
         EM.stop
       end
       Signal.trap(:INT, &stop)
+      Signal.trap(:QUIT, &stop)
       Signal.trap(:TERM, &stop)
 
       EM.start_server("0.0.0.0", Settings.db_proxy_port, DBProxyServer)
       EM.start_unix_domain_server(Settings.register_server_path, RegisterServer)
     end
   end
+
+  def stop
+  end
 end
+
+
 

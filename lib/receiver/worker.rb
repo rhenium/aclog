@@ -50,7 +50,9 @@ class Receiver::Worker < DaemonSpawn::Base
           $logger.info("Can't Save Tweet: Duplicate")
         end
       when "UNFAVORITE"
-        Favorite.delete_all("tweet_id = #{json[:tweet_id]} AND user_id = #{json[:user_id]}")
+        Favorite
+          .where("tweet_id = #{json[:tweet_id]} AND user_id = #{json[:user_id]}")
+          .destroy_all
       when "RETWEET"
         $logger.debug("Received Retweet")
         begin

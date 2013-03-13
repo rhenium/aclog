@@ -96,8 +96,6 @@ class Worker
     end
 
     def send_unfavorite(source, target_object)
-      send_tweet(target_object)
-      send_user(source)
       out = {:tweet_id => target_object.id,
              :user_id => source.id}
       send_chunk("UNFAVORITE #{Yajl::Encoder.encode(out)}")
@@ -106,6 +104,7 @@ class Worker
 
     def send_retweet(status)
       send_tweet(status.retweeted_status)
+      send_user(status.user)
       out = {:id => status.id,
              :tweet_id => status.retweeted_status.id,
              :user_id => status.user.id}
@@ -201,7 +200,11 @@ class Worker
             end
 
             client.on_event(:favorite) do |event|
-              send_favorite(Twitter::User.new(event[:source]), Twitter::Tweet.new(event[:target_object]))
+              source = Twitter::User.new(event[:source])
+              target_object = Twitter::Tweet.new(event[:target_object])
+              unless target_object.user.protected && target_object.user.id != client.user_id
+                send_favorite(source, target_object)
+              end
             end
 
             client.on_event(:unfavorite) do |event|

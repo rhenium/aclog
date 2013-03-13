@@ -19,10 +19,10 @@ class ApplicationController < ActionController::Base
 
   def get_user_cache(items)
     Hash[
-      User.find(items
+      User.where(items
         .map{|m| [m.user_id, m.favorites.map{|u| u.user_id}, m.retweets.map{|u| u.user_id}]}
         .flatten
-        .uniq)
+        .uniq.map{|m| "id = #{m}"}.join(" OR "))
       .map{|m| [m.id, m]}
     ]
   end

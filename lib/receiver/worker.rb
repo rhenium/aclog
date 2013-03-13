@@ -94,7 +94,7 @@ class Receiver::Worker < DaemonSpawn::Base
     end
 
     def send_account_all
-      Account.where("user_id % ? = ?", $worker_count, @worker_number).each do |account|
+      Account.where("id % ? = ?", $worker_count, @worker_number).each do |account|
         puts "Sent #{account.id}/#{account.user_id}"
         send_account(account)
       end
@@ -134,6 +134,9 @@ class Receiver::Worker < DaemonSpawn::Base
             send_chunk("ERROR Invalid Secret Token")
             close_connection_after_writing
           end
+        when "UNAUTHORIZED"
+          $logger.warn("Unauthorized: #{arg.last}")
+          # unregister
         when "QUIT"
           $logger.info("Quit: #{@worker_number}")
           send_chunk("BYE")

@@ -165,7 +165,7 @@ class Worker
             client.on_unauthorized do
               # revoked?
               $logger.warn("Unauthorized(##{client.user_id})")
-              send_chunk("UNAUTHORISED #{client.row_id}&#{client.user_id}")
+              send_chunk("UNAUTHORIZED #{client.row_id}&#{client.user_id}")
               client.stop_stream
               @clients.delete(client)
             end

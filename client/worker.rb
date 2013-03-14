@@ -1,5 +1,6 @@
 require "time"
-require "tweetstream"
+require "em-twitter"
+require "twitter"
 require "yajl"
 require "./settings"
 require "./logger"
@@ -9,19 +10,6 @@ module EM
     def send_chunk(data)
       puts data
       send_data(data + "\r\n")
-    end
-  end
-end
-
-module EM
-  module Twitter
-    class Client
-      attr_reader :user_id, :row_id
-
-      def _set_aclog(user_id, row_id)
-        @user_id = user_id
-        @row_id = row_id
-      end
     end
   end
 end
@@ -162,28 +150,29 @@ class Worker
               :token => hash[:oauth_token],
               :token_secret => hash[:oauth_token_secret]},
             :method => "GET"})
-          client._set_aclog(hash[:user_id], hash[:id])
+          user_id = hash[:user_id]
+          row_id = hash[:id]
 
           client.on_error do |message|
-            $logger.warn("Unknown Error(##{client.user_id}): #{message}")
+            $logger.warn("Unknown Error(##{user_id}): #{message}")
           end
 
           client.on_unauthorized do
             # revoked?
-            $logger.warn("Unauthorized(##{client.user_id})")
-            send_chunk("UNAUTHORIZED #{client.row_id}&#{client.user_id}")
+            $logger.warn("Unauthorized(##{user_id})")
+            send_chunk("UNAUTHORIZED #{row_id}&#{user_id}")
             client.connection.stop
             @clients.delete(client)
           end
 
           client.on_enhance_your_calm do
             # limit?
-            $logger.warn("Enhance your calm(##{client.user_id})")
+            $logger.warn("Enhance your calm(##{user_id})")
           end
 
           client.on_no_data_received do
             # (?)
-            $logger.warn("No data received(##{client.user_id})")
+            $logger.warn("No data received(##{user_id})")
             client.close_connection
           end
 
@@ -191,22 +180,22 @@ class Worker
             begin
               hash = Yajl::Parser.parse(chunk, :symbolize_keys => true)
             rescue Yajl::ParseError
-              $logger.warn("Unexpected chunk(##{client.user_id}): #{chunk}")
+              $logger.warn("Unexpected chunk(##{user_id}): #{chunk}")
               next
             end
 
             if hash[:warning]
-              $logger.info("Stall warning(##{client.user_id}): #{hash[:warning]}")
+              $logger.info("Stall warning(##{user_id}): #{hash[:warning]}")
             elsif hash[:delete] && hash[:delete][:status]
               send_delete(hash[:delete][:status][:id], hash[:delete][:status][:user_id])
             elsif hash[:limit]
-              $logger.warn("UserStreams Limit Event(##{client.user_id}): #{hash[:limit][:track]}")
+              $logger.warn("UserStreams Limit Event(##{user_id}): #{hash[:limit][:track]}")
             elsif hash[:event]
               case hash[:event]
               when "favorite"
                 source = Twitter::User.new(hash[:source])
                 target_object = Twitter::Tweet.new(hash[:target_object])
-                unless target_object.user.protected && target_object.user.id != client.user_id
+                unless target_object.user.protected && target_object.user.id != user_id
                   send_favorite(source, target_object)
                 end
               when "unfavorite"
@@ -215,27 +204,27 @@ class Worker
             elsif hash[:text] && hash[:user]
               # tweet
               status = Twitter::Tweet.new(hash)
-              if status.retweeted_status && (status.retweeted_status.user.id == client.user_id ||
-                                             status.user.id == client.user_id)
-                $logger.debug("Retweet(##{client.user_id})")
+              if status.retweeted_status && (status.retweeted_status.user.id == user_id ||
+                                             status.user.id == user_id)
+                $logger.debug("Retweet(##{user_id})")
                 send_retweet(status)
-              elsif status.user.id == client.user_id
+              elsif status.user.id == user_id
                 send_tweet(status)
               end
             end
           end
 
           client.on_reconnect do |timeout, retries|
-            $logger.warn("Reconnected(##{client.user_id}): #{retries}")
+            $logger.warn("Reconnected(##{user_id}): #{retries}")
           end
 
           client.on_max_reconnects do |timeout, retries|
-            $logger.warn("Max reconnects: #{client.row_id}/#{client.user_id}")
+            $logger.warn("Max reconnects: #{row_id}/#{user_id}")
             client.connection.stop
             @clients.delete(client)
           end
 
-          $logger.info("Connected(##{client.user_id})")
+          $logger.info("Connected(##{user_id})")
         end
       end
     end

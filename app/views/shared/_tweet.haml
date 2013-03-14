@@ -18,8 +18,8 @@
         %span.source
           = raw format_source_text(item.source)
   .stats
-    - [["FAVS", item.favorites], ["RETWEETS", item.retweets]].each do |type, data|
-      .type_row.clearfix
+    - [["FAVS", item.favorites, "favs_row"], ["RETWEETS", item.retweets, "retweets_row"]].each do |type, data, cssclass|
+      %div{:class => "#{cssclass} clearfix"}
         .info
           %span.count= data.length
           %span.type= type

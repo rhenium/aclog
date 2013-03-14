@@ -1,17 +1,6 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.3.3)
-    cookiejar (0.3.0)
-    daemons (1.1.9)
-    em-http-request (1.0.3)
-      addressable (>= 2.2.3)
-      cookiejar
-      em-socksify
-      eventmachine (>= 1.0.0.beta.4)
-      http_parser.rb (>= 0.5.3)
-    em-socksify (0.2.1)
-      eventmachine (>= 1.0.0.beta.4)
     em-twitter (0.2.1)
       eventmachine (~> 1.0)
       http_parser.rb (~> 0.5)
@@ -27,12 +16,6 @@ GEM
     settingslogic (2.0.9)
     simple_oauth (0.2.0)
     thor (0.17.0)
-    tweetstream (2.4.0)
-      daemons (~> 1.1)
-      em-http-request (~> 1.0.2)
-      em-twitter (~> 0.2)
-      twitter (~> 4.0)
-      yajl-ruby (~> 1.1)
     twitter (4.6.0)
       faraday (~> 0.8, < 0.10)
       multi_json (~> 1.0)
@@ -43,7 +26,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  em-twitter
   foreman
   settingslogic
-  tweetstream
+  twitter
   yajl-ruby

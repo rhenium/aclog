@@ -112,11 +112,16 @@ class Receiver::Worker < DaemonSpawn::Base
         arg = line.split(/ /, 2)
         case arg.first
         when "CONNECT"
-          ff = arg.last.split(/&/)
-          secret_token = ff[0]
-          worker_number = ff[1].to_i
-          worker_count = ff[2].to_i
-          if secret_token == Settings.secret_key
+          begin
+            json = ::Yajl::Parser.parse(arg.last, :symbolize_keys => true)
+          rescue ::Yajl::ParseError
+            # JSON parse error....??
+            p $!
+          end
+          secret_key = json[:secret_key]
+          worker_number = json[:worker_number]
+          worker_count = json[:worker_count]
+          if secret_key == Settings.secret_key
             if $worker_count != worker_count && $connections.size > 0
               $logger.error("Error: Worker Count Difference: $worker_count=#{$worker_count}, worker_count=#{worker_count}")
               send_chunk("ERROR Invalid Worker Count")
@@ -125,13 +130,14 @@ class Receiver::Worker < DaemonSpawn::Base
               $worker_count = worker_count
               $connections[worker_number] = self
               @worker_number = worker_number
+              @authorized = true
               $logger.info("Connected: #{worker_number}")
               send_chunk("OK Connected")
               send_account_all
             end
           else
             $logger.error("Error: Invalid Secret Key")
-            send_chunk("ERROR Invalid Secret Token")
+            send_chunk("ERROR Invalid Secret Key")
             close_connection_after_writing
           end
         when "UNAUTHORIZED"
@@ -142,7 +148,9 @@ class Receiver::Worker < DaemonSpawn::Base
           send_chunk("BYE")
           close_connection_after_writing
         else
-          @@wq.push arg
+          if @authorized
+            @@wq.push arg
+          end
         end
       end
     end

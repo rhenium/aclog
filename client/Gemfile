@@ -4,5 +4,6 @@ source 'https://rubygems.org'
 gem 'foreman'
 
 gem 'settingslogic'
-gem 'tweetstream'
+gem 'em-twitter'
+gem 'twitter'
 gem 'yajl-ruby', :require => "yajl"

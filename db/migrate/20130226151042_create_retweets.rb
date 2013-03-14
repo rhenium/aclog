@@ -5,6 +5,7 @@ class CreateRetweets < ActiveRecord::Migration
       t.references :user, :limit => 8, :null => false
     end
 
+    add_index :retweets, [:tweet_id, :user_id], :unique => true
     add_index :retweets, :tweet_id
   end
 end

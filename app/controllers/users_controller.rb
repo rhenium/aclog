@@ -12,8 +12,8 @@ class UsersController < ApplicationController
     else
       @items = []
     end
-    @user_cache = get_user_cache(@items)
     @title = "@#{screen_name}'s Best Tweets"
+    prepare_cache
   end
 
    def recent
@@ -29,8 +29,8 @@ class UsersController < ApplicationController
     else
       @items = []
     end
-    @user_cache = get_user_cache(@items)
     @title = "@#{screen_name}'s Newest Tweets"
+    prepare_cache
   end
 
   def timeline
@@ -45,8 +45,8 @@ class UsersController < ApplicationController
     else
       @items = []
     end
-    @user_cache = get_user_cache(@items)
     @title = "@#{screen_name}'s Newest Tweets"
+    prepare_cache
   end
 
   def my
@@ -67,8 +67,8 @@ class UsersController < ApplicationController
     else
       @items = []
     end
-    @user_cache = get_user_cache(@items)
     @title = "@#{screen_name}'s Recent Discoveries"
+    prepare_cache
   end
 
   def info

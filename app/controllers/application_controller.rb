@@ -17,13 +17,15 @@ class ApplicationController < ActionController::Base
     return 1
   end
 
-  def get_user_cache(items)
-    Hash[
-      User.where(items
-        .map{|m| [m.user_id, m.favorites.map{|u| u.user_id}, m.retweets.map{|u| u.user_id}]}
-        .flatten
-        .uniq.map{|m| "id = #{m}"}.join(" OR "))
-      .map{|m| [m.id, m]}
-    ]
+  def prepare_cache
+    # check
+    return unless @items
+
+    @favorite_cache = Favorite.where(@items.map{|m| "tweet_id = #{m.id}"}.join(" OR ")).sort_by{|m| m.id}.group_by{|m| m.tweet_id}
+    @retweet_cache = Retweet.where(@items.map{|m| "tweet_id = #{m.id}"}.join(" OR ")).sort_by{|m| m.id}.group_by{|m| m.tweet_id}
+    @user_cache = Hash[User.where(
+        (@items.to_a + @favorite_cache.values + @retweet_cache.values).flatten.map{|m| m.user_id}.uniq
+        .map{|m| "id = #{m}"}.join(" OR "))
+      .map{|m| [m.id, m]}]
   end
 end

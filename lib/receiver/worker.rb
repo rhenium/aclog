@@ -64,7 +64,7 @@ class Receiver::Worker < DaemonSpawn::Base
           $logger.info("Can't Save Retweet: Duplicate")
         end
       when "DELETE"
-        tweet = Tweet.find_by(:id => json[:id]) || Retweet.find_by(:id => json[:id])
+        tweet = Tweet.find_by(:id => json[:tweet_id]) || Retweet.find_by(:id => json[:tweet_id])
         if tweet
           tweet.destroy
         end
@@ -90,7 +90,7 @@ class Receiver::Worker < DaemonSpawn::Base
 
     def unbind
       $connections.delete_if{|k, v| v == self}
-      $logger.info("Connection closed")
+      $logger.info("Connection closed: #{@worker_number}")
     end
 
     def send_account_all

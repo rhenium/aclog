@@ -1,4 +1,4 @@
-worker_processes 8
+worker_processes 4
 
 working_directory File.expand_path("../../", __FILE__)
 

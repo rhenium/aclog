@@ -1,6 +1,5 @@
 require "time"
 require "em-twitter"
-require "twitter"
 require "yajl"
 require "./settings"
 require "./logger"
@@ -8,7 +7,7 @@ require "./logger"
 module EM
   class Connection
     def send_chunk(data)
-      puts data
+      #puts data
       send_data(data + "\r\n")
     end
   end
@@ -18,13 +17,14 @@ class Worker
   class DBProxyClient < EM::Connection
     def initialize
       @clients = []
+      @user_ids = []
       @receive_buf = ""
     end
 
     def format_text(status)
-      chars = status.text.to_s.split(//)
+      chars = status[:text].to_s.split(//)
 
-      entities = status.attrs[:entities].values.flatten.sort_by{|entity| entity[:indices].first}
+      entities = status[:entities].values.flatten.sort_by{|entity| entity[:indices].first}
 
       result = []
       last_index = entities.inject(0) do |last_index, entity|
@@ -46,58 +46,58 @@ class Worker
     end
 
     def format_source(status)
-      if status.source.index("<a")
-        url = status.source.scan(/href="(.+?)"/).flatten.first
-        name = status.source.scan(/>(.+?)</).flatten.first
+      if status[:source].index("<a")
+        url = status[:source].scan(/href="(.+?)"/).flatten.first
+        name = status[:source].scan(/>(.+?)</).flatten.first
         "<url:#{CGI.escape(url)}:#{CGI.escape(name)}>"
       else
-        status.source
+        status[:source]
       end
     end
 
     def send_user(user)
-      out = {:id => user.id,
-             :screen_name => user.screen_name,
-             :name => user.name,
-             :profile_image_url => user.profile_image_url_https}
+      out = {:id => user[:id],
+             :screen_name => user[:screen_name],
+             :name => user[:name],
+             :profile_image_url => user[:profile_image_url_https]}
       send_chunk("USER #{Yajl::Encoder.encode(out)}")
     end
 
     def send_tweet(status)
-      send_user(status.user)
-      out = {:id => status.id,
+      send_user(status[:user])
+      out = {:id => status[:id],
              :text => format_text(status),
              :source => format_source(status),
-             :tweeted_at => status.created_at,
-             :user_id => status.user.id}
+             :tweeted_at => status[:created_at],
+             :user_id => status[:user][:id]}
       send_chunk("TWEET #{Yajl::Encoder.encode(out)}")
-      $logger.debug("Sent Tweet: #{status.id}")
+      $logger.debug("Sent Tweet: #{status[:id]}")
     end
 
     def send_favorite(source, target_object)
       send_tweet(target_object)
       send_user(source)
-      out = {:tweet_id => target_object.id,
-             :user_id => source.id}
+      out = {:tweet_id => target_object[:id],
+             :user_id => source[:id]}
       send_chunk("FAVORITE #{Yajl::Encoder.encode(out)}")
-      $logger.debug("Sent Favorite: #{source.id} => #{target_object.id}")
+      $logger.debug("Sent Favorite: #{source[:id]} => #{target_object[:id]}")
     end
 
     def send_unfavorite(source, target_object)
-      out = {:tweet_id => target_object.id,
-             :user_id => source.id}
+      out = {:tweet_id => target_object[:id],
+             :user_id => source[:id]}
       send_chunk("UNFAVORITE #{Yajl::Encoder.encode(out)}")
-      $logger.debug("Sent Unfavorite: #{source.id} => #{target_object.id}")
+      $logger.debug("Sent Unfavorite: #{source[:id]} => #{target_object[:id]}")
     end
 
     def send_retweet(status)
-      send_tweet(status.retweeted_status)
-      send_user(status.user)
-      out = {:id => status.id,
-             :tweet_id => status.retweeted_status.id,
-             :user_id => status.user.id}
+      send_tweet(status[:retweeted_status])
+      send_user(status[:user])
+      out = {:id => status[:id],
+             :tweet_id => status[:retweeted_status][:id],
+             :user_id => status[:user][:id]}
       send_chunk("RETWEET #{Yajl::Encoder.encode(out)}")
-      $logger.debug("Sent Retweet: #{status.user.id} => #{status.retweeted_status.id}")
+      $logger.debug("Sent Retweet: #{status[:user][:id]} => #{status[:retweeted_status][:id]}")
     end
 
     def send_delete(status_id, user_id)
@@ -135,44 +135,46 @@ class Worker
           $logger.error("Error: #{arg.last}")
         when "ACCOUNT"
           begin
-            hash = ::Yajl::Parser.parse(arg.last, :symbolize_keys => true)
+            account = ::Yajl::Parser.parse(arg.last, :symbolize_keys => true)
           rescue Yajl::ParseError
             $logger.error("JSON Parse Error: #{json}")
             next
           end
 
-          @clients << client = EM::Twitter::Client.connect({
+          @user_ids << account[:user_id]
+          @clients << client = EM::Twitter::Client.new({
             :host => "userstream.twitter.com",
             :path => "/1.1/user.json",
             :oauth => {
               :consumer_key => Settings.consumer_key,
               :consumer_secret => Settings.consumer_secret,
-              :token => hash[:oauth_token],
-              :token_secret => hash[:oauth_token_secret]},
-            :method => "GET"})
-          user_id = hash[:user_id]
-          row_id = hash[:id]
+              :token => account[:oauth_token],
+              :token_secret => account[:oauth_token_secret]},
+            :method => "GET",
+            # monyo
+            :user_id => account[:user_id],
+            :row_id => account[:id]})
 
           client.on_error do |message|
-            $logger.warn("Unknown Error(##{user_id}): #{message}")
+            $logger.warn("Unknown Error(##{client.options[:user_id]}): #{message}")
           end
 
           client.on_unauthorized do
             # revoked?
-            $logger.warn("Unauthorized(##{user_id})")
-            send_chunk("UNAUTHORIZED #{row_id}&#{user_id}")
+            $logger.warn("Unauthorized(##{client.options[:user_id]})")
+            send_chunk("UNAUTHORIZED #{client.options[:row_id]}&#{client.options[:user_id]}")
             client.connection.stop
             @clients.delete(client)
           end
 
           client.on_enhance_your_calm do
             # limit?
-            $logger.warn("Enhance your calm(##{user_id})")
+            $logger.warn("Enhance your calm(##{client.options[:user_id]})")
           end
 
           client.on_no_data_received do
             # (?)
-            $logger.warn("No data received(##{user_id})")
+            $logger.warn("No data received(##{client.options[:user_id]})")
             client.close_connection
           end
 
@@ -180,51 +182,56 @@ class Worker
             begin
               hash = Yajl::Parser.parse(chunk, :symbolize_keys => true)
             rescue Yajl::ParseError
-              $logger.warn("Unexpected chunk(##{user_id}): #{chunk}")
+              $logger.warn("Unexpected chunk(##{client.options[:user_id]}): #{chunk}")
               next
             end
 
             if hash[:warning]
-              $logger.info("Stall warning(##{user_id}): #{hash[:warning]}")
+              $logger.info("Stall warning(##{client.options[:user_id]}): #{hash[:warning]}")
             elsif hash[:delete] && hash[:delete][:status]
               send_delete(hash[:delete][:status][:id], hash[:delete][:status][:user_id])
-            elsif hash[:limit]
-              $logger.warn("UserStreams Limit Event(##{user_id}): #{hash[:limit][:track]}")
-            elsif hash[:event]
+            elsif hash.key?(:limit)
+              $logger.warn("UserStreams Limit Event(##{client.options[:user_id]}): #{hash[:limit][:track]}")
+            elsif hash.key?(:event)
               case hash[:event]
               when "favorite"
-                source = Twitter::User.new(hash[:source])
-                target_object = Twitter::Tweet.new(hash[:target_object])
-                unless target_object.user.protected && target_object.user.id != user_id
+                source = hash[:source]
+                target_object = hash[:target_object]
+                unless target_object[:user][:protected] && target_object[:user][:id] != client.options[:user_id]
                   send_favorite(source, target_object)
                 end
               when "unfavorite"
-                send_unfavorite(Twitter::User.new(hash[:source]), Twitter::Tweet.new(hash[:target_object]))
+                send_unfavorite(hash[:source], hash[:target_object])
               end
-            elsif hash[:text] && hash[:user]
+            elsif hash.key?(:user)
               # tweet
-              status = Twitter::Tweet.new(hash)
-              if status.retweeted_status && (status.retweeted_status.user.id == user_id ||
-                                             status.user.id == user_id)
-                $logger.debug("Retweet(##{user_id})")
-                send_retweet(status)
-              elsif status.user.id == user_id
-                send_tweet(status)
+              if hash.key?(:retweeted_status)
+                # p user_id
+                # p status.retweeted_status.user.id
+                if @user_ids.include?(hash[:retweeted_status][:user][:id]) || @user_ids.include?(hash[:user][:id])
+                  $logger.debug("Retweet(##{client.options[:user_id]})")
+                  send_retweet(hash)
+                end
+              elsif @user_ids.include?(hash[:user][:id])
+                send_tweet(hash)
               end
+            else
+              $logger.debug("??")
             end
           end
 
           client.on_reconnect do |timeout, retries|
-            $logger.warn("Reconnected(##{user_id}): #{retries}")
+            $logger.warn("Reconnected(##{client.options[:user_id]}): #{retries}")
           end
 
           client.on_max_reconnects do |timeout, retries|
-            $logger.warn("Max reconnects: #{row_id}/#{user_id}")
+            $logger.warn("Max reconnects: #{client.options[:row_id]}/#{client.options[:user_id]}")
             client.connection.stop
             @clients.delete(client)
           end
 
-          $logger.info("Connected(##{user_id})")
+          client.connect
+          $logger.info("Connected(##{client.options[:user_id]})")
         end
       end
     end
@@ -236,7 +243,7 @@ class Worker
   end
 
   def initialize
-    $logger = Aclog::Logger.new(:warn)
+    $logger = Aclog::Logger.new(:debug)
   end
 
    def start

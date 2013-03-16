@@ -1,15 +1,15 @@
 .item
   .tweet
     .avatar
-      %a{href: user_url(item.user_id)}
-        %img{src: user_cache[item.user_id].profile_image_url}
+      - user = u(item)
+      = link_to image_tag(user.profile_image_url), user_url(user), :title => user.name
     .tweet_content_fix
     .tweet_content
       .user
         %span.name
-          = link_to user_cache[item.user_id].name, user_url(item.user_id)
+          = link_to user.name, user_url(user)
         %span.screen_name
-          = link_to "@#{user_cache[item.user_id].screen_name}", user_url(item.user_id)
+          = link_to "@#{user.screen_name}", user_url(user)
       .text
         = raw format_tweet_text(item.text)
       .meta.clearfix
@@ -18,17 +18,14 @@
         %span.source
           = raw format_source_text(item.source)
   .stats
-    - [["FAVS", item.favorites, "favs_row"], ["RETWEETS", item.retweets, "retweets_row"]].each do |type, data, cssclass|
+    - [["FAVS", favoriters(item), "favs"], ["RETWEETS", retweeters(item), "retweets"]].each do |type, users, cssclass|
       %div{:class => "#{cssclass} clearfix"}
         .info
-          %span.count= data.length
+          %span.count= users.size
           %span.type= type
-        .users_content_fix
-        .users_content
-          - data.map{|m| user_cache[m.user_id]}.each_slice(10) do |row|
-            %ul.users_row.clearfix
-              - row.select{|m| m}.each do |u|
-                %li
-                  %a{href: user_url(u.id)}><
-                    %img{src: u.profile_image_url}
+        .height_fix
+        %ul.favoriters.clearfix
+          - users.each do |m|
+            %li
+              = link_to image_tag(m.profile_image_url), user_url(m), :title => m.name
 

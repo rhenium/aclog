@@ -7,7 +7,7 @@ A web service like Favstar.
 * Free and open source (MIT License)
 
 ## Status
-* Working on ![aclog-re4k.dotcloud.com](aclog-re4k.dotcloud.com) for testing.
+* Working on [aclog.koba789.com](http://aclog.koba789.com) for testing.
 
 ## Requirements
 * Ruby 1.9.3+

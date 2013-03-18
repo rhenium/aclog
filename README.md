@@ -11,27 +11,6 @@ A web service like Favstar.
 
 ## Requirements
 * Ruby 1.9.3+
-* MySQL or SQLite
+* MySQL
 
-## Installation (dotCloud)
-1.
-
-    git clone https://github.com/re4k/aclog.git
-    bundle
-    
-    dotcloud push
-    *~(**)~*
-
-2.
-
-    cp dotcloud.yml.sample dotcloud.yml
-    (Edit)
-
-3.
-
-    cp config/settings.yml.sample config/settings.yml
-    (Edit)
-3.
-
-    (今度書きます..)
 

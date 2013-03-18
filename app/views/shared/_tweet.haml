@@ -19,7 +19,7 @@
         %span.source
           = raw format_source_text(item.source)
   .stats
-    - [["FAVS", item.favorites, "favs"], ["RETWEETS", item.retweets, "retweets"]].select{|m| m[1].size > 0}.each do |type, actions, cssclass|
+    - [["FAVS", item.favorites.order("id"), "favs"], ["RETWEETS", item.retweets.order("id"), "retweets"]].select{|m| m[1].size > 0}.each do |type, actions, cssclass|
       %div{:class => "#{cssclass} clearfix"}
         .info
           %span.count= actions.size

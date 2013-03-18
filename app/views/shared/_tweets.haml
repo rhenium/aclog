@@ -1,4 +1,4 @@
 .items
-  = render :partial => "shared/tweet", :collection => items, :as => :item
+  = render :partial => "shared/tweet", :collection => items, :as => :item, :local => {:showallusers => @showallusers}
 - if items.size > 0
   = paginate items

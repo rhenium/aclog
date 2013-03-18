@@ -19,13 +19,13 @@ class ApplicationController < ActionController::Base
 
   def prepare_cache
     # check
-    return unless @items
+    #return unless @items
 
-    @favorite_cache = Favorite.where(@items.map{|m| "tweet_id = #{m.id}"}.join(" OR ")).sort_by{|m| m.id}.group_by{|m| m.tweet_id}
-    @retweet_cache = Retweet.where(@items.map{|m| "tweet_id = #{m.id}"}.join(" OR ")).sort_by{|m| m.id}.group_by{|m| m.tweet_id}
-    @user_cache = Hash[User.where(
-        (@items.to_a + @favorite_cache.values + @retweet_cache.values).flatten.map{|m| m.user_id}.uniq
-        .map{|m| "id = #{m}"}.join(" OR "))
-      .map{|m| [m.id, m]}]
+    #@favorite_cache = Favorite.where(@items.map{|m| "tweet_id = #{m.id}"}.join(" OR ")).sort_by{|m| m.id}.group_by{|m| m.tweet_id}
+    #@retweet_cache = Retweet.where(@items.map{|m| "tweet_id = #{m.id}"}.join(" OR ")).sort_by{|m| m.id}.group_by{|m| m.tweet_id}
+    #@user_cache = Hash[User.where(
+    #    (@items.to_a + @favorite_cache.values + @retweet_cache.values).flatten.map{|m| m.user_id}.uniq
+    #    .map{|m| "id = #{m}"}.join(" OR "))
+    #  .map{|m| [m.id, m]}]
   end
 end

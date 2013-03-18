@@ -1,31 +1,36 @@
 .item
   .tweet
     .avatar
-      - user = u(item)
-      = link_to image_tag(user.profile_image_url), user_url(user), :title => user.name
+      = link_to image_tag(item.user.profile_image_url, :alt => item.user.screen_name, :title => item.user.name), :controller => "users", :action => "best", :screen_name => item.user.screen_name
     .tweet_content_fix
     .tweet_content
       .user
         %span.name
-          = link_to user.name, user_url(user)
+          = link_to item.user.name, :controller => "users", :action => "best", :screen_name => item.user.screen_name
         %span.screen_name
-          = link_to "@#{user.screen_name}", user_url(user)
+          = link_to "@#{item.user.screen_name}", :controller => "users", :action => "best", :screen_name => item.user.screen_name
       .text
         = raw format_tweet_text(item.text)
       .meta.clearfix
-        = link_to image_tag("bird_gray_16.png"), twitter_status_url(item), :target => "_blank", :class => "twitter_bird"
-        = link_to format_tweet_created_at(item.tweeted_at), status_url(item), :class => "created_at"
+        %span.twitter_bird
+          = link_to image_tag("bird_gray_16.png", :alt => "Twitter"), twitter_status_url(item), :target => "_blank"
+        %span.created_at
+          = link_to format_tweet_created_at(item.tweeted_at), :controller => "i", :action => "show", :id => item.id
         %span.source
           = raw format_source_text(item.source)
   .stats
-    - [["FAVS", favoriters(item), "favs"], ["RETWEETS", retweeters(item), "retweets"]].each do |type, users, cssclass|
+    - [["FAVS", item.favorites, "favs"], ["RETWEETS", item.retweets, "retweets"]].select{|m| m[1].size > 0}.each do |type, actions, cssclass|
       %div{:class => "#{cssclass} clearfix"}
         .info
-          %span.count= users.size
+          %span.count= actions.size
           %span.type= type
         .height_fix
         %ul.favoriters.clearfix
-          - users.each do |m|
+          - actions.take(params[:controller] == "i" && params[:action] == "show" ? actions.size : 20).each do |a| |
+          -   m = a.user || User.new
             %li
-              = link_to image_tag(m.profile_image_url), user_url(m), :title => m.name
+              - if m.screen_name
+                = link_to image_tag(m.profile_image_url, :alt => m.screen_name, :title => m.name), :controller => "users", :action => "best", :screen_name => m.screen_name
+              - else
+                = image_tag(m.profile_image_url, :alt => m.name, :title => m.name)
 

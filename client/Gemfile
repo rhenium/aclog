@@ -5,4 +5,5 @@ gem 'foreman'
 
 gem 'settingslogic'
 gem 'em-twitter'
+gem 'msgpack'
 gem 'yajl-ruby', :require => "yajl"

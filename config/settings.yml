@@ -1,6 +1,7 @@
 consumer_key: <%= ENV["CONSUMER_KEY"] %>
 consumer_secret: <%= ENV["CONSUMER_SECRET"] %>
 page_per: <%= ENV["ACLOG_PAGE_PER"] %>
+worker_count: <%= ENV["ACLOG_WORKER_COUNT"] %>
 secret_key: <%= ENV["ACLOG_SECRET_KEY"] %>
 db_proxy_port: <%= ENV["ACLOG_DB_PROXY_PORT"] %>
 register_server_path: <%= ENV["ACLOG_REGISTER_SERVER_PATH"] %>

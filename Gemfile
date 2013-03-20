@@ -19,7 +19,7 @@ end
 
 gem 'haml-rails'
 
-gem 'yajl-ruby', :require => "yajl"
+gem 'msgpack'
 gem 'omniauth-twitter', :github => "re4k/omniauth-twitter"
 gem 'em-twitter'
 gem 'twitter'

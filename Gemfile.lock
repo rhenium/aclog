@@ -78,6 +78,7 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.21)
     minitest (4.6.2)
+    msgpack (0.5.4)
     multi_json (1.6.1)
     multipart-post (1.2.0)
     mysql2 (0.3.11)
@@ -147,7 +148,6 @@ GEM
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
-    yajl-ruby (1.1.0)
 
 PLATFORMS
   ruby
@@ -159,6 +159,7 @@ DEPENDENCIES
   em-work_queue
   haml-rails
   kaminari
+  msgpack
   mysql2
   omniauth-twitter!
   rails (= 4.0.0.beta1)
@@ -167,4 +168,3 @@ DEPENDENCIES
   twitter
   uglifier (>= 1.0.3)
   unicorn
-  yajl-ruby

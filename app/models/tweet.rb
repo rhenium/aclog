@@ -19,7 +19,15 @@ class Tweet < ActiveRecord::Base
     order("COALESCE(favorites_count, 0) + COALESCE(retweets_count, 0) DESC")
   end
 
-  scope :discovered, -> user do
+  scope :favorited_by, -> user do
+    where("id IN (SELECT tweet_id FROM favorites WHERE user_id = ?)", user.id)
+  end
+
+  scope :retweeted_by, -> user do
+    where("id IN (SELECT tweet_id FROM retweets WHERE user_id = ?)", user.id)
+  end
+
+  scope :discovered_by, -> user do
     where("id IN (" +
           "SELECT tweet_id FROM favorites WHERE user_id = ?" +
           " UNION ALL " +

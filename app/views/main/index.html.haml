@@ -7,8 +7,6 @@
 %p
   %strong まだ開発途中段階のものです。うごかなかったらごめんね
 %p
-  Read/Write 要求するけど今のところ UserStreams しか使ってないです。こんど Favstar みたいにページ内から Fav/RT できるようにしたいなあと…
-%p
   %strong 動作のテスト中ですので、途中で登録をうちきったりあまりにふぁぼられ・ふぁぼりが多いユーザーの登録を削除する可能性もあります。
 %p
   登録ユーザーだったら一番下に統計（？）が表示されてるんじゃないですかね
@@ -21,11 +19,14 @@
     recent(最新3日のbest):
     = link_to "/cat/recent", "/cat/recent"
   %div
-    timeline(Favstar の Recent、ただ0Fav0RTも含む):
+    timeline(Favstar の Recent):
     = link_to "/cat/timeline", "/cat/timeline"
   %div
+    timeline(ユーザータイムライン):
+    = link_to "/cat/timeline/all", "/cat/timeline/all"
+  %div
     discovery:
-    = link_to "/cat/my", "/cat/my"
+    = link_to "/cat/discovered(/{favorite|retweet})", "/cat/discovered"
   %div
   %div
     全体のbest:
@@ -36,7 +37,26 @@
   %div
     URL 変えちゃうかもしれないです
   %div
-    API つくりたいですねﾊｲ
+    API っていえるのかな…？
+    %div
+      %p
+        \/i/show.json?id=[tweet_id]
+      %p
+        \/users/{best|recent|timeline|discovered}.json
+      %p
+        screen_name
+      %p
+        user_id
+      %p
+        count
+      %p
+        include_user=true|false ← fav/RTしたユーザーを取得するか(false で ID のみ
+      %p
+        tweets={*tweet*|all} ← /users/timeline
+      %p
+        tweets={favorite|retweet|*all*} ← discovered
+      %p
+        page
 %div
   = link_to "@cat", "https://twitter.com/cat"
 

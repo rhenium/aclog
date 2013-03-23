@@ -3,7 +3,7 @@ class IController < ApplicationController
     @items = Tweet
       .reacted
       .order_by_reactions
-      .limit(Settings.page_per)
+      .limit(get_page_count(params))
   end
 
   def recent
@@ -11,6 +11,23 @@ class IController < ApplicationController
       .recent
       .reacted
       .order_by_reactions
-      .limit(Settings.page_per)
+      .limit(get_page_count(params))
+  end
+
+  def show
+    tweet_id = Integer(params[:id])
+
+    @item = Tweet.find(tweet_id)
+    @user = @item.user
+    helpers = ApplicationController.helpers
+    @title = "\"#{helpers.strip_tags(helpers.format_tweet_text(@item.text))[0...30]}\" from @#{@item.user.screen_name}"
+
+    respond_to do |format|
+      format.html
+
+      format.json do
+        @trim_user = params[:trim_user] == "true"
+      end
+    end
   end
 end

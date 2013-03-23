@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.0.0.beta1'
 gem 'mysql2'
+gem 'dalli'
 
 gem 'unicorn'
 gem 'daemon-spawn', :require => 'daemon_spawn'
@@ -18,9 +19,9 @@ group :assets do
 end
 
 gem 'haml-rails'
+gem 'jbuilder'
 
 gem 'msgpack'
 gem 'omniauth-twitter', :github => "re4k/omniauth-twitter"
 gem 'em-twitter'
-gem 'twitter'
 

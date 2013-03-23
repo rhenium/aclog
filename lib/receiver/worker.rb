@@ -27,7 +27,8 @@ class Receiver::Worker < DaemonSpawn::Base
              :id => account.id,
              :oauth_token => account.oauth_token,
              :oauth_token_secret => account.oauth_token_secret,
-             :user_id => account.user_id}
+             :user_id => account.user_id,
+             :consumer_version => account.consumer_version.to_i}
       send_object(out)
     end
 
@@ -43,13 +44,13 @@ class Receiver::Worker < DaemonSpawn::Base
 
     def unbind
       $connections.delete_if{|k, v| v == self}
-      $logger.info("Connection closed: #{@worker_number}")
+      $logger.info("Connection closed(#{@worker_number})")
     end
 
     def receive_data(data)
       @pac.feed_each(data) do |msg|
-        unless msg["type"]
-          $logger.error("???: #{msg}")
+        unless msg.is_a?(Hash) && msg["type"]
+          $logger.error("???(#{@worker_number}): #{msg}")
           send_object({:type => "fatal", :message => "Unknown data"})
           close_connection_after_writing
           return
@@ -80,7 +81,7 @@ class Receiver::Worker < DaemonSpawn::Base
         when "quit"
           receive_quit(msg)
         else
-          $logger.warn("Unknown message type: #{msg["type"]}")
+          $logger.warn("Unknown message type(#{@worker_number}): #{msg["type"]}")
           send_object({:type => "error", :message => "Unknown message type: #{msg["type"]}"})
         end
       end
@@ -90,7 +91,7 @@ class Receiver::Worker < DaemonSpawn::Base
       secret_key = msg["secret_key"]
       worker_number = msg["worker_number"]
       unless secret_key == Settings.secret_key
-        $logger.error("Invalid secret_key: #{secret_key}")
+        $logger.error("Invalid secret_key(?:#{worker_number}): #{secret_key}")
         send_object({:type => "fatal", :message => "Invalid secret_key"})
         close_connection_after_writing
         return
@@ -98,52 +99,59 @@ class Receiver::Worker < DaemonSpawn::Base
       $connections[worker_number] = self
       @worker_number = worker_number
       @authorized = true
-      $logger.info("Connected: #{worker_number}")
+      $logger.info("Connected(#{@worker_number})")
       send_object({:type => "ok", :message => "Connected"})
       send_account_all
     end
 
     def receive_unauthorized(msg)
-      $logger.warn("Unauthorized: #{msg["user_id"]}")
+      $logger.warn("Unauthorized(#{@worker_number}): #{msg["user_id"]}")
       # unregister
     end
 
     def receive_user(msg)
       @@wq.push -> do
-        $logger.debug("Received User")
-        rec = User.find_or_initialize_by(:id => msg["id"])
-        rec.screen_name = msg["screen_name"]
-        rec.name = msg["name"]
-        rec.profile_image_url = msg["profile_image_url"]
-        rec.save! if rec.changed?
+        $logger.debug("Received User(#{@worker_number}): #{msg["id"]}")
+        begin
+          rec = User.find_or_initialize_by(:id => msg["id"])
+          rec.screen_name = msg["screen_name"]
+          rec.name = msg["name"]
+          rec.profile_image_url = msg["profile_image_url"]
+          rec.protected = msg["protected"]
+          rec.save! if rec.changed?
+        rescue
+          $logger.error("Unknown error while inserting user: #{$!}/#{$@}")
+        end
       end
     end
 
     def receive_tweet(msg)
       @@wq.push -> do
-        $logger.debug("Received Tweet")
+        $logger.debug("Received Tweet(#{@worker_number}): #{msg["id"]}")
         begin
           Tweet.create!(:id => msg["id"],
                         :text => msg["text"],
                         :source => msg["source"],
                         :tweeted_at => Time.parse(msg["tweeted_at"]),
                         :user_id => msg["user_id"])
-          $logger.debug("Saved Tweet")
         rescue ActiveRecord::RecordNotUnique
-          $logger.info("Can't Save Tweet: Duplicate")
+          $logger.debug("Duplicate Tweet(#{@worker_number}): #{msg["id"]}")
+        rescue
+          $logger.error("Unknown error while inserting tweet: #{$!}/#{$@}")
         end
       end
     end
 
     def receive_favorite(msg)
       @@wq.push -> do
-        $logger.debug("Received Favorite")
+        $logger.debug("Receive Favorite(#{@worker_number}): #{msg["user_id"]} => #{msg["tweet_id"]}")
         begin
           Favorite.create!(:tweet_id => msg["tweet_id"],
                            :user_id => msg["user_id"])
-          $logger.debug("Saved Favorite")
         rescue ActiveRecord::RecordNotUnique
-          $logger.info("Can't Save Tweet: Duplicate")
+          $logger.debug("Duplicate Favorite(#{@worker_number}): #{msg["id"]}")
+        rescue
+          $logger.error("Unknown error while inserting favorite: #{$!}/#{$@}")
         end
       end
     end
@@ -155,29 +163,36 @@ class Receiver::Worker < DaemonSpawn::Base
           Retweet.create!(:id => msg["id"],
                           :tweet_id => msg["tweet_id"],
                           :user_id => msg["user_id"])
-          $logger.debug("Saved Retweet")
         rescue ActiveRecord::RecordNotUnique
-          $logger.info("Can't Save Retweet: Duplicate")
+          $logger.debug("Duplicate Retweet(#{@worker_number}): #{msg["id"]}")
+        rescue
+          $logger.error("Unknown error while inserting retweet: #{$!}/#{$@}")
         end
       end
     end
 
     def receive_delete(msg)
       @@wq.push -> do
-        if msg["id"]
-          Tweet.where(:id => msg["id"]).destroy_all
-          Retweet.where(:id => msg["id"]).destroy_all
-        elsif msg["tweet_id"]
-          Favorite
-            .where("tweet_id = #{msg["tweet_id"]} AND user_id = #{msg["user_id"]}")
-            .destroy_all
+        begin
+          if msg["id"]
+            $logger.debug("Receive Delete(#{@worker_number}): #{msg["id"]}")
+            Tweet.where(:id => msg["id"]).destroy_all
+            Retweet.where(:id => msg["id"]).destroy_all
+          elsif msg["tweet_id"]
+            $logger.debug("Receive Unfavorite(#{@worker_number}): #{msg["user_id"]} => #{msg["tweet_id"]}")
+            Favorite
+              .where("tweet_id = #{msg["tweet_id"]} AND user_id = #{msg["user_id"]}")
+              .destroy_all
+          end
+        rescue
+          $logger.error("Unknown error while deleting: #{$!}/#{$@}")
         end
       end
     end
 
     def receive_quit(msg)
-      $logger.warn("Quit: #{@worker_number}")
-      send_data({:type => "ok", :message => "Bye"})
+      $logger.warn("Quit(#{@worker_number}): #{msg["reason"]}")
+      send_data({:type => "bye", :message => "Bye"})
       close_connection_after_writing
     end
   end
@@ -225,8 +240,8 @@ class Receiver::Worker < DaemonSpawn::Base
   end
 
   def initialize(opts = {})
-    #super(opts)
-    $logger = Receiver::Logger.new(:debug)
+    super(opts)
+    $logger = Receiver::Logger.new(:info)
     $connections = {}
   end
 

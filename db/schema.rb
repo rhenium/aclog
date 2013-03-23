@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130226151042) do
+ActiveRecord::Schema.define(version: 20130323045606) do
 
   create_table "accounts", force: true do |t|
     t.integer  "user_id",            limit: 8, null: false
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20130226151042) do
     t.string   "oauth_token_secret",           null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "consumer_version"
   end
 
   add_index "accounts", ["user_id"], name: "index_accounts_on_user_id", unique: true
@@ -30,6 +31,7 @@ ActiveRecord::Schema.define(version: 20130226151042) do
 
   add_index "favorites", ["tweet_id", "user_id"], name: "index_favorites_on_tweet_id_and_user_id", unique: true
   add_index "favorites", ["tweet_id"], name: "index_favorites_on_tweet_id"
+  add_index "favorites", ["user_id"], name: "index_favorites_on_user_id"
 
   create_table "retweets", force: true do |t|
     t.integer "tweet_id", limit: 8, null: false
@@ -37,6 +39,7 @@ ActiveRecord::Schema.define(version: 20130226151042) do
   end
 
   add_index "retweets", ["tweet_id"], name: "index_retweets_on_tweet_id"
+  add_index "retweets", ["user_id"], name: "index_retweets_on_user_id"
 
   create_table "tweets", force: true do |t|
     t.text     "text",                                  null: false
@@ -53,6 +56,7 @@ ActiveRecord::Schema.define(version: 20130226151042) do
     t.text     "profile_image_url"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "protected"
   end
 
   add_index "users", ["screen_name"], name: "index_users_on_screen_name"

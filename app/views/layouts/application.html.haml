@@ -7,7 +7,7 @@
     .container
       .left
         %h1><
-          Aclog
+          = link_to "Aclog", :controller => "main", :action => "index"
         %div
           - if session[:screen_name]
             %span= link_to "@#{session[:screen_name]}", :controller => "users", :action => "best", :screen_name => session[:screen_name]

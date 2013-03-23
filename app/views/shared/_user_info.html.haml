@@ -1,0 +1,17 @@
+- if user.registered?
+  %ul
+    %li
+      Tweets: 
+      = user.tweets.length
+    %li
+      Favorites:
+      = user.favorites.length
+    %li
+      Retweets:
+      = user.retweets.length
+    %li
+      Favorited:
+      = user.tweets.inject(0){|s, m| s + m.favorites_count}
+    %li
+      Retweeted:
+      = user.tweets.inject(0){|s, m| s + m.retweets_count}

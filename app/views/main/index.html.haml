@@ -1,0 +1,42 @@
+%p
+  %strong (´へεへ`*) ＜ トップページだよ〜〜
+%p
+  Favstar クローンです。UserStreams つかってます。
+  = link_to "@KOBA789", "https://twitter.com/KOBA789"
+  さんにサーバーを貸していただけることになりました…！！ありがとうございます！ありがとうございます！！！
+%p
+  %strong まだ開発途中段階のものです。うごかなかったらごめんね
+%p
+  Read/Write 要求するけど今のところ UserStreams しか使ってないです。こんど Favstar みたいにページ内から Fav/RT できるようにしたいなあと…
+%p
+  %strong 動作のテスト中ですので、途中で登録をうちきったりあまりにふぁぼられ・ふぁぼりが多いユーザーの登録を削除する可能性もあります。
+%p
+  登録ユーザーだったら一番下に統計（？）が表示されてるんじゃないですかね
+%div
+  URLとかについて
+  %div
+    best:
+    = link_to "/cat", "/cat"
+  %div
+    recent(最新3日のbest):
+    = link_to "/cat/recent", "/cat/recent"
+  %div
+    timeline(Favstar の Recent、ただ0Fav0RTも含む):
+    = link_to "/cat/timeline", "/cat/timeline"
+  %div
+    discovery:
+    = link_to "/cat/my", "/cat/my"
+  %div
+  %div
+    全体のbest:
+    = link_to "/i/best", "/i/best"
+  %div
+    全体の最新3日のbest
+    = link_to "/i/recent", "/i/recent"
+  %div
+    URL 変えちゃうかもしれないです
+  %div
+    API つくりたいですねﾊｲ
+%div
+  = link_to "@cat", "https://twitter.com/cat"
+

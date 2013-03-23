@@ -1,0 +1,6 @@
+= render :partial => "shared/user_nav", :locals => {:user => @user}
+.items
+  = render :partial => "shared/tweet", :collection => @items, :as => :item
+- if @items
+  = paginate @items
+= render :partial => "shared/user_info", :locals => {:user => @user}

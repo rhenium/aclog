@@ -15,7 +15,7 @@
         %span.twitter_bird
           = link_to image_tag("bird_gray_16.png", :alt => "Twitter"), twitter_status_url(item), :target => "_blank"
         %span.created_at
-          = link_to format_tweet_created_at(item.tweeted_at), :controller => "i", :action => "show", :id => item.id
+          = link_to format_tweet_created_at(item.tweeted_at), :controller => "users", :action => "show", :id => item.id
         %span.source
           = raw format_source_text(item.source)
   .stats
@@ -26,7 +26,7 @@
           %span.type= type
         .height_fix
         %ul.favoriters.clearfix
-          - actions.take(params[:controller] == "i" && params[:action] == "show" ? actions.size : 20).each do |a| |
+          - actions.take(params[:controller] == "users" && params[:action] == "show" ? actions.size : 20).each do |a| |
           -   m = a.user || User.new
             %li
               - if m.screen_name

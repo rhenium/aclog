@@ -5,11 +5,21 @@ class User < ActiveRecord::Base
       attrs = {:id => u}
     end
     attrs[:profile_image_url] ||= ActionController::Base.helpers.asset_path("missing_profile_image.png")
-    attrs[:name] ||= "Missing: id=#{u}"
+    attrs[:name] ||= "Missing name: #{u}"
     super(attrs)
   end
 
   has_many :tweets, :dependent => :delete_all
   has_many :favorites, :dependent => :delete_all
   has_many :retweets, :dependent => :delete_all
+
+  def self.cached(uid)
+    Rails.cache.fetch("user/#{uid}", :expires_in => 1.hour) do
+      where(:id => uid).first
+    end
+  end
+
+  def registered?
+    Account.exists?(:user_id => id)
+  end
 end

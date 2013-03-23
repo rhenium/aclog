@@ -1,14 +1,8 @@
-require "time"
 require "em-twitter"
 require "yajl"
 require "msgpack"
 require "./settings"
 require "./logger"
-
-module EM
-  class Connection
-  end
-end
 
 class Worker
   class DBProxyClient < EM::Connection
@@ -66,8 +60,8 @@ class Worker
         :host => "userstream.twitter.com",
         :path => "/1.1/user.json",
         :oauth => {
-          :consumer_key => Settings.consumer_key,
-          :consumer_secret => Settings.consumer_secret,
+          :consumer_key => Settings.consumer[msg["consumer_version"].to_i].key,
+          :consumer_secret => Settings.consumer[msg["consumer_version"].to_i].secret,
           :token => msg["oauth_token"],
           :token_secret => msg["oauth_token_secret"]},
         :method => "GET"})
@@ -77,7 +71,8 @@ class Worker
                :id => user[:id],
                :screen_name => user[:screen_name],
                :name => user[:name],
-               :profile_image_url => user[:profile_image_url_https]}
+               :profile_image_url => user[:profile_image_url_https],
+               :protected => user[:protected]}
         send_object(out)
         $logger.debug("User(##{account_id}/#{user_id}): #{user[:id]} = #{user[:screen_name]}")
       end
@@ -123,6 +118,14 @@ class Worker
         $logger.debug("Retweet(##{account_id}/#{user_id}): #{status[:user][:id]} => #{status[:retweeted_status][:id]}")
       end
 
+      send_delete = -> deleted_status_id, deleted_user_id do
+        out = {:type => "delete",
+               :id => deleted_status_id,
+               :user_id => deleted_user_id}
+        send_object(out)
+        $logger.debug("Delete(##{account_id}/#{user_id}): #{deleted_user_id} => #{deleted_status_id}")
+      end
+
       client.on_error do |message|
         $logger.warn("Unknown Error(##{account_id}/#{user_id}): #{message}")
       end
@@ -160,11 +163,7 @@ class Worker
         elsif hash[:delete] && hash[:delete][:status]
           deleted_status_id = hash[:delete][:status][:id]
           deleted_user_id = hash[:delete][:status][:user_id]
-          out = {:type => "delete",
-                 :id => deleted_status_id,
-                 :user_id => deleted_user_id}
-          send_object(out)
-          $logger.debug("Delete(##{account_id}/#{user_id}): #{deleted_user_id} => #{deleted_status_id}")
+          send_delete.call(deleted_status_id, deleted_user_id)
         elsif hash[:limit]
           $logger.warn("UserStreams Limit Event(##{account_id}/#{user_id}): #{hash[:limit][:track]}")
         elsif hash[:event]
@@ -213,8 +212,7 @@ class Worker
     def post_init
       out = {:type => "init",
              :secret_key => Settings.secret_key,
-             :worker_number => Settings.worker_number,
-             :worker_count => Settings.worker_count}
+             :worker_number => Settings.worker_number}
       send_object(out)
     end
 
@@ -228,7 +226,7 @@ class Worker
 
     def receive_data(data)
       @pac.feed_each(data) do |msg|
-        unless msg["type"]
+        unless msg.is_a?(Hash) && msg["type"]
           $logger.warn("Unknown data: #{msg}")
           return
         end
@@ -240,8 +238,17 @@ class Worker
           $logger.info("error: #{msg["message"]}")
         when "fatal"
           $logger.info("fatal: #{msg["message"]}")
+        when "bye"
+          $logger.info("bye: #{msg["message"]}")
         when "account"
-          receive_account(msg)
+          begin
+            receive_account(msg)
+          rescue
+            $logger.error($!)
+            $logger.error($@)
+          end
+        else
+          $logger.info("Unknown message type: #{msg}")
         end
       end
     end
@@ -253,7 +260,7 @@ class Worker
   end
 
   def initialize
-    $logger = Aclog::Logger.new(:debug)
+    $logger = Aclog::Logger.new(:info)
   end
 
   def start

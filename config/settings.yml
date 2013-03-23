@@ -1,5 +1,7 @@
-consumer_key: <%= ENV["CONSUMER_KEY"] %>
-consumer_secret: <%= ENV["CONSUMER_SECRET"] %>
+#consumer:
+#    - key: <%= ENV["CONSUMER_KEY"] %>
+#    secret: <%= ENV["CONSUMER_SECRET"] %>
+consumer_version: 1
 page_per: <%= ENV["ACLOG_PAGE_PER"] %>
 worker_count: <%= ENV["ACLOG_WORKER_COUNT"] %>
 secret_key: <%= ENV["ACLOG_SECRET_KEY"] %>

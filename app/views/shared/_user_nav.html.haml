@@ -1,0 +1,11 @@
+- if user
+  .links
+    %ul
+      %li
+        = link_to "Best", :controller => "users", :action => "best", :screen_name => user.screen_name
+      %li
+        = link_to "Recent", :controller => "users", :action => "recent", :screen_name => user.screen_name
+      %li
+        = link_to "Timeline", :controller => "users", :action => "timeline", :screen_name => user.screen_name
+      %li
+        = link_to "Discovered", :controller => "users", :action => "my", :screen_name => user.screen_name

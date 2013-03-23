@@ -1,5 +1,7 @@
-consumer_key: 
-consumer_secret: 
+consumer:
+  -
+    - **key**
+    - **secret**
 secret_key: 
 worker_count: 
 worker_number: 

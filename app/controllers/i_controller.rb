@@ -26,7 +26,7 @@ class IController < ApplicationController
       format.html
 
       format.json do
-        @trim_user = params[:trim_user] == "true"
+       @include_user = params[:include_user] == "true"
       end
     end
   end

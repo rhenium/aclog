@@ -16,23 +16,24 @@ Aclog::Application.routes.draw do
   get "/i/best" => "i#best"
   get "/i/recent" => "i#recent"
 
-  get "/i/:id" => "i#show", :constraints => constraints
   get "/i/show" => "i#show", :constraints => constraints
+  get "/users/best" => "users#best", :constraints => constraints
+  get "/users/recent" => "users#recent", :constraints => constraints
+  get "/users/timeline" => "users#timeline", :constraints => constraints
+  get "/users/discovered" => "users#discovered", :constraints => constraints
+
+  get "/i/:id" => "i#show", :constraints => constraints
 
   get "/:screen_name(/:page)" => "users#best", :constraints => constraints
-  get "/users/best" => "users#best", :constraints => constraints
   get "/:screen_name/best" => redirect("/%{screen_name}")
 
   get "/:screen_name/recent(/:page)" => "users#recent", :constraints => constraints
-  get "/users/recent" => "users#recent", :constraints => constraints
 
   get "/:screen_name/timeline(/:page)" => "users#timeline", :constraints => constraints
   get "/:screen_name/timeline/:tweets(/:page)" => "users#timeline", :constraints => constraints
-  get "/users/timeline" => "users#timeline", :constraints => constraints
 
   get "/:screen_name/discovered(/:page)" => "users#discovered", :constraints => constraints
   get "/:screen_name/discovered/:tweets(/:page)" => "users#discovered", :constraints => constraints
-  get "/users/discovered" => "users#discovered", :constraints => constraints
 
   get "/(users)/:screen_name/status(es)/:id" => redirect("/i/%{id}")
   get "/users/:screen_name" => redirect("/%{screen_name}")

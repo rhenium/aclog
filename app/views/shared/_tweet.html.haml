@@ -26,7 +26,7 @@
           %span.type= type
         .height_fix
         %ul.favoriters.clearfix
-          - actions.take(params[:controller] == "users" && params[:action] == "show" ? actions.size : 20).each do |a| |
+          - actions.take(params[:controller] == "i" && params[:action] == "show" ? actions.size : 20).each do |a| |
           -   m = a.user || User.new
             %li
               - if m.screen_name

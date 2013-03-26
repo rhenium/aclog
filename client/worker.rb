@@ -52,19 +52,25 @@ class Worker
     def receive_account(msg)
       user_id = msg["user_id"]
       account_id = msg["id"]
+
+      conopts = {:host => "userstream.twitter.com",
+                 :path => "/1.1/user.json",
+                 :oauth => {
+                   :consumer_key => Settings.consumer[msg["consumer_version"].to_i].key,
+                   :consumer_secret => Settings.consumer[msg["consumer_version"].to_i].secret,
+                   :token => msg["oauth_token"],
+                   :token_secret => msg["oauth_token_secret"]},
+                 :method => "GET"}
       if @clients[account_id]
-        @clients[account_id].connection.stop
-        @clients.delete(account_id)
+        unless @clients[account_id].options[:oauth][:token] == conopts[:oauth][:token]
+          @clients.connection.update(conopts)
+          $logger.info("Updated(##{account_id}/#{user_id}/#{msg["consumer_version"].to_i})")
+        else
+          $logger.info("Not Updated(##{account_id}/#{user_id}/#{msg["consumer_version"].to_i})")
+        end
+        return
       end
-      @clients[account_id] = client = EM::Twitter::Client.new({
-        :host => "userstream.twitter.com",
-        :path => "/1.1/user.json",
-        :oauth => {
-          :consumer_key => Settings.consumer[msg["consumer_version"].to_i].key,
-          :consumer_secret => Settings.consumer[msg["consumer_version"].to_i].secret,
-          :token => msg["oauth_token"],
-          :token_secret => msg["oauth_token_secret"]},
-        :method => "GET"})
+      @clients[account_id] = client = EM::Twitter::Client.new(conopts)
 
       send_user = -> user do
         out = {:type => "user",
@@ -206,7 +212,7 @@ class Worker
       end
 
       client.connect
-      $logger.info("Connected(##{account_id}/#{user_id})")
+      $logger.info("Connected(##{account_id}/#{user_id}/#{msg["consumer_version"].to_i})")
     end
 
     def post_init

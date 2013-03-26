@@ -1,11 +1,28 @@
-- if user
-  .links
+.links
+  %ul
+    %li
+      = link_to "Best", :controller => "users", :action => "best", :screen_name => user.screen_name
+    %li
+      = link_to "Recent", :controller => "users", :action => "recent", :screen_name => user.screen_name
+    %li
+      = link_to "Timeline", :controller => "users", :action => "timeline", :screen_name => user.screen_name
+    %li
+      = link_to "Discovered", :controller => "users", :action => "discovered", :screen_name => user.screen_name
+- if user.registered?
+  .records
     %ul
       %li
-        = link_to "Best", :controller => "users", :action => "best", :screen_name => user.screen_name
+        Tweets: 
+        = user.tweets.length
       %li
-        = link_to "Recent", :controller => "users", :action => "recent", :screen_name => user.screen_name
+        Favorites:
+        = user.favorites.length
       %li
-        = link_to "Timeline", :controller => "users", :action => "timeline", :screen_name => user.screen_name
+        Retweets:
+        = user.retweets.length
       %li
-        = link_to "Discovered", :controller => "users", :action => "discovered", :screen_name => user.screen_name
+        Favorited:
+        = user.tweets.inject(0){|s, m| s + m.favorites_count}
+      %li
+        Retweeted:
+        = user.tweets.inject(0){|s, m| s + m.retweets_count}

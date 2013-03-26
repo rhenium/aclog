@@ -15,6 +15,14 @@ class Tweet < ActiveRecord::Base
     order("id DESC")
   end
 
+  scope :order_by_favorites, -> do
+    order("favorites_count DESC")
+  end
+
+  scope :order_by_retweets, -> do
+    order("retweets_count DESC")
+  end
+
   scope :order_by_reactions, -> do
     order("COALESCE(favorites_count, 0) + COALESCE(retweets_count, 0) DESC")
   end
@@ -33,10 +41,6 @@ class Tweet < ActiveRecord::Base
           " UNION ALL " +
           "SELECT tweet_id FROM retweets WHERE user_id = ?" +
           ")", user.id, user.id)
-  end
-
-  scope :of, -> user do
-    where("user_id = ?", user.id)
   end
 
   def self.cached(id)

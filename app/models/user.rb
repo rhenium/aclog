@@ -22,4 +22,8 @@ class User < ActiveRecord::Base
   def registered?
     Account.exists?(:user_id => id)
   end
+
+  def profile_image_url_original
+    profile_image_url.sub(/_normal((\.(png|jpeg|gif))?)/, "\\1")
+  end
 end

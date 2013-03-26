@@ -25,5 +25,7 @@ module Aclog
     config.exceptions_app = -> env do
       ErrorsController.action(:render_error).call(env)
     end
+
+    config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
   end
 end

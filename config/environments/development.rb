@@ -10,7 +10,7 @@ Aclog::Application.configure do
   config.eager_load = false
 
   # Show full error reports and disable caching.
-  config.consider_all_requests_local       = false#true
+  config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
   # Don't care if the mailer can't send.
@@ -25,5 +25,5 @@ Aclog::Application.configure do
   # Expands the lines which load the assets.
   config.assets.debug = true
 
-  # config.cache_store = :dalli_store
+  config.cache_store = :dalli_store
 end

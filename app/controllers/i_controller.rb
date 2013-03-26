@@ -3,7 +3,7 @@ class IController < ApplicationController
     @items = Tweet
       .reacted
       .order_by_reactions
-      .limit(get_page_count(params))
+      .limit(Settings.page_per)
   end
 
   def recent
@@ -11,7 +11,14 @@ class IController < ApplicationController
       .recent
       .reacted
       .order_by_reactions
-      .limit(get_page_count(params))
+      .limit(Settings.page_per)
+  end
+
+  def timeline
+    @items = Tweet
+      .reacted
+      .order_by_id
+      .limit(Settings.page_per)
   end
 
   def show
@@ -26,7 +33,7 @@ class IController < ApplicationController
       format.html
 
       format.json do
-       @include_user = params[:include_user] == "true"
+        @include_user = params[:include_user] == "true"
       end
     end
   end

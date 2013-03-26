@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 20130323045606) do
     t.integer "user_id",  limit: 8, null: false
   end
 
+  add_index "retweets", ["tweet_id", "user_id"], name: "index_retweets_on_tweet_id_and_user_id", unique: true
   add_index "retweets", ["tweet_id"], name: "index_retweets_on_tweet_id"
   add_index "retweets", ["user_id"], name: "index_retweets_on_user_id"
 
@@ -49,6 +50,8 @@ ActiveRecord::Schema.define(version: 20130323045606) do
     t.integer  "favorites_count",           default: 0
     t.integer  "retweets_count",            default: 0
   end
+
+  add_index "tweets", ["user_id"], name: "index_tweets_on_user_id"
 
   create_table "users", force: true do |t|
     t.string   "screen_name"

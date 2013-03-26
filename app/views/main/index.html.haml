@@ -14,19 +14,25 @@
   URLとかについて
   %div
     best:
-    = link_to "/cat", "/cat"
+    = link_to "/sg4k", "/sg4k"
   %div
     recent(最新3日のbest):
-    = link_to "/cat/recent", "/cat/recent"
+    = link_to "/sg4k/recent", "/sg4k/recent"
   %div
     timeline(Favstar の Recent):
-    = link_to "/cat/timeline", "/cat/timeline"
+    = link_to "/sg4k/timeline", "/sg4k/timeline"
   %div
     timeline(ユーザータイムライン):
-    = link_to "/cat/timeline/all", "/cat/timeline/all"
+    = link_to "/sg4k/timeline/all", "/sg4k/timeline/all"
   %div
     discovery:
-    = link_to "/cat/discovered(/{favorite|retweet})", "/cat/discovered"
+    = link_to "/sg4k/discovered(/{favorite|retweet})", "/sg4k/discovered"
+  %div
+    favs_from:
+    = link_to "/sg4k/favs_from", "/sg4k/favs_from"
+  %div
+    rts_from:
+    = link_to "/sg4k/rts_from", "/sg4k/rts_from"
   %div
   %div
     全体のbest:
@@ -35,28 +41,35 @@
     全体の最新3日のbest
     = link_to "/i/recent", "/i/recent"
   %div
+    全体の最新反応あり
+    = link_to "/i/timeline", "/i/timeline"
+  %div
     URL 変えちゃうかもしれないです
   %div
     API っていえるのかな…？
     %div
       %p
-        \/i/show.json?id=[tweet_id]
+        URL
+        %p
+          \/i/show.json?id=[tweet_id]
+        %p
+          \/users/{best|recent|timeline|discovered}.json
       %p
-        \/users/{best|recent|timeline|discovered}.json
-      %p
-        screen_name
-      %p
-        user_id
-      %p
-        count
-      %p
-        include_user=true|false ← fav/RTしたユーザーを取得するか(false で ID のみ
-      %p
-        tweets={*tweet*|all} ← /users/timeline
-      %p
-        tweets={favorite|retweet|*all*} ← discovered
-      %p
-        page
+        params
+        %p
+          screen_name or user_id 必須
+        %p
+          count デフォルト10、100以下
+        %p
+          page ページ。1から
+        %p
+          include_user={true|} fav/RTしたユーザーを取得するか
+        %p
+          tweets={all|} timeline
+        %p
+          tweets={favorite|retweet|} discovered
+        %p
+          order={favorite|retweet|} best/recent
 %div
-  = link_to "@cat", "https://twitter.com/cat"
+  = link_to "@sg4k", "https://twitter.com/sg4k"
 

@@ -55,19 +55,18 @@
             :display block
             :float right
     .stats
-      :clear both
       //:border 1px solid #c1c5cb
       //:border-width 0 1px 1px
       //:border-radius 0 0 4px 4px
       :padding 15px
       //:background #edf0f4
-      .favs, .retweets
-        :margin-bottom 3px
-        .info
+      .dl-horizontal
+        :margin 0 0 3px 0
+        dt.info
+          :text-align left
           :width 60px
           :float left
-          .count,
-          .type
+          .count, .type
             :color #666666
             :display block
           .count
@@ -79,14 +78,18 @@
           :float left
           :height 48px
           :width 0
-        .favoriters
-          :float left
-          :list-style none
-          :width 480px
-          li
+        dd
+          :margin 0
+          ul
+            :margin 0
             :float left
-            img
-              :width 48px
-              :height 48px
-              :vertical-align bottom
+            :list-style none
+            :width 480px
+            li
+              :float left
+              :padding 0
+              img
+                :width 48px
+                :height 48px
+                :vertical-align bottom
 

@@ -37,7 +37,7 @@ Aclog::Application.routes.draw do
   get "/:screen_name/recent/:order(/:page)" => "users#recent", :constraints => constraints
 
   get "/:screen_name/timeline(/:page)" => "users#timeline", :constraints => constraints
-  get "/:screen_name/timeline/:tweets(/:page)" => "users#timeline", :constraints => constraints
+  get "/:screen_name/timeline/all(/:page)" => "users#timeline", :constraints => constraints, :defaults => {:all => "true"}
 
   get "/:screen_name/discovered(/:page)" => "users#discovered", :constraints => constraints
   get "/:screen_name/discovered/:tweets(/:page)" => "users#discovered", :constraints => constraints

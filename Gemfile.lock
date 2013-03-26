@@ -35,6 +35,8 @@ GEM
       tzinfo (~> 0.3.33)
     arel (4.0.0.beta2)
     atomic (1.0.1)
+    bootstrap-sass (2.3.1.0)
+      sass (~> 3.2)
     builder (3.1.4)
     coffee-rails (4.0.0.beta1)
       coffee-script (>= 2.2.0)
@@ -156,6 +158,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bootstrap-sass
   coffee-rails (~> 4.0.0.beta1)
   daemon-spawn
   dalli

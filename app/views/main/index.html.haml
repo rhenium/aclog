@@ -1,75 +1,84 @@
+%h1 aclog
+.lead
+  Favstar クローン
 %p
-  %strong (´へεへ`*) ＜ トップページだよ〜〜
-%p
-  Favstar クローンです。UserStreams つかってます。
   = link_to "@KOBA789", "https://twitter.com/KOBA789"
   さんにサーバーを貸していただけることになりました…！！ありがとうございます！ありがとうございます！！！
+.alert
+  開発中ですので、新規登録を停止したりあまりにふぁぼられ・ふぁぼりが多いユーザーの登録を削除する可能性もあります。
 %p
-  %strong まだ開発途中段階のものです。うごかなかったらごめんね
-%p
-  %strong 動作のテスト中ですので、途中で登録をうちきったりあまりにふぁぼられ・ふぁぼりが多いユーザーの登録を削除する可能性もあります。
-%p
-  登録ユーザーだったら一番下に統計（？）が表示されてるんじゃないですかね
-%div
-  URLとかについて
-  %div
-    best:
-    = link_to "/sg4k", "/sg4k"
-  %div
-    recent(最新3日のbest):
-    = link_to "/sg4k/recent", "/sg4k/recent"
-  %div
-    timeline(Favstar の Recent):
-    = link_to "/sg4k/timeline", "/sg4k/timeline"
-  %div
-    timeline(ユーザータイムライン):
-    = link_to "/sg4k/timeline/all", "/sg4k/timeline/all"
-  %div
-    discovery:
-    = link_to "/sg4k/discovered(/{favorite|retweet})", "/sg4k/discovered"
-  %div
-    favs_from:
-    = link_to "/sg4k/favs_from", "/sg4k/favs_from"
-  %div
-    rts_from:
-    = link_to "/sg4k/rts_from", "/sg4k/rts_from"
-  %div
-  %div
-    全体のbest:
-    = link_to "/i/best", "/i/best"
-  %div
-    全体の最新3日のbest
-    = link_to "/i/recent", "/i/recent"
-  %div
-    全体の最新反応あり
-    = link_to "/i/timeline", "/i/timeline"
-  %div
-    URL 変えちゃうかもしれないです
-  %div
-    API っていえるのかな…？
-    %div
-      %p
-        URL
-        %p
-          \/i/show.json?id=[tweet_id]
-        %p
-          \/users/{best|recent|timeline|discovered}.json
-      %p
-        params
-        %p
-          screen_name or user_id 必須
-        %p
-          count デフォルト10、100以下
-        %p
-          page ページ。1から
-        %p
-          include_user={true|} fav/RTしたユーザーを取得するか
-        %p
-          tweets={all|} timeline
-        %p
-          tweets={favorite|retweet|} discovered
-        %p
-          order={favorite|retweet|} best/recent
-%div
+  基本的に Favstar のパクリです。問題があったら私
+  = link_to "re4k@re4k.info"
+  にメールするか、
   = link_to "@sg4k", "https://twitter.com/sg4k"
+  へリプライを飛ばしてくれるとありがたいです。
+%h3 URL 等
+%dl
+  %dt best
+  %dd= link_to "/sg4k", "/sg4k"
+  %dt recent(最近3日のbest)
+  %dd= link_to "/sg4k/recent", "/sg4k/recent"
+  %dt timeline(Favstar の Recent)
+  %dd= link_to "/sg4k/timeline", "/sg4k/timeline"
+  %dt timeline(ユーザータイムライン)
+  %dd= link_to "/sg4k/timeline/all", "/sg4k/timeline/all"
+  %dt discovered
+  %dd= link_to "/sg4k/discovered(/{favorite|retweet})", "/sg4k/discovered"
+  %dt favs_from
+  %dd= link_to "/sg4k/favs_from", "/sg4k/favs_from"
+  %dt rts_from
+  %dd= link_to "/sg4k/rts_from", "/sg4k/rts_from"
+%dl
+  %dt 全体のbest
+  %dd= link_to "/i/best", "/i/best"
+  %dt 全体の最新3日のbest
+  %dd= link_to "/i/recent", "/i/recent"
+  %dt 全体の最新反応あり
+  %dd= link_to "/i/timeline", "/i/timeline"
+%p
+  Favstar のパスにアクセスされた場合リダイレクトするようになっているはず…
+%h3 API 的な何か
+%h4 URL
+%dl
+  %dt ツイート表示
+  %dd /i/show.json?id=(tweet_id)
+  %dt リスト
+  %dd /users/{best|recent|timeline|discovered}.json?user_id=(user_id)&amp;screen_name=(screen_name)
+%h4 パラメータ
+%dl
+  %dt include_user
+  %dd
+    %p true or false
+    %p default: false
+    %p 共通。ふぁぼ/RTしたユーザー情報を含めるか
+  %dt screen_name or user_id
+  %dd
+    %p Twitter アカウントのもの
+    %p 必須
+    %p リストのみ
+  %dt count
+  %dd
+    %p 1-100
+    %p default: 10
+    %p リストのみ。件数
+  %dt page
+  %dd
+    %p 1-
+    %p default: 1
+    %p リストのみ。ページ
+  %dt all
+  %dd
+    %p true or false
+    %p default: false
+    %p timeline のみ。反応がなかったツイートも含めるかどうか。
+  %dt tweets
+  %dd
+    %p favorite or retweet or all
+    %p default: all
+    %p discovered のみ。意味は察して疲れた
+  %dt order
+  %dd
+    %p favorite or retweet or all
+    %p default: all
+    %p best, recent のみ。察して
 

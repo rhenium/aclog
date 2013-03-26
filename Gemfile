@@ -21,6 +21,8 @@ end
 gem 'haml-rails'
 gem 'jbuilder'
 
+gem 'bootstrap-sass'
+
 gem 'msgpack'
 gem 'omniauth-twitter', :github => "re4k/omniauth-twitter"
 gem 'em-twitter'

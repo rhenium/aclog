@@ -19,18 +19,19 @@
         %span.source
           = raw format_source_text(item.source)
   .stats
-    - [["FAVS", item.favorites.order("id"), "favs"], ["RETWEETS", item.retweets.order("id"), "retweets"]].select{|m| m[1].size > 0}.each do |type, actions, cssclass|
-      %div{:class => "#{cssclass} clearfix"}
-        .info
+    - [["FAVS", item.favorites.order("id")], ["RETWEETS", item.retweets.order("id")]].select{|m| m[1].size > 0}.each do |type, actions|
+      %dl.dl-horizontal
+        %dt.info
           %span.count= actions.size
           %span.type= type
         .height_fix
-        %ul.favoriters.clearfix
-          - actions.take(params[:controller] == "i" && params[:action] == "show" ? actions.size : 20).each do |a| |
-          -   m = a.user || User.new
-            %li
-              - if m.screen_name
-                = link_to image_tag(m.profile_image_url, :alt => m.screen_name, :title => m.name), :controller => "users", :action => "best", :screen_name => m.screen_name
-              - else
-                = image_tag(m.profile_image_url, :alt => m.name, :title => m.name)
+        %dd
+          %ul.inline
+            - actions.take(params[:controller] == "i" && params[:action] == "show" ? actions.size : 20).each do |a| |
+            -   m = a.user || User.new
+              %li
+                - if m.screen_name
+                  = link_to image_tag(m.profile_image_url, :alt => m.screen_name, :title => m.name), :controller => "users", :action => "best", :screen_name => m.screen_name
+                - else
+                  = image_tag(m.profile_image_url, :alt => m.name, :title => m.name)
 

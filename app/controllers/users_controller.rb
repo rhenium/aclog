@@ -34,8 +34,8 @@ class UsersController < ApplicationController
 
     @title = "@#{@user.screen_name}'s Newest Tweets"
     render_page do
-      case params[:tweets]
-      when /^all/
+      case params[:all]
+      when /^(t|true|1)$/
         @user.tweets.order_by_id
       else
         @user.tweets.reacted.order_by_id

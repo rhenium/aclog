@@ -1,28 +1,30 @@
-.links
-  %ul
-    %li
-      = link_to "Best", :controller => "users", :action => "best", :screen_name => user.screen_name
-    %li
-      = link_to "Recent", :controller => "users", :action => "recent", :screen_name => user.screen_name
-    %li
-      = link_to "Timeline", :controller => "users", :action => "timeline", :screen_name => user.screen_name
-    %li
-      = link_to "Discovered", :controller => "users", :action => "discovered", :screen_name => user.screen_name
-- if user.registered?
-  .records
-    %ul
+- tweets = @user.tweets.length
+- faved = @user.tweets.inject(0){|s, m| s + m.favorites_count}
+- rted = @user.tweets.inject(0){|s, m| s + m.retweets_count}
+.sidebar
+  .avatar= image_tag @user.profile_image_url_original, :alt => @user.screen_name, :width => 64, :height => 64, :class => "icon img-rounded"
+  .screen_name= "@#{@user.screen_name}"
+  - if @user.registered?
+    %table.table.table-condensed.records
+      %caption records
+      %tr
+        %td faved
+        %td.data= faved
+      %tr
+        %td rted
+        %td.data= rted
+      %tr
+        %td avg. faved
+        %td.data= ((faved + 0.0) / tweets).round(2)
+  - else
+    .alert.alert-info user has never signed in to aclog.
+  .user_nav
+    %ul.nav.nav-tabs.nav-stacked
       %li
-        Tweets: 
-        = user.tweets.length
+        = link_to "best", :controller => "users", :action => "best", :screen_name => @user.screen_name
       %li
-        Favorites:
-        = user.favorites.length
+        = link_to "recent", :controller => "users", :action => "recent", :screen_name => @user.screen_name
       %li
-        Retweets:
-        = user.retweets.length
+        = link_to "timeline", :controller => "users", :action => "timeline", :screen_name => @user.screen_name
       %li
-        Favorited:
-        = user.tweets.inject(0){|s, m| s + m.favorites_count}
-      %li
-        Retweeted:
-        = user.tweets.inject(0){|s, m| s + m.retweets_count}
+        = link_to "discovered", :controller => "users", :action => "discovered", :screen_name => @user.screen_name

@@ -26,11 +26,10 @@
           %span.type= type
         %dd
           %ul.inline
-            - actions.take(params[:controller] == "users" && params[:action] == "show" ? actions.count : 20).each do |a| |
-            -   m = a.user || User.new
+            - actions.take(params[:action] == "show" ? actions.count : 20).each do |a|
+            - m = a.user
               %li
-                - if m.screen_name
+                - if m
                   = link_to image_tag(m.profile_image_url, :alt => m.screen_name, :title => m.name), :controller => "users", :action => "best", :screen_name => m.screen_name
                 - else
-                  = image_tag(m.profile_image_url, :alt => m.name, :title => m.name)
-
+                  = image_tag asset_path("missing_profile_image.png"), :alt => "Missing User: #{a.user_id}", :title => "Missing User: #{a.user_id}"

@@ -194,6 +194,7 @@ class UsersController < ApplicationController
     end
 
     raise Aclog::Exceptions::UserNotFound unless @user
+    raise Aclog::Exceptions::UserNotRegistered if @user.protected? && !@user.registered?
   end
 
   def get_user_b

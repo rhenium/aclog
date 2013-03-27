@@ -1,0 +1,62 @@
+%h1 API
+%p
+  ドキュメントは今度もっとわかりやすく書き直しますね
+%h3 URL
+%p
+  全部 GET です
+%dl
+  %dt ツイート表示
+  %dd /i/show.json?id=(tweet_id)
+  %dt ツイート一覧
+  %dd /users/{best|recent|timeline|discovered}.json
+  %dt 他ユーザーが関係してくるもの
+  %dd /users/{favorited_by|retweeted_by|given_favorites_to|given_retweets_to}.json
+  %dt ユーザー情報。include_user_stats は標準で有効になります。
+  %dd /users/info.json
+%h3 パラメータ
+%dl
+  %dt screen_name or user_id
+  %dd
+    %p Twitter アカウントのもの
+    %p 必須
+    %p ツイート表示以外では必須
+  %dt screen_name_b or user_id_b
+  %dd
+    %p Twitter アカウントのもの
+    %p 有無で結果が変わります
+    %p favorited_by などのみ。なんとなくわかるとおもう
+  %dt include_user
+  %dd
+    %p true or false
+    %p default: false
+    %p 共通。ふぁぼ/RTしたユーザー情報を含めるか。重め
+  %dt include_user_stats
+  %dd
+    %p true or false
+    %p default: false
+    %p 共通。ふぁぼ/RTしたユーザーのふぁぼられなどの情報を含めるか。重いです
+  %dt count
+  %dd
+    %p 1-100
+    %p default: 10
+    %p リストのみ。件数
+  %dt page
+  %dd
+    %p 1-
+    %p default: 1
+    %p リストのみ。ページ
+  %dt all
+  %dd
+    %p true or false
+    %p default: false
+    %p timeline のみ。反応がなかったツイートも含めるかどうか
+  %dt tweets
+  %dd
+    %p favorite or retweet or all
+    %p default: all
+    %p discovered のみ
+  %dt order
+  %dd
+    %p favorite or retweet or all
+    %p default: all
+    %p best, recent のみ

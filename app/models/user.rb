@@ -1,12 +1,6 @@
 class User < ActiveRecord::Base
-  def initialize(attrs = {})
-    if attrs.is_a?(Fixnum) || attrs.is_a?(Bignum)
-      u = attrs
-      attrs = {:id => u}
-    end
-    attrs[:profile_image_url] ||= ActionController::Base.helpers.asset_path("missing_profile_image.png")
-    attrs[:name] ||= "Missing name: #{u}"
-    super(attrs)
+  def protected?
+    protected
   end
 
   has_many :tweets, :dependent => :delete_all

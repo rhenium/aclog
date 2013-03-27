@@ -1,0 +1,20 @@
+%h1= response.status
+.lead
+  - case @exception
+  - when Aclog::Exceptions::TweetNotFound
+    ツイートが見つかりませんでした。
+  - when Aclog::Exceptions::UserNotFound
+    ユーザーが見つかりませんでした。
+  - when Aclog::Exceptions::UserNotRegistered
+    ユーザーは aclog に登録していません。
+  - when Aclog::Exceptions::UserProtected
+    ユーザーは非公開です。
+  - when Aclog::Exceptions::LoginRequired
+    このページの表示にはログインが必要です。
+  - when ActionController::RoutingError
+    不正な URL です。
+  - else
+    - if response.status == 404
+      Not Found (Unknown)
+    - else
+      Internal Error (Unknown)

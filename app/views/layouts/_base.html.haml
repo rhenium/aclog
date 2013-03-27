@@ -1,0 +1,21 @@
+!!! xml
+%html{xmlns: "http://www.w3.org/1999/xhtml"}
+  %head
+    %title= @title
+    = stylesheet_link_tag "application"
+  %body
+    .navbar.navbar-static-top
+      .navbar-inner
+        .container
+          .brand
+            = link_to "aclog", :controller => "main", :action => "index"
+          %ul.nav.pull-right
+            %li
+              = link_to "about", :controller => "main", :action => "about"
+            - if session[:screen_name]
+              %li= link_to "logout", :controller => "sessions", :action => "destroy"
+              %li= link_to "@#{session[:screen_name]}", :controller => "users", :action => "best", :screen_name => session[:screen_name]
+            - else
+              %li= link_to "login", "/i/login"
+    .container
+      = yield

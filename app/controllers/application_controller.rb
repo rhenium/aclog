@@ -1,7 +1,13 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
-  before_filter :get_include_user
+  before_filter :set_format, :get_include_user, :get_include_user_stats
   after_filter :set_content_type
+
+  def set_format
+    unless request.format == :json || request.format == :html
+      request.format = :html
+    end
+  end
 
   def set_content_type
     if request.format == :html
@@ -10,11 +16,13 @@ class ApplicationController < ActionController::Base
   end
 
   def get_include_user
-    case params[:include_user]
-    when /^t/
+    @include_user ||= get_bool(params[:include_user])
+  end
+
+  def get_include_user_stats
+    if @include_user_stats ||= get_bool(params[:include_user_stats])
       @include_user = true
     end
-    @include_user ||= false
   end
 
   def render_tweets(a = nil, &blk)
@@ -24,22 +32,47 @@ class ApplicationController < ActionController::Base
   end
 
   def page
-    if params[:page]
-      i = params[:page].to_i
-      if i > 0
-        ret = i
-      end
+    get_int(params[:page], 1) do |i|
+      i > 0
     end
-    ret || 1
   end
 
   def count
-    if params[:count]
-      i = params[:count].to_i
-      if (1..100) === i
-        ret = i
-      end
+    get_int(params[:count], 10) do |i|
+      (1..100) === i
     end
-    ret || Settings.page_per
+  end
+
+  def order
+    case params[:order]
+    when /^fav/
+      :favorite
+    when /^re?t/
+      :retweet
+    else
+      :default
+    end
+  end
+
+  def all
+    get_bool(params[:all])
+  end
+
+  private
+  def get_bool(str)
+    if /^(t.*|1)$/ =~ str
+      true
+    else
+      false
+    end
+  end
+
+  def get_int(str, default, &blk)
+    i = Integer(str) rescue default
+    if blk.call(i)
+      i
+    else
+      default
+    end
   end
 end

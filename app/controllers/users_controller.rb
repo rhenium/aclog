@@ -5,10 +5,10 @@ class UsersController < ApplicationController
   def best
     @title = "@#{@user.screen_name}'s Best Tweets"
     render_tweets do
-      case params[:order]
-      when /^fav/
+      case order
+      when :favorite
         @user.tweets.reacted.order_by_favorites
-      when /^re?t/
+      when :retweet
         @user.tweets.reacted.order_by_retweets
       else
         @user.tweets.reacted.order_by_reactions
@@ -19,10 +19,10 @@ class UsersController < ApplicationController
    def recent
     @title = "@#{@user.screen_name}'s Recent Best Tweets"
     render_tweets do
-      case params[:order]
-      when /^fav/
+      case order
+      when :favorite
         @user.tweets.recent.reacted.order_by_favorites
-      when /^re?t/
+      when :retweet
         @user.tweets.recent.reacted.order_by_retweets
       else
         @user.tweets.recent.reacted.order_by_reactions
@@ -35,8 +35,7 @@ class UsersController < ApplicationController
 
     @title = "@#{@user.screen_name}'s Newest Tweets"
     render_tweets do
-      case params[:all]
-      when /^(t|true|1)$/
+      if all
         @user.tweets.order_by_id
       else
         @user.tweets.reacted.order_by_id
@@ -64,11 +63,14 @@ class UsersController < ApplicationController
 
     @title = "@#{@user.screen_name} (#{@user.name})'s Profile"
 
-    @twitter_user = account.twitter_user
 
     respond_to do |format|
-      format.html
-      format.json
+      format.html do
+        @twitter_user = account.twitter_user
+      end
+      format.json do
+        @include_user_stats = true
+      end
     end
   end
 
@@ -118,17 +120,24 @@ class UsersController < ApplicationController
 
   def show
     tweet_id = params[:id].to_i
-    items = Tweet.where(:id => tweet_id)
+    @items = Tweet.where(:id => tweet_id).page
 
-    item = items.first
+    item = @items.first
     raise Aclog::Exceptions::TweetNotFound unless item
-    @user = items.first.user
+    @user = item.user
 
     helpers = ApplicationController.helpers
     @title = "\"#{helpers.strip_tags(helpers.format_tweet_text(item.text))[0...30]}\" from @#{@user.screen_name}"
     @title_b = "@#{@user.screen_name}'s Tweet"
 
-    render_tweets(items)
+    respond_to do |format|
+      format.html do
+        render "shared/tweets"
+      end
+      format.json do
+        render "shared/_tweet", :locals => {:item => item}
+      end
+    end
   end
 
   private
@@ -145,8 +154,6 @@ class UsersController < ApplicationController
       .limit(100)
       .inject(Hash.new(0)){|hash, tweet| pr.call(tweet).each{|event| hash[event.user_id] += 1}; hash}
       .sort_by{|id, count| -count}
-      .take(50)
-      .map{|user, count| [User.cached(user), count]}
 
     render "shared/users"
   end
@@ -165,8 +172,6 @@ class UsersController < ApplicationController
       .map{|e| Tweet.cached(e.tweet_id)}
       .inject(Hash.new(0)){|hash, tweet| hash[tweet.user_id] += 1; hash}
       .sort_by{|user_id, count| -count}
-      .take(50)
-      .map{|user_id, count| [User.cached(user_id), count]}
 
     render "shared/users"
   end

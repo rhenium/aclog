@@ -26,4 +26,19 @@ class User < ActiveRecord::Base
   def profile_image_url_original
     profile_image_url.sub(/_normal((\.(png|jpeg|gif))?)/, "\\1")
   end
+
+  def stats
+    return @stats_cache if @stats_cache
+
+    hash = tweets.inject(Hash.new(0)) do |hash, m|
+      hash[:favorited_count] += m.favorites_count
+      hash[:retweeted_count] += m.retweets_count
+      hash
+    end
+    hash[:favorites_count] = favorites.count
+    hash[:retweets_count] = retweets.count
+    hash[:tweets_count] = tweets.count
+
+    @stats_cache = hash
+  end
 end

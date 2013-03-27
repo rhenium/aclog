@@ -19,12 +19,11 @@
         %span.source
           = raw format_source_text(item.source)
   .stats
-    - [["FAVS", item.favorites.order("id")], ["RETWEETS", item.retweets.order("id")]].select{|m| m[1].size > 0}.each do |type, actions|
+    - [["favs", item.favorites.order("id")], ["retweets", item.retweets.order("id")]].select{|m| m[1].size > 0}.each do |type, actions|
       %dl.dl-horizontal
-        %dt.info
+        %dt
           %span.count= actions.size
           %span.type= type
-        .height_fix
         %dd
           %ul.inline
             - actions.take(params[:controller] == "i" && params[:action] == "show" ? actions.size : 20).each do |a| |

@@ -1,23 +1,17 @@
-.row
-  .span2= render :partial => "shared/user_nav"
-  .span10
-    .items
-      .item
-        %h1= "@#{@user.screen_name}"
-        .avatar
-          = image_tag @user.profile_image_url_original, :alt => @user.screen_name
-        %dl.dl-horizontal
-          %dt Username
-          %dd= @user.screen_name
-          %dt Name
-          %dd= raw @twitter_user.name
-          %dt Tweets
-          %dd= @twitter_user.statuses_count
-          %dt Following
-          %dd= @twitter_user.friends_count
-          %dt Followers
-          %dd= @twitter_user.followers_count
-          %dt Favorites
-          %dd= @twitter_user.favourites_count
-          %dt Bio
-          %dd= raw @twitter_user.description
+.avatar
+  = image_tag @user.profile_image_url_original, :alt => @user.screen_name
+%dl.dl-horizontal
+  %dt Username
+  %dd= @user.screen_name
+  %dt Name
+  %dd= raw @twitter_user.name
+  %dt Tweets
+  %dd= @twitter_user.statuses_count
+  %dt Following
+  %dd= @twitter_user.friends_count
+  %dt Followers
+  %dd= @twitter_user.followers_count
+  %dt Favorites
+  %dd= @twitter_user.favourites_count
+  %dt Bio
+  %dd= raw @twitter_user.description

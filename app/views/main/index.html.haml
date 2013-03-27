@@ -5,14 +5,17 @@
   = link_to "@KOBA789", "https://twitter.com/KOBA789"
   さんにサーバーを貸していただけることになりました…！！ありがとうございます！ありがとうございます！！！
 .alert
-  開発中ですので、新規登録を停止したりあまりにふぁぼられ・ふぁぼりが多いユーザーの登録を削除する可能性もあります。
+  開発中です。まだ不具合あるかもしれません。一応動いてるっぽいですが
 %p
-  基本的に Favstar のパクリです。問題があったら私
-  = link_to "re4k@re4k.info"
+  基本的に Favstar のパクリです。トロフィー・50favs通知以外の機能は一応全部つけたつもり。
+  トロフィー機能って必要ですかね、Favstar Pro じゃないし Favstar BAN されたしわかりません。
+%p
+  不具合があったら私
+  = link_to "re4k@re4k.info", "mailto:re4k@re4k.info"
   にメールするか、
   = link_to "@sg4k", "https://twitter.com/sg4k"
   へリプライを飛ばしてくれるとありがたいです。
-%h3 URL 等
+%h3 URL
 %dl
   %dt best
   %dd= link_to "/sg4k", "/sg4k"
@@ -20,14 +23,7 @@
   %dd= link_to "/sg4k/recent", "/sg4k/recent"
   %dt timeline(Favstar の Recent)
   %dd= link_to "/sg4k/timeline", "/sg4k/timeline"
-  %dt timeline(ユーザータイムライン)
-  %dd= link_to "/sg4k/timeline/all", "/sg4k/timeline/all"
-  %dt discovered
-  %dd= link_to "/sg4k/discovered(/{favorite|retweet})", "/sg4k/discovered"
-  %dt favs_from
-  %dd= link_to "/sg4k/favs_from", "/sg4k/favs_from"
-  %dt rts_from
-  %dd= link_to "/sg4k/rts_from", "/sg4k/rts_from"
+%p まだいろいろありますがユーザーのページを開くとサイドバーに一覧があるのでそちらからどうぞ
 %dl
   %dt 全体のbest
   %dd= link_to "/i/best", "/i/best"
@@ -37,48 +33,4 @@
   %dd= link_to "/i/timeline", "/i/timeline"
 %p
   Favstar のパスにアクセスされた場合リダイレクトするようになっているはず…
-%h3 API 的な何か
-%h4 URL
-%dl
-  %dt ツイート表示
-  %dd /i/show.json?id=(tweet_id)
-  %dt リスト
-  %dd /users/{best|recent|timeline|discovered}.json?user_id=(user_id)&amp;screen_name=(screen_name)
-%h4 パラメータ
-%dl
-  %dt include_user
-  %dd
-    %p true or false
-    %p default: false
-    %p 共通。ふぁぼ/RTしたユーザー情報を含めるか
-  %dt screen_name or user_id
-  %dd
-    %p Twitter アカウントのもの
-    %p 必須
-    %p リストのみ
-  %dt count
-  %dd
-    %p 1-100
-    %p default: 10
-    %p リストのみ。件数
-  %dt page
-  %dd
-    %p 1-
-    %p default: 1
-    %p リストのみ。ページ
-  %dt all
-  %dd
-    %p true or false
-    %p default: false
-    %p timeline のみ。反応がなかったツイートも含めるかどうか。
-  %dt tweets
-  %dd
-    %p favorite or retweet or all
-    %p default: all
-    %p discovered のみ。意味は察して疲れた
-  %dt order
-  %dd
-    %p favorite or retweet or all
-    %p default: all
-    %p best, recent のみ。察して
 

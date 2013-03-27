@@ -1,9 +1,10 @@
 class UsersController < ApplicationController
   before_filter :get_user
+  before_filter :get_user_b
 
   def best
     @title = "@#{@user.screen_name}'s Best Tweets"
-    render_page do
+    render_tweets do
       case params[:order]
       when /^fav/
         @user.tweets.reacted.order_by_favorites
@@ -17,7 +18,7 @@ class UsersController < ApplicationController
 
    def recent
     @title = "@#{@user.screen_name}'s Recent Best Tweets"
-    render_page do
+    render_tweets do
       case params[:order]
       when /^fav/
         @user.tweets.recent.reacted.order_by_favorites
@@ -33,7 +34,7 @@ class UsersController < ApplicationController
     raise Exception.new if @user.protected #FIXME
 
     @title = "@#{@user.screen_name}'s Newest Tweets"
-    render_page do
+    render_tweets do
       case params[:all]
       when /^(t|true|1)$/
         @user.tweets.order_by_id
@@ -45,7 +46,7 @@ class UsersController < ApplicationController
 
   def discovered
     @title = "@#{@user.screen_name}'s Recent Discoveries"
-    render_page do
+    render_tweets do
       case params[:tweets]
       when /^fav/
         Tweet.favorited_by(@user).order_by_id
@@ -73,45 +74,106 @@ class UsersController < ApplicationController
     end
   end
 
-  def from
-    hash = {}
-    @user.tweets.order_by_id.limit(100).each do |tweet|
-      case params[:event]
-      when /^fav/
-        events = tweet.favorites
-      when /^re?t/
-        events = tweet.retweets
-      else
-        raise Exception.new("Invalid event type")
-      end
-
-      events.each do |event|
-        hash[event.user_id] ||= 0
-        hash[event.user_id] += 1
-      end
+  def favorited_by
+    if @user_b
+      @title = "@#{@user.screen_name}'s Tweets"
+      render_tweets(@user.tweets.favorited_by(@user_b).order_by_id)
+    else
+      @title = "Who Favorited @#{@user.screen_name}"
+      @event_type = "favs"
+      render_users_by(:favorite)
     end
+  end
 
-    @usermap = hash.sort_by{|id, count| -count}
-      .take(50)
-      .map{|user, count| [User.cached(user), count]}
+  def retweeted_by
+    if @user_b
+      @title = "@#{@user.screen_name}'s Tweets"
+      render_tweets(@user.tweets.retweeted_by(@user_b).order_by_id)
+    else
+      @title = "Who Retweeted @#{@user.screen_name}"
+      @event_type = "retweets"
+      render_users_by(:retweet)
+    end
+  end
+
+  def given_favorites_to
+    if @user_b
+      @title = "@#{@user_b.screen_name}'s Tweets"
+      render_tweets(@user_b.tweets.favorited_by(@user).order_by_id)
+    else
+      @title = "@#{@user.screen_name}'s Favorites"
+      @event_type = "favs"
+      render_users_to(:favorite)
+    end
+  end
+
+  def given_retweets_to
+    if @user_b
+      @title = "@#{@user_b.screen_name}'s Tweets"
+      render_tweets(@user_b.tweets.retweeted_by(@user).order_by_id)
+    else
+      @title = "@#{@user.screen_name}'s Retweets"
+      @event_type = "retweets"
+      render_users_to(:retweet)
+    end
   end
 
   private
-  def render_page(&blk)
-    @items = blk.call.page(page).per(count)
-
-    respond_to do |format|
-      format.html
-      format.json
+  def render_users_by(event)
+    case event
+    when :favorite
+      pr = -> tweet{tweet.favorites}
+    when :retweet
+      pr = -> tweet{tweet.retweets}
+    else
+      raise Exception.new("Invalid event type")
     end
+    @usermap = @user.tweets
+      .order_by_id
+      .limit(100)
+      .inject(Hash.new(0)){|hash, tweet| pr.call(tweet).each{|event| hash[event.user_id] += 1}; hash}
+      .sort_by{|id, count| -count}
+      .take(50)
+      .map{|user, count| [User.cached(user), count]}
+
+    render "shared/users"
+  end
+
+  def render_users_to(event)
+    case event
+    when :favorite
+      es = @user.favorites
+    when :retweet
+      es = @user.retweets
+    end
+
+    @usermap = es
+      .order_by_id
+      .limit(500)
+      .map{|e| Tweet.cached(e.tweet_id)}
+      .inject(Hash.new(0)){|hash, tweet| hash[tweet.user_id] += 1; hash}
+      .sort_by{|user_id, count| -count}
+      .take(50)
+      .map{|user_id, count| [User.cached(user_id), count]}
+
+    render "shared/users"
   end
 
   def get_user
+    if params[:screen_name] == "me"
+      if session[:user_id]
+        params[:user_id] = session[:user_id]
+      else
+        # FIXME
+        # redirect?
+      end
+    end
+
     if params[:user_id]
       @user = User.cached(params[:user_id].to_i)
     end
 
-    if !@user || params[:screen_name]
+    if !@user && params[:screen_name]
       @user = User.where(:screen_name => params[:screen_name]).first
     end
 
@@ -121,31 +183,22 @@ class UsersController < ApplicationController
     end
   end
 
-  def page
-    if params[:page]
-      i = params[:page].to_i
-      if i > 0
-        ret = i
+  def get_user_b
+    if params[:screen_name_b] == "me"
+      if session[:user_id]
+        params[:user_id_b] = session[:user_id]
+      else
+        # FIXME
+        # redirect?
       end
     end
-    ret || 1
-  end
 
-  def count
-    if params[:count]
-      i = params[:count].to_i
-      if (1..100) === i
-        ret = i
-      end
+    if params[:user_id_b]
+      @user_b = User.cached(params[:user_id_b].to_i)
     end
-    ret || Settings.page_per
-  end
 
-  def include_user
-    case params[:include_user]
-    when /^t/
-      ret = true
+    if !@user_b && params[:screen_name_b]
+      @user_b = User.where(:screen_name => params[:screen_name_b]).first
     end
-    ret || false
   end
 end

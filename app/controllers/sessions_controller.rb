@@ -13,20 +13,22 @@ class SessionsController < ApplicationController
 
     begin
       UNIXSocket.open(Settings.register_server_path) do |socket|
-        socket.write({:type => "register", :id => account.id, :user_id => account.user_id}.to_msgpack)
+        socket.write({:type => "register",
+                      :id => account.id,
+                      :user_id => account.user_id}.to_msgpack)
       end
-    rescue Errno::ECONNREFUSED
+    rescue Exception
       # receiver not started?
       warn $!
       warn $@
     end
 
-    redirect_to root_url
+    redirect_to root_path
   end
 
   def destroy
     reset_session
 
-    redirect_to root_url
+    redirect_to root_path
   end
 end

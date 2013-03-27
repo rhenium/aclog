@@ -22,18 +22,19 @@ Aclog::Application.routes.draw do
   get "/i/logout" => "sessions#destroy"
 
   # other
-  get "/i/show" => "i#show", :constraints => constraints
-
   get "/i/best" => "i#best"
   get "/i/recent" => "i#recent"
   get "/i/timeline" => "i#timeline"
-  get "/i/:id" => "i#show", :constraints => constraints
 
   # user
+  get "/i/show" => "users#show", :constraints => constraints
+
   get "/users/best" => "users#best", :constraints => constraints
   get "/users/recent" => "users#recent", :constraints => constraints
   get "/users/timeline" => "users#timeline", :constraints => constraints
   get "/users/discovered" => "users#discovered", :constraints => constraints
+
+  get "/i/:id" => "users#show", :constraints => constraints
 
   get "/:screen_name(/:page)" => "users#best", :constraints => constraints
   get "/:screen_name/:order(/:page)" => "users#best", :constraints => constraints

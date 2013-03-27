@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_filter :get_user
+  before_filter :get_user, :except => :show
   before_filter :get_user_b
 
   def best
@@ -31,7 +31,7 @@ class UsersController < ApplicationController
   end
 
   def timeline
-    raise Exception.new if @user.protected #FIXME
+    raise Aclog::Exceptions::UserProtected if @user.protected
 
     @title = "@#{@user.screen_name}'s Newest Tweets"
     render_tweets do
@@ -60,9 +60,7 @@ class UsersController < ApplicationController
 
   def info
     account = Account.where(:user_id => @user.id).first
-    unless account
-      raise ActiveRecord::RecordNotFound.new("Account not found: #{@user}")
-    end
+    raise Aclog::Exceptions::UserNotRegistered unless account
 
     @title = "@#{@user.screen_name} (#{@user.name})'s Profile"
 
@@ -118,6 +116,21 @@ class UsersController < ApplicationController
     end
   end
 
+  def show
+    tweet_id = params[:id].to_i
+    items = Tweet.where(:id => tweet_id)
+
+    item = items.first
+    raise Aclog::Exceptions::TweetNotFound unless item
+    @user = items.first.user
+
+    helpers = ApplicationController.helpers
+    @title = "\"#{helpers.strip_tags(helpers.format_tweet_text(item.text))[0...30]}\" from @#{@user.screen_name}"
+    @title_b = "@#{@user.screen_name}'s Tweet"
+
+    render_tweets(items)
+  end
+
   private
   def render_users_by(event)
     case event
@@ -125,9 +138,8 @@ class UsersController < ApplicationController
       pr = -> tweet{tweet.favorites}
     when :retweet
       pr = -> tweet{tweet.retweets}
-    else
-      raise Exception.new("Invalid event type")
     end
+
     @usermap = @user.tweets
       .order_by_id
       .limit(100)
@@ -164,8 +176,7 @@ class UsersController < ApplicationController
       if session[:user_id]
         params[:user_id] = session[:user_id]
       else
-        # FIXME
-        # redirect?
+        raise Aclog::Exceptions::LoginRequired
       end
     end
 
@@ -177,10 +188,7 @@ class UsersController < ApplicationController
       @user = User.where(:screen_name => params[:screen_name]).first
     end
 
-    unless @user
-      raise ActiveRecord::RecordNotFound.new(
-        "User not found: #{{:user_id => params[:user_id], :screen_name => params[:screen_name]}.inspect}")
-    end
+    raise Aclog::Exceptions::UserNotFound unless @user
   end
 
   def get_user_b
@@ -188,8 +196,7 @@ class UsersController < ApplicationController
       if session[:user_id]
         params[:user_id_b] = session[:user_id]
       else
-        # FIXME
-        # redirect?
+        raise Aclog::Exceptions::LoginRequired
       end
     end
 

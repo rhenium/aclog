@@ -1,7 +1,13 @@
 .item
   .tweet
-    .avatar
-      = link_to image_tag(item.user.profile_image_url, :alt => item.user.screen_name, :title => item.user.name), :controller => "users", :action => "best", :screen_name => item.user.screen_name
+    .left
+      .avatar
+        = link_to image_tag(item.user.profile_image_url, :alt => item.user.screen_name, :title => item.user.name), :controller => "users", :action => "best", :screen_name => item.user.screen_name
+      %ul.inline.actions
+        %li
+          = link_to image_tag("reply.png", :alt => "reply"), "https://twitter.com/intent/tweet?in_reply_to=#{item.id}"
+          = link_to image_tag("retweet.png", :alt => "retweet"), "https://twitter.com/intent/retweet?tweet_id=#{item.id}"
+          = link_to image_tag("favorite.png", :alt => "favorite"), "https://twitter.com/intent/favorite?tweet_id=#{item.id}"
     .tweet_content_fix
     .tweet_content
       .user

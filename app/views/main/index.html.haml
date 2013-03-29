@@ -33,4 +33,20 @@
   %dd= link_to "/i/timeline", "/i/timeline"
 %p
   Favstar のパスにアクセスされた場合リダイレクトするようになっているはず…
-
+%h3 検索クエリ
+半角スペース区切りで、すべて AND 検索になります。
+%dl
+  %dt ユーザーの
+  %dt user:sg4k
+  %dt 反応数 〜〜以上
+  %dd reaction:30
+  %dd favorite:30
+  %dd retweet:30
+  %dt 並び替え
+  %dd order:old
+  %dd order:reaction
+  %dd order:favorite
+  %dd order:retweet
+  %dt 期間
+  %dd 20130328..20130330
+  %dt ツイート本文の検索はできません。付けるかはわかんない

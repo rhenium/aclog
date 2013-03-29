@@ -1,17 +1,22 @@
 .sidebar
-  .avatar= link_to (image_tag @user.profile_image_url_original, :alt => @user.screen_name, :width => 64, :height => 64, :class => "icon img-rounded"), :controller => "users", :action => "best", :screen_name => @user.screen_name
-  .screen_name= link_to "@#{@user.screen_name}", :controller => "users", :action => "best", :screen_name => @user.screen_name
+  .avatar
+    = link_to_user_page @user.screen_name do
+      = image_tag @user.profile_image_url_original, :alt => @user.screen_name, :width => 64, :height => 64, :class => "icon img-rounded"
+  .screen_name= link_to @user.screen_name, twitter_user_url(@user.screen_name)
   - if @user.registered?
-    %table.table.table-condensed.records
-      %tr
-        %td favorited
-        %td.data= @user.stats[:favorited_count]
-      %tr
-        %td retweeted
-        %td.data= @user.stats[:retweeted_count]
-      %tr
-        %td avg. fav
-        %td.data= ((@user.stats[:favorited_count] + 0.0) / @user.stats[:tweets_count]).round(2)
+    %ul.records
+      %li
+        %span favorited
+        %span.data= @user.stats[:favorited_count]
+      %li
+        %span retweeted
+        %span.data= @user.stats[:retweeted_count]
+      %li
+        %span avg. fav
+        %span.data= ((@user.stats[:favorited_count] + 0.0) / @user.stats[:tweets_count]).round(2)
+      %li
+        %span joined
+        %span.data= format_date_ago(@user.created_at)
   - else
     .alert.alert-info
       = "@#{@user.screen_name} has never signed in to aclog"
@@ -22,8 +27,6 @@
           = link_to "info", :controller => "users", :action => "info", :screen_name => @user.screen_name
       %li
         = link_to "best", :controller => "users", :action => "best", :screen_name => @user.screen_name
-      %li
-        = link_to "recent", :controller => "users", :action => "recent", :screen_name => @user.screen_name
       %li
         = link_to "timeline", :controller => "users", :action => "timeline", :screen_name => @user.screen_name
       %li

@@ -6,6 +6,7 @@ gem 'mysql2'
 gem 'dalli'
 
 gem 'unicorn'
+gem 'thin'
 gem 'daemon-spawn', :require => 'daemon_spawn'
 
 gem 'rails_config'

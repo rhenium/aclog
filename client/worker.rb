@@ -24,13 +24,13 @@ class Worker
       last_index = entities.inject(0) do |last_index, entity|
         result << chars[last_index...entity[:indices].first]
         result << if entity[:url]
-                    "<url:#{CGI.escape(entity[:expanded_url])}:#{CGI.escape(entity[:display_url])}>"
+                    "<url:#{escape_colon(entity[:expanded_url])}:#{escape_colon(entity[:display_url])}>"
                   elsif entity[:text]
-                    "<hashtag:#{CGI.escape(entity[:text])}>"
+                    "<hashtag:#{escape_colon(entity[:text])}>"
                   elsif entity[:screen_name]
-                    "<mention:#{CGI.escape(entity[:screen_name])}>"
+                    "<mention:#{escape_colon(entity[:screen_name])}>"
                   elsif entity[:cashtag]
-                    "<cashtag:#{CGI.escape(entity[:cashtag])}>"
+                    "<cashtag:#{escape_colon(entity[:cashtag])}>"
                   end
         entity[:indices].last
       end
@@ -38,6 +38,8 @@ class Worker
 
       result.flatten.join
     end
+
+    def escape_colon(str); str.gsub(":", "%3A").gsub("<", "%3C").gsub(">", "%3E"); end
 
     def format_source(status)
       if status[:source].index("<a")
@@ -192,6 +194,7 @@ class Worker
               send_retweet.call(hash)
             end
           elsif hash[:user][:id] == user_id
+            # update: exclude not favorited tweet
             send_tweet.call(hash)
           end
         elsif hash[:friends]

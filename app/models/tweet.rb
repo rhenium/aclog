@@ -36,11 +36,10 @@ class Tweet < ActiveRecord::Base
   end
 
   scope :discovered_by, -> user do
-    where("id IN (" +
-          "SELECT tweet_id FROM favorites WHERE user_id = ?" +
-          " UNION ALL " +
-          "SELECT tweet_id FROM retweets WHERE user_id = ?" +
-          ")", user.id, user.id)
+    where("id IN (SELECT tweet_id FROM favorites WHERE user_id = ?)" +
+          " OR " +
+          "id IN (SELECT tweet_id FROM retweets WHERE user_id = ?)",
+          user.id, user.id)
   end
 
   def self.cached(id)

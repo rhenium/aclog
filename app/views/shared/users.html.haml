@@ -4,10 +4,12 @@
       - user = User.cached(user_id)
       %li
         - if user
-          %a{:href => url_for(params.merge(:screen_name_b => user.screen_name))}
+          = link_to_user_page user.screen_name do
             .avatar= image_tag user.profile_image_url, :alt => user.screen_name, :title => user.name
         - else
           .avatar= image_tag asset_path("missing_profile_image.png"), :alt => "Missing User: #{user_id}", :title => "Missing User: #{user_id}"
-        .count= count
-        .type= @event_type
+        .data
+          = link_to url_for(params.merge(:screen_name_b => user.screen_name)) do
+            .count= count
+            .type= @event_type
 

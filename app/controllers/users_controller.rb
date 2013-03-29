@@ -58,16 +58,12 @@ class UsersController < ApplicationController
   end
 
   def info
-    account = Account.where(:user_id => @user.id).first
-    raise Aclog::Exceptions::UserNotRegistered unless account
+    raise Aclog::Exceptions::UserNotRegistered unless @user.account
 
     @title = "@#{@user.screen_name} (#{@user.name})'s Profile"
 
-
     respond_to do |format|
-      format.html do
-        @twitter_user = account.twitter_user
-      end
+      format.html
       format.json do
         @include_user_stats = true
       end
@@ -170,6 +166,7 @@ class UsersController < ApplicationController
       .order_by_id
       .limit(500)
       .map{|e| Tweet.cached(e.tweet_id)}
+      .compact
       .inject(Hash.new(0)){|hash, tweet| hash[tweet.user_id] += 1; hash}
       .sort_by{|user_id, count| -count}
 
@@ -186,11 +183,13 @@ class UsersController < ApplicationController
     end
 
     if params[:user_id]
+      #@user = User.cached(params[:user_id].to_i)
       @user = User.cached(params[:user_id].to_i)
     end
 
     if !@user && params[:screen_name]
-      @user = User.where(:screen_name => params[:screen_name]).first
+      #@user = User.where(:screen_name => params[:screen_name]).first
+      @user = User.cached(params[:screen_name])
     end
 
     raise Aclog::Exceptions::UserNotFound unless @user

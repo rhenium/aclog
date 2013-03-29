@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :set_format, :get_include_user, :get_include_user_stats
-  after_filter :set_content_type
+  after_filter :xhtml
 
   def set_format
     unless request.format == :json || request.format == :html
@@ -9,9 +10,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def set_content_type
+  def xhtml
     if request.format == :html
       response.content_type = "application/xhtml+xml"
+
+      # remove invalid charactors
+      response.body = response.body.gsub(/[\x0-\x8\xb\xc\xe-\x1f]/, "")
     end
   end
 

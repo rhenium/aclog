@@ -12,16 +12,16 @@
     .tweet_content
       .user
         %span.name
-          = link_to item.user.name, :controller => "users", :action => "best", :screen_name => item.user.screen_name
-        %span.screen_name
-          = link_to "@#{item.user.screen_name}", :controller => "users", :action => "best", :screen_name => item.user.screen_name
+          = link_to_user_page item.user.screen_name do
+            = item.user.name
+        %span.screen_name= link_to_user_page item.user.screen_name
       .text
         = raw format_tweet_text(item.text)
       .meta.clearfix
         %span.twitter_bird
           = link_to image_tag("bird_gray_16.png", :alt => "Twitter"), twitter_status_url(item), :target => "_blank"
         %span.created_at
-          = link_to format_tweet_created_at(item.tweeted_at), :controller => "users", :action => "show", :id => item.id
+          = link_to format_time(item.tweeted_at), :controller => "users", :action => "show", :id => item.id
         %span.source
           = raw format_source_text(item.source)
   .stats
@@ -36,6 +36,7 @@
             - m = a.user
               %li
                 - if m
-                  = link_to image_tag(m.profile_image_url, :alt => m.screen_name, :title => m.name), :controller => "users", :action => "best", :screen_name => m.screen_name
+                  = link_to_user_page m.screen_name do
+                    = image_tag m.profile_image_url, :alt => m.screen_name, :title => m.name
                 - else
                   = image_tag asset_path("missing_profile_image.png"), :alt => "Missing User: #{a.user_id}", :title => "Missing User: #{a.user_id}"

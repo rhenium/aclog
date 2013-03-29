@@ -4854,12 +4854,20 @@ a.label:hover, a.label:focus, a.badge:hover, a.badge:focus {
       border: 1px solid #c1c5cb;
       border-width: 1px 0;
       padding: 15px; }
-      .items .item .tweet .avatar {
-        width: 60px;
-        float: left; }
-        .items .item .tweet .avatar img {
+      .items .item .tweet .left {
+        float: left;
+        width: 60px; }
+        .items .item .tweet .left .avatar img {
           width: 48px;
           height: 48px; }
+        .items .item .tweet .left ul.actions li {
+          padding: 0; }
+          .items .item .tweet .left ul.actions li a {
+            float: left; }
+            .items .item .tweet .left ul.actions li a img {
+              width: 16px;
+              height: 16px;
+              vertical-align: bottom; }
       .items .item .tweet .tweet_content_fix {
         float: left;
         width: 0;
@@ -4965,8 +4973,25 @@ a.label:hover, a.label:focus, a.badge:hover, a.badge:focus {
     margin: 10px 0; }
   .sidebar .avatar {
     text-align: center; }
-  .sidebar .records .data {
-    text-align: right; }
+  .sidebar .records {
+    list-style: none;
+    margin: 0 0 20px; }
+    .sidebar .records li {
+      *zoom: 1;
+      border-top: 1px solid #dddddd; }
+      .sidebar .records li:before, .sidebar .records li:after {
+        display: table;
+        content: "";
+        line-height: 0; }
+      .sidebar .records li:after {
+        clear: both; }
+      .sidebar .records li span {
+        display: block;
+        float: left;
+        line-height: 20px;
+        padding: 4px 5px; }
+      .sidebar .records li .data {
+        float: right; }
 
 a {
   text-decoration: none;

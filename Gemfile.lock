@@ -46,6 +46,7 @@ GEM
       execjs
     coffee-script-source (1.6.2)
     daemon-spawn (0.4.2)
+    daemons (1.1.9)
     dalli (2.6.2)
     em-twitter (0.2.1)
       eventmachine (~> 1.0)
@@ -134,6 +135,10 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (~> 2.8)
+    thin (1.5.1)
+      daemons (>= 1.0.9)
+      eventmachine (>= 0.12.6)
+      rack (>= 1.0.0)
     thor (0.17.0)
     thread_safe (0.1.0)
       atomic
@@ -173,6 +178,7 @@ DEPENDENCIES
   rails (= 4.0.0.beta1)
   rails_config
   sass-rails (~> 4.0.0.beta1)
+  thin
   twitter
   uglifier (>= 1.0.3)
   unicorn

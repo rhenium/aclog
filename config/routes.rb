@@ -28,6 +28,8 @@ Aclog::Application.routes.draw do
   get "/i/show" => "users#show"
   get "/i/:id" => "users#show", :constraints => constraints
 
+  get "/search" => "search#search"
+
   # i -- end
   get "/i(/:none)" => redirect("/")
 
@@ -48,7 +50,6 @@ Aclog::Application.routes.draw do
   get "/:screen_name/recent(/:page)" => "users#recent", :constraints => constraints
   get "/:screen_name/recent/:order(/:page)" => "users#recent", :constraints => constraints
   get "/:screen_name/timeline(/:page)" => "users#timeline", :constraints => constraints
-  get "/:screen_name/timeline/all(/:page)" => "users#timeline", :constraints => constraints, :defaults => {:all => "true"}
   get "/:screen_name/discovered(/:page)" => "users#discovered", :constraints => constraints
   get "/:screen_name/discovered/:tweets(/:page)" => "users#discovered", :constraints => constraints
   get "/:screen_name/info" => "users#info", :constraints => constraints

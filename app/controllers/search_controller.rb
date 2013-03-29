@@ -4,12 +4,14 @@ require "shellwords"
 class SearchController < ApplicationController
   def search
     @show_search = true
+
     # TODO: OR とか () とか対応したいよね
     unless params[:query]
       render_tweets(Tweet.where(:id => -1))
       return
     end
-    p words = Shellwords.shellwords(params[:query])
+    words = Shellwords.shellwords(params[:query])
+    dateformat = "(20[0-9]{2})([-_\/]?)([0-9]{2})\\2([0-9]{2})" # $1: year, $3: month, $4: day
 
     result = words.inject(Tweet.order_by_id) do |tweets, word|
       case word
@@ -17,9 +19,13 @@ class SearchController < ApplicationController
         # 特殊
         key, value = word.split(":", 2)
         case key.downcase
-        when /^user$/
+        when /^-?user$/
           user = User.cached(value)
-          tweets.where(:user_id => user ? user.id : -1)
+          if key[0] == "-"
+            tweets.where("user_id != ?", user ? user.id : -1)
+          else
+            tweets.where(:user_id => user ? user.id : -1)
+          end
         when /^-?fav/
           search_unless_zero(tweets, "favorites_count", key[0], value)
         when /^-?re?t/
@@ -39,7 +45,7 @@ class SearchController < ApplicationController
           else
             tweets
           end
-        when "text"
+        when /^-?text$/
           sourcetext = word.split(":", 2).last.gsub("%", "\\%").gsub("*", "%")
           sourcetext = "%#{sourcetext}%".gsub(/%+/, "%")
           op = key[0] == "-" ? " NOT LIKE " : " LIKE "
@@ -52,12 +58,16 @@ class SearchController < ApplicationController
           # unknown command
           tweets
         end
-      when /^20[0-9]{6}\.\.20[0-9]{6}$/
-        since, to = word.split(/\.\./)
-        since = Time.utc(since[0...4].to_i, since[4...6].to_i, since[6...8].to_i) - 9 * 60 * 60
-        to = Time.utc(to[0...4].to_i, to[4...6].to_i, to[6...8].to_i + 1) - 9 * 60 * 60
+      when /^-?#{dateformat}\.\.#{dateformat}$/
 
-        tweets.where(:id => first_id_of_time(since)...first_id_of_time(to))
+        since = Time.utc($1.to_i, $3.to_i, $4.to_i) - 9 * 60 * 60
+        to = Time.utc($5.to_i, $7.to_i, $8.to_i + 1) - 9 * 60 * 60
+
+        if word[0] == "-"
+          tweets.where("id < ? OR id >= ?", first_id_of_time(since), first_id_of_time(to))
+        else
+          tweets.where(:id => first_id_of_time(since)...first_id_of_time(to))
+        end
       else
         # TODO: ツイート検索
         tweets

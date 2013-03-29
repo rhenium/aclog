@@ -65,7 +65,10 @@ Aclog::Application.routes.draw do
   get "/users/:screen_name/most_retweeted" => redirect("/%{screen_name}/retweet"), :constraints => constraints
   get "/users/:screen_name/discovered" => redirect("/%{screen_name}/discovered"), :constraints => constraints
   get "/users/:screen_name/recent" => redirect("/%{screen_name}/timeline"), :constraints => constraints
-  get "/users/:screen_name/favs_from(/:screen_name_b)" => redirect("/%{screen_name}/favorited_by/%{screen_name_b}"), :constraints => constraints
-  get "/users/:screen_name/retweeted_by(/:screen_name_b)" => redirect("/%{screen_name}/retweeted_by/%{screen_name_b}"), :constraints => constraints
-  get "/users/:screen_name/given_to(/:screen_name_b)" => redirect("/%{screen_name}/given_favorites_to/%{screen_name_b}"), :constraints => constraints
+  get "/users/:screen_name/favs_from" => redirect("/%{screen_name}/favorited_by"), :constraints => constraints
+  get "/users/:screen_name/favs_from/:screen_name_b" => redirect("/%{screen_name}/favorited_by/%{screen_name_b}"), :constraints => constraints
+  get "/users/:screen_name/retweeted_by" => redirect("/%{screen_name}/retweeted_by"), :constraints => constraints
+  get "/users/:screen_name/retweeted_by/:screen_name_b" => redirect("/%{screen_name}/retweeted_by/%{screen_name_b}"), :constraints => constraints
+  get "/users/:screen_name/given_to" => redirect("/%{screen_name}/given_favorites_to"), :constraints => constraints
+  get "/users/:screen_name/given_to/:screen_name_b" => redirect("/%{screen_name}/given_favorites_to/%{screen_name_b}"), :constraints => constraints
 end

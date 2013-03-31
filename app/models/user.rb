@@ -77,7 +77,7 @@ class User < ActiveRecord::Base
       rec.protected = hash[:protected]
       rec.save! if rec.changed?
     rescue
-      $logger.error("Unknown error while inserting user: #{$!}/#{$@}")
+      logger.error("Unknown error while inserting user: #{$!}/#{$@}")
     end
   end
 

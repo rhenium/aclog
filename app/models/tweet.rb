@@ -73,9 +73,9 @@ class Tweet < ActiveRecord::Base
               :tweeted_at => hash[:tweeted_at],
               :user_id => hash[:user_id])
     rescue ActiveRecord::RecordNotUnique
-      $logger.debug("Duplicate Tweet: #{hash[:id]}")
+      logger.debug("Duplicate Tweet: #{hash[:id]}")
     rescue
-      $logger.error("Unknown error while inserting tweet: #{$!}/#{$@}")
+      logger.error("Unknown error while inserting tweet: #{$!}/#{$@}")
     end
   end
 end

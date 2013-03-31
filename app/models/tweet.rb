@@ -28,18 +28,19 @@ class Tweet < ActiveRecord::Base
   end
 
   scope :favorited_by, -> user do
-    where("id IN (SELECT tweet_id FROM favorites WHERE user_id = ?)", user.id)
+    joins(:favorites).where(:favorites => {:user_id => user.id})
   end
 
   scope :retweeted_by, -> user do
-    where("id IN (SELECT tweet_id FROM retweets WHERE user_id = ?)", user.id)
+    joins(:retweets).where(:retweets => {:user_id => user.id})
   end
 
   scope :discovered_by, -> user do
-    where("id IN (SELECT tweet_id FROM favorites WHERE user_id = ?)" +
-          " OR " +
-          "id IN (SELECT tweet_id FROM retweets WHERE user_id = ?)",
-          user.id, user.id)
+    joins("INNER JOIN (" +
+            "(SELECT favorites.tweet_id FROM favorites WHERE favorites.user_id = #{user.id})" +
+          " UNION " +
+            "(SELECT retweets.tweet_id FROM retweets WHERE retweets.user_id = #{user.id})" +
+          ") AS m ON m.tweet_id = tweets.id")
   end
 
   def self.cached(id)
@@ -51,4 +52,31 @@ class Tweet < ActiveRecord::Base
   def user
     User.cached(user_id)
   end
+
+  def self.delete_from_id(id)
+    begin
+      # where(:id => id).destroy_all
+      # counter_cache の無駄を省くために delete_all で
+      Favorite.delete_all(:tweet_id => id)
+      Retweet.delete_all(:tweet_id => id)
+      Tweet.delete_all(:id => id)
+    rescue
+      logger.error("Unknown error while deleting tweet: #{$!}/#{$@}")
+    end
+  end
+
+  def self.from_hash(hash)
+    begin
+      create!(:id => hash[:id],
+              :text => hash[:text],
+              :source => hash[:source],
+              :tweeted_at => hash[:tweeted_at],
+              :user_id => hash[:user_id])
+    rescue ActiveRecord::RecordNotUnique
+      $logger.debug("Duplicate Tweet: #{hash[:id]}")
+    rescue
+      $logger.error("Unknown error while inserting tweet: #{$!}/#{$@}")
+    end
+  end
 end
+

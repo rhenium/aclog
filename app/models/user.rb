@@ -67,4 +67,25 @@ class User < ActiveRecord::Base
       end
     }.call
   end
+
+  def self.from_hash(hash)
+    begin
+      rec = find_or_initialize_by(:id => hash[:id])
+      rec.screen_name = hash[:screen_name]
+      rec.name = hash[:name]
+      rec.profile_image_url = hash[:profile_image_url]
+      rec.protected = hash[:protected]
+      rec.save! if rec.changed?
+    rescue
+      $logger.error("Unknown error while inserting user: #{$!}/#{$@}")
+    end
+  end
+
+  def self.from_user_object(user_object)
+    from_hash(:id => user_object.id,
+              :screen_name => user_object.screen_name,
+              :name => user_object.name,
+              :profile_image_url => user_object.profile_image_url_https,
+              :protected => user_object.protected)
+  end
 end

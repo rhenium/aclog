@@ -16,7 +16,7 @@ class UsersController < ApplicationController
     end
   end
 
-   def recent
+  def recent
     @title = "@#{@user.screen_name}'s Recent Best Tweets"
     render_tweets do
       case order
@@ -116,22 +116,24 @@ class UsersController < ApplicationController
 
   def show
     tweet_id = params[:id].to_i
-    @items = Tweet.where(:id => tweet_id).page
+    @item = Tweet.where(:id => tweet_id).first
 
-    item = @items.first
-    raise Aclog::Exceptions::TweetNotFound unless item
-    @user = item.user
+    raise Aclog::Exceptions::TweetNotFound unless @item
+    @user = @item.user
+
+    # import 100
+    if params[:import] == "force" && session[:account]
+      session[:account].import_favorites(@item.id)
+    end
 
     helpers = ApplicationController.helpers
-    @title = "\"#{helpers.strip_tags(helpers.format_tweet_text(item.text))[0...30]}\" from @#{@user.screen_name}"
+    @title = "\"#{helpers.strip_tags(helpers.format_tweet_text(@item.text))[0...30]}\" from @#{@user.screen_name}"
     @title_b = "@#{@user.screen_name}'s Tweet"
 
     respond_to do |format|
-      format.html do
-        render "shared/tweets"
-      end
+      format.html
       format.json do
-        render "shared/_tweet", :locals => {:item => item}
+        render "shared/_tweet", :locals => {:item => @item}
       end
     end
   end

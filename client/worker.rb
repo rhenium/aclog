@@ -15,6 +15,8 @@ class Worker
       @pac = MessagePack::Unpacker.new
     end
 
+    def escape_colon(str); str.gsub(":", "%3A").gsub("<", "%3C").gsub(">", "%3E"); end
+
     def format_text(status)
       chars = status[:text].to_s.split(//)
 
@@ -39,13 +41,11 @@ class Worker
       result.flatten.join
     end
 
-    def escape_colon(str); str.gsub(":", "%3A").gsub("<", "%3C").gsub(">", "%3E"); end
-
     def format_source(status)
       if status[:source].index("<a")
         url = status[:source].scan(/href="(.+?)"/).flatten.first
         name = status[:source].scan(/>(.+?)</).flatten.first
-        "<url:#{CGI.escape(url)}:#{CGI.escape(name)}>"
+        "<url:#{escapecolon(url)}:#{escapecolon(name)}>"
       else
         status[:source]
       end

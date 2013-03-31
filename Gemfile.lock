@@ -33,6 +33,8 @@ GEM
       multi_json (~> 1.3)
       thread_safe (~> 0.1)
       tzinfo (~> 0.3.33)
+    after_commit_action (0.1.3)
+      activerecord (>= 3.0.0)
     arel (4.0.0.beta2)
     atomic (1.0.1)
     bootstrap-sass (2.3.1.0)
@@ -45,6 +47,8 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.6.2)
+    counter_culture (0.1.10)
+      after_commit_action (~> 0.1.3)
     daemon-spawn (0.4.2)
     daemons (1.1.9)
     dalli (2.6.2)
@@ -165,6 +169,7 @@ PLATFORMS
 DEPENDENCIES
   bootstrap-sass
   coffee-rails (~> 4.0.0.beta1)
+  counter_culture
   daemon-spawn
   dalli
   em-twitter

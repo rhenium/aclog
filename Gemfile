@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.0.0.beta1'
 gem 'mysql2'
 gem 'dalli'
+gem 'counter_culture'
 
 gem 'unicorn'
 gem 'thin'

@@ -28,6 +28,11 @@ after_fork do |server, worker|
   if defined?(ActiveRecord::Base)
     ActiveRecord::Base.establish_connection
   end
+
+  if defined?(ActiveSupport::Cache::DalliStore) && Rails.cache.is_a?(ActiveSupport::Cache::DalliStore)
+    Rails.cache.reset
+    ObjectSpace.each_object(ActionDispatch::Session::DalliStore) { |obj| obj.reset }
+  end
 end
 
 

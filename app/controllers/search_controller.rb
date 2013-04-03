@@ -7,7 +7,7 @@ class SearchController < ApplicationController
 
     # TODO: OR とか () とか対応したいよね
     unless params[:query]
-      render_tweets(Tweet.where(:id => -1))
+      render_page(Tweet.where(:id => -1))
       return
     end
     words = Shellwords.shellwords(params[:query])
@@ -74,7 +74,7 @@ class SearchController < ApplicationController
       end
     end
 
-    render_tweets(result)
+    render_page(result)
   end
 
   private

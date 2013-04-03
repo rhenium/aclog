@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130323045606) do
+ActiveRecord::Schema.define(version: 20130403160821) do
 
   create_table "accounts", force: true do |t|
     t.integer  "user_id",            limit: 8, null: false
@@ -33,6 +33,17 @@ ActiveRecord::Schema.define(version: 20130323045606) do
   add_index "favorites", ["tweet_id"], name: "index_favorites_on_tweet_id"
   add_index "favorites", ["user_id"], name: "index_favorites_on_user_id"
 
+  create_table "issues", force: true do |t|
+    t.integer  "issue_type", limit: 2
+    t.integer  "status",     limit: 2
+    t.text     "data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "issues", ["issue_type"], name: "index_issues_on_issue_type"
+  add_index "issues", ["status"], name: "index_issues_on_status"
+
   create_table "retweets", force: true do |t|
     t.integer "tweet_id", limit: 8, null: false
     t.integer "user_id",  limit: 8, null: false
@@ -41,6 +52,14 @@ ActiveRecord::Schema.define(version: 20130323045606) do
   add_index "retweets", ["tweet_id", "user_id"], name: "index_retweets_on_tweet_id_and_user_id", unique: true
   add_index "retweets", ["tweet_id"], name: "index_retweets_on_tweet_id"
   add_index "retweets", ["user_id"], name: "index_retweets_on_user_id"
+
+  create_table "stolen_tweets", force: true do |t|
+    t.integer "tweet_id",    limit: 8
+    t.integer "original_id", limit: 8
+  end
+
+  add_index "stolen_tweets", ["original_id"], name: "index_stolen_tweets_on_original_id"
+  add_index "stolen_tweets", ["tweet_id"], name: "index_stolen_tweets_on_tweet_id", unique: true
 
   create_table "tweets", force: true do |t|
     t.text     "text",                                  null: false

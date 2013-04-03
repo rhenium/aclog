@@ -1,5 +1,6 @@
 //= require jquery.autopager-1.0.0-mod
 $(function() {
+  $(".pagination").hide();
   $.autopager({
     autoLoad: true,
     content: ".items",
@@ -10,7 +11,7 @@ $(function() {
       $(".loading").hide();
     }
   });
-  $("a[rel=next]").hide().click(function() {
+  $("a[rel=next]").click(function() {
     $.autopager("load");
     return false;
   });

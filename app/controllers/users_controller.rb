@@ -4,7 +4,7 @@ class UsersController < ApplicationController
 
   def best
     @title = "@#{@user.screen_name}'s Best Tweets"
-    render_tweets do
+    render_page do
       case order
       when :favorite
         @user.tweets.reacted.order_by_favorites
@@ -18,7 +18,7 @@ class UsersController < ApplicationController
 
   def recent
     @title = "@#{@user.screen_name}'s Recent Best Tweets"
-    render_tweets do
+    render_page do
       case order
       when :favorite
         @user.tweets.recent.reacted.order_by_favorites
@@ -34,7 +34,7 @@ class UsersController < ApplicationController
     raise Aclog::Exceptions::UserProtected if @user.protected
 
     @title = "@#{@user.screen_name}'s Newest Tweets"
-    render_tweets do
+    render_timeline do
       if all
         @user.tweets.order_by_id
       else
@@ -45,7 +45,7 @@ class UsersController < ApplicationController
 
   def discovered
     @title = "@#{@user.screen_name}'s Recent Discoveries"
-    render_tweets do
+    render_timeline do
       case params[:tweets]
       when /^fav/
         Tweet.favorited_by(@user).order_by_id
@@ -73,7 +73,7 @@ class UsersController < ApplicationController
   def favorited_by
     if @user_b
       @title = "@#{@user.screen_name}'s Tweets"
-      render_tweets(@user.tweets.favorited_by(@user_b).order_by_id)
+      render_timeline(@user.tweets.favorited_by(@user_b).order_by_id)
     else
       @title = "Who Favorited @#{@user.screen_name}"
       @event_type = "favs"
@@ -84,7 +84,7 @@ class UsersController < ApplicationController
   def retweeted_by
     if @user_b
       @title = "@#{@user.screen_name}'s Tweets"
-      render_tweets(@user.tweets.retweeted_by(@user_b).order_by_id)
+      render_timeline(@user.tweets.retweeted_by(@user_b).order_by_id)
     else
       @title = "Who Retweeted @#{@user.screen_name}"
       @event_type = "retweets"
@@ -95,7 +95,7 @@ class UsersController < ApplicationController
   def given_favorites_to
     if @user_b
       @title = "@#{@user_b.screen_name}'s Tweets"
-      render_tweets(@user_b.tweets.favorited_by(@user).order_by_id)
+      render_timeline(@user_b.tweets.favorited_by(@user).order_by_id)
     else
       @title = "@#{@user.screen_name}'s Favorites"
       @event_type = "favs"
@@ -106,7 +106,7 @@ class UsersController < ApplicationController
   def given_retweets_to
     if @user_b
       @title = "@#{@user_b.screen_name}'s Tweets"
-      render_tweets(@user_b.tweets.retweeted_by(@user).order_by_id)
+      render_timeline(@user_b.tweets.retweeted_by(@user).order_by_id)
     else
       @title = "@#{@user.screen_name}'s Retweets"
       @event_type = "retweets"
@@ -131,7 +131,10 @@ class UsersController < ApplicationController
     @title_b = "@#{@user.screen_name}'s Tweet"
 
     respond_to do |format|
-      format.html
+      format.html do
+        @full = full
+      end
+
       format.json do
         render "shared/_tweet", :locals => {:item => @item}
       end

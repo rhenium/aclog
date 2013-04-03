@@ -10,9 +10,8 @@ Aclog::Application.routes.draw do
     :order => /(fav(orite[sd]?|(or)?ed|s)?|re?t(weet(s|ed)?|s)?)/,
   }
 
-  root :to => "main#index"
-
   # static
+  root :to => "main#index"
   get "/about" => "main#about"
   get "/about/api" => "main#api"
 
@@ -27,6 +26,10 @@ Aclog::Application.routes.draw do
 
   get "/i/show" => "users#show"
   get "/i/:id" => "users#show", :constraints => constraints
+
+  # report
+  get "/i/report" => "report#index"
+  post "/i/report/tweet" => "report#tweet"
 
   get "/search" => "search#search"
 

@@ -1,7 +1,13 @@
 class Tweet < ActiveRecord::Base
   belongs_to :user
+
   has_many :favorites, :dependent => :delete_all
   has_many :retweets, :dependent => :delete_all
+  has_many :favoriters, ->{order("favorites.id")}, :through => :favorites, :source => :user
+  has_many :retweeters, ->{order("retweets.id")}, :through => :retweets, :source => :user
+
+  has_one :stolen_tweet, ->{includes(:original)}, :dependent => :delete
+  has_one :original, :through => :stolen_tweet, :source => :original
 
   scope :recent, -> do
     where("tweeted_at > ?", Time.zone.now - 3.days)
@@ -43,6 +49,10 @@ class Tweet < ActiveRecord::Base
           ") AS m ON m.tweet_id = tweets.id")
   end
 
+  scope :original, -> do
+    joins("LEFT JOIN stolen_tweets ON tweets.id = stolen_tweets.tweet_id").where(:stolen_tweets => {:tweet_id => nil})
+  end
+
   def self.cached(id)
     Rails.cache.fetch("tweet/#{id}", :expires_in => 3.hour) do
       where(:id => id).first
@@ -54,8 +64,8 @@ class Tweet < ActiveRecord::Base
   end
 
   def notify_favorite
-    if [50, 100, 250, 500, 1000].include? favorites_count
-      Aclog::Notification.reply_favs(self, favorites_count)
+    if [50, 100, 250, 500, 1000].include? favorites.count
+      Aclog::Notification.reply_favs(self, favorites.count)
     end
   end
 

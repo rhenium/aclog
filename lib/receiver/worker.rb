@@ -242,7 +242,9 @@ class Receiver::Worker < DaemonSpawn::Base
 
   def initialize(opts = {})
     super(opts)
-    ActiveRecord::Base.logger = Rails.logger = Logger.new(STDOUT)
+    _logger = Logger.new(STDOUT)
+    _logger.level = Rails.env.production? ? Logger::INFO : Logger::DEBUG
+    ActiveRecord::Base.logger = Rails.logger = _logger
   end
 
   def start(args)

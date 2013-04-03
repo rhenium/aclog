@@ -1,0 +1,17 @@
+%h1 パクリツイートの報告
+%p
+  まだ準備中です。全く同一のツイートのみしか対応しておりません。
+%hr
+= form_tag({:controller => "report", :action => "tweet"}, {:method => :post, :class => "form-horizontal"}) do
+  .control-group
+    = label_tag "tweet_id_0", "ツイート1", :class => "control-label"
+    .controls
+      = text_field_tag "tweet_id_0", params[:tweet_id_0], :style => "width: 100%"
+  .control-group
+    = label_tag "tweet_id_1", "ツイート2", :class => "control-label"
+    .controls
+      = text_field_tag "tweet_id_1", params[:tweet_id_1], :style => "width: 100%"
+  .control-group
+    .controls
+      = submit_tag "送信", :name => nil, :class => "btn"
+

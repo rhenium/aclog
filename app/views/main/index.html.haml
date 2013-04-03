@@ -2,58 +2,26 @@
 .lead
   Favstar クローン
 %p
-  = link_to "@KOBA789", "https://twitter.com/KOBA789"
-  さんにサーバーを貸していただけることになりました…！！ありがとうございます！ありがとうございます！！！
-.alert
-  開発中です。まだ不具合あるかもしれません。一応動いてるっぽいですが
+  UserStreams で登録ユーザーのふぁぼり・ふぁぼられ・RTを集めて表示するサービスです。あんふぁぼも反映されます。
 %p
-  基本的に Favstar のパクリです。トロフィー・50favs通知以外の機能は一応全部つけたつもり。
-  トロフィー機能って必要ですかね、Favstar Pro じゃないし Favstar BAN されたしわかりません。
+  Favstar を参考に開発しています。現時点でトロフィー以外の機能はすべて使えるはずです。
 %p
-  不具合があったら私
-  = link_to "contact@re4k.info", "mailto:contact@re4k.info"
-  にメールするか、
-  = link_to "@cn", "https://twitter.com/cn"
-  へリプライを飛ばしてくれるとありがたいです。
-%h3
-  今後の予定
+  API も提供する予定です。about → api を見てください（まだ開発中であり、変更がある可能性もあります）
+%h4
+  今後の予定(2013/04/03)
 %ul
   %li トロフィー機能を付ける予定はありません
-  %li 50favs通知・100favs通知・250favs通知・500favs通知…は付ける予定
-  %li ふぁぼったー・Favstar からのデータの取り込み: したいけど…
-%h3 URL
-%dl
-  %dt best
-  %dd= link_to "/cn", "/cn"
-  %dt recent(最近3日のbest)
-  %dd= link_to "/cn/recent", "/cn/recent"
-  %dt timeline(Favstar の Recent)
-  %dd= link_to "/cn/timeline", "/cn/timeline"
-%p まだいろいろありますがユーザーのページを開くとサイドバーに一覧があるのでそちらからどうぞ
-%dl
-  %dt 全体のbest
-  %dd= link_to "/i/best", "/i/best"
-  %dt 全体の最新3日のbest
-  %dd= link_to "/i/recent", "/i/recent"
-  %dt 全体の最新反応あり
-  %dd= link_to "/i/timeline", "/i/timeline"
+  %li ふぁぼったー・Favstar からのデータの取り込み
+  %li パクリツイート対策
+  %li ふぁぼ爆撃対策
 %p
-  Favstar のパスにアクセスされた場合リダイレクトするようになっているはず…
-%h3 検索クエリ
-%p 半角スペース区切りで、すべて AND 検索になります。OR 検索付けたいけどまだ使えません。
-%p order 以外は先頭に - を付けることで否定になります。
+  = link_to "ツイート", "https://twitter.com/share", :class => "twitter-share-button", :"data-text" => "aclog", :"data-count" => "none", :"data-url" => "http://aclog.koba789.com/"
+%hr
+%h5
+  連絡先
 %dl
-  %dt ユーザーの
-  %dd user:cn
-  %dt 反応数 〜〜以上
-  %dd reaction:30
-  %dd favorite:30
-  %dd retweet:30
-  %dt 並び替え
-  %dd order:old
-  %dd order:reaction
-  %dd order:favorite
-  %dd order:retweet
-  %dt 期間
-  %dd 20130328..20130330
-  %dt ツイート本文・クライアント名での検索はできません。クライアント名での検索は付けたいけれど…
+  %dt Twitter
+  %dd= link_to "@cn", "https://twitter.com/cn"
+  %dt メール(あんまり見ていません)
+  %dd= link_to "contact@re4k.info", "mailto:contact@re4k.info"
+

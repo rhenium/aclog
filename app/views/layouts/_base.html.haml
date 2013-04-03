@@ -1,7 +1,7 @@
 !!! xml
 %html{xmlns: "http://www.w3.org/1999/xhtml"}
   %head
-    %title= @title
+    %title= @title.to_s + " - aclog"
     = stylesheet_link_tag "application"
     = javascript_include_tag "twitter"
     = javascript_include_tag "application"
@@ -12,6 +12,8 @@
           .brand
             = link_to "aclog", :controller => "main", :action => "index"
           %ul.nav.pull-right
+            %li
+              = link_to "report", :controller => "report", :action => "index"
             %li
               = link_to "search", :controller => "search", :action => "search"
             %li

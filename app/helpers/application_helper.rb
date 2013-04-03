@@ -39,8 +39,13 @@ module ApplicationHelper
     link_to(body, :controller => "users", :action => "best", :screen_name => screen_name)
   end
 
+  # _tweet
+  def show_count(c)
+    params[:action] == "show" ? (@full ? c : 100) : 20
+  end
+
   # utf8
   def utf8_enforcer_tag
-    ""
+    raw ""
   end
 end

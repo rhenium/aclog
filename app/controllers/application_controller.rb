@@ -29,7 +29,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def render_tweets(a = nil, &blk)
+  def render_page(a = nil, &blk)
+    @items = (a || blk.call).page(page || 1).per(count)
+    @page_param = true
+
+    render "shared/tweets"
+  end
+
+  def render_timeline(a = nil, &blk)
     @items = a || blk.call
 
     if max_id
@@ -40,7 +47,7 @@ class ApplicationController < ActionController::Base
       @items = @items.where("tweets.id > ?", since_id)
     end
 
-    @items = @items.page(page || 1).per(count)
+    @items = @items.page(1).per(count)
 
     render "shared/tweets"
   end
@@ -64,9 +71,9 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def all
-    get_bool(params[:all])
-  end
+  def all; get_bool(params[:all]) end
+
+  def full; get_bool(params[:full]) end
 
   private
   def get_bool(str)

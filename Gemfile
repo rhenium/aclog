@@ -30,4 +30,4 @@ gem 'msgpack'
 gem 'omniauth-twitter', :github => "re4k/omniauth-twitter"
 gem 'em-twitter'
 gem 'twitter'
-
+gem 'yajl-ruby', :require => "yajl"

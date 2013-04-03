@@ -4,7 +4,7 @@
       .avatar
         = link_to image_tag(item.user.profile_image_url, :alt => item.user.screen_name, :title => item.user.name), :controller => "users", :action => "best", :screen_name => item.user.screen_name
       %ul.inline.actions
-        %li
+        %li.twitter
           = link_to image_tag("reply.png", :alt => "reply"), "https://twitter.com/intent/tweet?in_reply_to=#{item.id}"
           = link_to image_tag("retweet.png", :alt => "retweet"), "https://twitter.com/intent/retweet?tweet_id=#{item.id}"
           = link_to image_tag("favorite.png", :alt => "favorite"), "https://twitter.com/intent/favorite?tweet_id=#{item.id}"
@@ -15,28 +15,30 @@
           = link_to_user_page item.user.screen_name do
             = item.user.name
         %span.screen_name= link_to_user_page item.user.screen_name
-      .text
+      .text{:class => item.stolen_tweet ? "copied" : nil}
         = raw format_tweet_text(item.text)
       .meta.clearfix
         %span.twitter_bird
           = link_to image_tag("bird_gray_16.png", :alt => "Twitter"), twitter_status_url(item), :target => "_blank"
         %span.created_at
           = link_to format_time(item.tweeted_at), :controller => "users", :action => "show", :id => item.id
+        - if item.stolen_tweet
+          %span.copied
+            = link_to "original", :controller => "users", :action => "show", :id => item.original.id
         %span.source
           = raw format_source_text(item.source)
   .stats
-    - [["favs", item.favorites.order("id")], ["retweets", item.retweets.order("id")]].select{|m| m[1].count > 0}.each do |type, actions|
+    - [["favs", item.favoriters], ["retweets", item.retweeters]].select{|m| m[1].count > 0}.each do |type, actions|
       %dl.dl-horizontal
         %dt
           %span.count= actions.count
           %span.type= type
+          - if actions.count > show_count(actions.count)
+            %span.full
+              = link_to "show full", params.merge(:full => true)
         %dd
           %ul.inline
-            - actions.take(params[:action] == "show" ? actions.count : 20).each do |a|
-            - m = a.user
+            - actions.take(show_count(actions.count)).each do |m|
               %li
-                - if m
-                  = link_to_user_page m.screen_name do
-                    = image_tag m.profile_image_url, :alt => m.screen_name, :title => m.name
-                - else
-                  = image_tag asset_path("missing_profile_image.png"), :alt => "Missing User: #{a.user_id}", :title => "Missing User: #{a.user_id}"
+                = link_to_user_page m.screen_name do
+                  = image_tag m.profile_image_url, :alt => m.screen_name, :title => m.name

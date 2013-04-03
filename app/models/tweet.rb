@@ -53,13 +53,22 @@ class Tweet < ActiveRecord::Base
     User.cached(user_id)
   end
 
+  def notify_favorite
+    if [50, 100, 250, 500, 1000].include? favorites_count
+      Aclog::Notification.reply_favs(self, favorites_count)
+    end
+  end
+
   def self.delete_from_id(id)
     begin
-      # where(:id => id).destroy_all
       # counter_cache の無駄を省くために delete_all で
-      Favorite.delete_all(:tweet_id => id)
-      Retweet.delete_all(:tweet_id => id)
-      Tweet.delete_all(:id => id)
+      deleted_tweets = Tweet.delete_all(:id => id)
+      if deleted_tweets.to_i > 0
+        Favorite.delete_all(:tweet_id => id)
+        Retweet.delete_all(:tweet_id => id)
+      else
+        Retweet.where(:id => id).destroy_all # counter_cache
+      end
     rescue
       logger.error("Unknown error while deleting tweet: #{$!}/#{$@}")
     end
@@ -67,11 +76,12 @@ class Tweet < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      create!(:id => hash[:id],
-              :text => hash[:text],
-              :source => hash[:source],
-              :tweeted_at => hash[:tweeted_at],
-              :user_id => hash[:user_id])
+      t = create!(:id => hash[:id],
+                  :text => hash[:text],
+                  :source => hash[:source],
+                  :tweeted_at => hash[:tweeted_at],
+                  :user_id => hash[:user_id])
+      return t
     rescue ActiveRecord::RecordNotUnique
       logger.debug("Duplicate Tweet: #{hash[:id]}")
     rescue

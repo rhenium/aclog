@@ -17,9 +17,11 @@ class Favorite < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      create!(:tweet_id => hash[:tweet_id],
-              :user_id => hash[:user_id])
+      f = create!(:tweet_id => hash[:tweet_id],
+                  :user_id => hash[:user_id])
       logger.debug("Created Favorite: #{hash[:user_id]} => #{hash[:tweet_id]}")
+
+      return f
     rescue ActiveRecord::RecordNotUnique
       logger.debug("Duplicate Favorite: #{hash[:user_id]} => #{hash[:tweet_id]}")
     rescue
@@ -29,7 +31,7 @@ class Favorite < ActiveRecord::Base
 
   def self.from_tweet_object(tweet_object)
     if tweet_object.favoriters.is_a? Array
-      tweet_object.favoriters.each do |uid|
+      tweet_object.favoriters.map do |uid|
         from_hash(:user_id => uid, :tweet_id => tweet_object.id)
       end
     end

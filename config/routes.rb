@@ -64,6 +64,9 @@ Aclog::Application.routes.draw do
   get "/users/:screen_name/most_favorited" => redirect("/%{screen_name}/favorite"), :constraints => constraints
   get "/users/:screen_name/most_retweeted" => redirect("/%{screen_name}/retweet"), :constraints => constraints
   get "/users/:screen_name/discovered" => redirect("/%{screen_name}/discovered"), :constraints => constraints
+  get "/users/:screen_name/favorited" => redirect("/%{screen_name}/discovered/favorite"), :constraints => constraints
+  get "/users/:screen_name/given" => redirect("/%{screen_name}/discovered/favorite"), :constraints => constraints
+  get "/users/:screen_name/retweeted" => redirect("/%{screen_name}/discovered/retweet"), :constraints => constraints
   get "/users/:screen_name/recent" => redirect("/%{screen_name}/timeline"), :constraints => constraints
   get "/users/:screen_name/favs_from" => redirect("/%{screen_name}/favorited_by"), :constraints => constraints
   get "/users/:screen_name/favs_from/:screen_name_b" => redirect("/%{screen_name}/favorited_by/%{screen_name_b}"), :constraints => constraints

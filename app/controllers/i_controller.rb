@@ -26,4 +26,14 @@ class IController < ApplicationController
         .order_by_id
     end
   end
+
+  def report
+    if request.post?
+      case params[:type]
+      when "steal"
+        # パクリツイート
+
+      end
+    end
+  end
 end

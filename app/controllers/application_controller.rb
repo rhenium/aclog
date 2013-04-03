@@ -30,22 +30,28 @@ class ApplicationController < ActionController::Base
   end
 
   def render_tweets(a = nil, &blk)
-    @items = (a || blk.call).page(page).per(count)
+    @items = a || blk.call
+
+    if max_id
+      @items = @items.where("id <= ?", max_id)
+    end
+
+    if since_id
+      @items = @items.where("id > ?", since_id)
+    end
+
+    @items = @items.page(page || 1).per(count)
 
     render "shared/tweets"
   end
 
-  def page
-    get_int(params[:page], 1) do |i|
-      i > 0
-    end
-  end
+  def page; get_int(params[:page], nil){|i| i > 0} end
 
-  def count
-    get_int(params[:count], 10) do |i|
-      (1..100) === i
-    end
-  end
+  def count; get_int(params[:count], 10){|i| (1..100) === i} end
+
+  def max_id; get_int(params[:max_id], nil) end
+
+  def since_id; get_int(params[:since_id], nil) end
 
   def order
     case params[:order]
@@ -71,12 +77,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def get_int(str, default, &blk)
-    i = Integer(str) rescue default
-    if blk.call(i)
-      i
-    else
-      default
+  def get_int(str, default = 0, &blk)
+    if str =~ /^\d+$/
+      i = str.to_i
+      if !block_given? || blk.call(i)
+        return i
+      end
     end
+    default
   end
 end

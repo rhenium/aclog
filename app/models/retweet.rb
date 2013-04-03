@@ -17,10 +17,12 @@ class Retweet < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      create!(:id => hash[:id],
-              :tweet_id => hash[:tweet_id],
-              :user_id => hash[:user_id])
+      r = create!(:id => hash[:id],
+                  :tweet_id => hash[:tweet_id],
+                  :user_id => hash[:user_id])
       logger.debug("Created Retweet: #{hash[:id]}: #{hash[:user_id]} => #{hash[:tweet_id]}")
+
+      return r
     rescue ActiveRecord::RecordNotUnique
       logger.debug("Duplicate Retweet: #{hash[:id]}: #{hash[:user_id]} => #{hash[:tweet_id]}")
     rescue
@@ -33,9 +35,5 @@ class Retweet < ActiveRecord::Base
     from_hash(:id => status.id,
               :user_id => status.user.id,
               :tweet_id => status.retweeted_status.id)
-  end
-
-  def self.delete_from_id(id)
-    where(:id => id).destroy_all
   end
 end

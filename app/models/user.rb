@@ -25,6 +25,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def delete_cache
+    Rails.cache.delete("user/#{id}")
+  end
+
   def protected?
     protected
   end
@@ -70,12 +74,23 @@ class User < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      rec = find_or_initialize_by(:id => hash[:id])
-      rec.screen_name = hash[:screen_name]
-      rec.name = hash[:name]
-      rec.profile_image_url = hash[:profile_image_url]
-      rec.protected = hash[:protected]
-      rec.save! if rec.changed?
+      user = cached(hash[:id]) || User.new(id: hash[:id])
+      orig = user.attributes.dup
+
+      user.screen_name = hash[:screen_name]
+      user.name = hash[:name]
+      user.profile_image_url = hash[:profile_image_url]
+      user.protected = hash[:protected]
+
+      if orig != user.attributes
+        user.save!
+        user.delete_cache
+        logger.debug("User saved: #{user.id}")
+      else
+        logger.debug("User not changed: #{user.id}")
+      end
+
+      return user
     rescue
       logger.error("Unknown error while inserting user: #{$!}/#{$@}")
     end

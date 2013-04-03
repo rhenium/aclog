@@ -9,7 +9,7 @@
   %dt ツイート表示
   %dd /i/show.json?id=(tweet_id)
   %dt ツイート一覧
-  %dd /users/{best|recent|timeline|discovered}.json
+  %dd /users/{best|timeline|discovered}.json
   %dt 他ユーザーが関係してくるもの
   %dd /users/{favorited_by|retweeted_by|given_favorites_to|given_retweets_to}.json
   %dt ユーザー情報。include_user_stats は標準で有効になります。
@@ -35,7 +35,7 @@
   %dd
     %p true or false
     %p default: false
-    %p 共通。ふぁぼ/RTしたユーザーのふぁぼられなどの情報を含めるか。重いです
+    %p 共通。ふぁぼ/RTしたユーザーのふぁぼられなどの情報を含めるか。すごく重いです
   %dt count
   %dd
     %p 1-100
@@ -55,4 +55,4 @@
   %dd
     %p favorite or retweet or all
     %p default: all
-    %p best, recent のみ
+    %p best のみ

@@ -45,7 +45,7 @@ class Worker
       if status[:source].index("<a")
         url = status[:source].scan(/href="(.+?)"/).flatten.first
         name = status[:source].scan(/>(.+?)</).flatten.first
-        "<url:#{escapecolon(url)}:#{escapecolon(name)}>"
+        "<url:#{escape_colon(url)}:#{escape_colon(name)}>"
       else
         status[:source]
       end

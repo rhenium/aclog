@@ -33,11 +33,11 @@ class ApplicationController < ActionController::Base
     @items = a || blk.call
 
     if max_id
-      @items = @items.where("id <= ?", max_id)
+      @items = @items.where("tweets.id <= ?", max_id)
     end
 
     if since_id
-      @items = @items.where("id > ?", since_id)
+      @items = @items.where("tweets.id > ?", since_id)
     end
 
     @items = @items.page(page || 1).per(count)

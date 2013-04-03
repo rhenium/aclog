@@ -7,5 +7,5 @@
 - if @items
   - if params[:page]
     = link_to_next_page @items, raw("Next &#8250;")
-  - else
+  - elsif @items.last
     = link_to raw("Next &#8250;"), params.merge(:max_id => @items.last.id - 1), :rel => :next

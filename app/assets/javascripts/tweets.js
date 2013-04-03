@@ -10,7 +10,7 @@ $(function() {
       $(".loading").hide();
     }
   });
-  $("a[rel=next]").click(function() {
+  $("a[rel=next]").hide().click(function() {
     $.autopager("load");
     return false;
   });

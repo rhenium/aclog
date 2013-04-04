@@ -30,7 +30,7 @@ class Tweet < ActiveRecord::Base
   end
 
   scope :order_by_reactions, -> do
-    order("COALESCE(favorites_count, 0) + COALESCE(retweets_count, 0) DESC")
+    order("COALESCE(tweets.favorites_count, 0) + COALESCE(tweets.retweets_count, 0) DESC")
   end
 
   scope :favorited_by, -> user do

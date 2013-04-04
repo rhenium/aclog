@@ -25,9 +25,42 @@ class User < ActiveRecord::Base
     end
   end
 
-  def delete_cache
-    Rails.cache.delete("user/#{id}")
+  def self.from_hash(hash)
+    begin
+      user = cached(hash[:id]) || User.new(id: hash[:id])
+      orig = user.attributes.dup
+
+      user.screen_name = hash[:screen_name]
+      user.name = hash[:name]
+      user.profile_image_url = hash[:profile_image_url]
+      user.protected = hash[:protected]
+
+      if orig != user.attributes
+        user.save!
+        user.delete_cache
+        logger.debug("User saved: #{user.id}")
+      else
+        logger.debug("User not changed: #{user.id}")
+      end
+
+      return user
+    rescue
+      logger.error("Unknown error while inserting user: #{$!}/#{$@}")
+    end
   end
+
+  def self.from_user_object(user_object)
+    from_hash(:id => user_object.id,
+              :screen_name => user_object.screen_name,
+              :name => user_object.name,
+              :profile_image_url => user_object.profile_image_url_https,
+              :protected => user_object.protected)
+  end
+
+  def self.delete_cache(uid)
+    Rails.cache.delete("user/#{uid}")
+  end
+  def delete_cache; User.delete_cache(id) end
 
   def protected?
     protected
@@ -70,37 +103,5 @@ class User < ActiveRecord::Base
         hash
       end
     }.call
-  end
-
-  def self.from_hash(hash)
-    begin
-      user = cached(hash[:id]) || User.new(id: hash[:id])
-      orig = user.attributes.dup
-
-      user.screen_name = hash[:screen_name]
-      user.name = hash[:name]
-      user.profile_image_url = hash[:profile_image_url]
-      user.protected = hash[:protected]
-
-      if orig != user.attributes
-        user.save!
-        user.delete_cache
-        logger.debug("User saved: #{user.id}")
-      else
-        logger.debug("User not changed: #{user.id}")
-      end
-
-      return user
-    rescue
-      logger.error("Unknown error while inserting user: #{$!}/#{$@}")
-    end
-  end
-
-  def self.from_user_object(user_object)
-    from_hash(:id => user_object.id,
-              :screen_name => user_object.screen_name,
-              :name => user_object.name,
-              :profile_image_url => user_object.profile_image_url_https,
-              :protected => user_object.protected)
   end
 end

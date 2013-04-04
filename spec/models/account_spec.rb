@@ -41,6 +41,14 @@ describe Account do
     end
   end
 
+  describe "Account.client" do
+    before(:each){@account_1 = FactoryGirl.create(:account_1)}
+
+    it "Twitter::Client を返す。" do
+      @account_1.client.should be_a Twitter::Client
+    end
+  end
+
   describe "Account#twitter_user" do
     before(:each){@account_1 = FactoryGirl.create(:account_1)}
 
@@ -74,5 +82,10 @@ describe Account do
   end
 
   describe "Account.import_favorites" do
+    # TODO
+  end
+
+  describe "Account.stats_api" do
+    # TODO
   end
 end

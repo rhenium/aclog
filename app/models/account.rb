@@ -12,6 +12,14 @@ class Account < ActiveRecord::Base
     User.cached(user_id)
   end
 
+  def client
+    Twitter::Client.new(
+      :consumer_key => Settings.consumer[consumer_version.to_i].key,
+      :consumer_secret => Settings.consumer[consumer_version.to_i].secret,
+      :oauth_token => oauth_token,
+      :oauth_token_secret => oauth_token_secret)
+  end
+
   def twitter_user(uid = nil)
     uid ||= user_id
     Rails.cache.fetch("twitter_user/#{uid}", :expires_in => 1.hour) do
@@ -34,14 +42,6 @@ class Account < ActiveRecord::Base
     client.retweets(id).each do |status|
       Retweet.from_tweet_object(status)
     end
-  end
-
-  def client
-    Twitter::Client.new(
-      :consumer_key => Settings.consumer[consumer_version.to_i].key,
-      :consumer_secret => Settings.consumer[consumer_version.to_i].secret,
-      :oauth_token => oauth_token,
-      :oauth_token_secret => oauth_token_secret)
   end
 
   def stats_api

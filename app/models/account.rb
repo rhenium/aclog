@@ -1,11 +1,21 @@
 class Account < ActiveRecord::Base
+  def self.register_or_update(hash)
+    account = where(:user_id => hash[:user_id]).first_or_initialize
+    account.oauth_token = hash[:oauth_token]
+    account.oauth_token_secret = hash[:oauth_token_secret]
+    account.consumer_version = hash[:consumer_version]
+    account.save if account.changed?
+    account
+  end
+
   def user
     User.cached(user_id)
   end
 
-  def twitter_user
-    Rails.cache.fetch("twitter_user/#{user_id}", :expires_in => 1.hour) do
-      client.user(user_id) rescue nil
+  def twitter_user(uid = nil)
+    uid ||= user_id
+    Rails.cache.fetch("twitter_user/#{uid}", :expires_in => 1.hour) do
+      client.user(uid) rescue nil
     end
   end
 

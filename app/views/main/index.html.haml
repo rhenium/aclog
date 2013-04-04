@@ -7,13 +7,19 @@
   Favstar を参考に開発しています。現時点でトロフィー以外の機能はすべて使えるはずです。
 %p
   API も提供する予定です。about → api を見てください（まだ開発中であり、変更がある可能性もあります）
+.alert
+  (04/04) 諸事情でアプリケーションを作り直しました。再認証(logout → login)すると新しいトークンで上書きされます。
+  わざわざ再認証しなくても今のところ支障はありませんが、再認証した場合は、Twitter の設定の
+  = link_to "アプリ連携", "https://twitter.com/settings/applications"
+  から不要な "AcLog" と "Aclog2" は解除しても大丈夫です。
 %h4
-  今後の予定(2013/04/03)
+  今後の予定(2013/04/04)
 %ul
-  %li トロフィー機能を付ける予定はありません
-  %li ふぁぼったー・Favstar からのデータの取り込み
+  %li 通知を細かく設定できるように
   %li パクリツイート対策
+  %li ふぁぼったー・Favstar からのデータの取り込み
   %li ふぁぼ爆撃対策
+  %li トロフィー機能をいらないよね…
 %p
   = link_to "ツイート", "https://twitter.com/share", :class => "twitter-share-button", :"data-text" => "aclog", :"data-count" => "none", :"data-url" => "http://aclog.koba789.com/"
 %hr

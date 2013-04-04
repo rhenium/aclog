@@ -16,8 +16,8 @@ module Aclog
       begin
         @@account.update("@#{user.screen_name} #{text} #{url}", :in_reply_to_status_id => tweet.id)
       rescue Exception
-        logger.error($!)
-        logger.error($@)
+        Rails.logger.error($!)
+        Rails.logger.error($@)
       end
     end
   end

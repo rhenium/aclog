@@ -65,7 +65,7 @@ class Worker
                  :method => "GET"}
       if @clients[account_id]
         unless @clients[account_id].options[:oauth][:token] == conopts[:oauth][:token]
-          @clients.connection.update(conopts)
+          @clients[account_id].connection.update(conopts)
           $logger.info("Updated(##{account_id}/#{user_id}/#{msg["consumer_version"].to_i})")
         else
           $logger.info("Not Updated(##{account_id}/#{user_id}/#{msg["consumer_version"].to_i})")

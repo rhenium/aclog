@@ -124,7 +124,7 @@ class Receiver::Worker < DaemonSpawn::Base
         return
       end
       if @@connections[worker_number]
-        @@connections[worker_number].close
+        @@connections[worker_number].close_connection
       end
       @@connections[worker_number] = self
       @worker_number = worker_number

@@ -62,7 +62,7 @@ describe Tweet do
     end
 
     it "反応数順" do
-      tweets = Tweet.order_by_reactions.limit(2)
+      tweets = Tweet.order_by_reactions
       tweets.first.retweets.count.should be >= tweets.last.retweets.count
     end
 

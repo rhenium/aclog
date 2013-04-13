@@ -12,7 +12,7 @@
   %dd /users/{best|timeline|discovered}.json
   %dt 他ユーザーが関係してくるもの
   %dd /users/{favorited_by|retweeted_by|given_favorites_to|given_retweets_to}.json
-  %dt ユーザー情報。include_user_stats は標準で有効になります。
+  %dt ユーザー情報
   %dd /users/info.json
 %h3 パラメータ
 %dl
@@ -24,23 +24,18 @@
   %dt screen_name_b or user_id_b
   %dd
     %p Twitter アカウントのもの
-    %p 有無で結果が変わります
-    %p favorited_by などのみ。なんとなくわかるとおもう
-  %dt include_user
-  %dd
-    %p true or false
-    %p default: false
-    %p 共通。ふぁぼ/RTしたユーザー情報を含めるか。重め
-  %dt include_user_stats
-  %dd
-    %p true or false
-    %p default: false
-    %p 共通。ふぁぼ/RTしたユーザーのふぁぼられなどの情報を含めるか。すごく重いです
+    %p 有無で結果が変わる
+    %p 他ユーザーが関係してくるもののみ。「favorited_by の場合は screen_name_b にふぁぼられた screen_name のツイート」
   %dt count
   %dd
     %p 1-100
     %p default: 10
     %p リストのみ。件数
+  %dt max_id
+  %dd
+    %p 数値
+    %p default: -1
+    %p Twitter API のものと同じ挙動
   %dt page
   %dd
     %p 1-

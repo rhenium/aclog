@@ -39,7 +39,7 @@ class Account < ActiveRecord::Base
     end
 
     # rts 回収・RTのステータスIDを取得する必要がある
-    client.retweets(id).each do |status|
+    client.retweets(id, :count => 100).each do |status|
       Retweet.from_tweet_object(status)
     end
   end

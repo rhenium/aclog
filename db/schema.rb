@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130403160821) do
+ActiveRecord::Schema.define(version: 20130413042256) do
 
   create_table "accounts", force: true do |t|
     t.integer  "user_id",            limit: 8, null: false
@@ -62,12 +62,12 @@ ActiveRecord::Schema.define(version: 20130403160821) do
   add_index "stolen_tweets", ["tweet_id"], name: "index_stolen_tweets_on_tweet_id", unique: true
 
   create_table "tweets", force: true do |t|
-    t.text     "text",                                  null: false
-    t.text     "source"
-    t.integer  "user_id",         limit: 8,             null: false
+    t.text     "text",            limit: 16777215,             null: false
+    t.text     "source",          limit: 16777215
+    t.integer  "user_id",         limit: 8,                    null: false
     t.datetime "tweeted_at"
-    t.integer  "favorites_count",           default: 0
-    t.integer  "retweets_count",            default: 0
+    t.integer  "favorites_count",                  default: 0
+    t.integer  "retweets_count",                   default: 0
   end
 
   add_index "tweets", ["user_id"], name: "index_tweets_on_user_id"
@@ -75,12 +75,12 @@ ActiveRecord::Schema.define(version: 20130403160821) do
   create_table "users", force: true do |t|
     t.string   "screen_name"
     t.string   "name"
-    t.text     "profile_image_url"
+    t.text     "profile_image_url", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "protected"
   end
 
-  add_index "users", ["screen_name"], name: "index_users_on_screen_name"
+  add_index "users", ["screen_name"], name: "index_users_on_screen_name", length: {"screen_name"=>191}
 
 end

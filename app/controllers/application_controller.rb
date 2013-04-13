@@ -56,9 +56,9 @@ class ApplicationController < ActionController::Base
 
   def count; get_int(params[:count], 10){|i| (1..100) === i} end
 
-  def max_id; get_int(params[:max_id], nil) end
+  def max_id; get_int(params[:max_id], nil){|i| i >= 0} end
 
-  def since_id; get_int(params[:since_id], nil) end
+  def since_id; get_int(params[:since_id], nil){|i| i >= 0} end
 
   def order
     case params[:order]

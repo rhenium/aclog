@@ -2,7 +2,7 @@ ruby '1.9.3'
 source 'https://rubygems.org'
 
 gem 'rails', '4.0.0.beta1'
-gem 'mysql2'
+gem 'mysql2', "> 0.3.12b"
 gem 'dalli'
 
 gem 'counter_culture'
@@ -16,7 +16,7 @@ gem 'msgpack'
 gem 'em-work_queue'
 
 gem 'twitter'
-gem 'omniauth-twitter', :github => "re4k/omniauth-twitter"
+gem 'omniauth-twitter', :github => "rhenium/omniauth-twitter"
 gem 'kaminari'
 
 gem 'haml-rails'

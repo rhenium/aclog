@@ -189,8 +189,7 @@ class Worker
         elsif hash[:user]
           # tweet
           if hash[:retweeted_status]
-            if hash[:retweeted_status][:user][:id] == user_id ||
-                hash[:user][:id] == user_id
+            if hash[:retweeted_status][:user][:id] == user_id || hash[:user][:id] == user_id
               send_retweet.call(hash)
             end
           elsif hash[:user][:id] == user_id

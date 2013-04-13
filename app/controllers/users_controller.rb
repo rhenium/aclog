@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_filter :get_user, :except => :show
+  before_filter :get_user, :except => [:show, :favoriters]
   before_filter :get_user_b
 
   def best
@@ -139,6 +139,16 @@ class UsersController < ApplicationController
         render "shared/_tweet", :locals => {:item => @item}
       end
     end
+  end
+
+  # only json
+  def favoriters
+    tweet_id = params[:id].to_i
+    @item = Tweet.where(:id => tweet_id).first
+
+    raise Aclog::Exceptions::TweetNotFound unless @item
+
+    render json: @item.favorites.map{|f| f.user_id}
   end
 
   private

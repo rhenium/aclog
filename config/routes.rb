@@ -25,6 +25,7 @@ Aclog::Application.routes.draw do
   get "/i/timeline" => "i#timeline"
 
   get "/i/show" => "users#show"
+  get "/i/favoriters" => "users#favoriters", :format => :json
   get "/i/:id" => "users#show", :constraints => constraints
 
   # report

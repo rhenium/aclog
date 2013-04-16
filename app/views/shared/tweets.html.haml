@@ -1,12 +1,11 @@
-- if @show_search
+- if params[:action] == "search"
   = render :partial => "shared/search"
 .items
   = render :partial => "shared/tweet", :collection => @items, :as => :item
 .loading
   = image_tag "loading.gif", :alt => "loading...", :title => nil
-- if @items
-  - if @page_param
-    = paginate(@items)
-  - elsif @items.last
-    .pagination
-      = link_to raw("Next &#8250;"), params.merge(:max_id => @items.last.id - 1), :rel => :next
+- if /offset/i =~ @items.to_sql
+  = paginate(@items)
+- elsif @items.last
+  .pagination
+    = link_to raw("Next &#8250;"), params.merge(:max_id => @items.last.id - 1), :rel => :next

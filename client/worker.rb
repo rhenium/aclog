@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require "em-twitter"
 require "yajl"
 require "msgpack"
@@ -13,6 +14,7 @@ class Worker
     def initialize
       @clients = {}
       @pac = MessagePack::Unpacker.new
+      @excludes = []
     end
 
     def escape_colon(str); str.gsub(":", "%3A").gsub("<", "%3C").gsub(">", "%3E"); end
@@ -20,20 +22,22 @@ class Worker
     def format_text(status)
       chars = status[:text].to_s.split(//)
 
-      entities = status[:entities].values.flatten.sort_by{|entity| entity[:indices].first}
+      entities = status[:entities].map{|k, v| v.map{|n| n.update(:type => k)}}.flatten.sort_by{|entity| entity[:indices].first}
 
       result = []
       last_index = entities.inject(0) do |last_index, entity|
         result << chars[last_index...entity[:indices].first]
-        result << if entity[:url]
-                    "<url:#{escape_colon(entity[:expanded_url])}:#{escape_colon(entity[:display_url])}>"
-                  elsif entity[:text]
-                    "<hashtag:#{escape_colon(entity[:text])}>"
-                  elsif entity[:screen_name]
-                    "<mention:#{escape_colon(entity[:screen_name])}>"
-                  elsif entity[:cashtag]
-                    "<cashtag:#{escape_colon(entity[:cashtag])}>"
-                  end
+        case entity[:type]
+        when :urls, :media
+          result << "<url:#{escape_colon(entity[:expanded_url])}:#{escape_colon(entity[:display_url])}>"
+        when :hashtags
+          result << "<hashtag:#{escape_colon(entity[:text])}>"
+        when :user_mentions
+          result << "<mention:#{escape_colon(entity[:screen_name])}>"
+        when :symbols
+          result << "<symbol:#{escape_colon(entity[:text])}>"
+        end
+
         entity[:indices].last
       end
       result << chars[last_index..-1]
@@ -50,6 +54,124 @@ class Worker
         status[:source]
       end
     end
+
+    def favbot?(source, target_object)
+      favs = source[:favourites_count]
+      tweets = source[:statuses_count]
+      bio = source[:description]
+      name = source[:name]
+      # えたふぉ
+      if (Time.now - Time.parse(target_object[:created_at])) < 2
+        case
+        when
+          favs > tweets * 30,
+          tweets < 1000,
+          /ふぁぼ垢/ =~ bio,
+          /専属/ =~ bio,
+          /ふぁぼ/ =~ name
+          return true
+        when bot?(target_object)
+          return true
+        end
+      else
+        case
+        when
+          favs > tweets * 100,
+          tweets < 100 && favs > tweets * 2
+          return true
+        end
+      end
+
+      false
+    end
+
+    def bot?(status)
+      sources = [
+        /^<a href="http:\/\/twittbot\.net\/" rel="nofollow">twittbot\.net<\/a>$/,
+        /^<a href="http:\/\/botmaker\.dplays\.net\/" rel="nofollow">BotMaker<\/a>$/,
+        /^<a href="http:\/\/makebot\.sh\/" rel="nofollow">makebot\.sh( [0-9])?<\/a>$/,
+        /^<a href="http:\/\/lbattery\.dip\.jp\/twihaialert\/" rel="nofollow">ツイ廃あらーと<\/a>$/,
+        /^<a href="http:\/\/app\.xmgn\.com\/tweetcounter\/" rel="nofollow">ツイート数カウントくん<\/a>$/,
+        /^<a href="http:\/\/gumu-lab\.com\/replychecker\/" rel="nofollow">リプライ数チェッカ<\/a>$/,
+        /^<a href="http:\/\/bit.ly\/SiHFe6" rel="nofollow">劣化コピー<\/a>$/,
+      ]
+      sources.any?{|r| r =~ status[:source]}
+    end
+
+    def send_user(user)
+      send_object({
+        :type => "user",
+        :id => user[:id],
+        :screen_name => user[:screen_name],
+        :name => user[:name],
+        :profile_image_url => user[:profile_image_url_https],
+        :protected => user[:protected]
+      })
+    end
+
+    def send_tweet(status)
+      unless bot?(status)
+        send_user(status[:user])
+        send_object({
+          :type => "tweet",
+          :id => status[:id],
+          :text => format_text(status),
+          :source => format_source(status),
+          :tweeted_at => status[:created_at],
+          :user_id => status[:user][:id]
+        })
+      end
+    end
+
+    def send_favorite(source, target_object)
+      if @excludes.include?(source[:id])
+        # ignored
+      else
+        if favbot?(source, target_object)
+          # ignored
+          $logger.info("Add #{source[:screen_name]}(##{source[:id]}) to ignore list")
+          @excludes << source[:id]
+        elsif !bot?(target_object)
+          send_tweet(target_object)
+          send_user(source)
+          send_object({
+            :type => "favorite",
+            :tweet_id => target_object[:id],
+            :user_id => source[:id]
+          })
+        end
+      end
+    end
+
+    def send_unfavorite(source, target_object)
+      send_object({
+        :type => "delete",
+        :tweet_id => target_object[:id],
+        :user_id => source[:id]
+      })
+    end
+
+    def send_retweet(status)
+      unless bot?(status)
+        send_tweet(status[:retweeted_status])
+        send_user(status[:user])
+        send_object({
+          :type => "retweet",
+          :id => status[:id],
+          :tweet_id => status[:retweeted_status][:id],
+          :user_id => status[:user][:id]
+        })
+      end
+    end
+
+    def send_delete(deleted_status_id, deleted_user_id)
+      send_object({
+        :type => "delete",
+        :id => deleted_status_id,
+        :user_id => deleted_user_id
+      })
+    end
+    ### end - send to receiver
 
     def receive_account(msg)
       user_id = msg["user_id"]
@@ -73,66 +195,6 @@ class Worker
         return
       end
       @clients[account_id] = client = EM::Twitter::Client.new(conopts)
-
-      send_user = -> user do
-        out = {:type => "user",
-               :id => user[:id],
-               :screen_name => user[:screen_name],
-               :name => user[:name],
-               :profile_image_url => user[:profile_image_url_https],
-               :protected => user[:protected]}
-        send_object(out)
-        $logger.debug("User(##{account_id}/#{user_id}): #{user[:id]} = #{user[:screen_name]}")
-      end
-
-      send_tweet = -> status do
-        send_user.call(status[:user])
-        out = {:type => "tweet",
-               :id => status[:id],
-               :text => format_text(status),
-               :source => format_source(status),
-               :tweeted_at => status[:created_at],
-               :user_id => status[:user][:id]}
-        send_object(out)
-        $logger.debug("Tweet(##{account_id}/#{user_id}): #{status[:id]}")
-      end
-
-      send_favorite = -> source, target_object do
-        send_tweet.call(target_object)
-        send_user.call(source)
-        out = {:type => "favorite",
-               :tweet_id => target_object[:id],
-               :user_id => source[:id]}
-        send_object(out)
-        $logger.debug("Favorite(##{account_id}/#{user_id}): #{source[:id]} => #{target_object[:id]}")
-      end
-
-      send_unfavorite = -> source, target_object do
-        out = {:type => "delete",
-               :tweet_id => target_object[:id],
-               :user_id => source[:id]}
-        send_object(out)
-        $logger.debug("Unfavorite(##{account_id}/#{user_id}): #{source[:id]} => #{target_object[:id]}")
-      end
-
-      send_retweet = -> status do
-        send_tweet.call(status[:retweeted_status])
-        send_user.call(status[:user])
-        out = {:type => "retweet",
-               :id => status[:id],
-               :tweet_id => status[:retweeted_status][:id],
-               :user_id => status[:user][:id]}
-        send_object(out)
-        $logger.debug("Retweet(##{account_id}/#{user_id}): #{status[:user][:id]} => #{status[:retweeted_status][:id]}")
-      end
-
-      send_delete = -> deleted_status_id, deleted_user_id do
-        out = {:type => "delete",
-               :id => deleted_status_id,
-               :user_id => deleted_user_id}
-        send_object(out)
-        $logger.debug("Delete(##{account_id}/#{user_id}): #{deleted_user_id} => #{deleted_status_id}")
-      end
 
       client.on_error do |message|
         $logger.warn("Unknown Error(##{account_id}/#{user_id}): #{message}")
@@ -171,7 +233,8 @@ class Worker
         elsif hash[:delete] && hash[:delete][:status]
           deleted_status_id = hash[:delete][:status][:id]
           deleted_user_id = hash[:delete][:status][:user_id]
-          send_delete.call(deleted_status_id, deleted_user_id)
+          send_delete(deleted_status_id, deleted_user_id)
+          $logger.debug("Delete(##{account_id}/#{user_id}): #{deleted_user_id} => #{deleted_status_id}")
         elsif hash[:limit]
           $logger.warn("UserStreams Limit Event(##{account_id}/#{user_id}): #{hash[:limit][:track]}")
         elsif hash[:event]
@@ -179,22 +242,27 @@ class Worker
           when "favorite"
             source = hash[:source]
             target_object = hash[:target_object]
-            if !target_object[:user][:protected] ||
-                target_object[:user][:id] == user_id
-              send_favorite.call(source, target_object)
+            if target_object && target_object[:user] &&
+              (!target_object[:user][:protected] ||
+                target_object[:user][:id] == user_id)
+              send_favorite(source, target_object)
+              $logger.debug("Favorite(##{account_id}/#{user_id}): #{source[:screen_name]} => #{target_object[:id]}")
             end
           when "unfavorite"
-            send_unfavorite.call(hash[:source], hash[:target_object])
+            send_unfavorite(hash[:source], hash[:target_object])
+            $logger.debug("Unfavorite(##{account_id}/#{user_id}): #{hash[:source][:screen_name]} => #{hash[:target_object][:id]}")
           end
         elsif hash[:user]
           # tweet
           if hash[:retweeted_status]
             if hash[:retweeted_status][:user][:id] == user_id || hash[:user][:id] == user_id
-              send_retweet.call(hash)
+              send_retweet(hash)
+              $logger.debug("Retweet(##{account_id}/#{user_id}): #{hash[:user][:screen_name]} => #{hash[:retweeted_status][:id]}")
             end
           elsif hash[:user][:id] == user_id
             # update: exclude not favorited tweet
-            send_tweet.call(hash)
+            send_tweet(hash)
+            $logger.debug("Tweet(##{account_id}/#{user_id}): #{hash[:user][:screen_name]} => #{hash[:id]}")
           end
         elsif hash[:friends]
           # monyo

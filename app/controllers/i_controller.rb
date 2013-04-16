@@ -1,22 +1,26 @@
 class IController < ApplicationController
+  before_filter :force_page, :only => [:best, :recent]
+
   def best
     @title = "Best Tweets"
-    render_page do
+    render_timeline do
       Tweet
         .reacted
-        .order_by_reactions
+        .not_protected
         .original
+        .order_by_reactions
     end
   end
 
   def recent
     @title = "Recent Best Tweets"
-    render_page do
+    render_timeline do
       Tweet
         .recent
         .reacted
-        .order_by_reactions
+        .not_protected
         .original
+        .order_by_reactions
     end
   end
 
@@ -25,6 +29,7 @@ class IController < ApplicationController
     render_timeline do
       Tweet
         .reacted
+        .not_protected
         .order_by_id
     end
   end

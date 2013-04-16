@@ -1,8 +1,8 @@
 class Tweet < ActiveRecord::Base
   belongs_to :user
 
-  has_many :favorites, :dependent => :delete_all
-  has_many :retweets, :dependent => :delete_all
+  has_many :favorites, ->{order("favorites.id")}, :dependent => :delete_all
+  has_many :retweets, ->{order("retweets.id")}, :dependent => :delete_all
   has_many :favoriters, ->{order("favorites.id")}, :through => :favorites, :source => :user
   has_many :retweeters, ->{order("retweets.id")}, :through => :retweets, :source => :user
 
@@ -10,23 +10,23 @@ class Tweet < ActiveRecord::Base
   has_one :original, :through => :stolen_tweet, :source => :original
 
   scope :recent, -> do
-    where("tweeted_at > ?", Time.zone.now - 3.days)
+    where("tweets.tweeted_at > ?", Time.zone.now - 3.days)
   end
 
   scope :reacted, -> do
-    where("favorites_count > 0 OR retweets_count > 0")
+    where("tweets.favorites_count > 0 OR tweets.retweets_count > 0")
   end
 
   scope :order_by_id, -> do
-    order("id DESC")
+    order("tweets.id DESC")
   end
 
   scope :order_by_favorites, -> do
-    order("favorites_count DESC")
+    order("tweets.favorites_count DESC")
   end
 
   scope :order_by_retweets, -> do
-    order("retweets_count DESC")
+    order("tweets.retweets_count DESC")
   end
 
   scope :order_by_reactions, -> do
@@ -51,6 +51,10 @@ class Tweet < ActiveRecord::Base
 
   scope :original, -> do
     joins("LEFT JOIN stolen_tweets ON tweets.id = stolen_tweets.tweet_id").where(:stolen_tweets => {:tweet_id => nil})
+  end
+
+  scope :not_protected, -> do
+    includes(:user).where(:users => {:protected => false})
   end
 
   def self.cached(id)

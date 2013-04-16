@@ -39,9 +39,21 @@ module ApplicationHelper
     link_to(body, :controller => "users", :action => "best", :screen_name => screen_name)
   end
 
-  # _tweet
-  def show_count(c)
-    params[:action] == "show" ? (@full ? c : 100) : 20
+  def user_limit
+    i = params[:limit].to_i
+    if i == 0
+      if params[:action] == "show"
+        if params[:full] == "true"
+          return nil
+        else
+          return 100
+        end
+      else
+        return 20
+      end
+    else
+      return i
+    end
   end
 
   # utf8

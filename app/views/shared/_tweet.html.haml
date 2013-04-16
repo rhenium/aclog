@@ -33,12 +33,12 @@
         %dt
           %span.count= actions.count
           %span.type= type
-          - if actions.count > show_count(actions.count)
+          - if user_limit && params[:action] == "show"
             %span.full
               = link_to "show full", params.merge(:full => true)
         %dd
           %ul.inline
-            - actions.take(show_count(actions.count)).each do |m|
+            - actions.take(user_limit || actions.count).each do |m|
               %li
                 = link_to_user_page m.screen_name do
                   = image_tag m.profile_image_url, :alt => m.screen_name, :title => m.name

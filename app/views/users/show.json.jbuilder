@@ -1,2 +1,2 @@
-json.partial! "shared/tweet", :item => @item
+json.partial! "shared/partial/tweet", item: @item
 

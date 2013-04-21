@@ -1,6 +1,6 @@
 class Account < ActiveRecord::Base
   def self.register_or_update(hash)
-    account = where(:user_id => hash[:user_id]).first_or_initialize
+    account = where(user_id: hash[:user_id]).first_or_initialize
     account.oauth_token = hash[:oauth_token]
     account.oauth_token_secret = hash[:oauth_token_secret]
     account.consumer_version = hash[:consumer_version]
@@ -14,15 +14,15 @@ class Account < ActiveRecord::Base
 
   def client
     Twitter::Client.new(
-      :consumer_key => Settings.consumer[consumer_version.to_i].key,
-      :consumer_secret => Settings.consumer[consumer_version.to_i].secret,
-      :oauth_token => oauth_token,
-      :oauth_token_secret => oauth_token_secret)
+      consumer_key: Settings.consumer[consumer_version.to_i].key,
+      consumer_secret: Settings.consumer[consumer_version.to_i].secret,
+      oauth_token: oauth_token,
+      oauth_token_secret: oauth_token_secret)
   end
 
   def twitter_user(uid = nil)
     uid ||= user_id
-    Rails.cache.fetch("twitter_user/#{uid}", :expires_in => 1.hour) do
+    Rails.cache.fetch("twitter_user/#{uid}", expires_in: 1.hour) do
       client.user(uid) rescue nil
     end
   end
@@ -39,7 +39,7 @@ class Account < ActiveRecord::Base
     end
 
     # rts 回収・RTのステータスIDを取得する必要がある
-    client.retweets(id, :count => 100).each do |status|
+    client.retweets(id, count: 100).each do |status|
       Retweet.from_tweet_object(status)
     end
   end

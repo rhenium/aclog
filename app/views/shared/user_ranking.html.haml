@@ -1,0 +1,17 @@
+.users
+  %ul.inline
+    - @usermap.take(50).each do |user_id, count|
+      - user = User.cached(user_id)
+      %li
+        - if user
+          .avatar
+            = link_to user_path(user.screen_name) do
+              = image_tag user.profile_image_url, alt: user.screen_name, title: user.name
+          .data
+            = link_to url_for(params.merge(screen_name_b: user.screen_name)) do
+              .count= count
+        - else
+          .avatar= image_tag "missing_profile_image.png", alt: "Missing User: #{user_id}", title: "Missing User: #{user_id}"
+          .data
+            .count= count
+

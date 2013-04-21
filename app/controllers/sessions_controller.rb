@@ -13,9 +13,9 @@ class SessionsController < ApplicationController
 
     begin
       UNIXSocket.open(Settings.register_server_path) do |socket|
-        socket.write({:type => "register",
-                      :id => account.id,
-                      :user_id => account.user_id}.to_msgpack)
+        socket.write({type: "register",
+                      id: account.id,
+                      user_id: account.user_id}.to_msgpack)
       end
     rescue Exception
       # receiver not started?

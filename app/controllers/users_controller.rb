@@ -1,17 +1,18 @@
 class UsersController < ApplicationController
-  before_filter :force_page, :only => [:best, :recent]
-  before_filter :require_user, :except => [:show, :favoriters]
-  before_filter :include_user_b, :only => [:favorited_by, :retweeted_by, :given_favorites_to, :given_retweets_to]
+  before_filter :force_page, only: [:best, :recent]
+  before_filter :require_user, except: [:show, :favoriters]
+  before_filter :require_tweet, only: [:show, :favoriters]
+  before_filter :include_user_b, only: [:favorited_by, :retweeted_by, :given_favorites_to, :given_retweets_to]
   after_filter :check_protected
 
   def best
     @title = "@#{@user.screen_name}'s Best Tweets"
 
     render_timeline do
-      case order
-      when :favorite
+      case params[:order]
+      when /^fav/
         @user.tweets.reacted.order_by_favorites
-      when :retweet
+      when /^re?t/
         @user.tweets.reacted.order_by_retweets
       else
         @user.tweets.reacted.order_by_reactions
@@ -23,10 +24,10 @@ class UsersController < ApplicationController
     @title = "@#{@user.screen_name}'s Recent Best Tweets"
 
     render_timeline do
-      case order
-      when :favorite
+      case params[:order]
+      when /^fav/
         @user.tweets.recent.reacted.order_by_favorites
-      when :retweet
+      when /^re?t/
         @user.tweets.recent.reacted.order_by_retweets
       else
         @user.tweets.recent.reacted.order_by_reactions
@@ -65,8 +66,6 @@ class UsersController < ApplicationController
     raise Aclog::Exceptions::UserNotRegistered unless @user.registered?
 
     @title = "@#{@user.screen_name} (#{@user.name})'s Profile"
-
-    @include_user_stats = true
   end
 
   def favorited_by
@@ -102,10 +101,6 @@ class UsersController < ApplicationController
   end
 
   def show
-    tweet_id = params[:id].to_i
-    @item = Tweet.where(:id => tweet_id).first
-
-    raise Aclog::Exceptions::TweetNotFound unless @item
     @user = @item.user
 
     # import 100
@@ -113,21 +108,14 @@ class UsersController < ApplicationController
       session[:account].import_favorites(@item.id)
     end
 
-    helpers = ApplicationController.helpers
-    @title = "\"#{helpers.strip_tags(helpers.format_tweet_text(@item.text))[0...30]}\" from @#{@user.screen_name}"
+    text = ApplicationController.helpers.format_tweet_text(@item.text)[0...30]
+    @title = "\"#{text}\" from @#{@user.screen_name}"
     @title_b = "@#{@user.screen_name}'s Tweet"
-
-    @full = get_bool(params[:full])
   end
 
   # only json
   def favoriters
-    tweet_id = params[:id].to_i
-    @item = Tweet.where(:id => tweet_id).first
-
-    raise Aclog::Exceptions::TweetNotFound unless @item
-
-    render json: @item.favorites.map{|f| f.user_id}
+    render json: @item.favorites.load.map{|f| f.user_id}
   end
 
   private
@@ -165,7 +153,7 @@ class UsersController < ApplicationController
       .inject(Hash.new(0)){|hash, obj| hash[obj.user_id] += 1; hash}
       .sort_by{|id, count| -count}
 
-    render "shared/users"
+    render "shared/user_ranking"
   end
 
   def render_user_to_user
@@ -185,6 +173,10 @@ class UsersController < ApplicationController
         @user_b.tweets.retweeted_by(@user).order_by_id
       end
     end
+  end
+
+  def force_page
+    params[:page] = "1" unless page
   end
 
   def require_user
@@ -215,16 +207,25 @@ class UsersController < ApplicationController
     end
 
     if !user_b && params[:screen_name_b]
-      user_b = User.where(:screen_name => params[:screen_name_b]).first
+      user_b = User.where(screen_name: params[:screen_name_b]).first
     end
 
     @user_b = user_b
   end
 
+  def require_tweet
+    tweet_id = params[:id].to_i
+    item = Tweet.where(id: tweet_id).first
+
+    raise Aclog::Exceptions::TweetNotFound unless item
+
+    @item = item
+  end
+
   def check_protected
-    if @user && @user.protected? && !@user.registered?
-      unless session[:account] && session[:account].user_id == @user.id
-        raise Aclog::Exceptions::UserProtected if @user.protected
+    if @user && @user.protected?
+      if !@user.registered? || !session[:account] || session[:account].user_id != @user.id
+        raise Aclog::Exceptions::UserProtected
       end
     end
   end

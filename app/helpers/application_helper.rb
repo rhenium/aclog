@@ -1,26 +1,33 @@
-require "time"
-
 module ApplicationHelper
   def format_time(dt)
     dt.to_time.localtime("+09:00").strftime("%Y-%m-%d %H:%M:%S")
   end
 
-  def format_date_ago(dt)
-    "#{(DateTime.now.utc - dt.to_datetime).to_i}d ago"
-  end
-
   def format_tweet_text(text)
-    text
-      .gsub(/<url:(.+?):(.+?)>/){link_to(CGI.unescape($2), CGI.unescape($1), :target => "_blank")}
-      .gsub(/<hashtag:(.+?)>/){link_to("##{CGI.unescape($1)}", "https://twitter.com/search?q=%23#{$1}")}
-      .gsub(/<cashtag:(.+?)>/){link_to("$#{CGI.unescape($1)}", "https://twitter.com/search?q=%23#{$1}")}
-      .gsub(/<mention:(.+?)>/){link_to("@#{CGI.unescape($1)}", "/#{$1}")}
-      .gsub(/\r\n|\r|\n/, "<br />")
-  end
+    ret = text.gsub(/<([a-z]+?):(.+?)(?::(.+?))?>/) do
+      case $1
+      when "mention"
+        screen_name = CGI.unescape($2)
+        link_to("@#{screen_name}", "/#{screen_name}")
+      when "url"
+        display = CGI.unescape($3)
+        expanded_url = CGI.unescape($2)
+        link_to(display, expanded_url)
+      when "hashtag"
+        hashtag = CGI.unescape($2)
+        link_to("##{hashtag}", "https://twitter.com/search?q=#{CGI.escape("##{hashtag}")}")
+      when "symbol"
+        symbol = CGI.unescape($2)
+        link_to("##{symbol}", "https://twitter.com/search?q=#{CGI.escape("$#{symbol}")}")
+      else
+        $&
+      end
+    end
+    ret.gsub!(/\r\n|\r|\n/, "<br />")
 
-  def format_source_text(text)
-    format_tweet_text(text)
+    return ret
   end
+  alias format_source_text format_tweet_text
 
   def twitter_status_url(tweet)
     "https://twitter.com/#{tweet.user.screen_name}/status/#{tweet.id}"
@@ -30,33 +37,28 @@ module ApplicationHelper
     "https://twitter.com/#{screen_name}"
   end
 
-  def link_to_user_page(screen_name, &blk)
-    if block_given?
-      body = capture(&blk)
-    end
-
-    body ||= "@#{screen_name}"
-    link_to(body, :controller => "users", :action => "best", :screen_name => screen_name)
+  def user_icon_link(user)
+    logger.error("DEPRECATED user_icon_link")
+    link_to(image_tag(user.profile_image_url, alt: user.screen_name, title: user.name), user_path(user.screen_name))
   end
 
+  def include_user?; get_bool(params[:include_user]) end
   def user_limit
     i = params[:limit].to_i
-    if i == 0
+    if i > 0
+      return i
+    elsif i == -1
+      return nil
+    else
       if params[:action] == "show"
-        if params[:full] == "true"
-          return nil
-        else
-          return 100
-        end
+        return 100
       else
         return 20
       end
-    else
-      return i
     end
   end
 
-  # utf8
+  # utf8, form
   def utf8_enforcer_tag
     raw ""
   end

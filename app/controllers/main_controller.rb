@@ -1,7 +1,7 @@
 class MainController < ApplicationController
   def index
     @title = "aclog"
-    render :layout => "index"
+    render layout: "index"
   end
 
   def about

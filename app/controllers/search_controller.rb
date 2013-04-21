@@ -2,12 +2,14 @@
 require "shellwords"
 
 class SearchController < ApplicationController
+  before_filter :force_page
+
   def search
     @show_search = true
 
     # TODO: OR とか () とか対応したいよね
     unless params[:query]
-      render_page(Tweet.where(:id => -1))
+      render_timeline(Tweet.where(id: -1))
       return
     end
     words = Shellwords.shellwords(params[:query])
@@ -24,7 +26,7 @@ class SearchController < ApplicationController
           if key[0] == "-"
             tweets.where("user_id != ?", user ? user.id : -1)
           else
-            tweets.where(:user_id => user ? user.id : -1)
+            tweets.where(user_id: user ? user.id : -1)
           end
         when /^-?fav/
           search_unless_zero(tweets, "favorites_count", key[0], value)
@@ -66,7 +68,7 @@ class SearchController < ApplicationController
         if word[0] == "-"
           tweets.where("id < ? OR id >= ?", first_id_of_time(since), first_id_of_time(to))
         else
-          tweets.where(:id => first_id_of_time(since)...first_id_of_time(to))
+          tweets.where(id: first_id_of_time(since)...first_id_of_time(to))
         end
       else
         # TODO: ツイート検索
@@ -74,7 +76,7 @@ class SearchController < ApplicationController
       end
     end
 
-    render_page(result)
+    render_timeline(result)
   end
 
   private
@@ -87,7 +89,7 @@ class SearchController < ApplicationController
     n = flag == "-"
 
     unless num == 0
-      tweets.where("#{column}#{n ? "<" : ">="} ?", num)
+      tweets.where("#{column} #{n ? "<" : ">="} ?", num)
     else
       tweets
     end

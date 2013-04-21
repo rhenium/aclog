@@ -1,4 +1,4 @@
 json.array! @items do |json, item|
-  json.partial! "shared/tweet", :item => item
+  json.partial! "shared/partial/tweet", item: item
 end
 

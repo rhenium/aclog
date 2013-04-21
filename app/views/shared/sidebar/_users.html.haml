@@ -1,0 +1,41 @@
+.sidebar
+  .avatar
+    = link_to user_path(@user.screen_name) do
+      = image_tag @user.profile_image_url_original, alt: @user.screen_name, width: 64, height: 64, class: "icon img-rounded"
+  .screen_name= link_to @user.screen_name, twitter_user_url(@user.screen_name)
+  - if @user.registered?
+    %ul.records
+      %li
+        %span favorited
+        %span.data= @user.stats[:favorited_count]
+      %li
+        %span retweeted
+        %span.data= @user.stats[:retweeted_count]
+      %li
+        %span avg. fav
+        %span.data= ((@user.stats[:favorited_count] + 0.0) / @user.stats[:tweets_count]).round(2)
+      %li
+        %span joined
+        %span.data= format_date_ago(@user.created_at)
+  - else
+    .alert.alert-info
+      = "@#{@user.screen_name} has never signed in to aclog"
+  .user_nav
+    %ul.nav.nav-tabs.nav-stacked
+      - if @user.registered?
+        %li
+          = link_to "info", info_path(@user.screen_name)
+      %li
+        = link_to "best", user_path(@user.screen_name)
+      %li
+        = link_to "timeline", timeline_path(@user.screen_name)
+      %li
+        = link_to "discovered", discovered_path(@user.screen_name)
+      %li
+        = link_to "favorited by", favorited_by_path(@user.screen_name)
+      %li
+        = link_to "retweeted by", retweeted_by_path(@user.screen_name)
+      %li
+        = link_to "given favorites", given_favorites_to_path(@user.screen_name)
+      %li
+        = link_to "given retweets", given_retweets_to_path(@user.screen_name)

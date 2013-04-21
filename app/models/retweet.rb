@@ -17,9 +17,9 @@ class Retweet < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      r = create!(:id => hash[:id],
-                  :tweet_id => hash[:tweet_id],
-                  :user_id => hash[:user_id])
+      r = create!(id: hash[:id],
+                  tweet_id: hash[:tweet_id],
+                  user_id: hash[:user_id])
       logger.debug("Created Retweet: #{hash[:id]}: #{hash[:user_id]} => #{hash[:tweet_id]}")
 
       return r
@@ -32,8 +32,8 @@ class Retweet < ActiveRecord::Base
 
   def self.from_tweet_object(status)
     User.from_user_object(status.user)
-    from_hash(:id => status.id,
-              :user_id => status.user.id,
-              :tweet_id => status.retweeted_status.id)
+    from_hash(id: status.id,
+              user_id: status.user.id,
+              tweet_id: status.retweeted_status.id)
   end
 end

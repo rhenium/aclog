@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 class ApplicationController < ActionController::Base
   protect_from_forgery
+
   before_filter :set_format
   after_filter :xhtml
-  before_filter :get_include_user
+  helper_method :logged_in?, :page
+  helper_method :get_bool, :get_int
 
   def render_timeline(a = nil, &blk)
     @items = a || blk.call
@@ -11,36 +13,19 @@ class ApplicationController < ActionController::Base
     @items = @items.where("tweets.id <= ?", max_id) if max_id
     @items = @items.where("tweets.id > ?", since_id) if since_id
 
-    if @force_page || page
-      @items = @items.page(page || 1).per(count)
-    else
-      @items = @items.limit(count)
-    end
+    @items = @items.limit(count)
+    @items = @items.offset(((page || 1) - 1) * count) if page
 
     render "shared/tweets"
   end
+
+  def logged_in?; session[:user_id] != nil end
 
   # params
   def page; get_int(params[:page], nil){|i| i > 0} end
   def count; get_int(params[:count], 10){|i| (1..100) === i} end
   def max_id; get_int(params[:max_id], nil){|i| i >= 0} end
   def since_id; get_int(params[:since_id], nil){|i| i >= 0} end
-  def user_limit; get_int(params[:limit], 20){|i| i >= 0} end
-
-  def force_page
-    @force_page = true
-  end
-
-  def order
-    case params[:order]
-    when /^fav/
-      :favorite
-    when /^re?t/
-      :retweet
-    else
-      :default
-    end
-  end
 
   private
   def set_format
@@ -56,10 +41,6 @@ class ApplicationController < ActionController::Base
       # remove invalid charactors
       response.body = response.body.gsub(/[\x0-\x8\xb\xc\xe-\x1f]/, "")
     end
-  end
-
-  def get_include_user
-    @include_user ||= get_bool(params[:include_user])
   end
 
   def get_bool(str)

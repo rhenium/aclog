@@ -64,6 +64,6 @@ class ReportController < ApplicationController
   def add_issue_stolen(resolved, tweet_id, original_id)
     Issue.register(Aclog::Constants::IssueType::TWEET_STOLEN,
                    resolved ? Aclog::Constants::IssueStatus::RESOLVED : Aclog::Constants::IssueStatus::PENDING,
-                  {:tweet_id => tweet_id, :original_id => original_id})
+                  {tweet_id: tweet_id, original_id: original_id})
   end
 end

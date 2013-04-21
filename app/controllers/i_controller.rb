@@ -1,12 +1,11 @@
 class IController < ApplicationController
-  before_filter :force_page, :only => [:best, :recent]
+  before_filter :force_page, only: [:best, :recent]
 
   def best
     @title = "Best Tweets"
     render_timeline do
       Tweet
         .reacted
-        .not_protected
         .original
         .order_by_reactions
     end
@@ -18,7 +17,6 @@ class IController < ApplicationController
       Tweet
         .recent
         .reacted
-        .not_protected
         .original
         .order_by_reactions
     end
@@ -32,5 +30,10 @@ class IController < ApplicationController
         .not_protected
         .order_by_id
     end
+  end
+
+  private
+  def force_page
+    params[:page] = "1" unless page
   end
 end

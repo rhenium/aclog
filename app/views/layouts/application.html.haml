@@ -1,7 +1,7 @@
-= render :layout => "layouts/base" do
+= render layout: "layouts/base" do
   .row
     .span2
-      .sidebar= render :partial => "shared/sidebar_#{params[:controller]}"
+      .sidebar= render partial: "shared/sidebar/#{params[:controller]}"
     .span10
-      %h1= @title_b || @title
+      %h1= strip_tags(@title_b || @title)
       = yield

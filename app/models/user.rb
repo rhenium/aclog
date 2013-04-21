@@ -1,17 +1,17 @@
 class User < ActiveRecord::Base
-  has_many :tweets, :dependent => :delete_all
-  has_many :favorites, :dependent => :delete_all
-  has_many :retweets, :dependent => :delete_all
+  has_many :tweets, dependent: :delete_all
+  has_many :favorites, dependent: :delete_all
+  has_many :retweets, dependent: :delete_all
 
   def self.cached(identity)
     if identity.is_a?(Fixnum) || identity.is_a?(Bignum)
-      Rails.cache.fetch("user/#{identity}", :expires_in => 3.hour) do
-        where(:id => identity).first
+      Rails.cache.fetch("user/#{identity}", expires_in: 3.hour) do
+        where(id: identity).first
       end
     elsif identity.is_a?(String)
       if /^[A-Za-z0-9_]{1,15}$/ =~ identity
-        uid = Rails.cache.fetch("screen_name/#{identity}", :expires_in => 3.hour) do
-          if user = where(:screen_name => identity).first
+        uid = Rails.cache.fetch("screen_name/#{identity}", expires_in: 3.hour) do
+          if user = where(screen_name: identity).first
             user.id
           end
         end
@@ -50,11 +50,11 @@ class User < ActiveRecord::Base
   end
 
   def self.from_user_object(user_object)
-    from_hash(:id => user_object.id,
-              :screen_name => user_object.screen_name,
-              :name => user_object.name,
-              :profile_image_url => user_object.profile_image_url_https,
-              :protected => user_object.protected)
+    from_hash(id: user_object.id,
+              screen_name: user_object.screen_name,
+              name: user_object.name,
+              profile_image_url: user_object.profile_image_url_https,
+              protected: user_object.protected)
   end
 
   def self.delete_cache(uid)
@@ -71,7 +71,7 @@ class User < ActiveRecord::Base
   end
 
   def account
-    Account.where(:user_id => id).first
+    Account.where(user_id: id).first
   end
 
   def profile_image_url_original

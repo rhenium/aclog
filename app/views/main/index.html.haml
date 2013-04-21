@@ -11,7 +11,7 @@
   = link_to "アプリ連携", "https://twitter.com/settings/applications"
   から不要な "AcLog" と "Aclog2" は解除しても大丈夫です。
 %h4
-  今後の予定(2013/04/16)
+  今後の予定(2013/04/20)
 %ul
   %li ふぁぼ爆撃対策: TLふぁぼり（エタフォ）・ユーザーTLふぁぼり（fav2you）対策
   %li 通知を細かく設定できるように
@@ -21,7 +21,7 @@
 %p
   ふぁぼ爆撃（無差別なふぁぼなど）と判断された場合は数時間ふぁぼりの記録が停止されます。基準は相当高く設定しているので誤判定はまずないとは思いますがもしなにかあれば連絡ください。
 %p
-  = link_to "ツイート", "https://twitter.com/share", :class => "twitter-share-button", :"data-text" => "aclog", :"data-count" => "none", :"data-url" => "http://aclog.koba789.com/"
+  = link_to "ツイート", "https://twitter.com/share", class: "twitter-share-button", data: {text: "aclog", count: "none", url: "http://aclog.koba789.com"}
 %hr
 %h5
   連絡先
@@ -29,5 +29,5 @@
   %dt Twitter
   %dd= link_to "@cn", "https://twitter.com/cn"
   %dt メール(あんまり見ていません)
-  %dd= link_to "contact@re4k.info", "mailto:contact@re4k.info"
+  %dd= mail_to "contact@re4k.info"
 

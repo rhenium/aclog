@@ -1,1 +1,1 @@
-json.partial! "shared/user", :user => @user
+json.partial! "shared/partial/user", user: @user

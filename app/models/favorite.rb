@@ -1,6 +1,6 @@
 class Favorite < ActiveRecord::Base
-  belongs_to :tweet
-  counter_culture :tweet
+  belongs_to :tweet, :counter_cache => true
+#  counter_culture :tweet
   belongs_to :user
 
   scope :order_by_id, -> do

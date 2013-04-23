@@ -8,6 +8,7 @@ FactoryGirl.define do
     protected false
   end
 
+  # screen_name won't be changed
   factory :user_exists, class: User do
     id 15926668
     screen_name "toshi_a"
@@ -16,6 +17,7 @@ FactoryGirl.define do
     protected false
   end
 
+  # nil
   factory :user_not_exists, class: User do
     id 0
     screen_name ""
@@ -24,6 +26,7 @@ FactoryGirl.define do
     protected false
   end
 
+  # permanent suspended
   factory :user_suspended, class: User do
     id 230367516
     screen_name "re4k"
@@ -32,6 +35,7 @@ FactoryGirl.define do
     protected false
   end
 
+  # model user
   factory :user do |u|
     sequence(:screen_name){|n| "screen_name_#{n}"}
     sequence(:name){|n| "name_#{n}"}

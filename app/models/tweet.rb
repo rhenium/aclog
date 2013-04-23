@@ -83,6 +83,8 @@ class Tweet < ActiveRecord::Base
       else
         Retweet.where(id: id).destroy_all # counter_cache
       end
+
+      return id
     rescue
       logger.error("Unknown error while deleting tweet: #{$!}/#{$@}")
     end

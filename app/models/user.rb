@@ -75,7 +75,7 @@ class User < ActiveRecord::Base
   end
 
   def profile_image_url_original
-    profile_image_url.sub(/_normal((\.(png|jpeg|gif))?)/, "\\1")
+    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "\\1")
   end
 
   def twitter_user

@@ -52,7 +52,6 @@ class Account < ActiveRecord::Base
       followers_count: twitter_user.followers_count,
       tweets_count: twitter_user.statuses_count,
       friends_count: twitter_user.friends_count,
-      listed_count: twitter_user.listed_count,
       bio: twitter_user.description
     }
   end

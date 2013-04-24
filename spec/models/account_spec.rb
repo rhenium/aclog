@@ -2,90 +2,99 @@
 require 'spec_helper'
 
 describe Account do
-  describe "Account.register_or_update" do
-    it "登録されていなかった時 新しいレコードを作る。" do
-      account_1 = FactoryGirl.build(:account_1)
-      created_1 = Account.register_or_update(user_id: account_1.user_id,
-                                             oauth_token: account_1.oauth_token,
-                                             oauth_token_secret: account_1.oauth_token_secret,
-                                             consumer_version: account_1.consumer_version)
-      created_1.user_id.should eq account_1.user_id
+  describe ".register_or_update" do
+    context "when not recorded" do
+      let(:account) { FactoryGirl.build(:account_1) }
+      subject { Account.register_or_update(account.attributes.symbolize_keys) }
+      its(:user_id) { should be account.user_id }
+      its(:oauth_token) { should eq account.oauth_token }
+      its(:oauth_token_secret) { should eq account.oauth_token_secret }
+      its(:consumer_version) { should be account.consumer_version }
     end
 
-    it "登録されていた時 レコードを更新する。" do
-      created_1 = FactoryGirl.create(:account_1)
-
-      account_2 = FactoryGirl.build(:account_2)
-      created_2 = Account.register_or_update(user_id: account_2.user_id,
-                                             oauth_token: account_2.oauth_token,
-                                             oauth_token_secret: account_2.oauth_token_secret,
-                                             consumer_version: account_2.consumer_version)
-      created_2.oauth_token.should eq account_2.oauth_token
-      created_2.id.should eq created_1.id
-    end
-  end
-
-  describe "Account#user" do
-    before(:each){@account_1 = FactoryGirl.create(:account_1)}
-
-    it "ユーザーが記録されていた時 User を返す。" do
-      FactoryGirl.create(:user_1)
-
-      got_user = @account_1.user
-      got_user.id.should eq @account_1.user_id
-    end
-
-    it "ユーザーが記録されていなかった時 nil を返す。" do
-      got_user = @account_1.user
-      got_user.should eq nil
+    context "when already recorded" do
+      let(:old_account) { FactoryGirl.create(:account_1) }
+      let(:new_account) { FactoryGirl.build(:account_2) }
+      subject { Account.register_or_update(new_account.attributes.symbolize_keys) }
+      its(:id) { should be old_account.id }
+      its(:user_id) { should be old_account.user_id }
+      its(:user_id) { should be new_account.user_id }
+      its(:oauth_token) { should eq new_account.oauth_token }
+      its(:oauth_token_secret) { should eq new_account.oauth_token_secret }
+      its(:consumer_version) { should eq new_account.consumer_version }
     end
   end
 
-  describe "Account.client" do
-    before(:each){@account_1 = FactoryGirl.create(:account_1)}
+  describe "#user" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    subject { account.user }
 
-    it "Twitter::Client を返す。" do
-      @account_1.client.should be_a Twitter::Client
+    context "when exist" do
+      before { @user = FactoryGirl.create(:user_1) }
+      it { should_not eq nil }
+      it { should eq @user }
+    end
+
+    context "when not exist" do
+      it { should be nil }
     end
   end
 
-  describe "Account#twitter_user" do
-    before(:each){@account_1 = FactoryGirl.create(:account_1)}
+  describe "#client" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    subject { account.client }
+    it { should be_a Twitter::Client }
+  end
 
-    it "ユーザーが存在する時 Twitter::User を返す。" do
-      user = FactoryGirl.create(:user_exists)
+  describe "#twitter_user" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    let(:user) { FactoryGirl.create(user_fixture) }
+    subject { account.twitter_user(user.id) }
 
-      got_user = @account_1.twitter_user(user.id)
-      got_user.screen_name.should eq user.screen_name
+    context "when exist" do
+      let(:user_fixture) { :user_exists }
+      its(:id) { should be user.id }
+      its(:screen_name) { should eq user.screen_name }
     end
 
-    it "ユーザーが存在しない時 nil を返す。" do
-      user = FactoryGirl.create(:user_not_exists)
-
-      got_user = @account_1.twitter_user(user.id)
-      got_user.should eq nil
+    context "when not exist" do
+      let(:user_fixture) { :user_not_exists }
+      it { should be nil }
     end
 
-    it "ユーザーが凍結している時 nil を返す。" do
-      user = FactoryGirl.create(:user_suspended)
-
-      got_user = @account_1.twitter_user(user.id)
-      got_user.should eq nil
+    context "when suspended" do
+      let(:user_fixture) { :user_suspended }
+      it { should be nil }
     end
 
-    it "引数を省略した時自分の user_id を使う。" do
-      user = FactoryGirl.create(:user_1)
-
-      got_user = @account_1.twitter_user
-      got_user.screen_name.should eq user.screen_name
+    context "when no parameter" do
+      let(:user_fixture) { :user_1 }
+      before { user }
+      subject { account.twitter_user }
+      its(:id) { should be user.id }
+      its(:screen_name) { should eq user.screen_name }
     end
   end
 
-  describe "Account.import_favorites" do
+  describe "#import_favorites" do
     # TODO
   end
 
-  describe "Account.stats_api" do
-    # TODO
+  describe "#stats_api" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    let(:tweet) { OpenStruct.new(favourites_count: 10,
+                                 listed_count: 12,
+                                 followers_count: 14,
+                                 statuses_count: 16,
+                                 friends_count: 18,
+                                 description: "") }
+    before { account.stub!(:twitter_user).and_return(tweet) }
+    subject { OpenStruct.new(account.stats_api) }
+    its(:favorites_count) { should be tweet.favourites_count }
+    its(:listed_count) { should be tweet.listed_count }
+    its(:followers_count) { should be tweet.followers_count }
+    its(:tweets_count) { should be tweet.statuses_count }
+    its(:friends_count) { should be tweet.friends_count }
+    its(:bio) { should eq tweet.description }
   end
 end

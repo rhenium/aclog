@@ -8,6 +8,14 @@ FactoryGirl.define do
     protected false
   end
 
+  factory :user_2, class: User do
+    id 1326331596
+    screen_name "aclog_test" # same
+    name "aclog test (new)"
+    profile_image_url "https://si0.twimg.com/sticky/default_profile_images/default_profile_3_normal.png"
+    protected true
+  end
+
   # screen_name won't be changed
   factory :user_exists, class: User do
     id 15926668

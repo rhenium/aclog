@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 20130413042256) do
   create_table "issues", force: true do |t|
     t.integer  "issue_type", limit: 2
     t.integer  "status",     limit: 2
-    t.text     "data"
+    t.text     "data",       limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -81,6 +81,6 @@ ActiveRecord::Schema.define(version: 20130413042256) do
     t.boolean  "protected"
   end
 
-  add_index "users", ["screen_name"], name: "index_users_on_screen_name", length: {"screen_name"=>191}
+  add_index "users", ["screen_name"], name: "index_users_on_screen_name"
 
 end

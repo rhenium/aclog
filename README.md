@@ -11,6 +11,14 @@ A web service like Favstar.
 
 ## Requirements
 * Ruby 1.9.3+
-* MySQL
+* MySQL 5.5.14+
+
+## Setup
+Add to my.cnf
+
+    [mysqld]
+    innodb_file_format = Barracuda
+    innodb_file_per_table = 1
+    innodb_large_prefix
 
 

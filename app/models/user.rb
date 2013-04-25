@@ -78,14 +78,6 @@ class User < ActiveRecord::Base
     profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "\\1")
   end
 
-  def twitter_user
-    if registered?
-      account.twitter_user
-    else
-      raise Exception, "why??"
-    end
-  end
-
   def stats(include_stats_api = false)
     @stats_cache ||= begin
       raise Aclog::Exceptions::UserNotRegistered unless account

@@ -129,10 +129,17 @@ describe User do
       FactoryGirl.create(:favorite, tweet: tweet_1, user: user_3)
       FactoryGirl.create(:retweet,  tweet: tweet_2, user: user_2)
 
-      account.stub!(:stats_api).and_return(stats_api)
-      user.stub!(:account).and_return(account)
+      stub_request(:get, "https://api.twitter.com/1.1/account/verify_credentials.json")
+        .to_return(status: 200, body: {id: user.id,
+                                       favourites_count: 10,
+                                       listed_count: 12,
+                                       followers_count: 14,
+                                       statuses_count: 16,
+                                       friends_count: 18,
+                                       description: "abc"}.to_json)
     end
-    subject { OpenStruct.new(user.stats) }
+
+    subject { OpenStruct.new(user.stats(true)) }
     its(:stats_api) { should eq stats_api }
     its(:favorites_count) { should be 0 }
     its(:retweets_count) { should be 0 }

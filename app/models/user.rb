@@ -86,22 +86,36 @@ class User < ActiveRecord::Base
     end
   end
 
-  def stats
-    @stats_cache ||= ->{
+  def stats(include_stats_api = false)
+    @stats_cache ||= begin
       raise Aclog::Exceptions::UserNotRegistered unless account
 
-      tweets.inject(
-        {favorites_count: favorites.count,
-         retweets_count: retweets.count,
-         tweets_count: tweets.length, # cache: tweets.inject calls "SELECT `tweets`.*"
-         favorited_count: 0,
-         retweeted_count: 0,
-         stats_api: account.stats_api}
-      ) do |hash, m|
+      hash = {favorites_count: favorites.count,
+              retweets_count: retweets.count,
+              tweets_count: tweets.length, # cache: tweets.inject calls "SELECT `tweets`.*"
+              favorited_count: 0,
+              retweeted_count: 0}
+
+      if include_stats_api
+        twitter_user = account.client.user
+        if twitter_user
+          h = {
+            favorites_count: twitter_user.favourites_count,
+            listed_count: twitter_user.listed_count,
+            followers_count: twitter_user.followers_count,
+            tweets_count: twitter_user.statuses_count,
+            friends_count: twitter_user.friends_count,
+            bio: twitter_user.description
+          }
+        end
+        hash[:stats_api] = h
+      end
+
+      tweets.inject(hash) do |hash, m|
         hash[:favorited_count] += m.favorites_count
         hash[:retweeted_count] += m.retweets_count
         hash
       end
-    }.call
+    end
   end
 end

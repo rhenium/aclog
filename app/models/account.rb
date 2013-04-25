@@ -1,5 +1,5 @@
 class Account < ActiveRecord::Base
-  def self.register_or_update(hash)
+  def self.create_or_update(hash)
     account = where(user_id: hash[:user_id]).first_or_initialize
     account.oauth_token = hash[:oauth_token]
     account.oauth_token_secret = hash[:oauth_token_secret]
@@ -20,13 +20,6 @@ class Account < ActiveRecord::Base
       oauth_token_secret: oauth_token_secret)
   end
 
-  def twitter_user(uid = nil)
-    uid ||= user_id
-    Rails.cache.fetch("twitter_user/#{uid}", expires_in: 1.hour) do
-      client.user(uid) rescue nil
-    end
-  end
-
   def import_favorites(id)
     result = client.status_activity(id)
 
@@ -42,17 +35,5 @@ class Account < ActiveRecord::Base
     client.retweets(id, count: 100).each do |status|
       Retweet.from_tweet_object(status)
     end
-  end
-
-  def stats_api
-    return {} unless twitter_user
-    {
-      favorites_count: twitter_user.favourites_count,
-      listed_count: twitter_user.listed_count,
-      followers_count: twitter_user.followers_count,
-      tweets_count: twitter_user.statuses_count,
-      friends_count: twitter_user.friends_count,
-      bio: twitter_user.description
-    }
   end
 end

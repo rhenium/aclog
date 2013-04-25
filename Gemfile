@@ -32,5 +32,6 @@ group :development, :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'factory_girl_rails'#, :require => 'factory_girl'
+  gem 'webmock'
 end
 

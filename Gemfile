@@ -16,7 +16,7 @@ gem 'msgpack'
 gem 'em-work_queue'
 
 gem 'twitter'
-gem 'omniauth-twitter', :github => "rhenium/omniauth-twitter"
+gem 'omniauth-twitter'
 gem 'kaminari'
 
 gem 'haml-rails'
@@ -28,7 +28,7 @@ gem 'uglifier', '>= 1.0.3'
 
 gem 'bootstrap-sass'
 
-group :development, :test do
+group :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'factory_girl_rails'#, :require => 'factory_girl'

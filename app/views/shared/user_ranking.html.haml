@@ -1,7 +1,7 @@
 .users
   %ul.inline
     - @usermap.take(50).each do |user_id, count|
-      - user = User.cached(user_id)
+      - user = User.find(user_id)
       %li
         - if user
           .avatar

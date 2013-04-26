@@ -189,11 +189,11 @@ class UsersController < ApplicationController
     end
 
     if params[:user_id]
-      user = User.cached(params[:user_id].to_i)
+      user = User.find(params[:user_id].to_i)
     end
 
     if !user && params[:screen_name]
-      user = User.cached(params[:screen_name])
+      user = User.where(screen_name: params[:screen_name]).first
     end
 
     raise Aclog::Exceptions::UserNotFound unless user
@@ -203,7 +203,7 @@ class UsersController < ApplicationController
 
   def include_user_b
     if params[:user_id_b]
-      user_b = User.cached(params[:user_id_b].to_i)
+      user_b = User.find(params[:user_id_b].to_i)
     end
 
     if !user_b && params[:screen_name_b]

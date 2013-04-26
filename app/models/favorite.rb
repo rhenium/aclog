@@ -7,14 +7,6 @@ class Favorite < ActiveRecord::Base
     order("id DESC")
   end
 
-  def user
-    User.cached(user_id)
-  end
-
-  def tweet
-    Tweet.cached(tweet_id)
-  end
-
   def self.from_hash(hash)
     begin
       f = create!(tweet_id: hash[:tweet_id],

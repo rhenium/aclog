@@ -1,4 +1,6 @@
 class Account < ActiveRecord::Base
+  has_one :user
+
   def self.create_or_update(hash)
     account = where(user_id: hash[:user_id]).first_or_initialize
     account.oauth_token = hash[:oauth_token]
@@ -6,10 +8,6 @@ class Account < ActiveRecord::Base
     account.consumer_version = hash[:consumer_version]
     account.save if account.changed?
     account
-  end
-
-  def user
-    User.cached(user_id)
   end
 
   def client

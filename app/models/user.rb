@@ -3,31 +3,9 @@ class User < ActiveRecord::Base
   has_many :favorites, dependent: :delete_all
   has_many :retweets, dependent: :delete_all
 
-  def self.cached(identity)
-    if identity.is_a?(Fixnum) || identity.is_a?(Bignum)
-      Rails.cache.fetch("user/#{identity}", expires_in: 3.hour) do
-        where(id: identity).first
-      end
-    elsif identity.is_a?(String)
-      if /^[A-Za-z0-9_]{1,15}$/ =~ identity
-        uid = Rails.cache.fetch("screen_name/#{identity}", expires_in: 3.hour) do
-          if user = where(screen_name: identity).first
-            user.id
-          end
-        end
-
-        cached(uid)
-      end
-    elsif identity.is_a?(NilClass)
-      nil
-    else
-      raise Exception, "Invalid identity: #{identity}"
-    end
-  end
-
   def self.from_hash(hash)
     begin
-      user = cached(hash[:id]) || User.new(id: hash[:id])
+      user = where(id: hash[:id]).first || User.new(id: hash[:id])
       orig = user.attributes.dup
 
       user.screen_name = hash[:screen_name]
@@ -56,11 +34,6 @@ class User < ActiveRecord::Base
               profile_image_url: user_object.profile_image_url_https,
               protected: user_object.protected)
   end
-
-  def self.delete_cache(uid)
-    Rails.cache.delete("user/#{uid}")
-  end
-  def delete_cache; User.delete_cache(id) end
 
   def protected?
     protected

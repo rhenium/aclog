@@ -13,9 +13,9 @@ class ReportController < ApplicationController
       raise ActionController::BadRequest
     end
 
-    tweet = Tweet.cached(tweet_id)
+    tweet = Tweet.find(tweet_id)
     if tweet
-      original = Tweet.cached(original_id)
+      original = Tweet.find(original_id)
       unless original
         add_issue_stolen(false, tweet_id, original_id)
         return

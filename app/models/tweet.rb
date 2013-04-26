@@ -57,16 +57,6 @@ class Tweet < ActiveRecord::Base
     includes(:user).where(users: {protected: false})
   end
 
-  def self.cached(id)
-    Rails.cache.fetch("tweet/#{id}", expires_in: 3.hour) do
-      where(id: id).first
-    end
-  end
-
-  def user
-    User.cached(user_id)
-  end
-
   def notify_favorite
     if [50, 100, 250, 500, 1000].include? favorites.count
       Aclog::Notification.reply_favs(self, favorites.count)

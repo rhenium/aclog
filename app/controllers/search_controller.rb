@@ -22,7 +22,7 @@ class SearchController < ApplicationController
         key, value = word.split(":", 2)
         case key.downcase
         when /^-?user$/
-          user = User.cached(value)
+          user = User.where(screen_name: value).first
           if key[0] == "-"
             tweets.where("user_id != ?", user ? user.id : -1)
           else

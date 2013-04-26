@@ -10,6 +10,19 @@ class Account < ActiveRecord::Base
     account
   end
 
+  def update_connection
+    begin
+      UNIXSocket.open(Settings.register_server_path) do |socket|
+        socket.write({type: "register",
+                      id: self.id,
+                      user_id: self.user_id}.to_msgpack)
+      end
+    rescue Exception => ex
+      # receiver not started?
+      logger.error("Could't send account info to receiver daemon: #{ex}")
+    end
+  end
+
   def client
     Twitter::Client.new(
       consumer_key: Settings.consumer[consumer_version.to_i].key,

@@ -1,5 +1,3 @@
-require "socket"
-
 class SessionsController < ApplicationController
   def callback
     auth = request.env["omniauth.auth"]

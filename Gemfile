@@ -17,7 +17,6 @@ gem 'em-work_queue'
 
 gem 'twitter'
 gem 'omniauth-twitter'
-gem 'kaminari'
 
 gem 'haml-rails'
 gem 'sass-rails', '~> 4.0.0.beta1'
@@ -31,7 +30,7 @@ gem 'bootstrap-sass'
 group :test do
   gem 'rspec'
   gem 'rspec-rails'
-  gem 'factory_girl_rails'#, :require => 'factory_girl'
+  gem 'factory_girl_rails'
   gem 'webmock'
 end
 

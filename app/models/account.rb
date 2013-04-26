@@ -1,5 +1,5 @@
 class Account < ActiveRecord::Base
-  has_one :user
+  belongs_to :user
 
   def self.create_or_update(hash)
     account = where(user_id: hash[:user_id]).first_or_initialize

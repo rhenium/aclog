@@ -51,16 +51,18 @@ Aclog::Application.routes.draw do
 
   get "/:screen_name(/:page)" => "users#best", constraints: constraints, as: "user"
   get "/:screen_name/:order(/:page)" => "users#best", constraints: constraints
-  get "/:screen_name/recent(/:page)" => "users#recent", constraints: constraints, as: "recent"
-  get "/:screen_name/recent/:order(/:page)" => "users#recent", constraints: constraints
-  get "/:screen_name/timeline(/:page)" => "users#timeline", constraints: constraints, as: "timeline"
-  get "/:screen_name/discovered(/:page)" => "users#discovered", constraints: constraints, as: "discovered"
-  get "/:screen_name/discovered/:tweets(/:page)" => "users#discovered", constraints: constraints
+  get "/:screen_name/timeline" => "users#timeline", constraints: constraints, as: "timeline"
+  get "/:screen_name/discovered" => "users#discovered", constraints: constraints, as: "discovered"
+  get "/:screen_name/discovered/:tweets" => "users#discovered", constraints: constraints
   get "/:screen_name/info" => "users#info", constraints: constraints, as: "info"
   get "/:screen_name/favorited_by(/:screen_name_b)" => "users#favorited_by", constraints: constraints, as: "favorited_by"
   get "/:screen_name/retweeted_by(/:screen_name_b)" => "users#retweeted_by", constraints: constraints, as: "retweeted_by"
   get "/:screen_name/given_favorites_to(/:screen_name_b)" => "users#given_favorites_to", constraints: constraints, as: "given_favorites_to"
   get "/:screen_name/given_retweets_to(/:screen_name_b)" => "users#given_retweets_to", constraints: constraints, as: "given_retweets_to"
+
+  # will be removed..?
+  get "/:screen_name/recent(/:page)" => "users#recent", constraints: constraints, as: "recent"
+  get "/:screen_name/recent/:order(/:page)" => "users#recent", constraints: constraints
 
   # redirects
   get "(/users)/:screen_name/status(es)/:id" => redirect("/i/%{id}"), constraints: constraints

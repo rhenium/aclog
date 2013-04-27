@@ -2,14 +2,12 @@
 require "shellwords"
 
 class SearchController < ApplicationController
-  before_filter :force_page
-
   def search
     @show_search = true
 
     # TODO: OR とか () とか対応したいよね
     unless params[:query]
-      render_timeline(Tweet.where(id: -1))
+      render_tweets(force_page: true) { Tweet.none }
       return
     end
     words = Shellwords.shellwords(params[:query])
@@ -76,12 +74,12 @@ class SearchController < ApplicationController
       end
     end
 
-    render_timeline(result)
+    render_tweets(force_page: true) { result }
   end
 
   private
   def first_id_of_time(time)
-    p (time.to_i * 1000 - 1288834974657) << 22
+    (time.to_i * 1000 - 1288834974657) << 22
   end
 
   def search_unless_zero(tweets, column, flag, value)

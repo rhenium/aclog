@@ -3,10 +3,6 @@ class Retweet < ActiveRecord::Base
 #  counter_culture :tweet
   belongs_to :user
 
-  scope :order_by_id, -> do
-    order("id DESC")
-  end
-
   def self.from_hash(hash)
     begin
       r = create!(id: hash[:id],
@@ -24,6 +20,7 @@ class Retweet < ActiveRecord::Base
 
   def self.from_tweet_object(status)
     User.from_user_object(status.user)
+    Tweet.from_tweet_object(status.retweeted_status)
     from_hash(id: status.id,
               user_id: status.user.id,
               tweet_id: status.retweeted_status.id)

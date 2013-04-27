@@ -1,6 +1,13 @@
 module ApplicationHelper
+  def logged_in?; session[:user_id] && session[:account] end
+  def include_user?; !!params[:include_user] end
+
   def format_time(dt)
     dt.to_time.localtime("+09:00").strftime("%Y-%m-%d %H:%M:%S")
+  end
+
+  def format_days_ago(dt)
+    "#{(DateTime.now.utc - dt.to_datetime).to_i}d ago"
   end
 
   def format_tweet_text(text)
@@ -37,29 +44,6 @@ module ApplicationHelper
     "https://twitter.com/#{screen_name}"
   end
 
-  def user_icon_link(user)
-    logger.error("DEPRECATED user_icon_link")
-    link_to(image_tag(user.profile_image_url, alt: user.screen_name, title: user.name), user_path(user.screen_name))
-  end
-
-  def include_user?; get_bool(params[:include_user]) end
-  def user_limit
-    i = params[:limit].to_i
-    if i > 0
-      return i
-    elsif i == -1
-      return nil
-    else
-      if params[:action] == "show"
-        return 100
-      else
-        return 20
-      end
-    end
-  end
-
   # utf8, form
-  def utf8_enforcer_tag
-    raw ""
-  end
+  def utf8_enforcer_tag; raw "" end
 end

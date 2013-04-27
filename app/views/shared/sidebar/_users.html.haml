@@ -16,7 +16,7 @@
         %span.data= ((@user.stats[:favorited_count] + 0.0) / @user.stats[:tweets_count]).round(2)
       %li
         %span joined
-        %span.data= format_date_ago(@user.created_at)
+        %span.data= format_days_ago(@user.created_at)
   - else
     .alert.alert-info
       = "@#{@user.screen_name} has never signed in to aclog"

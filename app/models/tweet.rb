@@ -1,62 +1,31 @@
 class Tweet < ActiveRecord::Base
   belongs_to :user
+  has_many :favorites, -> { order("favorites.id") }, dependent: :delete_all
+  has_many :retweets, -> { order("retweets.id") }, dependent: :delete_all
+  has_one :stolen_tweet, ->{ includes(:original) }, dependent: :delete
 
-  has_many :favorites, ->{order("favorites.id")}, dependent: :delete_all
-  has_many :retweets, ->{order("retweets.id")}, dependent: :delete_all
-  has_many :favoriters, ->{order("favorites.id")}, through: :favorites, source: :user
-  has_many :retweeters, ->{order("retweets.id")}, through: :retweets, source: :user
-
-  has_one :stolen_tweet, ->{includes(:original)}, dependent: :delete
+  has_many :favoriters, ->  {order("favorites.id") }, through: :favorites, source: :user
+  has_many :retweeters, -> { order("retweets.id") }, through: :retweets, source: :user
   has_one :original, through: :stolen_tweet, source: :original
 
-  scope :recent, -> do
-    where("tweets.tweeted_at > ?", Time.zone.now - 3.days)
-  end
+  scope :recent, -> { where("tweets.tweeted_at > ?", Time.zone.now - 3.days) }
+  scope :reacted, -> {where("tweets.favorites_count > 0 OR tweets.retweets_count > 0") }
+  scope :original, -> { includes(:stolen_tweet).where(stolen_tweets: {tweet_id: nil}) }
+  scope :not_protected, -> { includes(:user).where(users: {protected: false}) }
+  scope :max_id, -> id { where("tweets.id <= ?", id) }
+  scope :since_id, -> id { where("tweets.id > ?", id) }
+  scope :page, -> page, count { offset((page - 1) * count) }
+  scope :order_by_id, -> { order("tweets.id DESC") }
+  scope :order_by_favorites, -> { order("tweets.favorites_count DESC") }
+  scope :order_by_retweets, -> { order("tweets.retweets_count DESC") }
+  scope :order_by_reactions, -> { order("COALESCE(tweets.favorites_count, 0) + COALESCE(tweets.retweets_count, 0) DESC") }
+  scope :favorited_by, -> user { joins(:favorites).where(favorites: {user_id: user.id}) }
+  scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user_id: user.id}) }
+  scope :discovered_by, -> user {
+    joins("INNER JOIN (#{user.favorites.to_sql} UNION #{user.retweets.to_sql}) m ON m.tweet_id = tweets.id")
+  }
 
-  scope :reacted, -> do
-    where("tweets.favorites_count > 0 OR tweets.retweets_count > 0")
-  end
-
-  scope :order_by_id, -> do
-    order("tweets.id DESC")
-  end
-
-  scope :order_by_favorites, -> do
-    order("tweets.favorites_count DESC")
-  end
-
-  scope :order_by_retweets, -> do
-    order("tweets.retweets_count DESC")
-  end
-
-  scope :order_by_reactions, -> do
-    order("COALESCE(tweets.favorites_count, 0) + COALESCE(tweets.retweets_count, 0) DESC")
-  end
-
-  scope :favorited_by, -> user do
-    joins(:favorites).where(favorites: {user_id: user.id})
-  end
-
-  scope :retweeted_by, -> user do
-    joins(:retweets).where(retweets: {user_id: user.id})
-  end
-
-  scope :discovered_by, -> user do
-    joins("INNER JOIN (" +
-            "(SELECT favorites.tweet_id FROM favorites WHERE favorites.user_id = #{user.id})" +
-          " UNION " +
-            "(SELECT retweets.tweet_id FROM retweets WHERE retweets.user_id = #{user.id})" +
-          ") AS m ON m.tweet_id = tweets.id")
-  end
-
-  scope :original, -> do
-    joins("LEFT JOIN stolen_tweets ON tweets.id = stolen_tweets.tweet_id").where(stolen_tweets: {tweet_id: nil})
-  end
-
-  scope :not_protected, -> do
-    includes(:user).where(users: {protected: false})
-  end
-
+  # will be moved
   def notify_favorite
     if [50, 100, 250, 500, 1000].include? favorites.count
       Aclog::Notification.reply_favs(self, favorites.count)

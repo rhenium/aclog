@@ -15,7 +15,6 @@ class User < ActiveRecord::Base
 
       if orig != user.attributes
         user.save!
-        user.delete_cache
         logger.debug("User saved: #{user.id}")
       else
         logger.debug("User not changed: #{user.id}")

@@ -1,5 +1,4 @@
 class UsersController < ApplicationController
-  before_filter :force_page, only: [:best, :recent]
   before_filter :require_user, except: [:show, :favoriters]
   before_filter :require_tweet, only: [:show, :favoriters]
   before_filter :include_user_b, only: [:favorited_by, :retweeted_by, :given_favorites_to, :given_retweets_to]
@@ -8,7 +7,7 @@ class UsersController < ApplicationController
   def best
     @title = "@#{@user.screen_name}'s Best Tweets"
 
-    render_timeline do
+    render_tweets(force_page: true) do
       case params[:order]
       when /^fav/
         @user.tweets.reacted.order_by_favorites
@@ -23,7 +22,7 @@ class UsersController < ApplicationController
   def recent
     @title = "@#{@user.screen_name}'s Recent Best Tweets"
 
-    render_timeline do
+    render_tweets(force_page: true) do
       case params[:order]
       when /^fav/
         @user.tweets.recent.reacted.order_by_favorites
@@ -38,8 +37,8 @@ class UsersController < ApplicationController
   def timeline
     @title = "@#{@user.screen_name}'s Newest Tweets"
 
-    render_timeline do
-      if get_bool(params[:all])
+    render_tweets do
+      if !!params[:all]
         @user.tweets.order_by_id
       else
         @user.tweets.reacted.order_by_id
@@ -50,7 +49,7 @@ class UsersController < ApplicationController
   def discovered
     @title = "@#{@user.screen_name}'s Recent Discoveries"
 
-    render_timeline do
+    render_tweets do
       case params[:tweets]
       when /^fav/
         Tweet.favorited_by(@user).order_by_id
@@ -122,15 +121,13 @@ class UsersController < ApplicationController
   def render_users_ranking
     by = -> model do
       model.joins(
-        "INNER JOIN (" +
-          "SELECT id FROM tweets WHERE tweets.user_id = #{@user.id} ORDER BY id DESC LIMIT 100" +
-        ") target ON tweet_id = target.id")
+        "INNER JOIN (#{@user.tweets.order_by_id.limit(100).to_sql}) target ON tweet_id = target.id")
     end
 
     to = -> model do
       Tweet.joins(
         "INNER JOIN (" +
-          "SELECT tweet_id FROM #{model.table_name} WHERE #{model.table_name}.user_id = #{@user.id} ORDER BY id DESC LIMIT 500" +
+          model.where(user_id: @user.id).order("id DESC").limit(500).to_sql +
         ") action ON tweets.id = action.tweet_id")
     end
 
@@ -157,7 +154,7 @@ class UsersController < ApplicationController
   end
 
   def render_user_to_user
-    render_timeline do
+    render_tweets do
       case params[:action].to_sym
       when :favorited_by
         @title = "@#{@user.screen_name}'s Tweets"
@@ -175,56 +172,26 @@ class UsersController < ApplicationController
     end
   end
 
-  def force_page
-    params[:page] = "1" unless page
-  end
-
   def require_user
-    if params[:screen_name] == "me"
-      if session[:user_id]
-        params[:user_id] = session[:user_id]
-      else
-        raise Aclog::Exceptions::LoginRequired
-      end
-    end
-
-    if params[:user_id]
-      user = User.find(params[:user_id].to_i)
-    end
-
-    if !user && params[:screen_name]
-      user = User.where(screen_name: params[:screen_name]).first
-    end
-
+    user = User.where(id: params[:user_id]).first || User.where(screen_name: params[:screen_name]).first
     raise Aclog::Exceptions::UserNotFound unless user
-
     @user = user
   end
 
   def include_user_b
-    if params[:user_id_b]
-      user_b = User.find(params[:user_id_b].to_i)
-    end
-
-    if !user_b && params[:screen_name_b]
-      user_b = User.where(screen_name: params[:screen_name_b]).first
-    end
-
+    user_b = User.where(id: params[:user_id_b]).first || User.where(screen_name: params[:screen_name_b]).first
     @user_b = user_b
   end
 
   def require_tweet
-    tweet_id = params[:id].to_i
-    item = Tweet.where(id: tweet_id).first
-
+    item = Tweet.where(id: params[:id]).first
     raise Aclog::Exceptions::TweetNotFound unless item
-
     @item = item
   end
 
   def check_protected
     if @user && @user.protected?
-      if !@user.registered? || !session[:account] || session[:account].user_id != @user.id
+      if session[:account] == nil || session[:account].user_id != @user.id
         raise Aclog::Exceptions::UserProtected
       end
     end

@@ -3,14 +3,9 @@ class Favorite < ActiveRecord::Base
 #  counter_culture :tweet
   belongs_to :user
 
-  scope :order_by_id, -> do
-    order("id DESC")
-  end
-
   def self.from_hash(hash)
     begin
-      f = create!(tweet_id: hash[:tweet_id],
-                  user_id: hash[:user_id])
+      f = create!(tweet_id: hash[:tweet_id], user_id: hash[:user_id])
       logger.debug("Created Favorite: #{hash[:user_id]} => #{hash[:tweet_id]}")
 
       return f
@@ -30,8 +25,6 @@ class Favorite < ActiveRecord::Base
   end
 
   def self.delete_from_hash(hash)
-    where(tweet_id: hash[:tweet_id])
-      .where(user_id: hash[:user_id])
-      .destroy_all
+    where(tweet_id: hash[:tweet_id], user_id: hash[:user_id]).destroy_all
   end
 end

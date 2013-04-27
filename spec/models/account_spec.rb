@@ -31,13 +31,20 @@ describe Account do
 
     context "when exist" do
       before { @user = FactoryGirl.create(:user_1) }
-      it { should_not eq nil }
       it { should eq @user }
     end
 
     context "when not exist" do
       it { should be nil }
     end
+  end
+
+  describe "#update_connection" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    it "should not raise error" do
+      expect { account.update_connection }.not_to raise_error
+    end
+    # TODO: how to test receiver...?
   end
 
   describe "#client" do

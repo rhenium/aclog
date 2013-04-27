@@ -1,42 +1,6 @@
 require 'spec_helper'
 
 describe User do
-  describe ".cached" do
-    let(:user) { FactoryGirl.create(:user_1) }
-
-    shared_examples_for "cached_exists" do
-      its(:id) { should be user.id }
-      its(:screen_name) { should eq user.screen_name }
-      its(:name) { should eq user.name }
-      its(:profile_image_url) { should eq user.profile_image_url }
-      its(:protected) { should be user.protected }
-    end
-
-    context "when exists" do
-      describe "user_id" do
-        subject { User.cached(user.id) }
-        it_behaves_like("cached_exists")
-      end
-
-      context "screen_name" do
-        subject { User.cached(user.screen_name) }
-        it_behaves_like("cached_exists")
-      end
-    end
-
-    context "when not exists" do
-      describe "user_id" do
-        subject { User.cached(-1) }
-        it { should be nil }
-      end
-
-      context "screen_name" do
-        subject { User.cached("me") }
-        it { should be nil }
-      end
-    end
-  end
-
   describe ".from_user_object" do
     context "when not recorded" do
       let(:user_1_model) { FactoryGirl.build(:user_1) }

@@ -31,14 +31,6 @@ describe Tweet do
     its(:retweets_count) { should be subject.retweets.count }
   end
 
-  describe ".cached" do
-    subject { Tweet.cached(@tweet_0_0) }
-    its(:id) { should be @tweet_0_0.id }
-    its(:text) { should eq @tweet_0_0.text }
-    its(:source) { should eq @tweet_0_0.source }
-    its(:user) { should eq @tweet_0_0.user }
-  end
-
   describe ".delete_from_id" do
     context "when of tweet" do
       subject { Tweet.delete_from_id(@tweet_1_0.id) }

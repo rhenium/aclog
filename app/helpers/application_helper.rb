@@ -44,6 +44,24 @@ module ApplicationHelper
     "https://twitter.com/#{screen_name}"
   end
 
+  def sidebar_type
+    if @sidebar
+      return @sidebar
+    elsif @user
+      return "users"
+    else
+      params[:controller]
+    end
+  end
+
+  def caption
+    "#{@description}"
+  end
+
+  def title
+    "#{@title || @description} - aclog"
+  end
+
   # utf8, form
   def utf8_enforcer_tag; raw "" end
 end

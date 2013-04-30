@@ -12,18 +12,20 @@ class Tweet < ActiveRecord::Base
   scope :reacted, -> {where("tweets.favorites_count > 0 OR tweets.retweets_count > 0") }
   scope :original, -> { includes(:stolen_tweet).where(stolen_tweets: {tweet_id: nil}) }
   scope :not_protected, -> { includes(:user).where(users: {protected: false}) }
-  scope :max_id, -> id { where("tweets.id <= ?", id) }
-  scope :since_id, -> id { where("tweets.id > ?", id) }
+  scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
+  scope :since_id, -> id { where("tweets.id > ?", id.to_i) if id }
+
   scope :page, -> page, count { offset((page - 1) * count) }
+
   scope :order_by_id, -> { order("tweets.id DESC") }
   scope :order_by_favorites, -> { order("tweets.favorites_count DESC") }
   scope :order_by_retweets, -> { order("tweets.retweets_count DESC") }
   scope :order_by_reactions, -> { order("COALESCE(tweets.favorites_count, 0) + COALESCE(tweets.retweets_count, 0) DESC") }
+
+  scope :of, -> user { where(user: user) if user }
   scope :favorited_by, -> user { joins(:favorites).where(favorites: {user_id: user.id}) }
   scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user_id: user.id}) }
-  scope :discovered_by, -> user {
-    joins("INNER JOIN (#{user.favorites.to_sql} UNION #{user.retweets.to_sql}) m ON m.tweet_id = tweets.id")
-  }
+  scope :discovered_by, -> user { joins("INNER JOIN (#{user.favorites.to_sql} UNION #{user.retweets.to_sql}) m ON m.tweet_id = tweets.id") }
 
   # will be moved
   def notify_favorite
@@ -63,5 +65,22 @@ class Tweet < ActiveRecord::Base
       logger.error("Unknown error while inserting tweet: #{$!}/#{$@}")
     end
   end
+
+  def self.list(params, options = {})
+    params[:page] ||= "1" if options[:force_page]
+
+    count = params[:count].to_i
+    count = 10 unless (1..100) === count
+
+    ret = limit(count)
+
+
+    if params[:page]
+      ret.page(params[:page].to_i, count)
+    else
+      ret.max_id(params[:max_id]).since_id(params[:since_id])
+    end
+  end
+
 end
 

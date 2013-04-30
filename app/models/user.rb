@@ -82,4 +82,23 @@ class User < ActiveRecord::Base
       end
     end
   end
+
+  def count_discovered_by
+    count_by(Favorite).merge(count_by(Retweet)) {|_, fav, rt| fav + rt }.sort_by {|user_id, count| -count }.map {|user_id, count| [User.find(user_id), count] }.take(50)
+  end
+
+  def count_discovered_of
+    count_to(Favorite).merge(count_to(Retweet)) {|_, fav, rt| fav + rt }.sort_by {|user_id, count| -count }.map {|user_id, count| [User.find(user_id), count] }.take(50)
+  end
+
+  private
+  def count_by(klass)
+    actions = klass.joins("INNER JOIN (#{tweets.order_by_id.limit(100).to_sql}) m ON tweet_id = m.id")
+    actions.inject(Hash.new(0)) {|hash, obj| hash[obj.user_id] += 1; hash }
+  end
+
+  def count_to(klass)
+    actions = Tweet.joins("INNER JOIN (#{klass.where(user: self).order("id DESC").limit(500).to_sql}) m ON tweets.id = m.tweet_id")
+    actions.inject(Hash.new(0)) {|hash, obj| hash[obj.user_id] += 1; hash }
+  end
 end

@@ -1,36 +1,36 @@
-.item
+.tweet
   .tweet
     .left
       .avatar
-        = link_to user_path(item.user.screen_name) do
-          = image_tag item.user.profile_image_url, alt: item.user.screen_name, title: item.user.name
+        = link_to user_best_path(tweet.user.screen_name) do
+          = image_tag tweet.user.profile_image_url, alt: tweet.user.screen_name, title: tweet.user.name
       %ul.inline.actions
         %li.twitter
-          = link_to image_tag("reply.png", alt: "reply"), "https://twitter.com/intent/tweet?in_reply_to=#{item.id}"
-          = link_to image_tag("retweet.png", alt: "retweet"), "https://twitter.com/intent/retweet?tweet_id=#{item.id}"
-          = link_to image_tag("favorite.png", alt: "favorite"), "https://twitter.com/intent/favorite?tweet_id=#{item.id}"
+          = link_to image_tag("reply.png", alt: "reply"), "https://twitter.com/intent/tweet?in_reply_to=#{tweet.id}"
+          = link_to image_tag("retweet.png", alt: "retweet"), "https://twitter.com/intent/retweet?tweet_id=#{tweet.id}"
+          = link_to image_tag("favorite.png", alt: "favorite"), "https://twitter.com/intent/favorite?tweet_id=#{tweet.id}"
     .tweet_content_fix
     .tweet_content
       .user
-        %span.nam= link_to item.user.name, user_path(item.user.screen_name)
-        %span.screen_name= link_to item.user.screen_name, user_path(item.user.screen_name)
-      .text{class: item.stolen_tweet ? "copied" : nil}
-        = raw format_tweet_text(item.text)
+        %span.nam= link_to tweet.user.name, user_best_path(tweet.user.screen_name)
+        %span.screen_name= link_to tweet.user.screen_name, user_best_path(tweet.user.screen_name)
+      .text{class: tweet.stolen_tweet ? "copied" : nil}
+        = raw format_tweet_text(tweet.text)
       .meta.clearfix
         %span.twitter_bird
-          = link_to image_tag("bird_gray_16.png", alt: "Twitter"), twitter_status_url(item), target: "_blank"
+          = link_to image_tag("bird_gray_16.png", alt: "Twitter"), twitter_status_url(tweet), target: "_blank"
         %span.created_at
-          = link_to format_time(item.tweeted_at), tweet_path(item.id)
+          = link_to format_time(tweet.tweeted_at), tweet_path(tweet.id)
         - if params[:action] == "show"
           %span.full
             = link_to "full", params.merge(limit: -1)
-        - if item.stolen_tweet
+        - if tweet.stolen_tweet
           %span.copied
-            = link_to "original", tweet_path(item.original.id)
+            = link_to "original", tweet_path(tweet.original.id)
         %span.source
-          = raw format_source_text(item.source)
+          = raw format_source_text(tweet.source)
   .stats
-    - [["favs", item.favoriters], ["retweets", item.retweeters]].each do |type, actions|
+    - [["favs", tweet.favoriters], ["retweets", tweet.retweeters]].each do |type, actions|
       - if actions.count > 0
         %dl.dl-horizontal
           %dt
@@ -40,5 +40,5 @@
             %ul.inline
               - actions.limit(user_limit).each do |m|
                 %li
-                  = link_to user_path(m.screen_name) do
+                  = link_to user_best_path(m.screen_name) do
                     = image_tag m.profile_image_url, alt: m.screen_name, title: m.name

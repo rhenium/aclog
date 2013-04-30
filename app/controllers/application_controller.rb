@@ -4,27 +4,12 @@ class ApplicationController < ActionController::Base
   before_filter :set_format
   after_filter :xhtml
 
-  def render_tweets(options = {}, &blk)
-    if params[:count]
-      count = params[:count].to_i
-    else
-      count = 10
+  def _get_user(id, screen_name)
+    if id
+      User.find_by(id: id.to_i)
+    elsif screen_name
+      User.find_by(screen_name: screen_name)
     end
-    p options
-    if options[:force_page]
-      params[:page] ||= "1"
-    end
-    
-    @items = blk.call.limit(count)
-
-    if params[:page]
-      @items = @items.page(params[:page].to_i, count)
-    else
-      @items = @items.max_id(params[:max_id].to_i) if params[:max_id]
-      @items = @items.since_id(params[:since_id].to_i) if params[:since_id]
-    end
-    
-    render "shared/tweets"
   end
 
   private

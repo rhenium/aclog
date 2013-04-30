@@ -1,9 +1,9 @@
-json.(item, :id, :text, :source, :tweeted_at, :favorites_count, :retweets_count)
+json.(tweet, :id, :text, :source, :tweeted_at, :favorites_count, :retweets_count)
 
 json.user do
-  json.id item.user_id
+  json.id tweet.user_id
   if include_user?
-    json.partial! "shared/partial/user", user: item.user
+    json.partial! "shared/partial/user", user: tweet.user
   end
 end
 
@@ -19,6 +19,6 @@ render_actions = -> name, data, render_id do
   end
 end
 
-render_actions.call(:favorites, item.favorites, false)
-render_actions.call(:retweets, item.retweets, true)
+render_actions.call(:favorites, tweet.favorites, false)
+render_actions.call(:retweets, tweet.retweets, true)
 

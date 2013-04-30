@@ -1,32 +1,11 @@
 class IController < ApplicationController
-  def best
-    @title = "Best Tweets"
-    render_tweets(force_page: true) do
-      Tweet
-        .reacted
-        .original
-        .order_by_reactions
-    end
-  end
-
-  def recent
-    @title = "Recent Best Tweets"
-    render_tweets(force_page: true) do
-      Tweet
-        .recent
-        .reacted
-        .original
-        .order_by_reactions
-    end
-  end
-
-  def timeline
-    @title = "Public Timeline"
-    render_tweets do
-      Tweet
-        .reacted
-        .not_protected
-        .order_by_id
+  # GET /api/tweets/import
+  def import
+    # import 100
+    if session[:account]
+      session[:account].import_favorites(params[:id].to_i)
+    else
+      raise Aclog::Exceptions::LoginRequired
     end
   end
 end

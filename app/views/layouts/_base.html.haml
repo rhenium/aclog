@@ -1,7 +1,7 @@
 !!! xml
 %html{xmlns: "http://www.w3.org/1999/xhtml"}
   %head
-    %title= strip_tags(@title.to_s) + " - aclog"
+    %title= title
     = stylesheet_link_tag "application"
     = javascript_include_tag "twitter"
     = javascript_include_tag "application"
@@ -10,17 +10,15 @@
       .navbar-inner
         .container
           .brand
-            = link_to "aclog", controller: "main", action: "index"
+            = link_to "aclog", root_path
           %ul.nav.pull-right
             %li
-              = link_to "report", controller: "report", action: "index"
+              = link_to "report", report_path
             %li
-              = link_to "search", controller: "search", action: "search"
-            %li
-              = link_to "about", controller: "main", action: "about"
+              = link_to "about", about_path
             - if logged_in?
-              %li= link_to "logout", controller: "sessions", action: "destroy"
-              %li= link_to session[:account].user.screen_name, user_path(session[:account].user.screen_name)
+              %li= link_to "logout", logout_path
+              %li= link_to session[:account].user.screen_name, user_best_path(session[:account].user.screen_name)
             - else
               %li= link_to "login", "/i/login"
     .container

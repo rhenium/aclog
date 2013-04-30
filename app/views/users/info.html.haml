@@ -7,23 +7,23 @@
   %dt Name
   %dd= raw @user.name
   %dt tweets
-  %dd= @user.stats[:stats_api][:tweets_count]
+  %dd= @stats[:stats_api][:tweets_count]
   %dt Following
-  %dd= @user.stats[:stats_api][:friends_count]
+  %dd= @stats[:stats_api][:friends_count]
   %dt Followers
-  %dd= @user.stats[:stats_api][:followers_count]
+  %dd= @stats[:stats_api][:followers_count]
   %dt Favorites
-  %dd= @user.stats[:stats_api][:favorites_count]
+  %dd= @stats[:stats_api][:favorites_count]
   %dt Listed
-  %dd= @user.stats[:stats_api][:listed_count]
+  %dd= @stats[:stats_api][:listed_count]
   %dt Bio
-  %dd= raw @user.stats[:stats_api][:bio]
+  %dd= raw @stats[:stats_api][:bio]
 - if @user.registered?
   %p records
   %dl.dl-horizontal
     %dt Favorited
-    %dd= @user.stats[:favorited_count]
+    %dd= @stats[:favorited_count]
     %dt Retweeted
-    %dd= @user.stats[:retweeted_count]
+    %dd= @stats[:retweeted_count]
     %dt Since
     %dd= @user.account.created_at

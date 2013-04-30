@@ -1,17 +1,20 @@
 .users
   %ul.inline
-    - @usermap.take(50).each do |user_id, count|
-      - user = User.find(user_id)
+    - @usermap.each do |user, count|
       %li
         - if user
           .avatar
-            = link_to user_path(user.screen_name) do
+            = link_to user_best_path(user.screen_name) do
               = image_tag user.profile_image_url, alt: user.screen_name, title: user.name
           .data
-            = link_to url_for(params.merge(screen_name_b: user.screen_name)) do
-              .count= count
+            .count
+              - if params[:action] == "discovered_by"
+                = link_to count, user_discovered_by_user_path(@user.screen_name, user.screen_name)
+              - elsif params[:action] == "discovered_of"
+                = link_to count, user_discovered_by_user_path(user.screen_name, @user.screen_name)
+              - else
+                - raise Exception
         - else
           .avatar= image_tag "missing_profile_image.png", alt: "Missing User: #{user_id}", title: "Missing User: #{user_id}"
           .data
             .count= count
-

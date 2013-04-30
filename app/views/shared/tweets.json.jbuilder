@@ -1,4 +1,4 @@
-json.array! @items do |json, item|
-  json.partial! "shared/partial/tweet", item: item
+json.array! @tweets do |json, tweet|
+  json.partial! "shared/partial/tweet", tweet: tweet
 end
 

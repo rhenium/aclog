@@ -3,7 +3,7 @@ $(function() {
   $(".pagination").hide();
   $.autopager({
     autoLoad: true,
-    content: ".items",
+    content: ".tweets",
     start: function(current, next) {
       $(".loading").show();
     },

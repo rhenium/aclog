@@ -1,11 +1,11 @@
 - if params[:action] == "search"
   = render partial: "shared/partial/search"
-.items
-  = render partial: "shared/partial/tweet", collection: @items, as: :item
+.tweets
+  = render partial: "shared/partial/tweet", collection: @tweets, as: :tweet
 .loading
   = image_tag "loading.gif", alt: "loading...", title: nil
 .pagination
   - if params[:page]
     = link_to raw("Next &#8250;"), params.merge(page: params[:page].to_i + 1), rel: :next
-  - elsif @items.last
-    = link_to raw("Next &#8250;"), params.merge(max_id: @items.last.id - 1), rel: :next
+  - elsif @tweets.last
+    = link_to raw("Next &#8250;"), params.merge(max_id: @tweets.last.id - 1), rel: :next

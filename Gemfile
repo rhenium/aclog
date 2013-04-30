@@ -1,7 +1,7 @@
 ruby '1.9.3'
 source 'https://rubygems.org'
 
-gem 'rails', '4.0.0.beta1'
+gem 'rails', '4.0.0.rc1'
 gem 'mysql2', "> 0.3.12b"
 gem 'dalli'
 
@@ -19,9 +19,9 @@ gem 'twitter'
 gem 'omniauth-twitter'
 
 gem 'haml-rails'
-gem 'sass-rails', '~> 4.0.0.beta1'
+gem 'sass-rails', '~> 4.0.0.rc1'
 gem 'jbuilder'
-gem 'coffee-rails', '~> 4.0.0.beta1'
+gem 'coffee-rails', '~> 4.0.0.rc1'
 gem 'jquery-rails'
 gem 'uglifier', '>= 1.0.3'
 

@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
 
   def _get_user(id, screen_name)
     if id
-      User.find_by(id: id.to_i)
+      User.find_by(id: id)
     elsif screen_name
       User.find_by(screen_name: screen_name)
     end

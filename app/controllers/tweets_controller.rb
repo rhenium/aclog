@@ -89,7 +89,7 @@ class TweetsController < ApplicationController
   def render(*args)
     if args.empty?
       if params[:action] == "show"
-        super "shared/tweet"
+        super
       else
         super "shared/tweets"
       end
@@ -110,5 +110,10 @@ class TweetsController < ApplicationController
   def user_b_required
     @user_b = _get_user(params[:user_id_b], params[:screen_name_b])
     raise Aclog::Exceptions::UserNotFound unless @user_b
+  end
+
+  def tweet_required
+    @tweet = Tweet.find_by(id: params[:id])
+    raise Aclog::Exceptions::TweetNotFound unless @tweet
   end
 end

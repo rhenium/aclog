@@ -1,5 +1,5 @@
 class IController < ApplicationController
-  # GET /api/tweets/import
+  # GET /i/import
   def import
     # import 100
     if session[:account]
@@ -7,5 +7,7 @@ class IController < ApplicationController
     else
       raise Aclog::Exceptions::LoginRequired
     end
+
+    redirect_to tweet_path(params[:id])
   end
 end

@@ -17,6 +17,7 @@ Aclog::Application.routes.draw do
   get "/about/api" => "main#api", as: "about_api"
 
   # Internals / SessionsController
+  get "/i/import/:id" => "i#import", constraints: constraints, as: "import"
   get "/i/callback" => "sessions#callback"
   get "/i/logout" => "sessions#destroy", as: "logout"
 

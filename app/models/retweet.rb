@@ -20,7 +20,8 @@ class Retweet < ActiveRecord::Base
 
   def self.from_tweet_object(status)
     User.from_user_object(status.user)
-    Tweet.from_tweet_object(status.retweeted_status)
+    # Tweet.from_tweet_object(status.retweeted_status)
+    # TODO: URL format...
     from_hash(id: status.id,
               user_id: status.user.id,
               tweet_id: status.retweeted_status.id)

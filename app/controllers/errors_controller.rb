@@ -22,7 +22,6 @@ class ErrorsController < ApplicationController
     when ActionController::RoutingError
       render "error", status: 404
     else
-      warn @exception
       render "error", status: 500
     end
   end

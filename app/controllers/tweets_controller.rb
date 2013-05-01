@@ -1,12 +1,14 @@
 class TweetsController < ApplicationController
+  before_filter :set_user_limit
+
   # GET /i/:id
   # GET /api/tweets/show
   def show
     tweet_required
     @user = @tweet.user
 
-    @description = "#{@user.screen_name}'s Tweet"
     text = ApplicationController.helpers.format_tweet_text(@tweet.text)[0...30]
+    @caption = "#{@user.screen_name}'s Tweet"
     @title = "\"#{text}\" from #{@user.screen_name}"
   end
 
@@ -15,7 +17,7 @@ class TweetsController < ApplicationController
   # GET /api/tweets/best
   def best
     user_optional
-    @description = "Best"
+    @caption = "Best"
     @tweets = Tweet.of(@user).reacted.order_by_reactions.list(params, force_page: true)
   end
 
@@ -23,7 +25,7 @@ class TweetsController < ApplicationController
   # GET /api/tweets/favorited
   def favorited
     user_optional
-    @description = "Most Favorited"
+    @caption = "Most Favorited"
     @tweets = Tweet.of(@user).reacted.order_by_favorites.list(params, force_page: true)
   end
 
@@ -31,7 +33,7 @@ class TweetsController < ApplicationController
   # GET /api/tweets/retweeted
   def retweeted
     user_optional
-    @description = "Most Retweeted"
+    @caption = "Most Retweeted"
     @tweets = Tweet.of(@user).reacted.order_by_retweets.list(params, force_page: true)
   end
 
@@ -39,7 +41,7 @@ class TweetsController < ApplicationController
   # GET /api/tweets/recent
   def recent
     user_optional
-    @description = "Recent Best"
+    @caption = "Recent Best"
     @tweets = Tweet.of(@user).recent.reacted.order_by_reactions.list(params, force_page: true)
   end
 
@@ -48,7 +50,7 @@ class TweetsController < ApplicationController
   # GET /api/tweets/timeline
   def timeline
     user_optional
-    @description = "Recent"
+    @caption = "Recent"
     @tweets = Tweet.of(@user).reacted.order_by_id.list(params)
   end
 
@@ -56,7 +58,7 @@ class TweetsController < ApplicationController
   # GET /api/tweets/discoveries
   def discoveries
     user_required
-    @description = "Discoveries"
+    @caption = "Discoveries"
     @tweets = Tweet.discovered_by(@user).order_by_id.list(params)
   end
 
@@ -64,7 +66,7 @@ class TweetsController < ApplicationController
   # GET /api/tweets/favorites
   def favorites
     user_required
-    @description = "Favorites"
+    @caption = "Favorites"
     @tweets = Tweet.favorited_by(@user).order_by_id.list(params)
   end
 
@@ -72,7 +74,7 @@ class TweetsController < ApplicationController
   # GET /api/tweets/retweets
   def retweets
     user_required
-    @description = "Retweets"
+    @caption = "Retweets"
     @tweets = Tweet.retweeted_by(@user).order_by_id.list(params)
   end
 
@@ -81,7 +83,7 @@ class TweetsController < ApplicationController
   def discovered_by
     user_required
     user_b_required
-    @description = "Discovored by #{@user_b.screen_name}"
+    @caption = "Discovored by #{@user_b.screen_name}"
     @tweets = Tweet.of(@user).discovered_by(@user_b).order_by_id.list(params)
   end
 
@@ -115,5 +117,20 @@ class TweetsController < ApplicationController
   def tweet_required
     @tweet = Tweet.find_by(id: params[:id])
     raise Aclog::Exceptions::TweetNotFound unless @tweet
+  end
+
+  def set_user_limit
+    if params[:limit]
+      if params[:limit].to_i == -1
+        @user_limit = nil
+      else
+        @user_limit = params[:limit].to_i
+      end
+    else
+      @user_limit = 20
+      if request.format == :html && params[:action] == "show"
+        @user_limit = 100
+      end
+    end
   end
 end

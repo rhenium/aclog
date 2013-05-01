@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_format
   after_filter :xhtml
 
+  protected
   def _get_user(id, screen_name)
     if id
       User.find_by(id: id)

@@ -7,9 +7,9 @@
   全部 GET です
 %dl
   %dt ツイート表示
-  %dd /i/show.json?id=(tweet_id)
+  %dd /api/tweets/show.json?id=(tweet_id)
   %dt ツイート一覧
-  %dd /users/{best|timeline|discovered}.json
+  %dd /tweets/{best|recent|timeline|discoveries}.json
   %dt 他ユーザーが関係してくるもの
   %dd /users/{favorited_by|retweeted_by|given_favorites_to|given_retweets_to}.json
   %dt ユーザー情報

@@ -9,6 +9,6 @@ class MainController < ApplicationController
   end
 
   def api
-    @title = "api"
+    @title = "about api"
   end
 end

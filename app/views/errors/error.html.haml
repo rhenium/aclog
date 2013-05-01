@@ -12,7 +12,7 @@
   - when Aclog::Exceptions::LoginRequired
     このページの表示にはログインが必要です。
   - when ActionController::RoutingError
-    不正な URL です。
+    このページは存在しません。
   - else
     - if response.status == 404
       Not Found (Unknown)

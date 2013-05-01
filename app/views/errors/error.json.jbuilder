@@ -12,7 +12,7 @@ json.error do |json|
   when Aclog::Exceptions::LoginRequired
     json.message "このページの表示にはログインが必要です。"
   when ActionController::RoutingError
-    json.message "不正な URL です。"
+    json.message "このページは存在しません。"
   else
     if response.status == 404
       json.message "Not Found (Unknown)"

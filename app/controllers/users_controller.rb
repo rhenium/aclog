@@ -1,19 +1,21 @@
 class UsersController < ApplicationController
   def info
     user_required
-    @description = "Profile"
+    @caption = "Profile"
     @stats = @user.stats(true)
   end
 
   def discovered_by
     user_required
     @usermap = @user.count_discovered_by
+    @caption = "Discovered By"
     render "shared/user_ranking"
   end
 
   def discovered_of
     user_required
     @usermap = @user.count_discovered_of
+    @caption = "Discovered Of"
     render "shared/user_ranking"
   end
 

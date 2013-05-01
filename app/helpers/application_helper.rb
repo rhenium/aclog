@@ -55,11 +55,11 @@ module ApplicationHelper
   end
 
   def caption
-    "#{@description}"
+    "#{@caption}"
   end
 
   def title
-    "#{@title || @description} - aclog"
+    "#{@title || @caption} - aclog"
   end
 
   # utf8, form

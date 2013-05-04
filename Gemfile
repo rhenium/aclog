@@ -25,7 +25,7 @@ gem 'coffee-rails', '~> 4.0.0.rc1'
 gem 'jquery-rails'
 gem 'uglifier', '>= 1.0.3'
 
-gem 'bootstrap-sass'
+gem 'bootstrap-sass-rails'
 
 group :test do
   gem 'rspec'

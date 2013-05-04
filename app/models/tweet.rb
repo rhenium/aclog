@@ -18,13 +18,14 @@ class Tweet < ActiveRecord::Base
   scope :page, -> page, count { offset((page - 1) * count) }
 
   scope :order_by_id, -> { order("tweets.id DESC") }
+  scope :order_by_reactions_id, -> { order("m.id DESC") }
   scope :order_by_favorites, -> { order("tweets.favorites_count DESC") }
   scope :order_by_retweets, -> { order("tweets.retweets_count DESC") }
   scope :order_by_reactions, -> { order("COALESCE(tweets.favorites_count, 0) + COALESCE(tweets.retweets_count, 0) DESC") }
 
   scope :of, -> user { where(user: user) if user }
-  scope :favorited_by, -> user { joins(:favorites).where(favorites: {user_id: user.id}) }
-  scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user_id: user.id}) }
+  scope :favorited_by, -> user { joins("INNER JOIN favorites AS m ON m.tweet_id = tweets.id").where(m: {user_id: user.id}) }
+  scope :retweeted_by, -> user { joins("INNER JOIN retweets AS m ON m.tweet_id = tweets.id").where(m: {user_id: user.id}) }
   scope :discovered_by, -> user { joins("INNER JOIN (#{user.favorites.to_sql} UNION #{user.retweets.to_sql}) m ON m.tweet_id = tweets.id") }
 
   # will be moved

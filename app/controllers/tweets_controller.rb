@@ -68,7 +68,7 @@ class TweetsController < ApplicationController
   def favorites
     user_required
     @caption = "Favorites"
-    @tweets = Tweet.favorited_by(@user).order_by_id.list(params)
+    @tweets = Tweet.favorited_by(@user).order_by_reactions_id.list(params)
   end
 
   # GET /:screen_name/retweets
@@ -76,7 +76,7 @@ class TweetsController < ApplicationController
   def retweets
     user_required
     @caption = "Retweets"
-    @tweets = Tweet.retweeted_by(@user).order_by_id.list(params)
+    @tweets = Tweet.retweeted_by(@user).order_by_reactions_id.list(params)
   end
 
   # GET /:screen_name/discovered_by/:screen_name_b

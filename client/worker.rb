@@ -64,20 +64,17 @@ class Worker
       if (Time.now - Time.parse(target_object[:created_at])) < 2
         case
         when
-          favs > tweets * 30,
-          tweets < 1000,
-          /ふぁぼ垢/ =~ bio,
-          /専属/ =~ bio,
-          /ふぁぼ/ =~ name
-          return true
-        when bot?(target_object)
+          (tweets < 1000 && favs > tweets * 2),
+          (source[:friends_count] > source[:followers_count] * 10 && favs > tweets)
           return true
         end
-      else
+      end
+      if
         case
         when
-          favs > tweets * 100,
-          tweets < 100 && favs > tweets * 2
+          favs > tweets * 30,
+          (tweets < 100 && favs > tweets * 2),
+          (source[:default_profile_image] == true && favs > tweets * 2)
           return true
         end
       end
@@ -96,6 +93,13 @@ class Worker
         /^<a href="http:\/\/bit.ly\/SiHFe6" rel="nofollow">劣化コピー<\/a>$/,
       ]
       sources.any?{|r| r =~ status[:source]}
+    end
+
+    def send_spam(user)
+      send_object({
+        type: "spam",
+        id: user[:id]
+      })
     end
 
     def send_user(user)
@@ -129,6 +133,7 @@ class Worker
       else
         if favbot?(source, target_object)
           # ignored
+          send_spam(source)
           $logger.info("Add #{source[:screen_name]}(##{source[:id]}) to ignore list")
           @excludes << source[:id]
         elsif !bot?(target_object)
@@ -152,7 +157,7 @@ class Worker
     end
 
     def send_retweet(status)
-      unless bot?(status)
+      unless bot?(status[:retweeted_status])
         send_tweet(status[:retweeted_status])
         send_user(status[:user])
         send_object({

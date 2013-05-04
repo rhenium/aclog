@@ -96,6 +96,8 @@ class Receiver::Worker < DaemonSpawn::Base
           receive_retweet(msg)
         when "delete"
           receive_delete(msg)
+        when "spam"
+          receive_spam(msg)
         when "quit"
           # Heroku の cycling など
           Rails.logger.info("Quit(#{@worker_number}): #{msg["reason"]}")
@@ -201,6 +203,13 @@ class Receiver::Worker < DaemonSpawn::Base
                                     :user_id => msg["user_id"])
         end
       end
+    end
+
+    def receive_spam(msg)
+      Rails.logger.info("Receive Spam(#{@worker_number}): #{msg["id"]}")
+      # @@wq.push -> do
+      #   # TODO
+      # end
     end
   end
 

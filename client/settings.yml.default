@@ -1,9 +1,16 @@
-consumer:
-  -
-    - **key**
-    - **secret**
-secret_key: 
-worker_count: 
-worker_number: 
-db_proxy_host: 
-db_proxy_port: 
+defaults: &defaults
+  consumer:
+    - key: *consumer_key*
+      secret: *consumer_secret*
+  secret_key: *secret_key*
+development:
+  <<: *defaults
+  worker_number: 0
+  db_proxy_host: localhost
+  db_proxy_port: 9001
+production:
+  <<: *defaults
+  worker_number: <%= ENV["ACLOG_WORKER_NUMBER"] %>
+  db_proxy_host: localhost
+  db_proxy_port: 9001
+

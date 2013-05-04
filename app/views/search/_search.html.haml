@@ -1,4 +1,4 @@
 .search
-  = form_tag({controller: "search", action: "search"}, {method: :get}) do
+  = form_tag({}, {method: :get}) do
     = text_field_tag :query, params[:query]
     = submit_tag "search", name: nil

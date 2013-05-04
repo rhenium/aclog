@@ -1,7 +1,7 @@
 - if params[:action] == "search"
-  = render partial: "shared/partial/search"
+  = render partial: "search/search"
 .tweets
-  = render partial: "tweet", collection: @tweets.includes(:user).includes(:stolen_tweet), as: :tweet
+  = render partial: "tweets/tweet", collection: @tweets.includes(:user).includes(:stolen_tweet), as: :tweet
 .loading
   = image_tag "loading.gif", alt: "loading...", title: nil
 .pagination

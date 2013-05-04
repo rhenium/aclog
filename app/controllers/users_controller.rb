@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  def info
+  def stats
     user_required
     @caption = "Profile"
     @user_stats = @user.stats
@@ -18,6 +18,13 @@ class UsersController < ApplicationController
     @result = @user.count_discovered_users.take(50)
     @caption = "Discovered Users"
     render "_user_ranking"
+  end
+
+  def screen_name
+    raise ActionController::RoutingError unless params[:user_id]
+    user_ids = params[:user_id].split(/,/).map(&:to_i)
+    result = User.where("id IN (?)", user_ids).map {|user| {id: user.id, screen_name: user.screen_name} }
+    render json: result
   end
 
   private

@@ -7,7 +7,8 @@ class SearchController < ApplicationController
 
     # TODO: OR とか () とか対応したいよね
     unless params[:query]
-      render_tweets(force_page: true) { Tweet.none }
+      @tweets = Tweet.none
+      render "tweets/_tweets"
       return
     end
     words = Shellwords.shellwords(params[:query])
@@ -70,11 +71,12 @@ class SearchController < ApplicationController
         end
       else
         # TODO: ツイート検索
-        tweets
+        tweets.none
       end
     end
 
-    render_tweets(force_page: true) { result }
+    @tweets = result
+    render "tweets/_tweets"
   end
 
   private

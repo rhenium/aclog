@@ -24,7 +24,7 @@
     %ul.nav.nav-tabs.nav-stacked
       - if @user.registered?
         %li
-          = link_to "info", user_info_path(@user.screen_name)
+          = link_to "stats", user_stats_path(@user.screen_name)
       %li
         = link_to "best", user_best_path(@user.screen_name)
       %li

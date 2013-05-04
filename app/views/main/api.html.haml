@@ -1,53 +1,99 @@
 %p
-  ドキュメントは今度もっとわかりやすく書き直しますね
-%p
-  aclog のweb版で見れるものすべて JSON で取れるようにしたい
-%h3 URL
-%p
-  全部 GET です
+  すべて GET です
+%h4 /api/tweets/show
 %dl
-  %dt ツイート表示
-  %dd /api/tweets/show.json?id=(tweet_id)
-  %dt ツイート一覧
-  %dd /tweets/{best|recent|timeline|discoveries}.json
-  %dt 他ユーザーが関係してくるもの
-  %dd /users/{favorited_by|retweeted_by|given_favorites_to|given_retweets_to}.json
-  %dt ユーザー情報
-  %dd /users/info.json
-%h3 パラメータ
+  %dd ツイート表示
+  %dt URL
+  %dd /api/tweets/show.json
+  %dt パラメータ
+  %dd id=(tweet_id)
+%h4 /api/tweets/(best|favorited|retweeted|recent)
 %dl
-  %dt screen_name or user_id
+  %dd ユーザーのベストツイート
+  %dd 最近3日間のベストツイート
+  %dd /api/tweets/best.json
+  %dd /api/tweets/recent.json
+  %dt パラメータ
+  %dd screen_name=(screen_name)
+  %dd user_id=(user_id)
   %dd
-    %p Twitter アカウントのもの
-    %p 必須
-    %p ツイート表示以外では必須
-  %dt screen_name_b or user_id_b
+    %strong どちらか必須
+  %dd count=(1..100)
+  %dd 一度に返す上限
+  %dd page=(1..)
+  %dd ページ番号
+%h4 /api/tweets/timeline
+%dl
+  %dd 最新ツイート
+  %dd /api/tweets/timeline.json
+  %dt パラメータ
+  %dd screen_name=(screen_name)
+  %dd user_id=(user_id)
   %dd
-    %p Twitter アカウントのもの
-    %p 有無で結果が変わる
-    %p 他ユーザーが関係してくるもののみ。「favorited_by の場合は screen_name_b にふぁぼられた screen_name のツイート」
-  %dt count
+    %strong どちらか必須
+  %dd count=(1..100)
+  %dd 一度に返す上限
+  %dd page=(1..)
+  %dd ページ番号
+  %dd max_id / since_id
+  %dd Twitter API のものと同じです
+%h4 /api/tweets/(discoveries|favorites|retweets)
+%dl
+  %dd ユーザーが反応したツイート
+  %dt URL
+  %dd /api/tweets/discoveries.json
+  %dd /api/tweets/favorites.json
+  %dd /api/tweets/retweets.json
+  %dt パラメータ
+  %dd screen_name=(screen_name)
+  %dd user_id=(user_id)
   %dd
-    %p 1-100
-    %p default: 10
-    %p リストのみ。件数
-  %dt max_id
+    %strong どちらか必須
+  %dd count=(1..100)
+  %dd 一度に返す上限
+  %dd page=(1..)
+  %dd ページ番号
+  %dd max_id / since_id
+  %dd Twitter API のものと同じです
+%h4 /api/tweets/discovered_by
+%dl
+  %dd B が反応した A の最新ツイート
+  %dt URL
+  %dd /api/tweets/discovered_by.json
+  %dt パラメータ
+  %dd screen_name=(screen_name)
+  %dd user_id=(user_id)
   %dd
-    %p 数値
-    %p default: -1
-    %p Twitter API のものと同じ挙動
-  %dt page
+    %strong どちらか必須
+  %dd screen_name_b=(screen_name)
+  %dd user_id_b=(user_id)
   %dd
-    %p 1-
-    %p default: 1
-    %p リストのみ。ページ
-  %dt tweets
+    %strong どちらか必須
+  %dd count=(1..100)
+  %dd 一度に返す上限
+  %dd page=(1..)
+  %dd ページ番号
+  %dd max_id / since_id
+  %dd Twitter API のものと同じです
+%h4 /api/users/stats
+%dl
+  %dd ユーザーの統計
+  %dt URL
+  %dd /api/users/stats.json
+  %dt パラメータ
+  %dd screen_name=(screen_name)
+  %dd user_id=(user_id)
   %dd
-    %p favorite or retweet or all
-    %p default: all
-    %p discovered のみ
-  %dt order
+    %strong どちらか必須
+%h4 /api/users/discovered_by
+%h4 /api/users/discovered_users
+%dl
+  %dd ユーザーがふぁぼ・RTしたユーザー・ユーザーをふぁぼ・RTしたユーザーを多い順に50人まで返します
+  %dt URL
+  %dd /api/users/discovered_by.json
+  %dd /api/users/discovered_users.json
+  %dt パラメータ
+  %dd screen_name=(screen_name)
+  %dd user_id=(user_id)
   %dd
-    %p favorite or retweet or all
-    %p default: all
-    %p best のみ
+    %strong どちらか必須

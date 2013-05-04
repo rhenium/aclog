@@ -16,6 +16,8 @@ Aclog::Application.routes.draw do
   get "/about" => "main#about", as: "about"
   get "/about/api" => "main#api", as: "about_api"
 
+  get "/search" => "search#search", as: "search"
+
   # Internals / SessionsController
   get "/i/import/:id" => "i#import", constraints: constraints, as: "import"
   get "/i/callback" => "sessions#callback"
@@ -44,25 +46,25 @@ Aclog::Application.routes.draw do
 
   # Favstar redirects
   scope "users/:screen_name", constraints: constraints do
-    get "/" => redirect("/%{screen_name}")
-    get "/most_favorited" => redirect("/%{screen_name}/favorite")
-    get "/most_retweeted" => redirect("/%{screen_name}/retweet")
-    get "/discovered" => redirect("/%{screen_name}/discovered")
-    get "/favorited" => redirect("/%{screen_name}/discovered/favorite")
-    get "/given" => redirect("/%{screen_name}/discovered/favorite")
-    get "/retweeted" => redirect("/%{screen_name}/discovered/retweet")
-    get "/recent" => redirect("/%{screen_name}/timeline")
-    get "/favs_from" => redirect("/%{screen_name}/favorited_by")
-    get "/favs_from/:screen_name_b" => redirect("/%{screen_name}/favorited_by/%{screen_name_b}")
-    get "/retweeted_by" => redirect("/%{screen_name}/retweeted_by")
-    get "/retweeted_by/:screen_name_b" => redirect("/%{screen_name}/retweeted_by/%{screen_name_b}")
-    get "/given_to" => redirect("/%{screen_name}/given_favorites_to")
-    get "/given_to/:screen_name_b" => redirect("/%{screen_name}/given_favorites_to/%{screen_name_b}")
+    get "/" =>                            redirect("/%{screen_name}")
+    get "/most_favorited" =>              redirect("/%{screen_name}/favorited")
+    get "/most_retweeted" =>              redirect("/%{screen_name}/retweeted")
+    get "/discovered" =>                  redirect("/%{screen_name}/discoveries")
+    get "/favorited" =>                   redirect("/%{screen_name}/favorites")
+    get "/given" =>                       redirect("/%{screen_name}/favorites")
+    get "/retweeted" =>                   redirect("/%{screen_name}/retweets")
+    get "/recent" =>                      redirect("/%{screen_name}/timeline")
+    get "/favs_from" =>                   redirect("/%{screen_name}/discovered_by")
+    get "/retweeted_by" =>                redirect("/%{screen_name}/discovered_by")
+    get "/favs_from/:screen_name_b" =>    redirect("/%{screen_name}/discovered_by/%{screen_name_b}")
+    get "/retweeted_by/:screen_name_b" => redirect("/%{screen_name}/discovered_by/%{screen_name_b}")
+    get "/given_to" =>                    redirect("/%{screen_name}/discovered_users")
+    get "/given_to/:screen_name_b" =>     redirect("/%{screen_name_b}/discovered_by/%{screen_name}")
   end
 
   # User pages.
   scope ":screen_name", controller: "users", constraints: constraints do
-    get "/info",                         action: "info",             as: "user_info"
+    get "/stats",                        action: "stats",            as: "user_stats"
     get "/discovered_by",                action: "discovered_by",    as: "user_discovered_by"
     get "/discovered_users",             action: "discovered_users", as: "user_discovered_users"
   end
@@ -73,8 +75,23 @@ Aclog::Application.routes.draw do
     get "/recent(/:page)",               action: "recent",        as: "user_recent"
     get "/timeline",                     action: "timeline",      as: "user_timeline"
     get "/discoveries",                  action: "discoveries",   as: "user_discoveries"
+    get "/favorites",                    action: "favorites",     as: "user_favorites"
+    get "/retweets",                     action: "retweets",      as: "user_retweets"
     get "/discovered_by/:screen_name_b", action: "discovered_by", as: "user_discovered_by_user"
   end
 
+  # Old URLs
+  scope ":screen_name", constraints: constraints do
+    get "/discovered" =>                        redirect("/%{screen_name}/discoveries")
+    get "/info" =>                              redirect("/%{screen_name}/stats")
+    get "/favorited_by" =>                      redirect("/%{screen_name}/discovered_by")
+    get "/retweeted_by" =>                      redirect("/%{screen_name}/discovered_by")
+    get "/favorited_by/:screen_name_b" =>       redirect("/%{screen_name}/discovered_by/%{screen_name_b}")
+    get "/retweeted_by/:screen_name_b" =>       redirect("/%{screen_name}/discovered_by/%{screen_name_b}")
+    get "/given_favorites_to" =>                redirect("/%{screen_name}/discovered_user")
+    get "/given_retweets_to" =>                 redirect("/%{screen_name}/discovered_user")
+    get "/given_favorites_to/:screen_name_b" => redirect("/%{screen_name_b}/discovered_by/%{screen_name}")
+    get "/given_retweets_to/:screen_name_b" =>  redirect("/%{screen_name_b}/discovered_by/%{screen_name}")
+  end
 
 end

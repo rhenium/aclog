@@ -50,7 +50,7 @@ class User < ActiveRecord::Base
     profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "\\1")
   end
 
-  def stats(include_stats_api = false)
+  def stats
     @stats_cache ||= begin
       raise Aclog::Exceptions::UserNotRegistered unless account
 
@@ -60,35 +60,22 @@ class User < ActiveRecord::Base
               favorited_count: 0,
               retweeted_count: 0}
 
-      if include_stats_api
-        twitter_user = account.client.user
-        if twitter_user
-          h = {
-            favorites_count: twitter_user.favourites_count,
-            listed_count: twitter_user.listed_count,
-            followers_count: twitter_user.followers_count,
-            tweets_count: twitter_user.statuses_count,
-            friends_count: twitter_user.friends_count,
-            bio: twitter_user.description
-          }
-        end
-        hash[:stats_api] = h
-      end
-
       tweets.inject(hash) do |hash, m|
         hash[:favorited_count] += m.favorites_count
         hash[:retweeted_count] += m.retweets_count
         hash
       end
+
+      OpenStruct.new(hash)
     end
   end
 
   def count_discovered_by
-    count_by(Favorite).merge(count_by(Retweet)) {|_, fav, rt| fav + rt }.sort_by {|user_id, count| -count }.map {|user_id, count| [User.find(user_id), count] }.take(50)
+    merge_count_user(count_by(Favorite), count_by(Retweet))
   end
 
-  def count_discovered_of
-    count_to(Favorite).merge(count_to(Retweet)) {|_, fav, rt| fav + rt }.sort_by {|user_id, count| -count }.map {|user_id, count| [User.find(user_id), count] }.take(50)
+  def count_discovered_users
+    merge_count_user(count_to(Favorite), count_to(Retweet))
   end
 
   private
@@ -100,5 +87,16 @@ class User < ActiveRecord::Base
   def count_to(klass)
     actions = Tweet.joins("INNER JOIN (#{klass.where(user: self).order("id DESC").limit(500).to_sql}) m ON tweets.id = m.tweet_id")
     actions.inject(Hash.new(0)) {|hash, obj| hash[obj.user_id] += 1; hash }
+  end
+
+  def merge_count_user(*args)
+    ret = {}
+    args.map.each_with_index do |o, i|
+      o.each do |user_id, count|
+        ret[user_id] ||= Array.new(args.size, 0)
+        ret[user_id][i] = count
+      end
+    end
+    ret.map(&:flatten).sort_by {|user_id, favorites_count, retweets_count| -(favorites_count + retweets_count) }
   end
 end

@@ -2,21 +2,22 @@ class UsersController < ApplicationController
   def info
     user_required
     @caption = "Profile"
-    @stats = @user.stats(true)
+    @user_stats = @user.stats
+    @user_twitter = @user.account.client.user if request.format == :html
   end
 
   def discovered_by
     user_required
-    @usermap = @user.count_discovered_by
+    @result = @user.count_discovered_by.take(50)
     @caption = "Discovered By"
-    render "shared/user_ranking"
+    render "_user_ranking"
   end
 
-  def discovered_of
+  def discovered_users
     user_required
-    @usermap = @user.count_discovered_of
-    @caption = "Discovered Of"
-    render "shared/user_ranking"
+    @result = @user.count_discovered_users.take(50)
+    @caption = "Discovered Users"
+    render "_user_ranking"
   end
 
   private

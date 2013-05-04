@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 class TweetsController < ApplicationController
   before_filter :set_user_limit
 
@@ -7,8 +8,8 @@ class TweetsController < ApplicationController
     tweet_required
     @user = @tweet.user
 
-    text = ApplicationController.helpers.format_tweet_text(@tweet.text)[0...30]
     @caption = "#{@user.screen_name}'s Tweet"
+    text = ApplicationController.helpers.format_tweet_text(@tweet.text)
     @title = "\"#{text}\" from #{@user.screen_name}"
   end
 
@@ -89,14 +90,10 @@ class TweetsController < ApplicationController
 
   private
   def render(*args)
-    if args.empty?
-      if params[:action] == "show"
-        super
-      else
-        super "shared/tweets"
-      end
-    else
+    if lookup_context.exists?(params[:action], params[:controller])
       super(*args)
+    else
+      super("_tweets")
     end
   end
 
@@ -120,17 +117,18 @@ class TweetsController < ApplicationController
   end
 
   def set_user_limit
-    if params[:limit]
-      if params[:limit].to_i == -1
+    if params[:action] == "show"
+      if params[:full] == "true"
         @user_limit = nil
       else
-        @user_limit = params[:limit].to_i
+        @user_limit = 100
       end
     else
       @user_limit = 20
-      if request.format == :html && params[:action] == "show"
-        @user_limit = 100
-      end
+    end
+
+    if request.format == :json
+      @user_limit = nil
     end
   end
 end

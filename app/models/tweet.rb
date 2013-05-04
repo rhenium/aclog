@@ -74,7 +74,6 @@ class Tweet < ActiveRecord::Base
 
     ret = limit(count)
 
-
     if params[:page]
       ret.page(params[:page].to_i, count)
     else

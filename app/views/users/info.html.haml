@@ -3,27 +3,27 @@
 %p profile
 %dl.dl-horizontal
   %dt Username
-  %dd= @user.screen_name
+  %dd= @user_twitter.screen_name
   %dt Name
-  %dd= raw @user.name
+  %dd= raw @user_twitter.name
   %dt tweets
-  %dd= @stats[:stats_api][:tweets_count]
+  %dd= @user_twitter.statuses_count
   %dt Following
-  %dd= @stats[:stats_api][:friends_count]
+  %dd= @user_twitter.friends_count
   %dt Followers
-  %dd= @stats[:stats_api][:followers_count]
+  %dd= @user_twitter.followers_count
   %dt Favorites
-  %dd= @stats[:stats_api][:favorites_count]
+  %dd= @user_twitter.favourites_count
   %dt Listed
-  %dd= @stats[:stats_api][:listed_count]
+  %dd= @user_twitter.listed_count
   %dt Bio
-  %dd= raw @stats[:stats_api][:bio]
+  %dd= raw @user_twitter.description
 - if @user.registered?
   %p records
   %dl.dl-horizontal
     %dt Favorited
-    %dd= @stats[:favorited_count]
+    %dd= @user.stats.favorited_count
     %dt Retweeted
-    %dd= @stats[:retweeted_count]
+    %dd= @user.stats.retweeted_count
     %dt Since
     %dd= @user.account.created_at

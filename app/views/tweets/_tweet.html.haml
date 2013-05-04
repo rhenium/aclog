@@ -15,30 +15,30 @@
         %span.nam= link_to tweet.user.name, user_best_path(tweet.user.screen_name)
         %span.screen_name= link_to tweet.user.screen_name, user_best_path(tweet.user.screen_name)
       .text{class: tweet.stolen_tweet ? "copied" : nil}
-        = raw format_tweet_text(tweet.text)
+        = simple_format(format_tweet_text(tweet.text))
       .meta.clearfix
         %span.twitter_bird
           = link_to image_tag("bird_gray_16.png", alt: "Twitter"), twitter_status_url(tweet), target: "_blank"
         %span.created_at
           = link_to format_time(tweet.tweeted_at), tweet_path(tweet.id)
-        - if params[:action] == "show"
+        - if params[:action] == "show" && user_truncated?(tweet)
           %span.full
-            = link_to "full", params.merge(limit: -1)
+            = link_to "full", params.merge(full: true)
         - if tweet.stolen_tweet
           %span.copied
             = link_to "original", tweet_path(tweet.original.id)
         %span.source
           = raw format_source_text(tweet.source)
   .stats
-    - [["favs", tweet.favoriters], ["retweets", tweet.retweeters]].each do |type, actions|
-      - if actions.count > 0
+    - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
+      - if count > 0
         %dl.dl-horizontal
           %dt
-            %span.count= actions.count
-            %span.type= type
+            %span.count= count
+            %span.type= title
           %dd
             %ul.inline
-              - actions.limit(user_limit).each do |m|
+              - users.limit(@user_limit).each do |m|
                 %li
                   = link_to user_best_path(m.screen_name) do
                     = image_tag m.profile_image_url, alt: m.screen_name, title: m.name

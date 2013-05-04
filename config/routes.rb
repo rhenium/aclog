@@ -37,22 +37,10 @@ Aclog::Application.routes.draw do
     get "/:controller/:action"
   end
 
-  # User pages.
-  scope ":screen_name", controller: "users", constraints: constraints do
-    get "/info",                         action: "info",            as: "user_info"
-    get "/discovered_by",                action: "discovered_by",   as: "user_discovered_by"
-    get "/discovered_of",                action: "discovered_of",   as: "user_discovered_of"
-  end
-  scope ":screen_name", controller: "tweets", constraints: constraints do
-    get "/(:page)",                      action: "best",          as: "user_best"
-    get "/favorited(/:page)",            action: "favorited",     as: "user_favorited"
-    get "/retweeted(/:page)",            action: "retweeted",     as: "user_retweeted"
-    get "/recent(/:page)",               action: "recent",        as: "user_recent"
-    get "/timeline",                     action: "timeline",      as: "user_timeline"
-    get "/discoveries",                  action: "discoveries",   as: "user_discoveries"
-    get "/discovered_by/:screen_name_b", action: "discovered_by", as: "user_discovered_by_user"
-  end
-
+  # deprecated API
+  get "/users/best" => "tweets#best"
+  get "/users/timeline" => "tweets#timeline"
+  get "/users/discovered" => "tweets#discoveries"
 
   # Favstar redirects
   scope "users/:screen_name", constraints: constraints do
@@ -72,9 +60,21 @@ Aclog::Application.routes.draw do
     get "/given_to/:screen_name_b" => redirect("/%{screen_name}/given_favorites_to/%{screen_name_b}")
   end
 
-  # deprecated API
-  get "/users/best" => "tweets#best"
-  get "/users/recent" => "tweets#recent"
-  get "/users/timeline" => "tweets#timeline"
-  get "/users/discovered" => "tweets#discoveries"
+  # User pages.
+  scope ":screen_name", controller: "users", constraints: constraints do
+    get "/info",                         action: "info",             as: "user_info"
+    get "/discovered_by",                action: "discovered_by",    as: "user_discovered_by"
+    get "/discovered_users",             action: "discovered_users", as: "user_discovered_users"
+  end
+  scope ":screen_name", controller: "tweets", constraints: constraints do
+    get "/(:page)",                      action: "best",          as: "user_best"
+    get "/favorited(/:page)",            action: "favorited",     as: "user_favorited"
+    get "/retweeted(/:page)",            action: "retweeted",     as: "user_retweeted"
+    get "/recent(/:page)",               action: "recent",        as: "user_recent"
+    get "/timeline",                     action: "timeline",      as: "user_timeline"
+    get "/discoveries",                  action: "discoveries",   as: "user_discoveries"
+    get "/discovered_by/:screen_name_b", action: "discovered_by", as: "user_discovered_by_user"
+  end
+
+
 end

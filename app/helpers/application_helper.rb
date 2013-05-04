@@ -30,8 +30,6 @@ module ApplicationHelper
         $&
       end
     end
-    ret.gsub!(/\r\n|\r|\n/, "<br />")
-
     return ret
   end
   alias format_source_text format_tweet_text

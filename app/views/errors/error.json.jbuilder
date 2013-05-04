@@ -20,5 +20,5 @@ json.error do |json|
       json.message "Internal Error (Unknown)"
     end
   end
-  json.exception @exception.class.to_s
+  # json.exception @exception.class.to_s
 end

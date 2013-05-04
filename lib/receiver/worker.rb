@@ -155,7 +155,7 @@ class Receiver::Worker < DaemonSpawn::Base
         Rails.logger.debug("Received Tweet(#{@worker_number}): #{msg["id"]}")
         unless @@saved_tweets.include?(msg["id"])
           @@saved_tweets << msg["id"]
-          if @@saved_tweets.size > 10000
+          if @@saved_tweets.size > 100000
             Rails.logger.debug("Tweet id dropped from cache: #{@@saved_tweets.shift}")
           end
 
@@ -214,7 +214,7 @@ class Receiver::Worker < DaemonSpawn::Base
 
     def receive_data(data)
       @pac.feed_each(data) do |msg|
-        p msg
+        Rails.logger.debug(msg.to_s)
         unless msg["type"]
           Rails.logger.error("Unknown message")
           send_object({:type => "fatal", :message => "Unknown message"})
@@ -259,14 +259,10 @@ class Receiver::Worker < DaemonSpawn::Base
         EM.stop
       end
       Signal.trap(:INT, &stop)
-      Signal.trap(:QUIT, &stop)
-      Signal.trap(:TERM, &stop)
     end
   end
 
   def stop
   end
 end
-
-
 

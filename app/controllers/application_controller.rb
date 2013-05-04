@@ -7,9 +7,9 @@ class ApplicationController < ActionController::Base
   protected
   def _get_user(id, screen_name)
     if id
-      User.find_by(id: id)
+      User.find(id: id) rescue raise Aclog::Exceptions::UserNotFound
     elsif screen_name
-      User.find_by(screen_name: screen_name)
+      User.find_by(screen_name: screen_name) || (raise Aclog::Exceptions::UserNotFound)
     end
   end
 

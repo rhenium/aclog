@@ -5,10 +5,10 @@ class Retweet < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      logger.quietly do
-        r = create!(id: hash[:id],
-                    tweet_id: hash[:tweet_id],
-                    user_id: hash[:user_id])
+      r = logger.quietly do
+        create!(id: hash[:id],
+                tweet_id: hash[:tweet_id],
+                user_id: hash[:user_id])
       end
       logger.debug("Created Retweet: #{hash[:id]}: #{hash[:user_id]} => #{hash[:tweet_id]}")
 

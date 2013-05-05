@@ -5,8 +5,8 @@ class Favorite < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      logger.quietly do
-        f = create!(tweet_id: hash[:tweet_id], user_id: hash[:user_id])
+      f = logger.quietly do
+        create!(tweet_id: hash[:tweet_id], user_id: hash[:user_id])
       end
       logger.debug("Created Favorite: #{hash[:user_id]} => #{hash[:tweet_id]}")
 

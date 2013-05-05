@@ -59,12 +59,12 @@ class Tweet < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      logger.quietly do
-        t = create!(id: hash[:id],
-                    text: hash[:text],
-                    source: hash[:source],
-                    tweeted_at: hash[:tweeted_at],
-                    user_id: hash[:user_id])
+      t = logger.quietly do
+        create!(id: hash[:id],
+                text: hash[:text],
+                source: hash[:source],
+                tweeted_at: hash[:tweeted_at],
+                user_id: hash[:user_id])
       end
       logger.debug("Created Tweet: #{hash[:id]}")
 

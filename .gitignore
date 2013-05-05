@@ -21,10 +21,10 @@
 /config/settings/*.local.yml
 /config/environments/*.local.yml
 /config/initializers/secret_token.rb
+/config/database.yml
 
 # local scripts
 /client/worker.sh
 /client/Procfile
 /client/settings.yml
-/server.sh
 

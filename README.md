@@ -37,12 +37,20 @@ Add to `my.cnf`
 
 Create MySQL user
 ### aclog configuration
-* Rename `config/settings.yml.example` to `config/settings.yml` and set consumer key, ...
-* Rename `env.sh.example` to `env.sh` and set `DATABASE_URL`.
+* Set consumer keys, base URL, ..
+
+        cp config/settings.yml.example config/settings.yml
+        vi config/settings.yml
+
 * Setup database
 
-        source env.sh
+        cp config/database.yml.example config/database.yml
+        vi config/database.yml
         rake db:setup
 
-* Set secret token. Rename `config/initializers/secret_token.rb.example` to `config/initializers/secret_token.rb`. Run `rake secret` and set the result to `config/initializers/secret_token.rb`.
+* Set secret token
+
+        cp config/initializers/secret_token.rb.example config/initializers/secret_token.rb
+        sed -i s/replace_here/$(rake secret)/g config/initializers/secret_token.rb
+
 

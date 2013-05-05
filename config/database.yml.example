@@ -1,0 +1,24 @@
+development:
+  adapter: mysql2
+  database: aclog_development
+  username: aclog
+  password: 
+  host: localhost
+  encoding: utf8mb4
+
+test:
+  adapter: mysql2
+  database: aclog_test
+  username: aclog
+  password: 
+  host: localhost
+  encoding: utf8mb4
+
+production:
+  adapter: mysql2
+  database: aclog_production
+  username: aclog
+  password: 
+  host: localhost
+  encoding: utf8mb4
+

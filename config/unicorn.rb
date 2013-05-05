@@ -2,7 +2,7 @@ _rails_root = File.expand_path("../../", __FILE__)
 
 worker_processes 4
 working_directory _rails_root
-listen File.join(_rails_root, "tmp", "unicorn.sock")
+listen File.join(_rails_root, "tmp", "sockets", "unicorn.sock")
 
 _log_file = File.join(_rails_root, "log", "unicorn.log")
 stderr_path _log_file

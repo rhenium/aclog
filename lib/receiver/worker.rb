@@ -259,8 +259,8 @@ class Receiver::Worker < DaemonSpawn::Base
   def start(args)
     Rails.logger.info("Database Proxy Started")
     EM.run do
-      o = EM.start_server("0.0.0.0", Settings.db_proxy_port, DBProxyServer)
-      i = EM.start_unix_domain_server(Settings.register_server_path, RegisterServer)
+      o = EM.start_server("0.0.0.0", Settings.listen_port, DBProxyServer)
+      i = EM.start_unix_domain_server(File.join(Rails.root, "tmp", "sockets", "receiver.sock"), RegisterServer)
 
       stop = Proc.new do
         EM.stop_server(o)

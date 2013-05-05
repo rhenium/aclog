@@ -1,0 +1,21 @@
+collector:
+  consumer:
+    - key:          "consumer key of collector (register)"
+      secret:       "consumer secret"
+    - key:          "if change consumer key"
+      secret:       
+  consumer_version: 0 # which consumer (0..)
+
+notification:
+  consumer:
+    key:            "consumer key of notification account"
+    secret:         "consumer secret"
+  token:
+    - token:        "access token of notification account"
+    - secret:       "access token secret"
+
+listen_port:        42106
+secret_key:         "secret key to authorize workers"
+worker_count:       1 # workers count
+base_url:           "http://example.com/" # base url
+

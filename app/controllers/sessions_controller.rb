@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
     account = Account.create_or_update(user_id: auth["uid"],
                                        oauth_token: auth["credentials"]["token"],
                                        oauth_token_secret: auth["credentials"]["secret"],
-                                       consumer_version: Settings.consumer_version)
+                                       consumer_version: Settings.collector.consumer_version)
     account.update_connection
 
     session[:account] = account

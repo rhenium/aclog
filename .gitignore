@@ -17,10 +17,10 @@
 /tmp/*
 /spec/tmp/*
 
-/config/settings.local.yml
+/config/settings.yml
 /config/settings/*.local.yml
 /config/environments/*.local.yml
-/config/initializers/secret_token.local.rb
+/config/initializers/secret_token.rb
 
 # local scripts
 /client/worker.sh

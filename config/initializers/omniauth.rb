@@ -11,8 +11,8 @@ end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :twitter,
-           Settings.consumer[Settings.consumer_version].key,
-           Settings.consumer[Settings.consumer_version].secret,
+           Settings.collector.consumer[Settings.collector.consumer_version].key,
+           Settings.collector.consumer[Settings.collector.consumer_version].secret,
            request_path: "/i/login",
            callback_path: "/i/callback"
 end

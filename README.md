@@ -23,14 +23,26 @@ A web service like Favstar.
 * User settings (favorites notification)
 
 ## Requirements
-* Ruby 1.9.3+
-* MySQL 5.5.14+
+* Ruby 1.9.3
+* MySQL/MariaDB 5.5.14+
 
 ## Setup
-Add to my.cnf
+### MySQL
+Add to `my.cnf`
 
     [mysqld]
     innodb_file_format = Barracuda
     innodb_file_per_table = 1
     innodb_large_prefix
+
+Create MySQL user
+### aclog configuration
+* Rename `config/settings.yml.example` to `config/settings.yml` and set consumer key, ...
+* Rename `env.sh.example` to `env.sh` and set `DATABASE_URL`.
+* Setup database
+
+        source env.sh
+        rake db:setup
+
+* Set secret token. Rename `config/initializers/secret_token.rb.example` to `config/initializers/secret_token.rb`. Run `rake secret` and set the result to `config/initializers/secret_token.rb`.
 

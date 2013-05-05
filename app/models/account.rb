@@ -12,7 +12,7 @@ class Account < ActiveRecord::Base
 
   def update_connection
     begin
-      UNIXSocket.open(Settings.register_server_path) do |socket|
+      UNIXSocket.open(File.join(Rails.root, "tmp", "sockets", "receiver.sock")) do |socket|
         socket.write({type: "register",
                       id: self.id,
                       user_id: self.user_id}.to_msgpack)
@@ -25,8 +25,8 @@ class Account < ActiveRecord::Base
 
   def client
     Twitter::Client.new(
-      consumer_key: Settings.consumer[consumer_version.to_i].key,
-      consumer_secret: Settings.consumer[consumer_version.to_i].secret,
+      consumer_key: Settings.collector.consumer[consumer_version].key,
+      consumer_secret: Settings.collector.consumer[consumer_version].secret,
       oauth_token: oauth_token,
       oauth_token_secret: oauth_token_secret)
   end

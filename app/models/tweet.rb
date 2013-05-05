@@ -71,7 +71,7 @@ class Tweet < ActiveRecord::Base
       return t
     rescue ActiveRecord::RecordNotUnique
       logger.debug("Duplicate Tweet: #{hash[:id]}")
-    rescue
+    rescue => e
       logger.error("Unknown error while inserting tweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     end
   end

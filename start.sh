@@ -2,17 +2,17 @@
 set -e
 
 export RAILS_ENV=production
+export RAILS_ROOT=$(readlink -f `dirname $0`)
 
-APP_ROOT=$(readlink -f `dirname $0`)
-PID="$APP_ROOT/tmp/pids/unicorn.pid"
+PID="$RAILS_ROOT/tmp/pids/unicorn.pid"
 PID_OLD="$PID.oldbin"
-cd $APP_ROOT || exit 1
+cd $RAILS_ROOT || exit 1
 
 sig () {
   test -s $1 && kill -$2 `cat $1`
 }
 
-unicorn="bundle exec unicorn_rails -D -E $RAILS_ENV -c $APP_ROOT/config/unicorn.rb -l 4000"
+unicorn="bundle exec unicorn_rails -D -E $RAILS_ENV -c $RAILS_ROOT/config/unicorn.rb -l 4000"
 receiver="bundle exec rails runner script/start.rb"
  
 case $1 in

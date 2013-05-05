@@ -1,12 +1,12 @@
-worker_processes 8
+_rails_root = File.expand_path("../../", __FILE__)
 
-working_directory File.expand_path("../../", __FILE__)
+worker_processes 4
+working_directory _rails_root
+listen File.join(_rails_root, "tmp", "unicorn.sock")
 
-listen  "/tmp/aclog-unicorn.sock"
-
-log = "/var/log/rails/unicorn.log"
-stderr_path File.expand_path("log/unicorn.log", ENV["RAILS_ROOT"])
-stdout_path File.expand_path("log/unicorn.log", ENV["RAILS_ROOT"])
+_log_file = File.join(_rails_root, "log", "unicorn.log")
+stderr_path _log_file
+stdout_path _log_file
 
 preload_app true
 
@@ -34,5 +34,4 @@ after_fork do |server, worker|
     ObjectSpace.each_object(ActionDispatch::Session::DalliStore) { |obj| obj.reset }
   end
 end
-
 

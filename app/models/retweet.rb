@@ -5,16 +5,18 @@ class Retweet < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      r = create!(id: hash[:id],
-                  tweet_id: hash[:tweet_id],
-                  user_id: hash[:user_id])
+      logger.quietly do
+        r = create!(id: hash[:id],
+                    tweet_id: hash[:tweet_id],
+                    user_id: hash[:user_id])
+      end
       logger.debug("Created Retweet: #{hash[:id]}: #{hash[:user_id]} => #{hash[:tweet_id]}")
 
       return r
     rescue ActiveRecord::RecordNotUnique
       logger.debug("Duplicate Retweet: #{hash[:id]}: #{hash[:user_id]} => #{hash[:tweet_id]}")
-    rescue
-      logger.error("Unknown error while inserting retweet: #{$!}/#{$@}")
+    rescue => e
+      logger.error("Unknown error while inserting retweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     end
   end
 

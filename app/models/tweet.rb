@@ -59,18 +59,20 @@ class Tweet < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      t = create!(id: hash[:id],
-                  text: hash[:text],
-                  source: hash[:source],
-                  tweeted_at: hash[:tweeted_at],
-                  user_id: hash[:user_id])
+      logger.quietly do
+        t = create!(id: hash[:id],
+                    text: hash[:text],
+                    source: hash[:source],
+                    tweeted_at: hash[:tweeted_at],
+                    user_id: hash[:user_id])
+      end
       logger.debug("Created Tweet: #{hash[:id]}")
 
       return t
     rescue ActiveRecord::RecordNotUnique
       logger.debug("Duplicate Tweet: #{hash[:id]}")
     rescue
-      logger.error("Unknown error while inserting tweet: #{$!}/#{$@}")
+      logger.error("Unknown error while inserting tweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     end
   end
 

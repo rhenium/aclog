@@ -5,14 +5,16 @@ class Favorite < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      f = create!(tweet_id: hash[:tweet_id], user_id: hash[:user_id])
+      logger.quietly do
+        f = create!(tweet_id: hash[:tweet_id], user_id: hash[:user_id])
+      end
       logger.debug("Created Favorite: #{hash[:user_id]} => #{hash[:tweet_id]}")
 
       return f
     rescue ActiveRecord::RecordNotUnique
       logger.debug("Duplicate Favorite: #{hash[:user_id]} => #{hash[:tweet_id]}")
-    rescue
-      logger.error("Unknown error while inserting favorite: #{$!}/#{$@}")
+    rescue => e
+      logger.error("Unknown error while inserting favorite: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     end
   end
 

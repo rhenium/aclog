@@ -5,6 +5,7 @@ development:
   password: 
   host: localhost
   encoding: utf8mb4
+  collation: utf8mb4_general_ci
 
 test:
   adapter: mysql2
@@ -13,6 +14,7 @@ test:
   password: 
   host: localhost
   encoding: utf8mb4
+  collation: utf8mb4_general_ci
 
 production:
   adapter: mysql2
@@ -21,4 +23,5 @@ production:
   password: 
   host: localhost
   encoding: utf8mb4
+  collation: utf8mb4_general_ci
 

@@ -7,4 +7,3 @@ $stderr.sync = true
 worker = Worker.new
 worker.start
 
-

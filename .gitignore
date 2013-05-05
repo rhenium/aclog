@@ -23,8 +23,6 @@
 /config/initializers/secret_token.rb
 /config/database.yml
 
-# local scripts
-/client/worker.sh
-/client/Procfile
-/client/settings.yml
+/collector/Procfile
+/collector/settings.yml
 

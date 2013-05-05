@@ -300,7 +300,7 @@ class Worker
     def unbind
       $logger.info("Connection closed")
       EM.add_timer(10) do
-        reconnect(Settings.db_proxy_host, Settings.db_proxy_port)
+        reconnect(Settings.receiver_host, Settings.receiver_port)
         post_init
       end
     end
@@ -347,7 +347,7 @@ class Worker
   def start
     $logger.info("Worker ##{Settings.worker_number} started")
     EM.run do
-      connection = EM.connect(Settings.db_proxy_host, Settings.db_proxy_port, DBProxyClient)
+      connection = EM.connect(Settings.receiver_host, Settings.receiver_port, DBProxyClient)
 
       stop = Proc.new do
         connection.stop_all

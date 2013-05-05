@@ -36,7 +36,7 @@ Add to `my.cnf`
     innodb_large_prefix
 
 Create MySQL user
-### aclog configuration
+### aclog configuration (application)
 * Set consumer keys, base URL, ..
 
         cp config/settings.yml.example config/settings.yml
@@ -53,4 +53,9 @@ Create MySQL user
         cp config/initializers/secret_token.rb.example config/initializers/secret_token.rb
         sed -i s/replace_here/$(rake secret)/g config/initializers/secret_token.rb
 
+### aclog configuration (worker)
+* Set consumer keys, secret key
+
+        cp collector/settings.yml.example collector/settings.yml
+        vi collector/settings.yml
 

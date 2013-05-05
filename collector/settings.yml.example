@@ -1,0 +1,18 @@
+defaults: &defaults
+  consumer:
+    - key:        "consumer key for collector"
+      secret:     "consumer secret"
+    - key:        "second consumer key"
+      secret:     "consumer secret"
+  secret_key:     "secret key"
+development:
+  <<: *defaults
+  worker_number:  0
+  receiver_host:  localhost
+  receiver_port:  42106
+production:
+  <<: *defaults
+  worker_number:  <%= ENV["ACLOG_WORKER_NUMBER"] %>
+  receiver_host:  localhost
+  receiver_port:  42106
+

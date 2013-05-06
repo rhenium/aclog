@@ -54,8 +54,7 @@ class User < ActiveRecord::Base
     raise Aclog::Exceptions::UserNotRegistered unless registered?
 
     Rails.cache.fetch("stats/#{self.id}", expires_in: 30.minutes) do
-      favorited_counts = self.tweets.pluck(:favorites_count)
-      retweeted_counts = self.tweets.pluck(:retweets_count)
+      favorited_counts, retweeted_counts = self.tweets.pluck(:favorites_count, :retweets_count).transpose
 
       ret = OpenStruct.new
       ret.updated_at = Time.now

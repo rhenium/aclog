@@ -17,16 +17,15 @@ class ApplicationController < ActionController::Base
 
   def authorized_to_show?(user)
     return true if not user.protected?
-    return true if session[:user_id] == user.id
 
     if session[:user_id]
-      return session[:account].following?(user.id)
+      return session[:user_id] == user.id || session[:account].following?(user.id)
     elsif request.headers["X-Verify-Credentials-Authorization"]
       # OAuth Echo
       user_id = authenticate_with_twitter_oauth_echo
       account = Account.find_by(user_id: user_id)
       if account
-        return account.following?(user.id)
+        return account.user_id == user.id || account.following?(user.id)
       else
         return false
       end

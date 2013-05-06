@@ -47,4 +47,9 @@ class Account < ActiveRecord::Base
       Retweet.from_tweet_object(status)
     end
   end
+
+  def following?(target_user)
+    client.friendship?(user_id, target_user.id)
+  end
 end
+

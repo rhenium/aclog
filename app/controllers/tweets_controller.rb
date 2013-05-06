@@ -6,7 +6,6 @@ class TweetsController < ApplicationController
   # GET /api/tweets/show
   def show
     tweet_required
-    @user = @tweet.user
 
     @caption = "#{@user.screen_name}'s Tweet"
     text = ApplicationController.helpers.format_tweet_text(@tweet.text)
@@ -99,6 +98,7 @@ class TweetsController < ApplicationController
 
   def user_optional
     @user = _get_user(params[:user_id], params[:screen_name])
+    raise Aclog::Exceptions::UserProtected unless authorized_to_show?(@user)
   end
 
   def user_required
@@ -109,11 +109,14 @@ class TweetsController < ApplicationController
   def user_b_required
     @user_b = _get_user(params[:user_id_b], params[:screen_name_b])
     raise Aclog::Exceptions::UserNotFound unless @user_b
+    raise Aclog::Exceptions::UserProtected unless authorized_to_show?(@user)
   end
 
   def tweet_required
     @tweet = Tweet.find_by(id: params[:id])
     raise Aclog::Exceptions::TweetNotFound unless @tweet
+    @user = @tweet.user
+    raise Aclog::Exceptions::UserProtected unless authorized_to_show?(@user)
   end
 
   def set_user_limit

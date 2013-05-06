@@ -31,5 +31,6 @@ class UsersController < ApplicationController
   def user_required
     @user = _get_user(params[:id] || params[:user_id], params[:screen_name])
     raise Aclog::Exceptions::UserNotFound unless @user
+    raise Aclog::Exceptions::UserProtected unless authorized_to_show?(@user)
   end
 end

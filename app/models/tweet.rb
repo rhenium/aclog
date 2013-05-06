@@ -26,11 +26,11 @@ class Tweet < ActiveRecord::Base
   scope :favorited_by, -> user { joins(:favorites).where(favorites: {user_id: user.id}) }
   scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user_id: user.id}) }
   scope :discovered_by, -> user {
-    un = "SELECT favorites.tweet_id, favorites.user_id FROM favorites" +
+    un = "SELECT favorites.tweet_id FROM favorites WHERE favorites.user_id = #{user.id}" +
          " UNION " +
-         "SELECT retweets.tweet_id, retweets.user_id FROM retweets"
+         "SELECT retweets.tweet_id FROM retweets WHERE favorites.user_id = #{user.id}"
 
-    joins("INNER JOIN (#{un}) m ON m.tweet_id = tweets.id AND m.user_id = #{user.id}")
+    joins("INNER JOIN (#{un}) m ON m.tweet_id = tweets.id")
   }
 
   # will be moved

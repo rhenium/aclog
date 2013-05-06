@@ -28,7 +28,7 @@ class Tweet < ActiveRecord::Base
   scope :discovered_by, -> user {
     un = "SELECT favorites.tweet_id FROM favorites WHERE favorites.user_id = #{user.id}" +
          " UNION " +
-         "SELECT retweets.tweet_id FROM retweets WHERE favorites.user_id = #{user.id}"
+         "SELECT retweets.tweet_id FROM retweets WHERE retweets.user_id = #{user.id}"
 
     joins("INNER JOIN (#{un}) m ON m.tweet_id = tweets.id")
   }

@@ -17,6 +17,7 @@ class ApplicationController < ActionController::Base
 
   def authorized_to_show?(user)
     return true if not user.protected?
+    return true if session[:user_id] == user.id
 
     if session[:user_id]
       return session[:account].following?(user.id)

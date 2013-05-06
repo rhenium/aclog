@@ -1,13 +1,7 @@
 Aclog::Application.routes.draw do
   constraints = {
-    id: /[0-9]+/,
-    user_id: /[0-9]+/,
     screen_name: /[a-zA-Z0-9_]{1,20}/,
     screen_name_b: /[a-zA-Z0-9_]{1,20}/,
-    page: /[0-9]+/,
-    count: /[0-9]+/,
-    tweets: /(all|fav(orite[sd]?|(or)?ed|s)?|re?t(weet(s|ed)?|s)?)/,
-    order: /(fav(orite[sd]?|(or)?ed|s)?|re?t(weet(s|ed)?|s)?)/,
   }
 
   # MainController
@@ -19,7 +13,7 @@ Aclog::Application.routes.draw do
   get "/search" => "search#search", as: "search"
 
   # Internals / SessionsController
-  get "/i/import/:id" => "i#import", constraints: constraints, as: "import"
+  get "/i/import/:id" => "i#import", as: "import"
   get "/i/callback" => "sessions#callback"
   get "/i/logout" => "sessions#destroy", as: "logout"
 
@@ -27,16 +21,18 @@ Aclog::Application.routes.draw do
   get "/i/report" => "report#index", as: "report"
   post "/i/report/tweet" => "report#tweet"
 
-  # public
-  get "/i/best" => "tweets#best", as: "best"
-  get "/i/recent" => "tweets#recent", as: "recent"
-  get "/i/timeline" => "tweets#timeline", as: "timeline"
-  get "/i/:id" => "tweets#show", constraints: constraints, as: "tweet"
-  get "(/users)/:screen_name/status(es)/:id" => redirect("/i/%{id}"), constraints: constraints
+  # /i/
+  scope :i, controller: :tweets, format: false do
+    get "/best",      action: "all_best",     as: "best"
+    get "/recent",    action: "all_recent",   as: "recent"
+    get "/timeline",  action: "all_timeline", as: "timeline"
+    get "/:id",       action: "show",         as: "tweet"
+  end
+  get "(/users)/:screen_name/status(es)/:id" => redirect("/i/%{id}")
 
   # JSON API
-  scope :api do
-    get "/:controller/:action"
+  scope :api, format: false, defaults: {format: :json} do
+    get "/:controller/:action.json"
   end
 
   # deprecated API
@@ -45,7 +41,7 @@ Aclog::Application.routes.draw do
   get "/users/discovered" => "tweets#discoveries"
 
   # Favstar redirects
-  scope "users/:screen_name", constraints: constraints do
+  scope "users/:screen_name", constraints: constraints, format: false do
     get "/" =>                            redirect("/%{screen_name}")
     get "/most_favorited" =>              redirect("/%{screen_name}/favorited")
     get "/most_retweeted" =>              redirect("/%{screen_name}/retweeted")
@@ -63,25 +59,25 @@ Aclog::Application.routes.draw do
   end
 
   # User pages.
-  scope ":screen_name", controller: "users", constraints: constraints do
-    get "/stats",                        action: "stats",            as: "user_stats"
-    get "/discovered_by",                action: "discovered_by",    as: "user_discovered_by"
-    get "/discovered_users",             action: "discovered_users", as: "user_discovered_users"
+  scope ":screen_name", controller: "users", constraints: constraints, format: false do
+    get "/stats",                         action: "stats",            as: "user_stats"
+    get "/discovered_by",                 action: "discovered_by",    as: "user_discovered_by"
+    get "/discovered_users",              action: "discovered_users", as: "user_discovered_users"
   end
-  scope ":screen_name", controller: "tweets", constraints: constraints do
-    get "/(:page)",                      action: "best",          as: "user_best"
-    get "/favorited(/:page)",            action: "favorited",     as: "user_favorited"
-    get "/retweeted(/:page)",            action: "retweeted",     as: "user_retweeted"
-    get "/recent(/:page)",               action: "recent",        as: "user_recent"
-    get "/timeline",                     action: "timeline",      as: "user_timeline"
-    get "/discoveries",                  action: "discoveries",   as: "user_discoveries"
-    get "/favorites",                    action: "favorites",     as: "user_favorites"
-    get "/retweets",                     action: "retweets",      as: "user_retweets"
-    get "/discovered_by/:screen_name_b", action: "discovered_by", as: "user_discovered_by_user"
+  scope ":screen_name", controller: "tweets", constraints: constraints, format: false do
+    get "/",                              action: "best",          as: "user_best"
+    get "/favorited",                     action: "favorited",     as: "user_favorited"
+    get "/retweeted",                     action: "retweeted",     as: "user_retweeted"
+    get "/recent",                        action: "recent",        as: "user_recent"
+    get "/timeline",                      action: "timeline",      as: "user_timeline"
+    get "/discoveries",                   action: "discoveries",   as: "user_discoveries"
+    get "/favorites",                     action: "favorites",     as: "user_favorites"
+    get "/retweets",                      action: "retweets",      as: "user_retweets"
+    get "/discovered_by/:screen_name_b",  action: "discovered_by", as: "user_discovered_by_user"
   end
 
   # Old URLs
-  scope ":screen_name", constraints: constraints do
+  scope ":screen_name", constraints: constraints, format: false do
     get "/discovered" =>                        redirect("/%{screen_name}/discoveries")
     get "/info" =>                              redirect("/%{screen_name}/stats")
     get "/favorited_by" =>                      redirect("/%{screen_name}/discovered_by")
@@ -93,5 +89,5 @@ Aclog::Application.routes.draw do
     get "/given_favorites_to/:screen_name_b" => redirect("/%{screen_name_b}/discovered_by/%{screen_name}")
     get "/given_retweets_to/:screen_name_b" =>  redirect("/%{screen_name_b}/discovered_by/%{screen_name}")
   end
-
 end
+

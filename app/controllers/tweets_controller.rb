@@ -98,7 +98,7 @@ class TweetsController < ApplicationController
 
   def user_optional
     @user = _get_user(params[:user_id], params[:screen_name])
-    raise Aclog::Exceptions::UserProtected unless authorized_to_show?(@user)
+    raise Aclog::Exceptions::UserProtected if @user and not authorized_to_show?(@user)
   end
 
   def user_required

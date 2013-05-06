@@ -20,6 +20,8 @@ class ErrorsController < ApplicationController
       render "error", status: 403
     when Aclog::Exceptions::LoginRequired
       render "error", status: 403
+    when Aclog::Exceptions::OAuthEchoUnauthorized
+      render "error", status: 401
     when ActionController::RoutingError
       render "error", status: 404
     else

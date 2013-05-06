@@ -11,10 +11,14 @@
     ユーザーは非公開です。
   - when Aclog::Exceptions::LoginRequired
     このページの表示にはログインが必要です。
+  - when Aclog::Exceptions::OAuthEchoUnauthorized
+    OAuth Echo 認証に失敗しました。
   - when ActionController::RoutingError
     このページは存在しません。
   - else
     - if response.status == 404
-      Not Found (Unknown)
+      Not Found (Unknown):
+      = @exception.class
     - else
-      Internal Error (Unknown)
+      Internal Error (Unknown):
+      = @exception.class

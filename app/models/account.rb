@@ -48,8 +48,12 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def following?(target_user)
-    client.friendship?(user_id, target_user.id)
+  def following?(target_user_id)
+    client.friendship?(user_id, target_user_id)
+  end
+
+  def followed_by?(source_user_id)
+    client.friendship?(source_user_id, user_id)
   end
 end
 

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 class ApplicationController < ActionController::Base
+  include Aclog::TwitterOauthEchoAuthentication::ControllerMethods
+
   protect_from_forgery
   before_filter :set_format, :check_session
   after_filter :xhtml
@@ -14,17 +16,21 @@ class ApplicationController < ActionController::Base
   end
 
   def authorized_to_show?(user)
-    case
-    when (not user.protected?)
-      true
-    when (not session[:user_id])
-      false
-    when user.id == session[:user_id]
-      true
-    when session[:account].following?(user)
-      true
+    return true if not user.protected?
+
+    if session[:user_id]
+      return session[:account].following?(user.id)
+    elsif request.headers["X-Verify-Credentials-Authorization"]
+      # OAuth Echo
+      user_id = authenticate_with_twitter_oauth_echo
+      account = Account.find_by(user_id: user_id)
+      if account
+        return account.following?(user.id)
+      else
+        return false
+      end
     else
-      false
+      return false
     end
   end
 

@@ -49,11 +49,21 @@ class Account < ActiveRecord::Base
   end
 
   def following?(target_user_id)
-    client.friendship?(user_id, target_user_id)
+    api_friendship?(user_id, target_user_id)
   end
 
   def followed_by?(source_user_id)
-    client.friendship?(source_user_id, user_id)
+    api_friendship?(source_user_id, user_id)
+  end
+
+  private
+  def api_friendship?(source_user_id, target_user_id)
+    return nil unless source_user_id && source_user_id.is_a?(Integer)
+    return nil unless target_user_id && target_user_id.is_a?(Integer)
+
+    Rails.cache.fetch("friendship/#{source_user_id}-#{target_user_id}", expires_in: 3.days) do
+      client.friendship?(source_user_id, target_user_id)
+    end
   end
 end
 

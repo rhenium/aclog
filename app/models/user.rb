@@ -51,9 +51,9 @@ class User < ActiveRecord::Base
   end
 
   def stats
-    @stats_cache ||= begin
-      raise Aclog::Exceptions::UserNotRegistered unless account
+    raise Aclog::Exceptions::UserNotRegistered unless registered?
 
+    Rails.cache.fetch("stats/#{self.id}", expires_in: 30.minutes) do
       hash = {favorites_count: favorites.count,
               retweets_count: retweets.count,
               tweets_count: tweets.length, # cache: tweets.inject calls "SELECT `tweets`.*"

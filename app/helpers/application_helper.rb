@@ -6,10 +6,6 @@ module ApplicationHelper
     dt.to_time.localtime("+09:00").strftime("%Y-%m-%d %H:%M:%S")
   end
 
-  def format_days_ago(dt)
-    "#{(DateTime.now.utc - dt.to_datetime).to_i}d ago"
-  end
-
   def format_tweet_text(text)
     ret = text.gsub(/<([a-z]+?):(.+?)(?::(.+?))?>/) do
       case $1

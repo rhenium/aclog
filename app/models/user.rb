@@ -54,19 +54,30 @@ class User < ActiveRecord::Base
     raise Aclog::Exceptions::UserNotRegistered unless registered?
 
     Rails.cache.fetch("stats/#{self.id}", expires_in: 30.minutes) do
-      hash = {favorites_count: favorites.count,
-              retweets_count: retweets.count,
-              tweets_count: tweets.length, # cache: tweets.inject calls "SELECT `tweets`.*"
-              favorited_count: 0,
-              retweeted_count: 0}
+      favorited_counts = self.tweets.pluck(:favorites_count)
+      retweeted_counts = self.tweets.pluck(:retweets_count)
 
-      tweets.inject(hash) do |hash, m|
-        hash[:favorited_count] += m.favorites_count
-        hash[:retweeted_count] += m.retweets_count
-        hash
+      ret = OpenStruct.new
+      ret.updated_at = Time.now
+      ret.since_join = (DateTime.now.utc - self.account.created_at.to_datetime).to_i
+      ret.favorites_count = self.favorites.count
+      ret.retweets_count = self.retweets.count
+      ret.tweets_count = self.tweets.count
+      ret.favorited_count = favorited_counts.sum
+      ret.retweeted_count = retweeted_counts.sum
+      ret.average_favorited_count = favorited_counts.inject(:+).to_f / ret.tweets_count
+      ret.average_retweeted_count = retweeted_counts.inject(:+).to_f / ret.tweets_count
+      ret.retweeted_count_str = ret.retweeted_count.to_s
+
+      if ret.favorited_count > (ret.since_join + 1) * 5000
+        i = ret.favorited_count
+        m = 10 ** Math.log10(i).to_i
+        ret.favorited_count_str = "#{(i / m).to_i * m}+"
+      else
+        ret.favorited_count_str = ret.favorited_count.to_s
       end
 
-      OpenStruct.new(hash)
+      ret
     end
   end
 

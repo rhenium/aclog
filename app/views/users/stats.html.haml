@@ -26,4 +26,6 @@
     %dt Retweeted
     %dd= @user.stats.retweeted_count
     %dt Since
-    %dd= @user.account.created_at
+    %dd= format_time @user.account.created_at
+    %dt Last update
+    %dd= format_time @user.stats.updated_at

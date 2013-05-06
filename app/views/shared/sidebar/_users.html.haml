@@ -7,16 +7,16 @@
     %ul.records
       %li
         %span favorited
-        %span.data= @user.stats.favorited_count
+        %span.data= @user.stats.favorited_count_str
       %li
         %span retweeted
-        %span.data= @user.stats.retweeted_count
+        %span.data= @user.stats.retweeted_count_str
       %li
         %span avg. fav
-        %span.data= ((@user.stats.favorited_count + 0.0) / @user.stats.tweets_count).round(2)
+        %span.data= @user.stats.average_favorited_count.round(2)
       %li
         %span joined
-        %span.data= format_days_ago(@user.account.created_at)
+        %span.data= @user.stats.since_join.to_s + "d ago"
   - else
     .alert.alert-info
       = "@#{@user.screen_name} has never signed in to aclog"

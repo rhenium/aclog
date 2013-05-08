@@ -22,10 +22,10 @@
   %p records
   %dl.dl-horizontal
     %dt Favorited
-    %dd= @user.stats.favorited_count
+    %dd= @user.stats.favorited_count_str
     %dt Retweeted
-    %dd= @user.stats.retweeted_count
-    %dt Since
+    %dd= @user.stats.retweeted_count_str
+    %dt Registered
     %dd= format_time @user.account.created_at
     %dt Last update
     %dd= format_time @user.stats.updated_at

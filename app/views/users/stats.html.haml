@@ -5,7 +5,7 @@
   %dt Username
   %dd= @user_twitter.screen_name
   %dt Name
-  %dd= raw @user_twitter.name
+  %dd= raw @user_twitter.name.gsub(/&(?!(amp;|gt;|lt;|quot;|apos;))/, "&amp;")
   %dt tweets
   %dd= @user_twitter.statuses_count
   %dt Following
@@ -17,7 +17,7 @@
   %dt Listed
   %dd= @user_twitter.listed_count
   %dt Bio
-  %dd= raw @user_twitter.description
+  %dd= raw @user_twitter.description.gsub(/&(?!(amp;|gt;|lt;|quot;|apos;))/, "&amp;")
 - if @user.registered?
   %p records
   %dl.dl-horizontal

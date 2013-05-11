@@ -43,12 +43,12 @@ class Tweet < ActiveRecord::Base
   def self.delete_from_id(id)
     begin
       # counter_cache の無駄を省くために delete_all で
-      deleted_tweets = Tweet.delete_all(id: id)
+      deleted_tweets = Tweet.where("id IN (?)", id).delete_all
       if deleted_tweets.to_i > 0
-        Favorite.delete_all(tweet_id: id)
-        Retweet.delete_all(tweet_id: id)
+        Favorite.where("tweet_id IN (?)", id).delete_all
+        Retweet.where("tweet_id IN (?)", id).delete_all
       else
-        Retweet.where(id: id).destroy_all # counter_cache
+        Retweet.where("id IN (?)", id).destroy_all # counter_cache
       end
 
       return id

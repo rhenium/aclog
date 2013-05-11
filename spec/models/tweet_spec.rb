@@ -101,6 +101,11 @@ describe Tweet do
       }
     end
 
+    describe "of" do
+      subject { Tweet.of(@user_1) }
+      its(:to_sql) { should eq @user_1.tweets.to_sql }
+    end
+
     describe "favorited_by" do
       subject { Tweet.favorited_by(@user_1) }
       its(:count) { should be 2 }
@@ -122,6 +127,10 @@ describe Tweet do
     end
 
     describe "original" do
+      # TODO
+    end
+
+    describe "not_protected" do
       # TODO
     end
   end

@@ -28,34 +28,62 @@ A web service like Favstar.
 
 ## Setup
 ### MySQL
-Add to `my.cnf`
+* Add to `my.cnf`
 
-    [mysqld]
-    innodb_file_format = Barracuda
-    innodb_file_per_table = 1
-    innodb_large_prefix
+```ini
+[mysqld]
+innodb_file_format = Barracuda
+innodb_file_per_table = 1
+innodb_large_prefix
+```
 
-Create MySQL user
+* Create MySQL user
+
 ### aclog configuration (application)
+* Install packages
+
+        $ bundle install
+
 * Set consumer keys, base URL, ..
 
-        cp config/settings.yml.example config/settings.yml
-        vi config/settings.yml
+        $ cp config/settings.yml.example config/settings.yml
+        $ vi config/settings.yml
 
 * Setup database
 
-        cp config/database.yml.example config/database.yml
-        vi config/database.yml
-        rake db:setup
+        $ cp config/database.yml.example config/database.yml
+        $ vi config/database.yml
+        $ rake db:setup
 
 * Set secret token
 
-        cp config/initializers/secret_token.rb.example config/initializers/secret_token.rb
-        sed -i s/replace_here/$(rake secret)/g config/initializers/secret_token.rb
+        $ cp config/initializers/secret_token.rb.example config/initializers/secret_token.rb
+        $ sed -i s/replace_here/$(rake secret)/g config/initializers/secret_token.rb
+
+* Start
+
+        $ ./start.sh start
 
 ### aclog configuration (worker)
+* In collector/ ..
+* Install packages
+
+        $ bundle install
+
 * Set consumer keys, secret key
 
-        cp collector/settings.yml.example collector/settings.yml
-        vi collector/settings.yml
+        $ cp settings.yml.example collector/settings.yml
+        $ vi settings.yml
+
+* Start
+
+        $ RAILS_ENV=production ./start.sh
+
+
+## Contributing
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
 

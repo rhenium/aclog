@@ -56,7 +56,7 @@ class User < ActiveRecord::Base
   def stats
     raise Aclog::Exceptions::UserNotRegistered unless registered?
 
-    Rails.cache.fetch("stats/#{self.id}", expires_in: 30.minutes) do
+    Rails.cache.fetch("stats/#{self.id}", expires_in: 3.hours) do
       favorited_counts, retweeted_counts = self.tweets.pluck(:favorites_count, :retweets_count).transpose
 
       ret = OpenStruct.new
@@ -71,10 +71,9 @@ class User < ActiveRecord::Base
       ret.average_retweeted_count = retweeted_counts.inject(:+).to_f / ret.tweets_count
       ret.retweeted_count_str = ret.retweeted_count.to_s
 
-      if ret.favorited_count > (ret.since_join + 1) * 5000
-        i = ret.favorited_count
-        m = 10 ** Math.log10(i).to_i
-        ret.favorited_count_str = "#{(i / m).to_i * m}+"
+      if ret.favorited_count > (i = (ret.since_join + 1) * 3000) &&
+         ret.favorited_count > ret.retweeted_count * 10
+        ret.favorited_count_str = "#{i}+"
       else
         ret.favorited_count_str = ret.favorited_count.to_s
       end

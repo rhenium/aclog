@@ -17,7 +17,7 @@ class TweetsController < ApplicationController
   def best
     user_required
     @caption = "Best"
-    @tweets = @user.tweets.reacted.order_by_reactions.list(params, force_page: true)
+    @tweets = cache_tweets(3.minutes, @user.tweets.reacted.order_by_reactions.list(params, force_page: true))
   end
 
   # GET /:screen_name/favorited
@@ -25,7 +25,7 @@ class TweetsController < ApplicationController
   def favorited
     user_required
     @caption = "Most Favorited"
-    @tweets = @user.tweets.reacted.order_by_favorites.list(params, force_page: true)
+    @tweets = cache_tweets(3.minutes, @user.tweets.reacted.order_by_favorites.list(params, force_page: true))
   end
 
   # GET /:screen_name/retweeted
@@ -33,14 +33,14 @@ class TweetsController < ApplicationController
   def retweeted
     user_required
     @caption = "Most Retweeted"
-    @tweets = @user.tweets.reacted.order_by_retweets.list(params, force_page: true)
+    @tweets = cache_tweets(3.minutes, @user.tweets.reacted.order_by_retweets.list(params, force_page: true))
   end
 
   # GET /api/tweets/recent
   def recent
     user_required
     @caption = "Recent Best"
-    @tweets = @user.tweets.recent.reacted.order_by_reactions.list(params, force_page: true)
+    @tweets = cache_tweets(3.minutes, @user.tweets.recent.reacted.order_by_reactions.list(params, force_page: true))
   end
 
   # GET /:screen_name/timeline
@@ -87,13 +87,13 @@ class TweetsController < ApplicationController
   # GET /i/best
   def all_best
     @caption = "Best of all"
-    @tweets = Tweet.reacted.order_by_reactions.list(params, force_page: true)
+    @tweets = cache_tweets(3.hours, Tweet.reacted.order_by_reactions.list(params, force_page: true))
   end
 
   # GET /i/recent
   def all_recent
     @caption = "Recent of all"
-    @tweets = Tweet.recent.reacted.order_by_reactions.list(params, force_page: true)
+    @tweets = cache_tweets(10.minutes, Tweet.recent.reacted.order_by_reactions.list(params, force_page: true))
   end
 
   # GET /i/timeline
@@ -149,4 +149,17 @@ class TweetsController < ApplicationController
       end
     end
   end
+
+  def cache_tweets(expires_in, tweets)
+    key = "tweets/#{params.to_param}"
+    p ids = Rails.cache.read(key)
+    if not ids
+      tweets.load
+      Rails.cache.write(key, tweets.map(&:id), expires_in: expires_in)
+      tweets
+    else
+      n = Tweet.where("id IN (?)", ids).order("CASE #{ids.each_with_index.map {|m, i| "WHEN ID = #{m} THEN #{i}" }.join(" ")} END")
+    end
+  end
 end
+

@@ -30,9 +30,11 @@ module Aclog
         @client.on_reconnect {|timeout, retries|
           log(:warn, "Reconnected", retries) }
         @client.on_max_reconnects {|timeout, retries|
+          @client.connection.stop
           log(:warn, "Reached max reconnects", retries) }
         @client.on_unauthorized {
           log(:warn, "Unauthorized")
+          @client.connection.stop
           @callback.call(type: "unauthorized", user_id: @user_id, id: @account_id) }
 
         @client.each do |chunk|

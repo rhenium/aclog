@@ -109,6 +109,9 @@ module Aclog
         {
           host: "userstream.twitter.com",
           path: "/1.1/user.json",
+          params: {
+            with: "user"
+          },
           oauth: {
             consumer_key: Settings.consumer[msg["consumer_version"]].key,
             consumer_secret: Settings.consumer[msg["consumer_version"]].secret,

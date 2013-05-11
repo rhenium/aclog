@@ -3,7 +3,7 @@ require "time"
 
 module Aclog
   module Receiver
-    class CollectorServer < EM::Connection
+    class CollectorConnection < EM::Connection
       def initialize(connections)
         @connections = connections
 

@@ -13,10 +13,10 @@ class User < ActiveRecord::Base
       user.profile_image_url = hash[:profile_image_url]
       user.protected = hash[:protected]
 
-      if orig.screen_name == user.screen_name &&
-         orig.name == user.name &&
-         orig.profile_image_url.split(//).reverse.take(36) == user.profile_image_url.split(//).reverse.take(36) &&
-         orig.protected = user.protected?
+      if orig["screen_name"] == user.screen_name &&
+         orig["name"] == user.name &&
+         orig["profile_image_url"].split(//).reverse.take(36) == user.profile_image_url.split(//).reverse.take(36) &&
+         orig["protected"] = user.protected?
         user.save!
         logger.debug("User saved: #{user.id}")
       else

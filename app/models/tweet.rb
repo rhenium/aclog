@@ -41,17 +41,20 @@ class Tweet < ActiveRecord::Base
   end
 
   def self.delete_from_id(id)
+    return {} if id.is_a?(Array) && id.size == 0
     begin
       # counter_cache の無駄を省くために delete_all で
       deleted_tweets = Tweet.where("id IN (?)", id).delete_all
-      if deleted_tweets.to_i > 0
-        Favorite.where("tweet_id IN (?)", id).delete_all
-        Retweet.where("tweet_id IN (?)", id).delete_all
-      else
-        Retweet.where("id IN (?)", id).destroy_all # counter_cache
+      if deleted_tweets > 0
+        deleted_favorites = Favorite.where("tweet_id IN (?)", id).delete_all
+        deleted_retweets = Retweet.where("tweet_id IN (?)", id).delete_all
       end
 
-      return id
+      unless id.is_a?(Integer) && deleted_tweets == 1
+        deleted_retweets = Retweet.where("id IN (?)", id).destroy_all.size # counter_cache
+      end
+
+      return {tweets: deleted_tweets, favorites: deleted_favorites, retweets: deleted_retweets}
     rescue
       logger.error("Unknown error while deleting tweet: #{$!}/#{$@}")
     end

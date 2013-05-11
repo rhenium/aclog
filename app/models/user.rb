@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
 
   def self.from_hash(hash)
     begin
-      user = where(id: hash[:id]).first || User.new(id: hash[:id])
+      user = where(id: hash[:id]).first_or_initialize
       orig = user.attributes.dup
 
       user.screen_name = hash[:screen_name]
@@ -13,7 +13,10 @@ class User < ActiveRecord::Base
       user.profile_image_url = hash[:profile_image_url]
       user.protected = hash[:protected]
 
-      if orig != user.attributes
+      if orig.screen_name == user.screen_name &&
+         orig.name == user.name &&
+         orig.profile_image_url.split(//).reverse.take(36) == user.profile_image_url.split(//).reverse.take(36) &&
+         orig.protected = user.protected?
         user.save!
         logger.debug("User saved: #{user.id}")
       else

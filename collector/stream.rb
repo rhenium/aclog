@@ -74,6 +74,8 @@ module Aclog
           elsif hash[:friends]
             # maybe first message
             log(:debug, "Received friends", hash[:friends].size)
+          elsif hash[:scrub_geo]
+            log(:debug, "scrub_geo", hash)
           else
             log(:info, "Unexpected UserStreams data", hash)
           end

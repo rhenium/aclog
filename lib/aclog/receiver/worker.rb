@@ -1,49 +1,28 @@
 # -*- coding: utf-8 -*-
-require "time"
+require "msgpack/rpc/transport/unix"
 
-module EM
-  class Connection
-    def send_object(data)
-      send_data(data.to_msgpack)
-    end
-  end
-end
 module Aclog
   module Receiver
     class Worker < DaemonSpawn::Base
-      class RegisterServer < EM::Connection
-        def initialize
-          @pac = MessagePack::Unpacker.new
+      class RegisterServer
+        def initialize(connections)
+          @connections = connections
         end
 
-        def post_init
-        end
-
-        def receive_data(data)
-          @pac.feed_each(data) do |msg|
-            Rails.logger.debug(msg.to_s)
-            unless msg["type"]
-              Rails.logger.error("Unknown message")
-              send_object({:type => "fatal", :message => "Unknown message"})
-              close_connection_after_writing
-              return
-            end
-
-            case msg["type"]
-            when "register"
-              account = Account.where(:id => msg["id"]).first
-              if account
-                Aclog::Receiver::CollectorServer.send_account(account)
-                Rails.logger.info("Account registered and sent")
-              else
-                Rails.logger.error("Unknown account id")
-                send_object({:type => "error", :message => "Unknown account id"})
-              end
-              close_connection_after_writing
-            else
-              Rails.logger.warn("Unknown register command: #{msg["type"]}")
-            end
+        def register(account_)
+          account = Marshal.load(account_)
+          con_num = account.id % Settings.worker_count
+          con = @connections[con_num]
+          if con
+            con.send_account(account)
+            Rails.logger.info("Sent account: connection_number: #{con_num} / account_id: #{account.id}")
+          else
+            Rails.logger.info("Connection not found: connection_number: #{con_num} / account_id: #{account.id}")
           end
+        end
+
+        def unregister(account)
+          # TODO
         end
       end
 
@@ -55,17 +34,25 @@ module Aclog
       end
 
       def start(args)
-        Rails.logger.info("Database Proxy Started")
+        Rails.logger.info("Receiver started")
         EM.run do
-          o = EM.start_server("0.0.0.0", Settings.listen_port, Aclog::Receiver::CollectorServer)
-          i = EM.start_unix_domain_server(File.join(Rails.root, "tmp", "sockets", "receiver.sock"), RegisterServer)
+          connections = {}
+
+          collector_server = EM.start_server("0.0.0.0", Settings.listen_port, Aclog::Receiver::CollectorServer, connections)
+
+          reg_svr_listener = MessagePack::RPC::UNIXServerTransport.new(File.join(Rails.root, "tmp", "sockets", "receiver.sock"))
+          register_server = MessagePack::RPC::Server.new
+          register_server.listen(reg_svr_listener, RegisterServer.new(connections))
+          EM.defer { register_server.run }
 
           stop = Proc.new do
-            EM.stop_server(o)
-            EM.stop_server(i)
+            EM.stop_server(collector_server)
+            register_server.close
+            File.delete(File.join(Rails.root, "tmp", "sockets", "receiver.sock"))
             EM.stop
           end
           Signal.trap(:INT, &stop)
+          Signal.trap(:TERM, &stop)
         end
       end
 

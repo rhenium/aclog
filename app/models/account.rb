@@ -1,3 +1,5 @@
+require "msgpack/rpc/transport/unix"
+
 class Account < ActiveRecord::Base
   belongs_to :user
 
@@ -11,16 +13,9 @@ class Account < ActiveRecord::Base
   end
 
   def update_connection
-    begin
-      UNIXSocket.open(File.join(Rails.root, "tmp", "sockets", "receiver.sock")) do |socket|
-        socket.write({type: "register",
-                      id: self.id,
-                      user_id: self.user_id}.to_msgpack)
-      end
-    rescue Exception => ex
-      # receiver not started?
-      logger.error("Could't send account info to receiver daemon: #{ex}")
-    end
+    transport = MessagePack::RPC::UNIXTransport.new
+    client = MessagePack::RPC::Client.new(transport, File.join(Rails.root, "tmp", "sockets", "receiver.sock"))
+    client.call(:register, Marshal.dump(self))
   end
 
   def client

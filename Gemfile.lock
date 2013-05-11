@@ -41,6 +41,8 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.6.2)
+    cool.io (1.1.0)
+      iobuffer (>= 1.0.0)
     counter_culture (0.1.11)
       after_commit_action (~> 0.1.3)
     crack (0.3.2)
@@ -71,6 +73,7 @@ GEM
     hashie (2.0.4)
     hike (1.2.2)
     i18n (0.6.4)
+    iobuffer (1.1.2)
     jbuilder (1.4.0)
       activesupport (>= 3.0.0)
       multi_json (>= 1.2.0)
@@ -85,6 +88,9 @@ GEM
     mime-types (1.23)
     minitest (4.7.4)
     msgpack (0.5.4)
+    msgpack-rpc (0.5.0)
+      cool.io (>= 1.0.0)
+      msgpack (>= 0.4.4)
     multi_json (1.7.2)
     multipart-post (1.2.0)
     mysql2 (0.3.12b6)
@@ -193,6 +199,7 @@ DEPENDENCIES
   jbuilder
   jquery-rails
   msgpack
+  msgpack-rpc
   mysql2 (> 0.3.12b)
   omniauth-twitter
   rails (= 4.0.0.rc1)

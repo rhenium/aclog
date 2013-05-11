@@ -13,6 +13,7 @@ gem 'unicorn'
 gem 'thin'
 gem 'daemon-spawn', :require => 'daemon_spawn'
 gem 'msgpack'
+gem 'msgpack-rpc'
 gem 'em-work_queue'
 
 gem 'twitter'

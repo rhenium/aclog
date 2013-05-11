@@ -36,6 +36,10 @@ module Aclog
           log(:warn, "Unauthorized")
           @client.connection.stop
           @callback.call(type: "unauthorized", user_id: @user_id, id: @account_id) }
+        @client.on_service_unavailable {
+          # account deleted?
+          log(:warn, "Service Unavailable")
+          @client.connection.stop }
 
         @client.each do |chunk|
           begin

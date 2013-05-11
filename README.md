@@ -30,12 +30,12 @@ A web service like Favstar.
 ### MySQL
 * Add to `my.cnf`
 
-```ini
-[mysqld]
-innodb_file_format = Barracuda
-innodb_file_per_table = 1
-innodb_large_prefix
-```
+    ```ini
+    [mysqld]
+    innodb_file_format = Barracuda
+    innodb_file_per_table = 1
+    innodb_large_prefix
+    ```
 
 * Create MySQL user
 

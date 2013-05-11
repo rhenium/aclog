@@ -17,10 +17,10 @@ class User < ActiveRecord::Base
          orig["name"] == user.name &&
          orig["profile_image_url"].split(//).reverse.take(36) == user.profile_image_url.split(//).reverse.take(36) &&
          orig["protected"] = user.protected?
+        logger.debug("User not changed: #{user.id}")
+      else
         user.save!
         logger.debug("User saved: #{user.id}")
-      else
-        logger.debug("User not changed: #{user.id}")
       end
 
       return user

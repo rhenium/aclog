@@ -36,10 +36,6 @@ describe User do
     end
   end
 
-  describe ".delete_cache" do
-    # TODO
-  end
-
   describe "#protected?" do
     context "when not protected" do
       let(:user) { FactoryGirl.create(:user, protected: false) }
@@ -80,31 +76,17 @@ describe User do
   describe "#stats" do
     let!(:account) { FactoryGirl.create(:account_1) }
     let(:user) { FactoryGirl.create(:user_1) }
-    let(:stats_api) { {favorites_count: 10,
-                       listed_count: 12,
-                       followers_count: 14,
-                       tweets_count: 16,
-                       friends_count: 18,
-                       bio: "abc"} }
     before do
       user_2, user_3 = FactoryGirl.create_list(:user, 2)
       tweet_1, tweet_2 = FactoryGirl.create_list(:tweet, 2, user: user)
       FactoryGirl.create(:favorite, tweet: tweet_1, user: user_2)
       FactoryGirl.create(:favorite, tweet: tweet_1, user: user_3)
       FactoryGirl.create(:retweet,  tweet: tweet_2, user: user_2)
-
-      stub_request(:get, "https://api.twitter.com/1.1/account/verify_credentials.json")
-        .to_return(status: 200, body: {id: user.id,
-                                       favourites_count: 10,
-                                       listed_count: 12,
-                                       followers_count: 14,
-                                       statuses_count: 16,
-                                       friends_count: 18,
-                                       description: "abc"}.to_json)
     end
 
-    subject { OpenStruct.new(user.stats(true)) }
-    its(:stats_api) { should eq stats_api }
+    subject { user.stats }
+    its(:updated_at) { should_not be nil }
+    its(:since_join) { should be_a Integer }
     its(:favorites_count) { should be 0 }
     its(:retweets_count) { should be 0 }
     its(:tweets_count) { should be 2 }

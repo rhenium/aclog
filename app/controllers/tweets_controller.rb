@@ -142,10 +142,10 @@ class TweetsController < ApplicationController
     end
 
     if request.format == :json
-      @user_limit = nil
-      # old api
       if params[:limit]
         @user_limit = params[:limit].to_i
+      else
+        @user_limit = nil
       end
     end
   end

@@ -1,6 +1,5 @@
 module ApplicationHelper
   def logged_in?; session[:user_id] && session[:account] end
-  def include_user?; !!params[:include_user] end
 
   def format_time(dt)
     dt.to_time.localtime("+09:00").strftime("%Y-%m-%d %H:%M:%S")

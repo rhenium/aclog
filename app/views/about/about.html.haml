@@ -1,10 +1,12 @@
 %p
-  私のアカウントが不当に Favstar から BAN されたので仕方なく代わりを作りました。
+  = link_to "Favstar", "http://favstar.fm/"
+  というサービスがあります。このサービスはとても便利なのですが、「ShootingStar というクライアントを使った」という理由で私のアカウントが BAN されてしまいました。
+  そのため代わりになるように作ったサービスです。
 %p
   = link_to "@KOBA789", "https://twitter.com/KOBA789"
-  さんにサーバーを借りています。
+  さんにサーバーを借りています。ありがとうございます...！
 %p
-  そーすはこっち
+  The MIT License
   = link_to "GitHub", "https://github.com/rhenium/aclog"
 %p
   使用しているもの
@@ -12,36 +14,6 @@
     %li
       読み込み中アニメーションGIF
       %span= link_to "http://www.ajaxload.info/", "http://www.ajaxload.info/"
-%h3 各ページのURLについてメモ
-%dl
-  %dt best
-  %dd= link_to "/cn", "/cn"
-  %dt timeline(Favstar の Recent に相当)
-  %dd= link_to "/cn/timeline", "/cn/timeline"
-%dl
-  %dt 全体のbest
-  %dd= link_to "/i/best", "/i/best"
-  %dt 全体の最新3日のbest
-  %dd= link_to "/i/recent", "/i/recent"
-  %dt 全体の最新反応あり
-  %dd= link_to "/i/timeline", "/i/timeline"
 %p
-  Favstar のパスにアクセスされた場合リダイレクトするようになっているはず…
-/%h3 検索クエリ
-/%p 半角スペース区切りで、すべて AND 検索になります。OR 検索付けたいけどまだ使えません。
-/%p order 以外は先頭に - を付けることで否定になります。
-/%dl
-/  %dt ユーザーの
-/  %dd user:cn
-/  %dt 反応数 〜〜以上
-/  %dd reaction:30
-/  %dd favorite:30
-/  %dd retweet:30
-/  %dt 並び替え
-/  %dd order:old
-/  %dd order:reaction
-/  %dd order:favorite
-/  %dd order:retweet
-/  %dt 期間
-/  %dd 20130328..20130330
-/  %dt ツイート本文・クライアント名での検索はできません。クライアント名での検索は付けたいけれど…%p
+  Favstar のパスにアクセスされた場合リダイレクトするようになっているはずです
+

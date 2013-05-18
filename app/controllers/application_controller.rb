@@ -11,12 +11,12 @@ class ApplicationController < ActionController::Base
     if id
       User.find(id) rescue raise Aclog::Exceptions::UserNotFound
     elsif screen_name
-      User.find_by(screen_name: screen_name) || (raise Aclog::Exceptions::UserNotFound)
+      User.find_by(screen_name: screen_name) or raise Aclog::Exceptions::UserNotFound
     end
   end
 
   def authorized_to_show?(user)
-    return true if not user.protected?
+    return true unless user.protected?
 
     if session[:user_id]
       return session[:user_id] == user.id || session[:account].following?(user.id)
@@ -36,8 +36,12 @@ class ApplicationController < ActionController::Base
 
   private
   def check_format
-    unless [:json, :html].include?(request.format.to_sym)
-      raise ActionController::RoutingError, "Not supported format: #{request.format}"
+    unless request.format == :html || request.format == :json
+      if params[:format] == nil
+        request.format = :html
+      else
+        raise ActionController::RoutingError, "Not supported format: #{request.format}"
+      end
     end
   end
 

@@ -75,7 +75,7 @@ class SearchController < ApplicationController
       end
     end
 
-    @tweets = result
+    @tweets = result.list(params, force_page: true)
     render "tweets/_tweets"
   end
 

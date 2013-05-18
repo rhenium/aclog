@@ -8,9 +8,9 @@ class ReportController < ApplicationController
   def tweet
     original_id, tweet_id = [get_tweet_id(params[:tweet_id_0]), get_tweet_id(params[:tweet_id_1])].sort
 
-    unless original_id && tweet_id
+    raise ActionController::BadRequest unless original_id && tweet_id
       # 何かがおかしいよ
-      raise ActionController::BadRequest
+
     end
 
     tweet = Tweet.find(tweet_id)

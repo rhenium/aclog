@@ -14,8 +14,12 @@
       .user
         %span.nam= link_to tweet.user.name, user_best_path(tweet.user.screen_name)
         %span.screen_name= link_to tweet.user.screen_name, user_best_path(tweet.user.screen_name)
-      .text{class: tweet.stolen_tweet ? "copied" : nil}
-        = simple_format(format_tweet_text(tweet.text))
+      .text{class: tweet.stolen_tweet ? "quiet" : nil}
+        - if authorized_to_show?(tweet.user)
+          = simple_format(format_tweet_text(tweet.text))
+        - else
+          %span.quiet
+            ユーザーは非公開です
       .meta.clearfix
         %span.twitter_bird
           = link_to image_tag("bird_gray_16.png", alt: "Twitter"), twitter_status_url(tweet), target: "_blank"

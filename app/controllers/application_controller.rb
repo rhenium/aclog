@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :check_format, :check_session
   after_filter :xhtml
+  helper_method :authorized_to_show?
 
   protected
   def _get_user(id, screen_name)

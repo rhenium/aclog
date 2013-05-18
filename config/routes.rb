@@ -1,5 +1,5 @@
 Aclog::Application.routes.draw do
-  root to: "main#index"
+  root to: "about#index"
 
   scope format: false do
     get "/search" => "search#search", as: "search"

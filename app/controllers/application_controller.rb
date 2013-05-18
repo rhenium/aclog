@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   include Aclog::TwitterOauthEchoAuthentication::ControllerMethods
 
   protect_from_forgery
-  before_filter :set_format, :check_session
+  before_filter :check_format, :check_session
   after_filter :xhtml
 
   protected
@@ -35,9 +35,9 @@ class ApplicationController < ActionController::Base
   end
 
   private
-  def set_format
+  def check_format
     unless [:json, :html].include?(request.format.to_sym)
-      request.format = :html
+      raise ActionController::RoutingError, "Not supported format: #{request.format}"
     end
   end
 

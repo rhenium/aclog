@@ -1,5 +1,7 @@
 class ErrorsController < ApplicationController
   layout "index"
+  skip_before_filter :check_format
+  before_filter :force_format
 
   def render_error
     @exception = env["action_dispatch.exception"]
@@ -26,6 +28,13 @@ class ErrorsController < ApplicationController
       render "error", status: 404
     else
       render "error", status: 500
+    end
+  end
+
+  private
+  def force_format
+    unless [:json, :html].include?(request.format.to_sym)
+      request.format = "html"
     end
   end
 end

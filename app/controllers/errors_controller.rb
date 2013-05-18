@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 class ErrorsController < ApplicationController
   layout "index"
   skip_before_filter :check_format
@@ -13,20 +14,28 @@ class ErrorsController < ApplicationController
       # /i/callback
       redirect_to root_path
     when Aclog::Exceptions::TweetNotFound
+      @message = "ツイートが見つかりませんでした。"
       render "error", status: 404
     when Aclog::Exceptions::UserNotFound
+      @message = "ユーザーが見つかりませんでした。"
       render "error", status: 404
     when Aclog::Exceptions::UserNotRegistered
+      @message = "ユーザーは aclog に登録していません。"
       render "error", status: 404
     when Aclog::Exceptions::UserProtected
+      @message = "ユーザーは非公開です。"
       render "error", status: 403
     when Aclog::Exceptions::LoginRequired
+      @message = "このページの表示にはログインが必要です。"
       render "error", status: 403
     when Aclog::Exceptions::OAuthEchoUnauthorized
+      @message = "OAuth Echo 認証に失敗しました。"
       render "error", status: 401
     when ActionController::RoutingError
+      @message = "このページは存在しません。"
       render "error", status: 404
     else
+      @message = "Internal Error: #{@exception.class}"
       render "error", status: 500
     end
   end

@@ -1,4 +1,4 @@
-class MainController < ApplicationController
+class AboutController < ApplicationController
   def index
     @title = "aclog"
     render layout: "index"

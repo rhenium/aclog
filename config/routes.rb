@@ -4,7 +4,6 @@ Aclog::Application.routes.draw do
     screen_name_b: /[a-zA-Z0-9_]{1,20}/,
   }
 
-  # MainController
   root to: "main#index"
 
   scope format: false, constraints: constraints do
@@ -19,7 +18,7 @@ Aclog::Application.routes.draw do
     get "/i/report" => "report#index",          as: "report"
     post "/i/report/tweet" => "report#tweet"
 
-    scope "about", controller: "main" do
+    scope "about", controller: "about" do
       get "/",              action: "about",    as: "about"
       get "/api",           action: "api",      as: "about_api"
     end

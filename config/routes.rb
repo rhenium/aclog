@@ -1,12 +1,7 @@
 Aclog::Application.routes.draw do
-  constraints = {
-    screen_name: /[a-zA-Z0-9_]{1,20}/,
-    screen_name_b: /[a-zA-Z0-9_]{1,20}/,
-  }
-
   root to: "main#index"
 
-  scope format: false, constraints: constraints do
+  scope format: false do
     get "/search" => "search#search", as: "search"
 
     # Internals / SessionsController
@@ -33,7 +28,8 @@ Aclog::Application.routes.draw do
 
     # JSON API
     scope "api", format: "json" do
-      get "/:controller/:action"
+      get "/users/:action", controller: "users"
+      get "/tweets/:action", controller: "tweets"
     end
 
     # Favstar redirects

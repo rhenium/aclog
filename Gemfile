@@ -7,15 +7,16 @@ gem 'dalli'
 
 gem 'counter_culture'
 gem 'rails_config'
-gem 'yajl-ruby', :require => "yajl"
+gem 'yajl-ruby', require: "yajl"
 
 gem 'unicorn'
 gem 'thin'
-gem 'daemon-spawn', :require => 'daemon_spawn'
+gem 'daemon-spawn', require: 'daemon_spawn'
 gem 'msgpack'
 gem 'msgpack-rpc'
 gem 'em-work_queue'
 
+gem 'typhoeus', require: "typhoeus/adapters/faraday"
 gem 'twitter'
 gem 'omniauth-twitter'
 

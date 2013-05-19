@@ -8,7 +8,8 @@ class TweetsController < ApplicationController
     tweet_required
 
     @caption = "#{@user.screen_name}'s Tweet"
-    text = ApplicationController.helpers.format_tweet_text(@tweet.text)
+    h = ApplicationController.helpers
+    text = h.strip_tags(h.format_tweet_text(@tweet.text))
     @title = "\"#{text}\" from #{@user.screen_name}"
   end
 

@@ -61,9 +61,9 @@ module Aclog
             # event
             case hash[:event]
             when "favorite"
-              send_favorite(hash[:source], hash[:target_object])
+              send_favorite(hash[:source], hash[:target], hash[:target_object])
             when "unfavorite"
-              send_unfavorite(hash[:source], hash[:target_object])
+              send_unfavorite(hash[:source], hash[:target], hash[:target_object])
             end
           elsif hash[:user]
             # tweet
@@ -150,7 +150,7 @@ module Aclog
         log(:debug, "Sent tweet", status[:id])
       end
 
-      def send_favorite(source, target_object)
+      def send_favorite(source, target, target_object)
         send_tweet(target_object)
         send_user(source)
         @callback.call(
@@ -162,7 +162,7 @@ module Aclog
         log(:debug, "Sent favorite", source[:id] => target_object[:id])
       end
 
-      def send_unfavorite(source, target_object)
+      def send_unfavorite(source, target, target_object)
         @callback.call(
           type: "unfavorite",
           tweet_id: target_object[:id],

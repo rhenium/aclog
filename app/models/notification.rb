@@ -6,8 +6,10 @@ class Notification
   end
 
   def self.reply_favs(tweet, count)
-    url = Rails.application.routes.url_helpers.tweet_url(host: Settings.base_url, id: tweet.id)
-    tweet("@#{tweet.user.screen_name} #{count}favs! #{url}", tweet.id)
+    Thread.new do
+      url = Rails.application.routes.url_helpers.tweet_url(host: Settings.base_url, id: tweet.id)
+      tweet("@#{tweet.user.screen_name} #{count}favs! #{url}", tweet.id)
+    end
   end
 
   private

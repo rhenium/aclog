@@ -156,6 +156,7 @@ module Aclog
         @callback.call(
           type: "favorite",
           tweet_id: target_object[:id],
+          target_user_id: target[:id],
           user_id: source[:id]
         )
         log(:debug, "Sent favorite", source[:id] => target_object[:id])
@@ -163,8 +164,9 @@ module Aclog
 
       def send_unfavorite(source, target_object)
         @callback.call(
-          type: "delete",
+          type: "unfavorite",
           tweet_id: target_object[:id],
+          target_user_id: target[:id],
           user_id: source[:id]
         )
         log(:debug, "Sent unfavorite", source[:id] => target_object[:id])
@@ -177,6 +179,7 @@ module Aclog
           type: "retweet",
           id: status[:id],
           tweet_id: status[:retweeted_status][:id],
+          target_user_id: status[:retweeted_status][:user][:id],
           user_id: status[:user][:id]
         )
         log(:debug, "Sent retweet", status[:user][:id] => status[:retweeted_status][:id])

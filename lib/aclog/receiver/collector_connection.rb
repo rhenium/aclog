@@ -67,6 +67,8 @@ module Aclog
             receive_tweet(msg)
           when "favorite"
             receive_favorite(msg)
+          when "unfavorite"
+            receive_unfavorite(msg)
           when "retweet"
             receive_retweet(msg)
           when "delete"
@@ -166,6 +168,14 @@ module Aclog
         end
       end
 
+      def receive_unfavorite(msg)
+        @@queue.push -> do
+          Rails.logger.debug("Receive Unfavorite(#{@worker_number}): #{msg["user_id"]} => #{msg["tweet_id"]}")
+          Favorite.delete_from_hash(:tweet_id => msg["tweet_id"],
+                                    :user_id => msg["user_id"])
+        end
+      end
+
       def receive_retweet(msg)
         @@queue.push -> do
           Rails.logger.debug("Receive Retweet(#{@worker_number}): #{msg["user_id"]} => #{msg["tweet_id"]}")
@@ -176,15 +186,13 @@ module Aclog
       end
 
       def receive_delete(msg)
-        @@queue.push -> do
-          if msg["id"]
+        if msg["id"]
+          @@queue.push -> do
             Rails.logger.debug("Receive Delete(#{@worker_number}): #{msg["id"]}")
             Tweet.delete_from_id(msg["id"])
-          elsif msg["tweet_id"]
-            Rails.logger.debug("Receive Unfavorite(#{@worker_number}): #{msg["user_id"]} => #{msg["tweet_id"]}")
-            Favorite.delete_from_hash(:tweet_id => msg["tweet_id"],
-                                      :user_id => msg["user_id"])
           end
+        elsif msg["tweet_id"]
+          receive_unfavorite(msg)
         end
       end
 

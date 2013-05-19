@@ -48,11 +48,11 @@ module ApplicationHelper
   end
 
   def caption
-    "#{@caption}"
+    CGI.unescapeHTML "#{@caption}"
   end
 
   def title
-    "#{@title || @caption} - aclog"
+    CGI.unescapeHTML "#{@title || @caption} - aclog"
   end
 
   # utf8, form

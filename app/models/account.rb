@@ -16,6 +16,8 @@ class Account < ActiveRecord::Base
     transport = MessagePack::RPC::UNIXTransport.new
     client = MessagePack::RPC::Client.new(transport, File.join(Rails.root, "tmp", "sockets", "receiver.sock"))
     client.call(:register, Marshal.dump(self))
+  rescue Errno::ECONNREFUSED
+    Rails.logger.error($!)
   end
 
   def client

@@ -16,7 +16,6 @@ gem 'msgpack'
 gem 'msgpack-rpc'
 gem 'em-work_queue'
 
-gem 'typhoeus', require: "typhoeus/adapters/faraday"
 gem 'twitter'
 gem 'omniauth-twitter'
 

@@ -1,8 +1,7 @@
 class Notification
   def self.notify_favorite(tweet)
-    tweet.reload
-    if [50, 100, 250, 500, 1000].include?(tweet.favorites_count)
-      reply_favs(tweet, tweet.favorites_count) if tweet.user.registered?
+    if [50, 100, 250, 500, 1000].include?(tweet.favorites.count)
+      reply_favs(tweet, tweet.favorites.count) if tweet.user.registered?
     end
   end
 

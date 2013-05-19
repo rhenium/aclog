@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
 
   private
   def check_format
-    unless request.format == :html || request.format == :json
+    unless request.format == :html || request.format == :json || request.format == :rss
       if params[:format] == nil
         request.format = :html
       else

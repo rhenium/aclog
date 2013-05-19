@@ -8,6 +8,12 @@ class SessionsController < ApplicationController
                                        consumer_version: Settings.collector.consumer_version)
     account.update_connection
 
+    User.from_hash(id: account.user_id,
+                   screen_name: auth["extra"]["raw_info"]["screen_name"],
+                   name: auth["extra"]["raw_info"]["name"],
+                   profile_image_url: auth["extra"]["raw_info"]["profile_image_url_https"],
+                   protected: auth["extra"]["raw_info"]["protected"])
+
     session[:account] = account
     session[:user_id] = account.user_id
 

@@ -33,13 +33,6 @@ class Tweet < ActiveRecord::Base
     joins("INNER JOIN (#{un}) m ON m.tweet_id = tweets.id")
   }
 
-  # will be moved
-  def notify_favorite
-    if [50, 100, 250, 500, 1000].include? favorites.count
-      Aclog::Notification.reply_favs(self, favorites.count)
-    end
-  end
-
   def self.delete_from_id(id)
     return {} if id.is_a?(Array) && id.size == 0
     begin

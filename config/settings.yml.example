@@ -12,7 +12,7 @@ notification:
     secret:         "consumer secret"
   token:
     - token:        "access token of notification account"
-    - secret:       "access token secret"
+      secret:       "access token secret"
 
 listen_port:        42106
 secret_key:         "secret key to authorize workers"

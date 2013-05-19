@@ -161,7 +161,7 @@ module Aclog
           f = Favorite.from_hash(:tweet_id => msg["tweet_id"],
                                  :user_id => msg["user_id"])
           if t = Tweet.find_by(id: msg["tweet_id"])
-            t.notify_favorite
+            Notification.notify_favorite(t)
           end
         end
       end

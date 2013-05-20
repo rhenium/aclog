@@ -1,13 +1,22 @@
 %h1 aclog
 %p
-  UserStreams で登録ユーザーのふぁぼり・ふぁぼられ・RTを集めて表示するサービスです。
+  aclog は Twitter でのふぁぼ・RTを集めて表示するサービスです
 %p
-  API も提供する予定です。about → api を見てください（まだ開発中であり、変更がある可能性もあります）
+  鍵垢の場合は自分またはフォロワーのみがツイートが見れるようになっています。
+%p
+  JSON の API も提供しています。API については
+  = link_to "こちら", about_api_path
+  を参照してください。
+%p
+  RSS にも対応しています。例:
+  %ul
+    %li= link_to "/cn/timeline.rss", "/cn/timeline.rss"
+    %li= link_to "/cn/discoveries.rss", "/cn/discoveries.rss"
 %h4
-  今後の予定(2013/05/04)
+  今後の予定(2013/05/20)
 %ul
   %li 通知を細かく設定できるように
-  %li ふぁぼったー・Favstar からのデータの取り込み
+  %li ふぁぼったー・Favstar などからのデータの取り込み
 %p
   = link_to "ツイート", "https://twitter.com/share", class: "twitter-share-button", data: {text: "ふぁぼられ収集サービス aclog", count: "none", url: "http://aclog.koba789.com"}
 %hr

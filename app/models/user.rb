@@ -69,14 +69,10 @@ class User < ActiveRecord::Base
       ret.retweeted_count = retweeted_counts.sum
       ret.average_favorited_count = favorited_counts.inject(:+).to_f / ret.tweets_count
       ret.average_retweeted_count = retweeted_counts.inject(:+).to_f / ret.tweets_count
-      ret.retweeted_count_str = ret.retweeted_count.to_s
 
-      if ret.favorited_count > (i = (ret.since_join + 1) * 3000) &&
-         ret.favorited_count > ret.retweeted_count * 10
-        ret.favorited_count_str = "#{i}+"
-      else
-        ret.favorited_count_str = ret.favorited_count.to_s
-      end
+      _conv = -> i { g = 10 ** (Math.log10(i).to_i - 2); "#{i / g * g}+" }
+      ret.retweeted_count_str = _conv.call(ret.retweeted_count)
+      ret.favorited_count_str = _conv.call(ret.favorited_count)
 
       ret
     end

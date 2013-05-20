@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class ReportController < ApplicationController
+class IssuesController < ApplicationController
   layout "index"
   def index
     # いんでっくす

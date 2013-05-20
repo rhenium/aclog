@@ -29,6 +29,7 @@ module Aclog
     config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
 
     config.generators do |g|
+      g.test_framework :rspec
       g.fixture_replacement :factory_girl
     end
   end

@@ -6,7 +6,7 @@ class ErrorsController < ApplicationController
 
   def render_error
     @exception = env["action_dispatch.exception"]
-    @status = ActionDispatch::ExceptionWrapper.new(env, @exception).status_code
+    #@status = ActionDispatch::ExceptionWrapper.new(env, @exception).status_code
     @title = "?"
 
     case @exception
@@ -14,36 +14,42 @@ class ErrorsController < ApplicationController
       # /i/callback
       redirect_to root_path
     when Aclog::Exceptions::TweetNotFound
+      @status = 404
       @message = "ツイートが見つかりませんでした。"
-      render "error", status: 404
     when Aclog::Exceptions::UserNotFound
+      @status = 404
       @message = "ユーザーが見つかりませんでした。"
-      render "error", status: 404
     when Aclog::Exceptions::UserNotRegistered
+      @status = 404
       @message = "ユーザーは aclog に登録していません。"
-      render "error", status: 404
     when Aclog::Exceptions::UserProtected
+      @status = 403
       @message = "ユーザーは非公開です。"
-      render "error", status: 403
     when Aclog::Exceptions::LoginRequired
+      @status = 403
       @message = "このページの表示にはログインが必要です。"
-      render "error", status: 403
     when Aclog::Exceptions::OAuthEchoUnauthorized
+      @status = 401
       @message = "OAuth Echo 認証に失敗しました。"
-      render "error", status: 401
     when ActionController::RoutingError
+      @status = 404
       @message = "このページは存在しません。"
-      render "error", status: 404
     else
+      @status = 500
       @message = "Internal Error: #{@exception.class}"
-      render "error", status: 500
     end
+
+    render status: @status
   end
 
   private
   def force_format
-    unless [:json, :html].include?(request.format.to_sym)
-      request.format = "html"
+    if request.format == :html
+      request.format = env["REQUEST_PATH"].scan(/\.([A-Za-z]+)$/).flatten.first || :html
+    end
+
+    unless request.format == :html || request.format == :json
+      request.format = :html
     end
   end
 end

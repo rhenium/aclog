@@ -18,7 +18,6 @@ Aclog::Application.routes.draw do
 
     # ReportController
     get "/i/report" => "report#index",          as: "report"
-    post "/i/report/tweet" => "report#tweet"
 
     get "/i/:id" =>         "tweets#show",      as: "tweet", constraints: {id: /\d+/}
 

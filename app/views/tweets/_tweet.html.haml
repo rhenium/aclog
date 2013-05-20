@@ -14,7 +14,7 @@
       .user
         %span.nam= link_to tweet.user.name, user_best_path(tweet.user.screen_name)
         %span.screen_name= link_to tweet.user.screen_name, user_best_path(tweet.user.screen_name)
-      .text{class: tweet.stolen_tweet ? "quiet" : nil}
+      .text
         - if authorized_to_show?(tweet.user)
           = simple_format(format_tweet_text(tweet.text))
         - else
@@ -28,9 +28,6 @@
         - if params[:action] == "show" && user_truncated?(tweet)
           %span.full
             = link_to "full", params.merge(full: true)
-        - if tweet.stolen_tweet
-          %span.copied
-            = link_to "original", tweet_path(tweet.original.id)
         %span.source
           = raw format_source_text(tweet.source)
   .stats

@@ -53,14 +53,6 @@ ActiveRecord::Schema.define(version: 20130511060935) do
   add_index "retweets", ["tweet_id"], name: "index_retweets_on_tweet_id", using: :btree
   add_index "retweets", ["user_id"], name: "index_retweets_on_user_id", using: :btree
 
-  create_table "stolen_tweets", force: true do |t|
-    t.integer "tweet_id",    limit: 8
-    t.integer "original_id", limit: 8
-  end
-
-  add_index "stolen_tweets", ["original_id"], name: "index_stolen_tweets_on_original_id", using: :btree
-  add_index "stolen_tweets", ["tweet_id"], name: "index_stolen_tweets_on_tweet_id", unique: true, using: :btree
-
   create_table "tweets", force: true do |t|
     t.text     "text",            limit: 16777215,             null: false
     t.text     "source",          limit: 16777215

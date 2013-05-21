@@ -19,7 +19,7 @@ module Aclog
         EM.run do
           connections = {}
 
-          collector_server = EM.start_server("0.0.0.0", Settings.listen_port, CollectorConnection, connections)
+          collector_server = EM.start_server("0.0.0.0", Settings.collector.server_port, CollectorConnection, connections)
 
           reg_svr_listener = MessagePack::RPC::UNIXServerTransport.new(_sock_path)
           register_server = MessagePack::RPC::Server.new

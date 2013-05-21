@@ -8,14 +8,14 @@ class UsersController < ApplicationController
 
   def discovered_by
     user_required
-    @result = @user.count_discovered_by.take(50)
+    @result = @user.count_discovered_by.take(Settings.user_ranking.count)
     @caption = "Discovered By"
     render "_user_ranking"
   end
 
   def discovered_users
     user_required
-    @result = @user.count_discovered_users.take(50)
+    @result = @user.count_discovered_users.take(Settings.user_ranking.count)
     @caption = "Discovered Users"
     render "_user_ranking"
   end

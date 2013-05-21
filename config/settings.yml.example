@@ -1,22 +1,46 @@
-collector:
-  consumer:
-    - key:          "consumer key of collector (register)"
-      secret:       "consumer secret"
-    - key:          "if change consumer key"
-      secret:       
-  consumer_version: 0 # which consumer (0..)
+default: &default
+  base_url:           "http://example.com/" # base url
+  
+  collector:
+    server_port:      42106
+    secret_key:       "secret key to authorize workers"
+    count:            1 # workers count
+    consumer_version: 0 # which consumer (0..)
+    consumer:
+      - key:          "consumer key of collector (register)"
+        secret:       "consumer secret"
+      - key:          "if change consumer key"
+        secret:       
+  
+  notification:
+    enabled:          false
+    consumer:
+      key:            "consumer key of notification account"
+      secret:         "consumer secret"
+    token:
+      - token:        "access token of notification account"
+        secret:       "access token secret"
+    favorites:
+      - 50
+      - 100
+      - 250
+  
+  tweets:
+    count_default:    10
+    count_max:        100
+    users:
+      count_default:  20
+      count_lot:      100
+  
+  user_ranking:
+    count:            50
 
-notification:
-  enabled:          false
-  consumer:
-    key:            "consumer key of notification account"
-    secret:         "consumer secret"
-  token:
-    - token:        "access token of notification account"
-      secret:       "access token secret"
+development:
+  <<: *default
 
-listen_port:        42106
-secret_key:         "secret key to authorize workers"
-worker_count:       1 # workers count
-base_url:           "http://example.com/" # base url
+test:
+  <<: *default
+
+production:
+  <<: *default
 

@@ -136,10 +136,10 @@ class TweetsController < ApplicationController
       if params[:full] == "true"
         @user_limit = nil
       else
-        @user_limit = 100
+        @user_limit = Settings.tweets.users.count_lot
       end
     else
-      @user_limit = 20
+      @user_limit = Settings.tweets.users.count_default
     end
 
     if request.format == :json
@@ -155,7 +155,6 @@ class TweetsController < ApplicationController
     key = "tweets/#{params.to_param}"
     p ids = Rails.cache.read(key)
     if not ids
-      tweets.load
       Rails.cache.write(key, tweets.map(&:id), expires_in: expires_in)
       tweets
     else

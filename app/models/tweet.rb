@@ -73,7 +73,7 @@ class Tweet < ActiveRecord::Base
     params[:page] ||= "1" if options[:force_page]
 
     count = params[:count].to_i
-    count = 10 unless (1..100) === count
+    count = Settings.tweets.count_default unless (1..Settings.tweets.count_max) === count
 
     ret = limit(count)
 

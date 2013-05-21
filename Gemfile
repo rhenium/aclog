@@ -6,7 +6,7 @@ gem 'mysql2', "> 0.3.12b"
 gem 'dalli'
 
 gem 'counter_culture'
-gem 'rails_config'
+gem 'settingslogic'
 gem 'yajl-ruby', require: "yajl"
 
 gem 'unicorn'

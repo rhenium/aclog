@@ -37,7 +37,7 @@ module Aclog
 
       def unbind
         Rails.logger.info("Connection closed(#{@worker_number})")
-        @connections.delete_if{|k, v| v == self}
+        @connections.delete_if {|k, v| v == self }
       end
 
       def receive_data(data)
@@ -94,13 +94,13 @@ module Aclog
       def receive_init(msg)
         secret_key = msg["secret_key"]
         worker_number = msg["worker_number"]
-        unless secret_key == Settings.secret_key
+        unless secret_key == Settings.collector.secret_key
           Rails.logger.warn("Invalid secret_key(?:#{worker_number}): \"#{secret_key}\"")
           send_object(type: "fatal", message: "Invalid secret_key")
           close_connection_after_writing
           return
         end
-        if worker_number > Settings.worker_count
+        if worker_number > Settings.collector.count
           Rails.logger.warn("Invalid worker_number: #{worker_number}, secret_key: \"#{secret_key}\"")
           send_object(type: "fatal", message: "Invalid worker_number")
           close_connection_after_writing
@@ -116,7 +116,7 @@ module Aclog
         Rails.logger.info("Connected(#{@worker_number})")
         send_object(type: "ok", message: "Connected")
 
-        Account.where("id % ? = ?", Settings.worker_count, @worker_number).each do |account|
+        Account.where("id % ? = ?", Settings.collector.count, @worker_number).each do |account|
           send_account(account)
         end
       end

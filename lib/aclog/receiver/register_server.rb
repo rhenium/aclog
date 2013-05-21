@@ -8,7 +8,7 @@ module Aclog
 
       def register(account_)
         account = Marshal.load(account_)
-        con_num = account.id % Settings.worker_count
+        con_num = account.id % Settings.collector.count
         con = @connections[con_num]
         if con
           con.send_account(account)

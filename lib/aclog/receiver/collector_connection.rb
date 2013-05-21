@@ -162,7 +162,7 @@ module Aclog
           Rails.logger.debug("Receive Favorite(#{@worker_number}): #{msg["user_id"]} => #{msg["tweet_id"]}")
           f = Favorite.from_hash(:tweet_id => msg["tweet_id"],
                                  :user_id => msg["user_id"])
-          if t = Tweet.find_by(id: msg["tweet_id"])
+          if Settings.notification.enabled && t = Tweet.find_by(id: msg["tweet_id"])
             Notification.notify_favorite(t)
           end
         end
@@ -194,13 +194,6 @@ module Aclog
         elsif msg["tweet_id"]
           receive_unfavorite(msg)
         end
-      end
-
-      def receive_spam(msg)
-        Rails.logger.info("Receive Spam(#{@worker_number}): #{msg["id"]}")
-        # @@queue.push -> do
-        #   # TODO
-        # end
       end
     end
   end

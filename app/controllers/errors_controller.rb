@@ -45,7 +45,7 @@ class ErrorsController < ApplicationController
   private
   def force_format
     if request.format == :html
-      request.format = env["REQUEST_PATH"].scan(/\.([A-Za-z]+)$/).flatten.first || :html
+      request.format = (env["REQUEST_PATH"].scan(/\.([A-Za-z]+)$/).flatten.first || :html).to_sym
     end
 
     unless request.format == :html || request.format == :json

@@ -40,6 +40,11 @@ development:
 
 test:
   <<: *default
+  collector:
+    consumer_version: 0
+    consumer:
+      - key:          "JVkX2Uy0Qtigsh0GiG5Lw"
+        secret:       "vfkPvOkzKUGuZ4xKtFAVvlAKoL3u2grxchuQEBvE"
 
 production:
   <<: *default

@@ -16,6 +16,7 @@
               = link_to "about", about_path
             - if logged_in?
               %li= link_to "logout", logout_path
+              %li= link_to "settings", settings_path
               %li= link_to session[:account].user.screen_name, user_best_path(session[:account].user.screen_name)
             - else
               %li= link_to "login", "/i/login"

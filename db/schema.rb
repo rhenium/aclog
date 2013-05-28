@@ -11,15 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130511060935) do
+ActiveRecord::Schema.define(version: 20130525142430) do
 
   create_table "accounts", force: true do |t|
-    t.integer  "user_id",            limit: 8, null: false
-    t.string   "oauth_token",                  null: false
-    t.string   "oauth_token_secret",           null: false
+    t.integer  "user_id",            limit: 8,                 null: false
+    t.string   "oauth_token",                                  null: false
+    t.string   "oauth_token_secret",                           null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "consumer_version",             null: false
+    t.integer  "consumer_version",                             null: false
+    t.boolean  "notification",                 default: false, null: false
+    t.boolean  "private",                      default: false, null: false
+    t.integer  "status",             limit: 2, default: 0,     null: false
   end
 
   add_index "accounts", ["user_id"], name: "index_accounts_on_user_id", unique: true, using: :btree

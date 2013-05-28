@@ -1,15 +1,37 @@
 require "msgpack/rpc/transport/unix"
 
 class Account < ActiveRecord::Base
+  ACTIVE = 0; DEACTIVATED = 1
+
   belongs_to :user
+
+  scope :active, -> { where(status: Account::ACTIVE) }
 
   def self.create_or_update(hash)
     account = where(user_id: hash[:user_id]).first_or_initialize
     account.oauth_token = hash[:oauth_token]
     account.oauth_token_secret = hash[:oauth_token_secret]
     account.consumer_version = hash[:consumer_version]
+    account.status = Account::ACTIVE
     account.save if account.changed?
     account
+  end
+
+  def notification?; self.notification end
+  def private?; self.private end
+  def active?; self.status == Account::ACTIVE end
+
+  def update_settings!(params)
+    self.notification = params[:notification]
+    self.private = params[:private]
+    self.save! if self.changed?
+  end
+
+  def deactivate!
+    self.status = Account::DEACTIVATED
+    self.save!
+
+    update_connection
   end
 
   def update_connection

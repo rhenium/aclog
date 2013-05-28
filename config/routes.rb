@@ -21,6 +21,13 @@ Aclog::Application.routes.draw do
 
     get "/i/:id" =>         "tweets#show",      as: "tweet", constraints: {id: /\d+/}
 
+    scope "/i/settings", controller: "settings" do
+      get "/",                      action: "index", as: "settings"
+      post "/update",                     action: "update"
+      get "/confirm_deactivation",  action: "confirm_deactivation"
+      post "/deactivate",           action: "deactivate"
+    end
+
     scope "about", controller: "about" do
       get "/",              action: "about",    as: "about"
       get "/api",           action: "api",      as: "about_api"

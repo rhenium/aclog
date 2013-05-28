@@ -2,82 +2,59 @@
 class TweetsController < ApplicationController
   before_filter :set_user_limit
 
-  # GET /i/:id
-  # GET /api/tweets/show
   def show
     tweet_required
-
     @caption = "#{@user.screen_name}'s Tweet"
-    h = ApplicationController.helpers
-    text = h.strip_tags(h.format_tweet_text(@tweet.text))
-    @title = "\"#{text}\" from #{@user.screen_name}"
   end
 
-  # GET /:screen_name
-  # GET /api/tweets/best
   def best
     user_required
-    @caption = "Best"
-    @tweets = cache_tweets(3.minutes, @user.tweets.reacted.order_by_reactions.list(params, force_page: true))
+    @caption = "#{@user.screen_name}'s Best"
+    @tweets = @user.tweets.reacted.order_by_reactions.list(params, force_page: true, cache: 3.minutes)
   end
 
-  # GET /:screen_name/favorited
-  # GET /api/tweets/favorited
   def favorited
     user_required
-    @caption = "Most Favorited"
-    @tweets = cache_tweets(3.minutes, @user.tweets.reacted.order_by_favorites.list(params, force_page: true))
+    @caption = "#{@user.screen_name}'s Most Favorited"
+    @tweets = @user.tweets.reacted.order_by_favorites.list(params, force_page: true, cache: 3.minutes)
   end
 
-  # GET /:screen_name/retweeted
-  # GET /api/tweets/retweeted
   def retweeted
     user_required
-    @caption = "Most Retweeted"
-    @tweets = cache_tweets(3.minutes, @user.tweets.reacted.order_by_retweets.list(params, force_page: true))
+    @caption = "#{@user.screen_name}'s Most Retweeted"
+    @tweets = @user.tweets.reacted.order_by_retweets.list(params, force_page: true, cache: 3.minutes)
   end
 
-  # GET /api/tweets/recent
   def recent
     user_required
-    @caption = "Recent Best"
-    @tweets = cache_tweets(3.minutes, @user.tweets.recent.reacted.order_by_reactions.list(params, force_page: true))
+    @caption = "#{@user.screen_name}'s Recent Best"
+    @tweets = @user.tweets.recent.reacted.order_by_reactions.list(params, force_page: true, cache: 3.minutes)
   end
 
-  # GET /:screen_name/timeline
-  # GET /api/tweets/timeline
   def timeline
     user_required
-    @caption = "Newest"
+    @caption = "#{@user.screen_name}'s Newest"
     @tweets = @user.tweets.reacted.order_by_id.list(params)
   end
 
-  # GET /:screen_name/discoveries
-  # GET /api/tweets/discoveries
   def discoveries
     user_required
-    @caption = "Discoveries"
+    @caption = "#{@user.screen_name}'s Discoveries"
     @tweets = Tweet.discovered_by(@user).order_by_id.list(params)
   end
 
-  # GET /:screen_name/favorites
-  # GET /api/tweets/favorites
   def favorites
     user_required
-    @caption = "Favorites"
+    @caption = "#{@user.screen_name}'s Favorites"
     @tweets = Tweet.favorited_by(@user).order_by_id.list(params)
   end
 
-  # GET /:screen_name/retweets
-  # GET /api/tweets/retweets
   def retweets
     user_required
-    @caption = "Retweets"
+    @caption = "#{@user.screen_name}'s Retweets"
     @tweets = Tweet.retweeted_by(@user).order_by_id.list(params)
   end
 
-  # GET /:screen_name/discovered_by/:screen_name_b
-  # GET /api/tweets/discovered_by
   def discovered_by
     user_required
     user_b_required
@@ -85,21 +62,18 @@ class TweetsController < ApplicationController
     @tweets = @user.tweets.discovered_by(@user_b).order_by_id.list(params)
   end
 
-  # GET /i/best
   def all_best
-    @caption = "Best of all"
-    @tweets = cache_tweets(3.hours, Tweet.reacted.order_by_reactions.list(params, force_page: true))
+    @caption = "Top Tweets"
+    @tweets = Tweet.reacted.order_by_reactions.list(params, force_page: true, cache: 3.hours)
   end
 
-  # GET /i/recent
   def all_recent
-    @caption = "Recent of all"
-    @tweets = cache_tweets(10.minutes, Tweet.recent.reacted.order_by_reactions.list(params, force_page: true))
+    @caption = "Recent"
+    @tweets = Tweet.recent.reacted.order_by_reactions.list(params, force_page: true, cache: 3.hours)
   end
 
-  # GET /i/timeline
   def all_timeline
-    @caption = "Newest of all"
+    @caption = "Newest"
     @tweets = Tweet.reacted.order_by_id.list(params)
   end
 
@@ -113,15 +87,11 @@ class TweetsController < ApplicationController
   end
 
   def user_required
-    @user = _get_user(params[:user_id], params[:screen_name])
-    raise Aclog::Exceptions::UserNotFound unless @user
-    raise Aclog::Exceptions::UserProtected unless authorized_to_show?(@user)
+    @user = _require_user(params[:user_id], params[:screen_name])
   end
 
   def user_b_required
-    @user_b = _get_user(params[:user_id_b], params[:screen_name_b])
-    raise Aclog::Exceptions::UserNotFound unless @user_b
-    raise Aclog::Exceptions::UserProtected unless authorized_to_show?(@user)
+    @user_b = _require_user(params[:user_id_b], params[:screen_name_b])
   end
 
   def tweet_required
@@ -151,15 +121,11 @@ class TweetsController < ApplicationController
     end
   end
 
-  def cache_tweets(expires_in, tweets)
-    key = "tweets/#{params.to_param}"
-    p ids = Rails.cache.read(key)
-    if not ids
-      Rails.cache.write(key, tweets.map(&:id), expires_in: expires_in)
-      tweets
-    else
-      n = Tweet.where("id IN (?)", ids).order("CASE #{ids.each_with_index.map {|m, i| "WHEN ID = #{m} THEN #{i}" }.join(" ")} END")
-    end
+  def _require_user(user_id, screen_name)
+    user = _get_user(user_id, screen_name)
+    raise Aclog::Exceptions::UserNotFound unless user
+    raise Aclog::Exceptions::UserProtected unless authorized_to_show?(user)
+    user
   end
 end
 

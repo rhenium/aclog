@@ -30,6 +30,27 @@ class Tweet < ActiveRecord::Base
     joins("INNER JOIN (#{un}) m ON m.tweet_id = tweets.id")
   }
 
+  def self.list(params, options = {})
+    params[:page] ||= "1" if options[:force_page]
+
+    count = params[:count].to_i
+    count = Settings.tweets.count_default unless (1..Settings.tweets.count_max) === count
+
+    ret = limit(count)
+
+    if params[:page]
+      ret = ret.page(params[:page].to_i, count)
+    else
+      ret = ret.max_id(params[:max_id]).since_id(params[:since_id])
+    end
+
+    if options[:cache] && options[:cache] > 0
+      ret = ret.cache_list(options[:cache])
+    end
+
+    ret
+  end
+
   def self.delete_from_id(id)
     return {} if id.is_a?(Array) && id.size == 0
     begin
@@ -69,20 +90,17 @@ class Tweet < ActiveRecord::Base
     end
   end
 
-  def self.list(params, options = {})
-    params[:page] ||= "1" if options[:force_page]
-
-    count = params[:count].to_i
-    count = Settings.tweets.count_default unless (1..Settings.tweets.count_max) === count
-
-    ret = limit(count)
-
-    if params[:page]
-      ret.page(params[:page].to_i, count)
+  private
+  def self.cache_list(expires_in)
+    key = "tweets/#{scoped.to_sql}"
+    ids = Rails.cache.read(key)
+    if ids
+      Tweet.where("id IN (?)", ids).order("CASE #{ids.each_with_index.map {|m, i| "WHEN ID = #{m} THEN #{i}" }.join(" ")} END")
     else
-      ret.max_id(params[:max_id]).since_id(params[:since_id])
+      # use map instead of pluck: not to excecute new SQL
+      Rails.cache.write(key, scoped.map(&:id), expires_in: expires_in)
+      scoped
     end
   end
-
 end
 

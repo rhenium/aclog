@@ -37,7 +37,11 @@ class Account < ActiveRecord::Base
   def update_connection
     transport = MessagePack::RPC::UNIXTransport.new
     client = MessagePack::RPC::Client.new(transport, File.join(Rails.root, "tmp", "sockets", "receiver.sock"))
-    client.call(:register, Marshal.dump(self))
+    if self.status == Account::ACTIVE
+      client.call(:register, Marshal.dump(self))
+    elsif self.status == Account::INACTIVE
+      client.call(:unregister, Marshal.dump(self))
+    end
   rescue Errno::ECONNREFUSED
     Rails.logger.error($!)
   end

@@ -52,6 +52,11 @@ module ApplicationHelper
   end
 
   def title
+    if @tweet
+      text = strip_tags(format_tweet_text(@tweet.text))
+      @title = "\"#{text}\" from #{@user.screen_name}"
+    end
+
     CGI.unescapeHTML "#{@title || @caption} - aclog"
   end
 

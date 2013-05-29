@@ -1,6 +1,6 @@
 .sidebar
   .avatar
-    = link_to user_best_path(@user.screen_name) do
+    = link_to user_path(@user.screen_name) do
       = image_tag @user.profile_image_url_original, alt: @user.screen_name, width: 64, height: 64, class: "icon img-rounded"
   .screen_name= link_to @user.screen_name, twitter_user_url(@user.screen_name)
   - if @user.registered?
@@ -22,16 +22,23 @@
       = "@#{@user.screen_name} has never signed in to aclog"
   .user_nav
     %ul.nav.nav-tabs.nav-stacked
-      - if @user.registered?
+      - if authorized_to_show_best?(@user)
+        %li
+          = link_to "best", user_path(@user.screen_name)
+        %li
+          = link_to "timeline", user_timeline_path(@user.screen_name)
+        %li
+          = link_to "discoveries", user_discoveries_path(@user.screen_name)
+        %li
+          = link_to "discovered by", user_discovered_by_path(@user.screen_name)
+        %li
+          = link_to "discovered users", user_discovered_users_path(@user.screen_name)
         %li
           = link_to "stats", user_stats_path(@user.screen_name)
-      %li
-        = link_to "best", user_best_path(@user.screen_name)
-      %li
-        = link_to "timeline", user_timeline_path(@user.screen_name)
-      %li
-        = link_to "discoveries", user_discoveries_path(@user.screen_name)
-      %li
-        = link_to "discovered by", user_discovered_by_path(@user.screen_name)
-      %li
-        = link_to "discovered users", user_discovered_users_path(@user.screen_name)
+      - else
+        %li
+          = link_to "timeline", user_path(@user.screen_name)
+        %li
+          = link_to "discoveries", user_discoveries_path(@user.screen_name)
+        %li
+          = link_to "stats", user_stats_path(@user.screen_name)

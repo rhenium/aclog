@@ -18,6 +18,10 @@ module Aclog
         end
       end
 
+      def unregister(account_)
+        account = Marshal.load(account_)
+      end
+
       def unregister(account)
         # TODO
       end

@@ -4,7 +4,7 @@
       - target = User.find(user_id)
       %li
         .avatar
-          = link_to user_best_path(target.screen_name) do
+          = link_to user_path(target.screen_name) do
             = image_tag target.profile_image_url, alt: target.screen_name, title: target.name
         .data
           .count

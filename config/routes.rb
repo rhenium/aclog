@@ -54,7 +54,8 @@ Aclog::Application.routes.draw do
 
     # TweetController / Tweets
     scope ":screen_name" do
-      get "/",                              action: "best",          as: "user_best"
+      get "/",                              action: "index",         as: "user"
+      get "/best",                          action: "best",          as: "user_best"
       get "/favorited",                     action: "favorited",     as: "user_favorited"
       get "/retweeted",                     action: "retweeted",     as: "user_retweeted"
       get "/recent",                        action: "recent",        as: "user_recent"

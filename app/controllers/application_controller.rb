@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :check_format, :check_session
   after_filter :xhtml
-  helper_method :authorized_to_show?
+  helper_method :authorized_to_show_user?, :authorized_to_show_best?
 
   protected
   def _get_user(id, screen_name)
@@ -16,23 +16,43 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def authorized_to_show?(user)
-    return true unless user.protected?
-
-    if session[:user_id]
-      return session[:user_id] == user.id || session[:account].following?(user.id)
-    elsif request.headers["X-Verify-Credentials-Authorization"]
-      # OAuth Echo
-      user_id = authenticate_with_twitter_oauth_echo
-      account = Account.find_by(user_id: user_id)
-      if account
-        return account.user_id == user.id || account.following?(user.id)
+  def authorized_to_show_user?(user)
+    @authorized_to_show_user ||= {}
+    @authorized_to_show_user[user.id] ||= begin
+      if !user.protected?
+        true
+      elsif session[:user_id] == user.id
+        true
+      elsif session[:account] && session[:account].following?(user.id)
+        true
+      elsif request.headers["X-Verify-Credentials-Authorization"]
+        # OAuth Echo
+        user_id = authenticate_with_twitter_oauth_echo
+        account = Account.find_by(user_id: user_id)
+        if account && (account.user_id == user.id || account.following?(user.id))
+          true
+        else
+          false
+        end
       else
-        return false
+        false
       end
-    else
-      return false
     end
+  end
+
+  def authorized_to_show_best?(user)
+    authorized_to_show_user?(user) && user.registered? && (!user.account.private? || user.id == session[:user_id])
+  end
+
+  def authorize_to_show_user!(user)
+    authorized_to_show_user?(user) or raise Aclog::Exceptions::UserProtected
+  end
+
+  def authorize_to_show_best!(user)
+    authorize_to_show_user!(user)
+    raise Aclog::Exceptions::UserNotRegistered unless user.registered?
+    raise Aclog::Exceptions::AccountPrivate if user.account.private? && user.id != session[:user_id]
+    true
   end
 
   private

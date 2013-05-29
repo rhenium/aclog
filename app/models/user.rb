@@ -71,14 +71,8 @@ class User < ActiveRecord::Base
       ret.retweeted_count = retweeted_counts.sum
       ret.average_favorited_count = favorited_counts.inject(:+).to_f / ret.tweets_count
       ret.average_retweeted_count = retweeted_counts.inject(:+).to_f / ret.tweets_count
-
-      _conv = lambda do |i|
-        g = 10 ** (i.to_s.size - 4)
-        m = (i / g * g).to_i
-        "#{m}#{(m == i) ? "" : "+"}"
-      end
-      ret.retweeted_count_str = _conv.call(ret.retweeted_count)
-      ret.favorited_count_str = _conv.call(ret.favorited_count)
+      ret.retweeted_count_str = ret.retweeted_count.to_s
+      ret.favorited_count_str = ret.favorited_count.to_s
 
       ret
     end

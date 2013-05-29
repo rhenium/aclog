@@ -2,7 +2,7 @@
   .tweet
     .left
       .avatar
-        = link_to user_best_path(tweet.user.screen_name) do
+        = link_to user_path(tweet.user.screen_name) do
           = image_tag tweet.user.profile_image_url, alt: tweet.user.screen_name, title: tweet.user.name
       %ul.inline.actions
         %li.twitter
@@ -12,10 +12,10 @@
     .tweet_content_fix
     .tweet_content
       .user
-        %span.nam= link_to tweet.user.name, user_best_path(tweet.user.screen_name)
-        %span.screen_name= link_to tweet.user.screen_name, user_best_path(tweet.user.screen_name)
+        %span.nam= link_to tweet.user.name, user_path(tweet.user.screen_name)
+        %span.screen_name= link_to tweet.user.screen_name, user_path(tweet.user.screen_name)
       .text
-        - if authorized_to_show?(tweet.user)
+        - if authorized_to_show_user?(tweet.user)
           = simple_format(format_tweet_text(tweet.text))
         - else
           %span.quiet
@@ -41,5 +41,5 @@
             %ul.inline
               - users.limit(@user_limit).each do |m|
                 %li
-                  = link_to user_best_path(m.screen_name) do
+                  = link_to user_path(m.screen_name) do
                     = image_tag m.profile_image_url, alt: m.screen_name, title: m.name

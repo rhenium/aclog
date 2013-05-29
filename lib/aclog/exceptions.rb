@@ -5,6 +5,7 @@ module Aclog
     class UserProtected < StandardError; end
     class LoginRequired < StandardError; end
     class TweetNotFound < StandardError; end
+    class AccountPrivate < StandardError; end
     class OAuthEchoUnauthorized < StandardError; end
   end
 end

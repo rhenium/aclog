@@ -31,6 +31,9 @@ class ErrorsController < ApplicationController
     when Aclog::Exceptions::OAuthEchoUnauthorized
       @status = 401
       @message = "OAuth Echo 認証に失敗しました。"
+    when Aclog::Exceptions::AccountPrivate
+      @status = 403
+      @message = "ユーザーの best は非公開です"
     when ActionController::RoutingError
       @status = 404
       @message = "このページは存在しません。"

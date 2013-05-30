@@ -45,13 +45,13 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize_to_show_user!(user)
-    authorized_to_show_user?(user) or raise Aclog::Exceptions::UserProtected
+    authorized_to_show_user?(user) or raise Aclog::Exceptions::UserProtected.new(user)
   end
 
   def authorize_to_show_best!(user)
     authorize_to_show_user!(user)
-    raise Aclog::Exceptions::UserNotRegistered unless user.registered?
-    raise Aclog::Exceptions::AccountPrivate if user.account.private? && user.id != session[:user_id]
+    raise Aclog::Exceptions::UserNotRegistered.new(user) unless user.registered?
+    raise Aclog::Exceptions::AccountPrivate.new(user) if user.account.private? && user.id != session[:user_id]
     true
   end
 

@@ -12,7 +12,7 @@
     .tweet_content_fix
     .tweet_content
       .user
-        %span.nam= link_to tweet.user.name, user_path(tweet.user.screen_name)
+        %span.name= link_to tweet.user.name, user_path(tweet.user.screen_name)
         %span.screen_name= link_to tweet.user.screen_name, user_path(tweet.user.screen_name)
       .text
         - if authorized_to_show_user?(tweet.user)

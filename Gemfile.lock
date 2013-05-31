@@ -177,6 +177,8 @@ GEM
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
+    unicorn-worker-killer (0.4.1)
+      unicorn (~> 4)
     webmock (1.11.0)
       addressable (>= 2.2.7)
       crack (>= 0.3.2)
@@ -209,5 +211,6 @@ DEPENDENCIES
   twitter
   uglifier (>= 1.0.3)
   unicorn
+  unicorn-worker-killer
   webmock
   yajl-ruby

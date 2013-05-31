@@ -10,6 +10,7 @@ gem 'settingslogic'
 gem 'yajl-ruby', require: "yajl"
 
 gem 'unicorn'
+gem 'unicorn-worker-killer'
 gem 'thin'
 gem 'daemon-spawn', require: 'daemon_spawn'
 gem 'msgpack'

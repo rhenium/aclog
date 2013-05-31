@@ -6,7 +6,6 @@ class ErrorsController < ApplicationController
 
   def render_error
     @exception = env["action_dispatch.exception"]
-    #@status = ActionDispatch::ExceptionWrapper.new(env, @exception).status_code
     @title = "?"
 
     case @exception
@@ -46,10 +45,7 @@ class ErrorsController < ApplicationController
       @user = @exception.user
     end
 
-    respond_to do |format|
-      format.html { render status: @status }
-      format.json { render status: @status }
-    end
+    render status: @status
   end
 
   private

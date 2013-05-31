@@ -1,5 +1,3 @@
-- if params[:action] == "search"
-  = render partial: "search/search"
 .tweets
   = render partial: "tweets/tweet", collection: @tweets.includes(:user), as: :tweet
 .loading

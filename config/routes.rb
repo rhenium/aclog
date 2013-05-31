@@ -9,7 +9,7 @@ Aclog::Application.routes.draw do
 
   # HTML only pages
   scope format: "html" do
-    get "/search" => "search#search", as: "search"
+    get "/search" =>        "search#search",    as: "search"
 
     # Internals / SessionsController
     get "/i/import/:id" =>  "i#import",         as: "import"

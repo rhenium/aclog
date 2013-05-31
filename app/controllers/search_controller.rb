@@ -10,13 +10,13 @@ class SearchController < ApplicationController
   def parse_query(input)
     str = input.dup
     strings = []
-    str.gsub!(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; " ##{strings.size - 1} " }
+    str.gsub!(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; "##{strings.size - 1}" }
     groups = []
     while str.sub!(/\(([^()]*?)\)/) {|m| groups << $1; " $#{groups.size - 1} " }; end
 
     conv = -> s do
-      s.scan(/\S+(?: OR \S+)*/).map {|co|
-        co.split(" OR ").map {|token|
+      s.scan(/\S+(?: +OR +\S+)*/).map {|co|
+        co.split(/ +OR +/).map {|token|
           if /^\$(\d+)$/ =~ token
             conv.call(groups[$1.to_i])
           else
@@ -44,8 +44,10 @@ class SearchController < ApplicationController
       u = User.find_by(screen_name: $1)
       uid = u && u.id || 0
       tweets[:user_id].__send__(positive ? :eq :not_eq, uid)
-    when /^-?date:(\d{4}(-?)\d{2}\2\d{2})(?:\.\.|-)(\d{4}\2\d{2}\2\d{2})$/ # $1: begin, $2: end
-      tweets[:id].__send__(positive ? :in : :not_in, snowflake(Date.parse($1))...snowflake(Date.parse($3) + 1))
+    when /^-?since:(\d{4}(-?)\d{2}\2\d{2})$/
+      tweets[:id].__send__(positive ? :gteq : :lt, snowflake(Date.parse($1)))
+    when /^-?until:(\d{4}(-?)\d{2}\2\d{2})$/
+      tweets[:id].__send__(positive ? :lt : :gteq, snowflake(Date.parse($1) + 1))
     when /^-?favs?:(\d+)$/
       tweets[:favorites_count].__send__(positive ? :gteq : :lt, $1.to_i)
     when /^-?rts?:(\d+)$/

@@ -2,7 +2,7 @@ Aclog::Application.routes.draw do
   root to: "about#index"
 
   # JSON
-  scope "api", format: "json" do
+  scope "/api", format: "json" do
     get "/users/:action", controller: "users"
     get "/tweets/:action", controller: "tweets"
   end
@@ -28,13 +28,17 @@ Aclog::Application.routes.draw do
       post "/deactivate",           action: "deactivate"
     end
 
-    scope "about", controller: "about" do
+    scope "/about", controller: "about" do
       get "/",              action: "about",    as: "about"
       get "/api",           action: "api",      as: "about_api"
     end
 
+    scope "/help", controller: "help" do
+      get "/search",        action: "search",   as: "help_search"
+    end
+
     # User pages
-    scope ":screen_name", controller: "users" do
+    scope "/:screen_name", controller: "users" do
       get "/stats",                         action: "stats",            as: "user_stats"
       get "/discovered_by",                 action: "discovered_by",    as: "user_discovered_by"
       get "/discovered_users",              action: "discovered_users", as: "user_discovered_users"
@@ -53,7 +57,7 @@ Aclog::Application.routes.draw do
     end
 
     # TweetController / Tweets
-    scope ":screen_name" do
+    scope "/:screen_name" do
       get "/",                              action: "index",         as: "user"
       get "/best",                          action: "best",          as: "user_best"
       get "/favorited",                     action: "favorited",     as: "user_favorited"

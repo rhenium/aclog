@@ -3,16 +3,16 @@ class SearchController < ApplicationController
 
   def search
     @caption = "search"
-    @tweets = Tweet.where(parse_query(params[:query])).reacted.recent(7).order_by_id.list(params, force_page: true)
+    @tweets = Tweet.where(parse_query(params[:query] || "")).reacted.recent(7).order_by_id.list(params, force_page: true)
   end
 
   private
   def parse_query(input)
     str = input.dup
     strings = []
-    str.gsub!(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; "##{strings.size - 1}" }
+    str.gsub!(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; " ##{strings.size - 1} " }
     groups = []
-    while str.sub!(/\(([^()]*?)\)/) {|m| groups << $1; "$#{groups.size - 1}" }; end
+    while str.sub!(/\(([^()]*?)\)/) {|m| groups << $1; " $#{groups.size - 1} " }; end
 
     conv = -> s do
       s.scan(/\S+(?: OR \S+)*/).map {|co|

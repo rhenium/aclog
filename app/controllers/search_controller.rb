@@ -1,7 +1,9 @@
 class SearchController < ApplicationController
+  include Aclog::Twitter
+
   def search
     @caption = "search"
-    @tweets = Tweet.where(parse_query(params[:query])).order_by_id.reacted.list(params, force_page: true)
+    @tweets = Tweet.where(parse_query(params[:query])).reacted.recent(7).order_by_id.list(params, force_page: true)
   end
 
   private
@@ -43,7 +45,7 @@ class SearchController < ApplicationController
       uid = u && u.id || 0
       tweets[:user_id].__send__(positive ? :eq :not_eq, uid)
     when /^-?date:(\d{4}(-?)\d{2}\2\d{2})(?:\.\.|-)(\d{4}\2\d{2}\2\d{2})$/ # $1: begin, $2: end
-      tweets[:id].__send__(positive ? :in : :not_in, date_to_id($1)...date_to_id($3, 1))
+      tweets[:id].__send__(positive ? :in : :not_in, snowflake(Date.parse($1))...snowflake(Date.parse($3) + 1))
     when /^-?favs?:(\d+)$/
       tweets[:favorites_count].__send__(positive ? :gteq : :lt, $1.to_i)
     when /^-?rts?:(\d+)$/
@@ -57,10 +59,5 @@ class SearchController < ApplicationController
       search_text = escape_text.call(positive ? token : token[1..-1])
       tweets[:text].__send__(positive ? :matches : :does_not_match, "%#{search_text}%")
     end
-  end
-
-  def date_to_id(str, offset = 0)
-    time = (Date.parse(str) + offset).to_datetime
-    (time.to_i * 1000 - 1288834974657) << 22
   end
 end

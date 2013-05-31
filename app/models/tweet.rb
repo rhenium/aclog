@@ -130,7 +130,7 @@ class Tweet < ActiveRecord::Base
     when /^-?(?:user|from):([A-Za-z0-9_]{1,20})$/
       u = User.find_by(screen_name: $1)
       uid = u && u.id || 0
-      tweets[:user_id].__send__(positive ? :eq :not_eq, uid)
+      tweets[:user_id].__send__(positive ? :eq : :not_eq, uid)
     when /^-?since:(\d{4}(-?)\d{2}\2\d{2})$/
       tweets[:id].__send__(positive ? :gteq : :lt, snowflake(Date.parse($1)))
     when /^-?until:(\d{4}(-?)\d{2}\2\d{2})$/

@@ -85,7 +85,7 @@ class Account < ActiveRecord::Base
     return nil unless target_user_id && target_user_id.is_a?(Integer)
 
     Rails.cache.fetch("friendship/#{source_user_id}-#{target_user_id}", expires_in: 3.days) do
-      client.friendship?(source_user_id, target_user_id)
+      client.friendship?(source_user_id, target_user_id) rescue nil
     end
   end
 end

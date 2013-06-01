@@ -1,9 +1,8 @@
-.tweets
-  = render partial: "tweets/tweet", collection: @tweets.includes(:user), as: :tweet
-.loading
-  = image_tag "loading.gif", alt: "loading...", title: nil
-.pagination
-  - if params[:page]
-    = link_to raw("Next &#8250;"), params.merge(page: params[:page].to_i + 1), rel: :next
-  - elsif @tweets.last
-    = link_to raw("Next &#8250;"), params.merge(max_id: @tweets.last.id - 1), rel: :next
+.tweets= render partial: "tweets/tweet", collection: @tweets.includes(:user), as: :tweet
+= if @tweets.count > 0
+  .loading= image_tag "loading.gif", alt: "loading...", title: nil
+  .pagination
+    - if params[:page]
+      = link_to raw("Next &#8250;"), params.merge(page: params[:page].to_i + 1), rel: :next
+    - elsif @tweets.last
+      = link_to raw("Next &#8250;"), params.merge(max_id: @tweets.last.id - 1), rel: :next

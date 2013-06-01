@@ -88,13 +88,19 @@ class User < ActiveRecord::Base
 
   private
   def count_by(klass)
-    actions = klass.joins("INNER JOIN (#{tweets.order_by_id.limit(100).to_sql}) m ON tweet_id = m.id")
-    actions.inject(Hash.new(0)) {|hash, obj| hash[obj.user_id] += 1; hash }
+    klas = klass.arel_table
+    tws = Tweet.arel_table
+    m = tws.project(tws[:id]).where(tws[:user_id].eq(self.id)).order(tws[:id].desc).take(100).as("m")
+    query = klas.project(klas[:user_id], klas[:user_id].count).join(m).on(klas[:tweet_id].eq(m[:id])).group(klas[:user_id])
+    ActiveRecord::Base.connection.exec_query(query.to_sql).rows
   end
 
   def count_to(klass)
-    actions = Tweet.joins("INNER JOIN (#{klass.where(user: self).order("id DESC").limit(500).to_sql}) m ON tweets.id = m.tweet_id")
-    actions.inject(Hash.new(0)) {|hash, obj| hash[obj.user_id] += 1; hash }
+    klas = klass.arel_table
+    tws = Tweet.arel_table
+    m = klas.project(klas[:tweet_id]).where(klas[:user_id].eq(self.id)).order(klas[:id].desc).take(500).as("m")
+    query = tws.project(tws[:user_id], tws[:user_id].count).join(m).on(tws[:id].eq(m[:tweet_id])).group(tws[:user_id])
+    ActiveRecord::Base.connection.exec_query(query.to_sql).rows
   end
 
   def merge_count_user(*args)

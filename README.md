@@ -15,11 +15,11 @@ A web service like Favstar.
 * Collect favorites and retweets by UserStreams
 * List user's best/newest favorited or retweeted tweets
 * Show how many favorited/retweeted by specified user
+* Protected account support
 * JSON API
 
 ### Not yet / will be implemented
 * New UI
-* Protected users support
 * User settings (favorites notification)
 
 ## Requirements
@@ -62,17 +62,21 @@ A web service like Favstar.
 
 * Start
 
-        $ ./start.sh start
+        $ ./start.sh start receiver
+        $ ./start.sh start unicorn
 
 ### aclog configuration (worker)
-* In collector/ ..
+* In collector/
+
+        $ cd collector
+
 * Install packages
 
         $ bundle install
 
 * Set consumer keys, secret key
 
-        $ cp settings.yml.example collector/settings.yml
+        $ cp settings.yml.example settings.yml
         $ vi settings.yml
 
 * Start

@@ -48,7 +48,7 @@ module ApplicationHelper
   end
 
   def caption
-    CGI.unescapeHTML "#{@caption}"
+    "#{@caption}"
   end
 
   def title

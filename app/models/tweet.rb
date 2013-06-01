@@ -11,10 +11,10 @@ class Tweet < ActiveRecord::Base
   scope :recent, ->(days = 3) { where("tweets.id > ?", snowflake(Time.zone.now - days.days)) }
   scope :reacted, -> {where("tweets.favorites_count > 0 OR tweets.retweets_count > 0") }
   scope :not_protected, -> { includes(:user).where(users: {protected: false}) }
+
   scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
   scope :since_id, -> id { where("tweets.id > ?", id.to_i) if id }
-
-  scope :page, -> page, count { offset((page - 1) * count) }
+  scope :page, ->(page, count) { offset((page - 1) * count) }
 
   scope :order_by_id, -> { order("tweets.id DESC") }
   scope :order_by_favorites, -> { order("tweets.favorites_count DESC") }
@@ -22,8 +22,8 @@ class Tweet < ActiveRecord::Base
   scope :order_by_reactions, -> { order("COALESCE(tweets.favorites_count, 0) + COALESCE(tweets.retweets_count, 0) DESC") }
 
   scope :of, -> user { where(user: user) if user }
-  scope :favorited_by, -> user { joins(:favorites).where(favorites: {user_id: user.id}) }
-  scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user_id: user.id}) }
+  scope :favorited_by, -> user { joins(:favorites).where(favoriters: user) }
+  scope :retweeted_by, -> user { joins(:retweets).where(retweeters: user) }
   scope :discovered_by, -> user {
     un = "SELECT favorites.tweet_id FROM favorites WHERE favorites.user_id = #{user.id}" +
          " UNION " +
@@ -57,14 +57,14 @@ class Tweet < ActiveRecord::Base
     return {} if id.is_a?(Array) && id.size == 0
     begin
       # counter_cache の無駄を省くために delete_all で
-      deleted_tweets = Tweet.where("id IN (?)", id).delete_all
+      deleted_tweets = Tweet.where(id: id).delete_all
       if deleted_tweets > 0
-        deleted_favorites = Favorite.where("tweet_id IN (?)", id).delete_all
-        deleted_retweets = Retweet.where("tweet_id IN (?)", id).delete_all
+        deleted_favorites = Favorite.where(tweet_id: id).delete_all
+        deleted_retweets = Retweet.where(tweet_id: id).delete_all
       end
 
       unless id.is_a?(Integer) && deleted_tweets == 1
-        deleted_retweets = Retweet.where("id IN (?)", id).destroy_all.size # counter_cache
+        deleted_retweets = Retweet.where(id: id).destroy_all.size # counter_cache
       end
 
       return {tweets: deleted_tweets, favorites: deleted_favorites, retweets: deleted_retweets}
@@ -154,7 +154,7 @@ class Tweet < ActiveRecord::Base
     key = "tweets/#{scoped.to_sql}"
     ids = Rails.cache.read(key)
     if ids
-      Tweet.where("id IN (?)", ids).order("CASE #{ids.each_with_index.map {|m, i| "WHEN ID = #{m} THEN #{i}" }.join(" ")} END")
+      Tweet.where(id: ids).order("CASE #{ids.each_with_index.map {|m, i| "WHEN ID = #{m} THEN #{i}" }.join(" ")} END")
     else
       # use map instead of pluck: not to excecute new SQL
       Rails.cache.write(key, scoped.map(&:id), expires_in: expires_in)

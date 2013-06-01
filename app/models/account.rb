@@ -29,14 +29,14 @@ class Account < ActiveRecord::Base
 
   def deactivate!
     self.status = Account::DEACTIVATED
-    self.save!
+    self.save! if self.changed?
 
     update_connection
   end
 
   def update_connection
     transport = MessagePack::RPC::UNIXTransport.new
-    client = MessagePack::RPC::Client.new(transport, File.join(Rails.root, "tmp", "sockets", "receiver.sock"))
+    client = MessagePack::RPC::Client.new(transport, Rails.root.join("tmp", "sockets", "receiver.sock").to_s)
     if self.status == Account::ACTIVE
       client.call(:register, Marshal.dump(self))
     elsif self.status == Account::INACTIVE
@@ -47,11 +47,10 @@ class Account < ActiveRecord::Base
   end
 
   def client
-    Twitter::Client.new(
-      consumer_key: Settings.collector.consumer[consumer_version].key,
-      consumer_secret: Settings.collector.consumer[consumer_version].secret,
-      oauth_token: oauth_token,
-      oauth_token_secret: oauth_token_secret)
+    Twitter::Client.new(consumer_key: Settings.collector.consumer[consumer_version].key,
+                        consumer_secret: Settings.collector.consumer[consumer_version].secret,
+                        oauth_token: oauth_token,
+                        oauth_token_secret: oauth_token_secret)
   end
 
   def import_favorites(id)

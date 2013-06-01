@@ -39,7 +39,7 @@
             %span.type= title
           %dd
             %ul.inline
-              - users.limit(@user_limit).each do |m|
+              - users.limit(user_limit).each do |m|
                 %li
                   = link_to user_path(m.screen_name) do
                     = image_tag m.profile_image_url, alt: m.screen_name, title: m.name

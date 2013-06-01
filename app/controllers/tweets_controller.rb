@@ -1,8 +1,5 @@
 # -*- encoding: utf-8 -*-
 class TweetsController < ApplicationController
-  before_filter :set_user_limit
-  helper_method :account_private?
-
   def show
     tweet_required
     @caption = "#{@user.screen_name}'s Tweet"
@@ -100,26 +97,6 @@ class TweetsController < ApplicationController
     @tweet = Tweet.find_by(id: params[:id])
     raise Aclog::Exceptions::TweetNotFound unless @tweet
     @user = _require_user(@tweet.user_id, nil)
-  end
-
-  def set_user_limit
-    if params[:action] == "show"
-      if params[:full] == "true"
-        @user_limit = nil
-      else
-        @user_limit = Settings.tweets.users.count_lot
-      end
-    else
-      @user_limit = Settings.tweets.users.count_default
-    end
-
-    if request.format == :json
-      if params[:limit]
-        @user_limit = params[:limit].to_i
-      else
-        @user_limit = nil
-      end
-    end
   end
 
   def check_public!

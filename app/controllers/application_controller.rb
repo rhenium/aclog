@@ -77,7 +77,8 @@ class ApplicationController < ActionController::Base
       response.content_type = "application/xhtml+xml"
 
       # remove invalid charactors
-      response.body = response.body.gsub(/[\x0-\x8\xb\xc\xe-\x1f]/, "")
+      u = ActiveSupport::Multibyte::Unicode
+      response.body = u.tidy_bytes(response.body)
     end
   end
 end

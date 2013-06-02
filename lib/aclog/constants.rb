@@ -4,9 +4,5 @@ module Aclog
       RESOLVED = 0
       PENDING = 1
     end
-
-    module IssueType
-      TWEET_STOLEN = 0
-    end
   end
 end

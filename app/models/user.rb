@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
 
       if orig["screen_name"] == user.screen_name &&
          orig["name"] == user.name &&
-         orig["profile_image_url"].split(//).reverse.take(36) == user.profile_image_url.split(//).reverse.take(36) &&
+         orig["profile_image_url"][-44..-1] == user.profile_image_url[-44..-1] &&
          orig["protected"] = user.protected?
         logger.debug("User not changed: #{user.id}")
       else
@@ -71,41 +71,37 @@ class User < ActiveRecord::Base
       ret.retweeted_count = retweeted_counts.sum
       ret.average_favorited_count = favorited_counts.inject(:+).to_f / ret.tweets_count
       ret.average_retweeted_count = retweeted_counts.inject(:+).to_f / ret.tweets_count
-      ret.retweeted_count_str = ret.retweeted_count.to_s
-      ret.favorited_count_str = ret.favorited_count.to_s
 
       ret
     end
   end
 
   def count_discovered_by
-    merge_count_user(count_by(Favorite), count_by(Retweet))
+    tws = Tweet.arel_table
+    f = -> model do
+      klas = model.arel_table
+      m = tws.project(tws[:id]).where(tws[:user_id].eq(self.id)).order(tws[:id].desc).take(100).as("m")
+      query = klas.project(klas[:user_id], klas[:user_id].count).join(m).on(klas[:tweet_id].eq(m[:id])).group(klas[:user_id])
+      ActiveRecord::Base.connection.exec_query(query.to_sql).rows
+    end
+    merge_count_user(f.call(Favorite), f.call(Retweet))
   end
 
   def count_discovered_users
-    merge_count_user(count_to(Favorite), count_to(Retweet))
+    tws = Tweet.arel_table
+    f = -> model do
+      klas = model.arel_table
+      m = klas.project(klas[:tweet_id]).where(klas[:user_id].eq(self.id)).order(klas[:id].desc).take(500).as("m")
+      query = tws.project(tws[:user_id], tws[:user_id].count).join(m).on(tws[:id].eq(m[:tweet_id])).group(tws[:user_id])
+      ActiveRecord::Base.connection.exec_query(query.to_sql).rows
+    end
+    merge_count_user(f.call(Favorite), f.call(Retweet))
   end
 
   private
-  def count_by(klass)
-    klas = klass.arel_table
-    tws = Tweet.arel_table
-    m = tws.project(tws[:id]).where(tws[:user_id].eq(self.id)).order(tws[:id].desc).take(100).as("m")
-    query = klas.project(klas[:user_id], klas[:user_id].count).join(m).on(klas[:tweet_id].eq(m[:id])).group(klas[:user_id])
-    ActiveRecord::Base.connection.exec_query(query.to_sql).rows
-  end
-
-  def count_to(klass)
-    klas = klass.arel_table
-    tws = Tweet.arel_table
-    m = klas.project(klas[:tweet_id]).where(klas[:user_id].eq(self.id)).order(klas[:id].desc).take(500).as("m")
-    query = tws.project(tws[:user_id], tws[:user_id].count).join(m).on(tws[:id].eq(m[:tweet_id])).group(tws[:user_id])
-    ActiveRecord::Base.connection.exec_query(query.to_sql).rows
-  end
-
   def merge_count_user(*args)
     ret = {}
-    args.map.each_with_index do |o, i|
+    args.each_with_index do |o, i|
       o.each do |user_id, count|
         ret[user_id] ||= Array.new(args.size, 0)
         ret[user_id][i] = count

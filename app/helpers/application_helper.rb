@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 module ApplicationHelper
   def logged_in?; session[:user_id] && session[:account] end
 
@@ -6,15 +7,14 @@ module ApplicationHelper
   end
 
   def format_tweet_text(text)
-    ret = text.gsub(/<([a-z]+?):(.+?)(?::(.+?))?>/) do
+    ret = text.gsub(/<([a-z]+?)(?<!\\):(.+?)(?:(?<!\\):(.+?))?>/) do
       case $1
       when "mention"
         screen_name = CGI.unescape($2)
         link_to("@#{screen_name}", "/#{screen_name}")
       when "url"
-        display = CGI.unescape($3)
-        expanded_url = CGI.unescape($2)
-        link_to(display, expanded_url)
+        n = [$3, $2.gsub(/(https?)%3A/, "\\1:")].map {|m| m.gsub("\\:", ":") }
+        link_to(*n)
       when "hashtag"
         hashtag = CGI.unescape($2)
         link_to("##{hashtag}", "https://twitter.com/search?q=#{CGI.escape("##{hashtag}")}")

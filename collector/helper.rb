@@ -14,11 +14,11 @@ module Aclog
           when :urls, :media
             result << "<url:#{escape_colon(entity[:expanded_url])}:#{escape_colon(entity[:display_url])}>"
           when :hashtags
-            result << "<hashtag:#{escape_colon(entity[:text])}>"
+            result << "<hashtag:#{entity[:text]}>"
           when :user_mentions
-            result << "<mention:#{escape_colon(entity[:screen_name])}>"
+            result << "<mention:#{entity[:screen_name]}>"
           when :symbols
-            result << "<symbol:#{escape_colon(entity[:text])}>"
+            result << "<symbol:#{entity[:text]}>"
           end
 
           entity[:indices].last
@@ -39,7 +39,8 @@ module Aclog
       end
 
       private
-      def escape_colon(str); str.gsub(":", "%3A").gsub("<", "%3C").gsub(">", "%3E") end
+      # escape ":" to "\\:". "\\" is in neither Unreserved Characters nor Reserved Characters (RFC3986)
+      def escape_colon(str); str.gsub(":", "\\:") end
     end
   end
 end

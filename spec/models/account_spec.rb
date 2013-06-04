@@ -10,18 +10,49 @@ describe Account do
       its(:oauth_token) { should eq account.oauth_token }
       its(:oauth_token_secret) { should eq account.oauth_token_secret }
       its(:consumer_version) { should be account.consumer_version }
+      its(:status) { should be Account::ACTIVE }
     end
 
     context "when already recorded" do
-      let(:old_account) { FactoryGirl.create(:account_1) }
+      before { @old_account = FactoryGirl.create(:account_1).update_settings!(notification: false, private: true) }
       let(:new_account) { FactoryGirl.build(:account_2) }
       subject { Account.create_or_update(new_account.attributes.symbolize_keys) }
-      its(:id) { should be old_account.id }
-      its(:user_id) { should be old_account.user_id }
+      its(:id) { should be @old_account.id }
+      its(:user_id) { should be @old_account.user_id }
       its(:user_id) { should be new_account.user_id }
       its(:oauth_token) { should eq new_account.oauth_token }
       its(:oauth_token_secret) { should eq new_account.oauth_token_secret }
       its(:consumer_version) { should eq new_account.consumer_version }
+      its(:notification) { should be false }
+      its(:private) { should be true }
+      its(:status) { should be Account::ACTIVE }
+    end
+  end
+
+  describe "#update_settings!" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    subject { account.update_settings!(notification: false, private: true) }
+    its(:notification) { should be false }
+    its(:private) { should be true }
+  end
+
+  describe "#deactivate!" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    it { account.active?.should be true }
+    subject { account.tap(&:deactivate!) }
+    its(:active?) { should be false }
+  end
+
+  describe "#active?" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    context "when active" do
+      subject { account }
+      its(:active?) { should be true }
+    end
+
+    context "when inactive" do
+      subject { account.tap(&:deactivate!) }
+      its(:active?) { should be false }
     end
   end
 
@@ -37,6 +68,7 @@ describe Account do
     let(:account) { FactoryGirl.create(:account_1) }
     subject { account.client }
     it { should be_a Twitter::Client }
+    it { subject.__send__(:credentials)[:token].should eq account.oauth_token }
   end
 
   describe "#import_favorites" do

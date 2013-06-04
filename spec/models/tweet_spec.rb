@@ -1,28 +1,22 @@
 # -*- coding: utf-8 -*-
-require 'spec_helper'
+require "spec_helper"
+
+include Aclog::Twitter
 
 describe Tweet do
   before do
     @user_0, @user_1, @user_2 = FactoryGirl.create_list(:user, 3) # t/f/r = 3/1/0, 1/2/1, 0/0/1
 
-    @tweet_0_0 = FactoryGirl.create(:tweet, user: @user_0, tweeted_at: 2.days.ago) # f/r = 2/0
-    @tweet_0_1 = FactoryGirl.create(:tweet, user: @user_0, tweeted_at: 4.days.ago) # f/r = 0/1
-    @tweet_0_2 = FactoryGirl.create(:tweet, user: @user_0, tweeted_at: 6.days.ago) # f/r = 0/0
-    @tweet_1_0 = FactoryGirl.create(:tweet, user: @user_1, tweeted_at: 1.days.ago) # f/r = 1/1
+    @tweet_0_0 = FactoryGirl.create(:tweet, id: snowflake(2.days.ago) + 5000, user: @user_0, tweeted_at: 2.days.ago) # f/r = 2/0
+    @tweet_0_1 = FactoryGirl.create(:tweet, id: snowflake(4.days.ago) + 5000, user: @user_0, tweeted_at: 4.days.ago) # f/r = 0/1
+    @tweet_0_2 = FactoryGirl.create(:tweet, id: snowflake(6.days.ago) + 5000, user: @user_0, tweeted_at: 6.days.ago) # f/r = 0/0
+    @tweet_1_0 = FactoryGirl.create(:tweet, id: snowflake(1.days.ago) + 5000, user: @user_1, tweeted_at: 1.days.ago) # f/r = 1/1
 
     @tweet_0_0_f_0 = FactoryGirl.create(:favorite, user: @user_0, tweet: @tweet_0_0)
     @tweet_0_0_f_1 = FactoryGirl.create(:favorite, user: @user_1, tweet: @tweet_0_0)
     @tweet_0_1_r_1 = FactoryGirl.create(:retweet,  user: @user_1, tweet: @tweet_0_1)
     @tweet_1_0_f_1 = FactoryGirl.create(:favorite, user: @user_1, tweet: @tweet_1_0)
     @tweet_1_0_r_2 = FactoryGirl.create(:retweet,  user: @user_2, tweet: @tweet_1_0)
-  end
-
-  describe ".create!" do
-    subject { @tweet_0_0 }
-    its(:text) { should_not be nil }
-    its(:source) { should_not be nil }
-    its(:user_id) { should be @user_0.id }
-    its(:user) { should eq @user_0 }
   end
 
   describe "counter_cache" do
@@ -33,18 +27,28 @@ describe Tweet do
 
   describe ".delete_from_id" do
     context "when of tweet" do
-      subject { Tweet.delete_from_id(@tweet_1_0.id) }
-      it { should be @tweet_1_0.id }
-      it { Tweet.where(id: subject).first.should be nil }
-      it { Favorite.where(tweet_id: subject).count.should be 0 }
-      it { Retweet.where(tweet_id: subject).count.should be 0 }
+      before do
+        @id = @tweet_1_0.id
+        @result = OpenStruct.new(Tweet.delete_from_id(@id))
+      end
+      it { @result.tweets.should be 1 }
+      it { @result.favorites.should be 1 }
+      it { @result.retweets.should be 1 }
+      it { Tweet.find_by(id: @id).should be nil }
+      it { Favorite.where(tweet_id: @id).count.should be 0 }
+      it { Retweet.where(tweet_id: @id).count.should be 0 }
     end
 
     context "when of retweet" do
-      subject { Tweet.delete_from_id(@tweet_1_0_r_2.id).tap { @tweet_1_0.reload } }
-      it { should be @tweet_1_0_r_2.id }
-      it { Retweet.where(id: subject).first.should be nil }
-      it { @tweet_1_0.retweets_count.should be 0 }
+      before do
+        @id = @tweet_1_0_r_2.id
+        @result = OpenStruct.new(Tweet.delete_from_id(@id))
+      end
+      it { @result.tweets.should be 0 }
+      it { @result.retweets.should be 1 }
+      it { Tweet.find_by(id: @tweet_1_0).retweets_count.should be 0 }
+      it { Favorite.where(tweet_id: @id).count.should be 0 }
+      it { Retweet.where(id: @id).count.should be 0 }
     end
   end
 
@@ -66,8 +70,8 @@ describe Tweet do
 
   context "scopes" do
     describe "recent" do
-      subject { Tweet.recent }
-      it { should_not include -> tweet { tweet.tweeted_at < Time.zone.now - 3.days } }
+      subject { Tweet.recent(3) }
+      it { should_not include -> tweet { tweet.tweeted_at < Time.now - 3.days } }
       its(:count) { should be 2 }
     end
 
@@ -101,11 +105,6 @@ describe Tweet do
       }
     end
 
-    describe "of" do
-      subject { Tweet.of(@user_1) }
-      its(:to_sql) { should eq @user_1.tweets.to_sql }
-    end
-
     describe "favorited_by" do
       subject { Tweet.favorited_by(@user_1) }
       its(:count) { should be 2 }
@@ -126,12 +125,21 @@ describe Tweet do
       it { should_not include -> tweet { not (tweet.retweets + tweet.favorites).any? {|a| a.user_id == @user_1.id } } }
     end
 
-    describe "original" do
-      # TODO
+    describe "not_protected" do
+      subject { Tweet.not_protected.includes(:user) }
+      it { should_not include -> tweet { tweet.user.protected? } }
     end
 
-    describe "not_protected" do
-      # TODO
+    describe "max_id" do
+      subject { Tweet.max_id(@tweet_0_0.id - 1) }
+      its(:count) { should be 2 }
+      it { should_not include -> tweet { tweet.id > @tweet_0_0.id - 1 } }
+    end
+
+    describe "since" do
+      subject { Tweet.since_id(@tweet_0_0.id) }
+      its(:count) { should be 1 }
+      it { should_not include -> tweet { tweet.id <= @tweet_0_0.id } }
     end
   end
 end

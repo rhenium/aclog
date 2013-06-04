@@ -93,4 +93,38 @@ describe User do
     its(:favorited_count) { should be 2 }
     its(:retweeted_count) { should be 1 }
   end
+
+  describe "#count_discovered_by" do
+    before do
+      @user = FactoryGirl.create_list(:user, 3)
+      tweet_1, tweet_2 = FactoryGirl.create_list(:tweet, 2, user: @user[0])
+      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[0])
+      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[1])
+      FactoryGirl.create(:retweet, tweet: tweet_1, user: @user[1])
+      FactoryGirl.create(:favorite, tweet: tweet_2, user: @user[1])
+      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[2])
+      FactoryGirl.create(:favorite, tweet: tweet_2, user: @user[2])
+    end
+    subject { @user.first.count_discovered_by }
+    its(:size) { should be 3 }
+    it { should eq [[@user[1].id, 2, 1], [@user[2].id, 2, 0], [@user[0].id, 1, 0]] }
+  end
+
+  describe "#count_discovered_users" do
+    before do
+      @user = FactoryGirl.create_list(:user, 3)
+      tweet_1 = FactoryGirl.create(:tweet, user: @user[1])
+      tweet_2 = FactoryGirl.create(:tweet, user: @user[2])
+      tweet_3 = FactoryGirl.create(:tweet, user: @user[2])
+      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[0])
+      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[1])
+      FactoryGirl.create(:retweet, tweet: tweet_1, user: @user[0])
+      FactoryGirl.create(:favorite, tweet: tweet_2, user: @user[0])
+      FactoryGirl.create(:retweet, tweet: tweet_2, user: @user[0])
+      FactoryGirl.create(:favorite, tweet: tweet_3, user: @user[0])
+    end
+    subject { @user[0].count_discovered_users }
+    its(:size) { should be 2 }
+    it { should eq [[@user[2].id, 2, 1], [@user[1].id, 1, 1]] }
+  end
 end

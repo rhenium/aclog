@@ -110,3 +110,4 @@ class User < ActiveRecord::Base
     ret.map(&:flatten).sort_by {|user_id, favorites_count, retweets_count| -(favorites_count + retweets_count) }
   end
 end
+

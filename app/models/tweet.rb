@@ -21,9 +21,8 @@ class Tweet < ActiveRecord::Base
   scope :order_by_retweets, -> { order("tweets.retweets_count DESC") }
   scope :order_by_reactions, -> { order("COALESCE(tweets.favorites_count, 0) + COALESCE(tweets.retweets_count, 0) DESC") }
 
-  scope :of, -> user { where(user: user) if user }
-  scope :favorited_by, -> user { joins(:favorites).where(favoriters: user) }
-  scope :retweeted_by, -> user { joins(:retweets).where(retweeters: user) }
+  scope :favorited_by, -> user { joins(:favorites).where(favorites: {user: user}) }
+  scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user: user}) }
   scope :discovered_by, -> user {
     un = "SELECT favorites.tweet_id FROM favorites WHERE favorites.user_id = #{user.id}" +
          " UNION " +

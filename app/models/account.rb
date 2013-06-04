@@ -22,9 +22,10 @@ class Account < ActiveRecord::Base
   def active?; self.status == Account::ACTIVE end
 
   def update_settings!(params)
-    self.notification = params[:notification]
-    self.private = params[:private]
+    self.notification = !!params[:notification]
+    self.private = !!params[:private]
     self.save! if self.changed?
+    self
   end
 
   def deactivate!
@@ -39,7 +40,7 @@ class Account < ActiveRecord::Base
     client = MessagePack::RPC::Client.new(transport, Rails.root.join("tmp", "sockets", "receiver.sock").to_s)
     if self.status == Account::ACTIVE
       client.call(:register, Marshal.dump(self))
-    elsif self.status == Account::INACTIVE
+    elsif self.status == Account::DEACTIVATED
       client.call(:unregister, Marshal.dump(self))
     end
   rescue Errno::ECONNREFUSED

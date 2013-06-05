@@ -20,7 +20,7 @@ module ApplicationHelper
         link_to("##{hashtag}", "https://twitter.com/search?q=#{CGI.escape("##{hashtag}")}")
       when "symbol"
         symbol = CGI.unescape($2)
-        link_to("##{symbol}", "https://twitter.com/search?q=#{CGI.escape("$#{symbol}")}")
+        link_to("$#{symbol}", "https://twitter.com/search?q=#{CGI.escape("$#{symbol}")}")
       else
         $&
       end

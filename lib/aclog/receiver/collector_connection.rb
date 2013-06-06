@@ -186,13 +186,9 @@ module Aclog
       end
 
       def receive_delete(msg)
-        if msg["id"]
-          @@queue.push -> do
-            Rails.logger.debug("Receive Delete(#{@worker_number}): #{msg["id"]}")
-            Tweet.delete_from_id(msg["id"])
-          end
-        elsif msg["tweet_id"]
-          receive_unfavorite(msg)
+        @@queue.push -> do
+          Rails.logger.debug("Receive Delete(#{@worker_number}): #{msg["id"]}")
+          Tweet.delete_from_id(msg["id"])
         end
       end
     end

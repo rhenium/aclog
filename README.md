@@ -24,19 +24,10 @@ A web service like Favstar.
 
 ## Requirements
 * Ruby 1.9.3
-* MySQL/MariaDB 5.5.14+
+* MySQL/MariaDB 5.5.14+ (must support utf8mb4)
 
 ## Setup
 ### MySQL
-* Add to `my.cnf`
-
-    ```ini
-    [mysqld]
-    innodb_file_format = Barracuda
-    innodb_file_per_table = 1
-    innodb_large_prefix
-    ```
-
 * Create MySQL user
 
 ### aclog configuration (application)

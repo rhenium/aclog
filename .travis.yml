@@ -12,6 +12,7 @@ before_script:
   - "mysql -e 'CREATE DATABASE aclog_test;'"
 script:
   - "RAILS_ENV=test bundle exec rake db:drop db:create db:migrate"
+  - "RAILS_ENV=test bundle exec rake tmp:create"
   - "RAILS_ENV=test bundle exec rails runner script/start.rb start"
   - "RAILS_ENV=test bundle exec rake spec"
 

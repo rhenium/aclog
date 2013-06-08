@@ -1,22 +1,7 @@
-# Common
-**.orig
-
-# Linux
-.*
-!.gitignore
-!.gitkeep
-*~
-
-# SASS
-*.sass-cache
-*.sassc
-
-# Rails
-*.rbc
 /vendor/bundle
 /log/*.log
-/tmp/*
-/spec/tmp/*
+/tmp
+/spec/tmp
 /coverage
 /public/assets
 
@@ -26,9 +11,12 @@
 /config/initializers/secret_token.rb
 /config/database.yml
 
-/collector/Procfile
 /collector/settings.yml
 
-!.coveralls.yml
-!.travis.yml
+.*
+*~
+!.gitignore
+!.gitkeep
+!/.coveralls.yml
+!/.travis.yml
 

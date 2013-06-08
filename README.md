@@ -1,4 +1,4 @@
-# Aclog
+# Aclog [![Build Status](https://travis-ci.org/rhenium/aclog.png?branch=master)](https://travis-ci.org/rhenium/aclog) [![Coverage Status](https://coveralls.io/repos/rhenium/aclog/badge.png)](https://coveralls.io/r/rhenium/aclog)
 Collects favs and retweets in real time by UserStreams.
 A web service like Favstar.
 

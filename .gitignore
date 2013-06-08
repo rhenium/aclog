@@ -4,6 +4,7 @@
 # Linux
 .*
 !.gitignore
+!.gitkeep
 *~
 
 # SASS

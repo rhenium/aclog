@@ -41,6 +41,9 @@ development:
 test:
   <<: *default
   collector:
+    server_port:      42106
+    secret_key:       "secret"
+    count:            1
     consumer_version: 0
     consumer:
       - key:          "JVkX2Uy0Qtigsh0GiG5Lw"

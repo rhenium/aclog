@@ -13,9 +13,11 @@
 # Rails
 *.rbc
 /vendor/bundle
-/log/*
+/log/*.log
 /tmp/*
 /spec/tmp/*
+/coverage
+/public/assets
 
 /config/settings.yml
 /config/settings/*.local.yml
@@ -25,4 +27,7 @@
 
 /collector/Procfile
 /collector/settings.yml
+
+!.coveralls.yml
+!.travis.yml
 

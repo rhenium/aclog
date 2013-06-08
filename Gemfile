@@ -29,6 +29,8 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem 'webmock'
+  gem 'coveralls', require: false
+  gem 'simplecov', require: false
 end
 
 group :assets do

@@ -18,7 +18,7 @@ class User < ActiveRecord::Base
       if orig["screen_name"] == user.screen_name &&
          orig["name"] == user.name &&
          orig["profile_image_url"][-44..-1] == user.profile_image_url[-44..-1] &&
-         orig["protected"] = user.protected?
+         orig["protected"] == user.protected?
         logger.debug("User not changed: #{user.id}")
       else
         user.save!

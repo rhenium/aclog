@@ -38,7 +38,68 @@ describe ApplicationController do
   end
 
   describe "#authorized_to_show_user?" do
-    pending
+    before do
+      @user = FactoryGirl.create(:user, protected: true)
+      @account = FactoryGirl.create(:account_1, user: @user)
+    end
+    let(:user) { @user }
+    let(:account) { @account }
+
+    subject { controller.__send__(:authorized_to_show_user?, user) }
+
+    context "when not protected" do
+      before { user.protected = false }
+      it { should be true }
+    end
+
+    context "when protected" do
+      context "and logged in" do
+        it "as the user" do
+          session[:user_id] = user.id
+          subject.should be true
+        end
+
+        it "as the user's follower" do
+          account.stub!(:following?).and_return(true)
+          session[:account] = account
+          subject.should be true
+        end
+
+        it "as not the user's follower" do
+          account.stub!(:following?).and_return(false)
+          session[:account] = account
+          subject.should be false
+        end
+      end
+    end
+
+    context "when using OAuth Echo" do
+      before { request.headers["X-Verify-Credentials-Authorization"] = true }
+
+      it "as the user" do
+        controller.stub!(:authenticate_with_twitter_oauth_echo).and_return(user.id)
+        subject.should be true
+      end
+
+      it "as the user's follower" do
+        controller.stub!(:authenticate_with_twitter_oauth_echo).and_return(user.id)
+        user.id += 1
+        Account.any_instance.stub(:following?).and_return(true)
+        subject.should be true
+      end
+
+      it "not as the user's follower" do
+        controller.stub!(:authenticate_with_twitter_oauth_echo).and_return(user.id + 1)
+        Account.any_instance.stub(:following?).and_return(false)
+        subject.should be false
+      end
+
+      it "but failed in verification" do
+        controller.stub!(:authenticate_with_twitter_oauth_echo).and_raise(Aclog::Exceptions::OAuthEchoUnauthorized)
+        Account.any_instance.stub(:following?).and_return(false)
+        subject.should be false
+      end
+    end
   end
 
   describe "#authorized_to_show_best?" do

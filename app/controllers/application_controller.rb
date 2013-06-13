@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
         true
       elsif request.headers["X-Verify-Credentials-Authorization"]
         # OAuth Echo
-        user_id = authenticate_with_twitter_oauth_echo
+        user_id = authenticate_with_twitter_oauth_echo rescue false
         account = Account.find_by(user_id: user_id)
         if account && (account.user_id == user.id || account.following?(user.id))
           true

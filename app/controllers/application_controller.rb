@@ -67,15 +67,19 @@ class ApplicationController < ActionController::Base
   end
 
   def check_session
-    if (session[:user_id] || session[:account]) and not (session[:user_id] && session[:account])
+    if !!session[:user_id] == !!session[:account]
+      true
+    else
       reset_session
+      false
     end
   end
 
   def xhtml
     if request.format == :html
       response.content_type = "application/xhtml+xml"
-
+    end
+    if request.format == :html || request.format == :rss
       # remove invalid charactors
       u = ActiveSupport::Multibyte::Unicode
       response.body = u.tidy_bytes(response.body)

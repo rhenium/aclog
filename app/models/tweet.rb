@@ -153,7 +153,7 @@ class Tweet < ActiveRecord::Base
     key = "tweets/#{scoped.to_sql}"
     ids = Rails.cache.read(key)
     unless ids
-      ids = pluck(&:id)
+      ids = pluck(:id)
       Rails.cache.write(key, ids, expires_in: expires_in)
     end
     Tweet.where(id: ids).order("CASE tweets.id #{ids.each_with_index.map {|m, i| "WHEN #{m} THEN #{i}" }.join(" ")} END")

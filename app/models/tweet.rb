@@ -1,3 +1,5 @@
+require "digest/md5"
+
 class Tweet < ActiveRecord::Base
   extend Aclog::Twitter
 
@@ -150,13 +152,13 @@ class Tweet < ActiveRecord::Base
   end
 
   def self.cache_list(expires_in)
-    key = "tweets/#{scoped.to_sql}"
+    key = "tweets/ids/#{Digest::MD5.hexdigest(scoped.to_sql)}"
     ids = Rails.cache.read(key)
     unless ids
-      ids = pluck(:id)
+      ids = scoped.pluck(:id)
       Rails.cache.write(key, ids, expires_in: expires_in)
     end
-    Tweet.where(id: ids).order("CASE tweets.id #{ids.each_with_index.map {|m, i| "WHEN #{m} THEN #{i}" }.join(" ")} END")
+    unscoped.where(id: ids).order("CASE tweets.id #{ids.each_with_index.map {|m, i| "WHEN #{m} THEN #{i}" }.join(" ")} END")
   end
 end
 

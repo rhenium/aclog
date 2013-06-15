@@ -152,13 +152,11 @@ class Tweet < ActiveRecord::Base
   def self.cache_list(expires_in)
     key = "tweets/#{scoped.to_sql}"
     ids = Rails.cache.read(key)
-    if ids
-      Tweet.where(id: ids).order("CASE #{ids.each_with_index.map {|m, i| "WHEN ID = #{m} THEN #{i}" }.join(" ")} END")
-    else
-      # use map instead of pluck: not to excecute new SQL
-      Rails.cache.write(key, scoped.map(&:id), expires_in: expires_in)
-      scoped
+    unless ids
+      ids = pluck(&:id)
+      Rails.cache.write(key, ids, expires_in: expires_in)
     end
+    Tweet.where(id: ids).order("CASE tweets.id #{ids.each_with_index.map {|m, i| "WHEN #{m} THEN #{i}" }.join(" ")} END")
   end
 end
 

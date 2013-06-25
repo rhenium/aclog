@@ -1,7 +1,7 @@
 ruby "1.9.3"
 source "https://rubygems.org"
 
-gem "rails", "4.0.0.rc2"
+gem "rails", "~> 4.0.0"
 gem "mysql2", "> 0.3.12b"
 gem "dalli"
 
@@ -34,8 +34,8 @@ group :development, :test do
 end
 
 group :assets do
-  gem "sass-rails", "~> 4.0.0.rc2"
-  gem "coffee-rails", "~> 4.0.0.rc2"
+  gem "sass-rails", "~> 4.0.0"
+  gem "coffee-rails", "~> 4.0.0"
   gem "uglifier"
 end
 

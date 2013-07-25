@@ -43,7 +43,7 @@ class Account < ActiveRecord::Base
     elsif self.status == Account::DEACTIVATED
       client.call(:unregister, Marshal.dump(self))
     end
-  rescue Errno::ECONNREFUSED
+  rescue Errno::ECONNREFUSED, Errno::ENOENT
     Rails.logger.error($!)
   end
 

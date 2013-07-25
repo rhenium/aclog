@@ -152,10 +152,10 @@ class Tweet < ActiveRecord::Base
   end
 
   def self.cache_list(expires_in)
-    key = "tweets/ids/#{Digest::MD5.hexdigest(scoped.to_sql)}"
+    key = "tweets/ids/#{Digest::MD5.hexdigest(current_scope.to_sql)}"
     ids = Rails.cache.read(key)
     unless ids
-      ids = scoped.pluck(:id)
+      ids = current_scope.pluck(:id)
       Rails.cache.write(key, ids, expires_in: expires_in)
     end
     m = unscoped.where(id: ids)

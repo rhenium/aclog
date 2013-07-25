@@ -158,7 +158,12 @@ class Tweet < ActiveRecord::Base
       ids = scoped.pluck(:id)
       Rails.cache.write(key, ids, expires_in: expires_in)
     end
-    unscoped.where(id: ids).order("CASE tweets.id #{ids.each_with_index.map {|m, i| "WHEN #{m} THEN #{i}" }.join(" ")} END")
+    m = unscoped.where(id: ids)
+    if ids.size > 0
+      m.order("CASE tweets.id #{ids.each_with_index.map {|m, i| "WHEN #{m} THEN #{i}" }.join(" ")} END")
+    else
+      m
+    end
   end
 end
 

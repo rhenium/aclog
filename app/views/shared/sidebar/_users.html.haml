@@ -38,6 +38,3 @@
           = link_to "timeline", user_path(@user.screen_name)
         %li
           = link_to "discoveries", user_discoveries_path(@user.screen_name)
-      - if @user.registered?
-        %li
-          = link_to "stats", user_stats_path(@user.screen_name)

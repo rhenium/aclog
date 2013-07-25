@@ -57,12 +57,12 @@ ActiveRecord::Schema.define(version: 20130525142430) do
   add_index "retweets", ["user_id"], name: "index_retweets_on_user_id", using: :btree
 
   create_table "tweets", force: true do |t|
-    t.text     "text",            limit: 16777215,             null: false
-    t.text     "source",          limit: 16777215
-    t.integer  "user_id",         limit: 8,                    null: false
+    t.text     "text",                                  null: false
+    t.text     "source"
+    t.integer  "user_id",         limit: 8,             null: false
     t.datetime "tweeted_at"
-    t.integer  "favorites_count",                  default: 0
-    t.integer  "retweets_count",                   default: 0
+    t.integer  "favorites_count",           default: 0
+    t.integer  "retweets_count",            default: 0
   end
 
   add_index "tweets", ["user_id"], name: "index_tweets_on_user_id", using: :btree
@@ -70,7 +70,7 @@ ActiveRecord::Schema.define(version: 20130525142430) do
   create_table "users", force: true do |t|
     t.string   "screen_name"
     t.string   "name"
-    t.text     "profile_image_url", limit: 16777215
+    t.text     "profile_image_url"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "protected"

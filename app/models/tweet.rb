@@ -33,6 +33,12 @@ class Tweet < ActiveRecord::Base
     joins("INNER JOIN (#{un}) m ON m.tweet_id = tweets.id")
   }
 
+  def notify_favorite
+    if Settings.notification.enabled
+      Notification.notify_favorite(self)
+    end
+  end
+
   def self.list(params, options = {})
     params[:page] ||= "1" if options[:force_page]
 
@@ -74,23 +80,31 @@ class Tweet < ActiveRecord::Base
     end
   end
 
-  def self.from_hash(hash)
-    begin
-      t = logger.quietly do
-        create!(id: hash[:id],
-                text: hash[:text],
-                source: hash[:source],
-                tweeted_at: hash[:tweeted_at],
-                user_id: hash[:user_id])
-      end
-      logger.debug("Created Tweet: #{hash[:id]}")
+  def self.delete_from_receiver(msg)
+    delete_from_id(msg["id"])
+  end
 
+  def self.from_receiver(msg)
+    transaction do
+      t = self.find_by(id: msg["id"])
+      unless t
+        begin
+          u = User.from_receiver(msg["user"])
+          t = self.create!(id: msg["id"],
+                           text: msg["text"],
+                           source: msg["source"],
+                           tweeted_at: Time.parse(msg["tweeted_at"]),
+                           user: u)
+          logger.debug("Created Tweet: #{msg["id"]}")
+        rescue ActiveRecord::RecordNotUnique
+          logger.debug("Duplicate Tweet: #{msg["id"]}")
+        end
+      end
       return t
-    rescue ActiveRecord::RecordNotUnique
-      logger.debug("Duplicate Tweet: #{hash[:id]}")
-    rescue => e
-      logger.error("Unknown error while inserting tweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     end
+  rescue => e
+    logger.error("Unknown error while inserting tweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
+    return nil
   end
 
   def self.parse_query(query)

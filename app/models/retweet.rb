@@ -1,23 +1,23 @@
 class Retweet < ActiveRecord::Base
   belongs_to :tweet, :counter_cache => true
-#  counter_culture :tweet
   belongs_to :user
 
-  def self.from_hash(hash)
-    begin
-      r = logger.quietly do
-        create!(id: hash[:id],
-                tweet_id: hash[:tweet_id],
-                user_id: hash[:user_id])
-      end
-      logger.debug("Created Retweet: #{hash[:id]}: #{hash[:user_id]} => #{hash[:tweet_id]}")
-
+  def self.from_receiver(msg)
+    transaction do
+      t = Tweet.from_receiver(msg["tweet"])
+      u = User.from_receiver(msg["user"])
+      r = self.create!(id: msg["id"],
+                       tweet: t,
+                       user: u)
+      logger.debug("Created Retweet: #{msg["id"]}: #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
       return r
-    rescue ActiveRecord::RecordNotUnique
-      logger.debug("Duplicate Retweet: #{hash[:id]}: #{hash[:user_id]} => #{hash[:tweet_id]}")
-    rescue => e
-      logger.error("Unknown error while inserting retweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     end
+  rescue ActiveRecord::RecordNotUnique
+    logger.debug("Duplicate Retweet: #{msg["id"]}: #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
+    return nil
+  rescue => e
+    logger.error("Unknown error while inserting retweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
+    return nil
   end
 
   def self.from_tweet_object(status)

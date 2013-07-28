@@ -125,72 +125,54 @@ module Aclog
         }
       end
 
-      def send_user(user)
-        @callback.call(
-          type: "user",
-          id: user[:id],
-          screen_name: user[:screen_name],
-          name: user[:name],
-          profile_image_url: user[:profile_image_url_https],
-          protected: user[:protected]
-        )
-        log(:debug, "Sent user", user[:id])
+      def conv_user(user)
+        {id: user[:id],
+         screen_name: user[:screen_name],
+         name: user[:name],
+         profile_image_url: user[:profile_image_url_https],
+         protected: user[:protected]}
+      end
+
+      def conv_tweet(status)
+        {type: "tweet",
+         id: status[:id],
+         text: format_text(status),
+         source: format_source(status),
+         tweeted_at: status[:created_at],
+         user: conv_user(status[:user])}
       end
 
       def send_tweet(status)
-        send_user(status[:user])
-        @callback.call(
-          type: "tweet",
-          id: status[:id],
-          text: format_text(status),
-          source: format_source(status),
-          tweeted_at: status[:created_at],
-          user_id: status[:user][:id]
-        )
+        @callback.call(conv_tweet(status))
         log(:debug, "Sent tweet", status[:id])
       end
 
       def send_favorite(source, target, target_object)
-        send_tweet(target_object)
-        send_user(source)
-        @callback.call(
-          type: "favorite",
-          tweet_id: target_object[:id],
-          target_user_id: target[:id],
-          user_id: source[:id]
-        )
+        @callback.call(type: "favorite",
+                       tweet: conv_tweet(target_object),
+                       user: conv_user(source))
         log(:debug, "Sent favorite", source[:id] => target_object[:id])
       end
 
       def send_unfavorite(source, target, target_object)
-        @callback.call(
-          type: "unfavorite",
-          tweet_id: target_object[:id],
-          target_user_id: target[:id],
-          user_id: source[:id]
-        )
+        @callback.call(type: "unfavorite",
+                       tweet: conv_tweet(target_object),
+                       user: conv_user(source))
         log(:debug, "Sent unfavorite", source[:id] => target_object[:id])
       end
 
       def send_retweet(status)
-        send_tweet(status[:retweeted_status])
-        send_user(status[:user])
-        @callback.call(
-          type: "retweet",
-          id: status[:id],
-          tweet_id: status[:retweeted_status][:id],
-          target_user_id: status[:retweeted_status][:user][:id],
-          user_id: status[:user][:id]
-        )
+        @callback.call(type: "retweet",
+                       id: status[:id],
+                       tweet: conv_tweet(status[:retweeted_status]),
+                       user: conv_user(status[:user]))
         log(:debug, "Sent retweet", status[:user][:id] => status[:retweeted_status][:id])
       end
 
       def send_delete(deleted_status_id, deleted_user_id)
-        @callback.call(
-          :type => "delete",
-          :id => deleted_status_id,
-          :user_id => deleted_user_id
-        )
+        @callback.call(type: "delete",
+                       id: deleted_status_id,
+                       user_id: deleted_user_id)
         log(:debug, "Sent delete", deleted_user_id => deleted_status_id)
       end
     end

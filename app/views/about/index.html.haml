@@ -1,4 +1,6 @@
 %h1 aclog
+- if Rails.env.development?
+  %h1.text-error !!!DEVELOPMENT!!!
 %p
   aclog は Twitter でのふぁぼ・RTを集めて表示するサービスです
 %p

@@ -1,21 +1,22 @@
 class Favorite < ActiveRecord::Base
-  belongs_to :tweet, :counter_cache => true
-#  counter_culture :tweet
+  belongs_to :tweet, counter_cache: true
   belongs_to :user
 
-  def self.from_hash(hash)
-    begin
-      f = logger.quietly do
-        create!(tweet_id: hash[:tweet_id], user_id: hash[:user_id])
-      end
-      logger.debug("Created Favorite: #{hash[:user_id]} => #{hash[:tweet_id]}")
-
+  def self.from_receiver(msg)
+    transaction do
+      t = Tweet.from_receiver(msg["tweet"])
+      u = User.from_receiver(msg["user"])
+      f = self.create!(tweet: t,
+                       user: u)
+      logger.debug("Created Favorite: #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
       return f
-    rescue ActiveRecord::RecordNotUnique
-      logger.debug("Duplicate Favorite: #{hash[:user_id]} => #{hash[:tweet_id]}")
-    rescue => e
-      logger.error("Unknown error while inserting favorite: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     end
+  rescue ActiveRecord::RecordNotUnique
+    logger.debug("Duplicate Favorite: #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
+    return nil
+  rescue => e
+    logger.error("Unknown error while inserting favorite: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
+    return nil
   end
 
   def self.from_tweet_object(tweet_object)
@@ -26,7 +27,7 @@ class Favorite < ActiveRecord::Base
     end
   end
 
-  def self.delete_from_hash(hash)
-    where(tweet_id: hash[:tweet_id], user_id: hash[:user_id]).destroy_all
+  def self.delete_from_receiver(msg)
+    where(tweet_id: msg["tweet"]["id"], user_id: msg["user"]["id"]).destroy_all
   end
 end

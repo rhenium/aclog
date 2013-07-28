@@ -5,38 +5,36 @@ class User < ActiveRecord::Base
   has_many :favorites, dependent: :delete_all
   has_many :retweets, dependent: :delete_all
 
-  def self.from_hash(hash)
-    begin
-      user = where(id: hash[:id]).first_or_initialize
-      orig = user.attributes.dup
+  def self.from_receiver(msg)
+    user = where(id: msg["id"]).first_or_initialize
+    att = user.attributes.dup
 
-      user.screen_name = hash[:screen_name]
-      user.name = hash[:name]
-      user.profile_image_url = hash[:profile_image_url]
-      user.protected = hash[:protected]
+    user.screen_name = msg["screen_name"]
+    user.name = msg["name"]
+    user.profile_image_url = msg["profile_image_url"]
+    user.protected = msg["protected"]
 
-      if orig["screen_name"] == user.screen_name &&
-         orig["name"] == user.name &&
-         orig["profile_image_url"][-44..-1] == user.profile_image_url[-44..-1] &&
-         orig["protected"] == user.protected?
-        logger.debug("User not changed: #{user.id}")
-      else
-        user.save!
-        logger.debug("User saved: #{user.id}")
-      end
-
-      return user
-    rescue
-      logger.error("Unknown error while inserting user: #{$!}/#{$@}")
+    if att["screen_name"] == user.screen_name &&
+       att["name"] == user.name &&
+       att["profile_image_url"][-44..-1] == user.profile_image_url[-44..-1] &&
+       att["protected"] == user.protected?
+      logger.debug("User not changed: #{user.id}")
+    else
+      user.save!
+      logger.debug("User saved: #{user.id}")
     end
+
+    return user
+  rescue
+    logger.error("Unknown error while inserting user: #{$!}/#{$@}")
   end
 
   def self.from_user_object(user_object)
-    from_hash(id: user_object.id,
-              screen_name: user_object.screen_name,
-              name: user_object.name,
-              profile_image_url: user_object.profile_image_url_https,
-              protected: user_object.protected)
+    from_receiver("id" => user_object.id,
+                  "screen_name" => user_object.screen_name,
+                  "name" => user_object.name,
+                  "profile_image_url" => user_object.profile_image_url_https,
+                  "protected" => user_object.protected)
   end
 
   def protected?
@@ -44,7 +42,7 @@ class User < ActiveRecord::Base
   end
 
   def registered?
-    account
+    !!account
   end
 
   def account

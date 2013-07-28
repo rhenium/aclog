@@ -90,11 +90,13 @@ class Tweet < ActiveRecord::Base
       unless t
         begin
           u = User.from_receiver(msg["user"])
-          t = self.create!(id: msg["id"],
-                           text: msg["text"],
-                           source: msg["source"],
-                           tweeted_at: Time.parse(msg["tweeted_at"]),
-                           user: u)
+          t = logger.quietly do
+            self.create!(id: msg["id"],
+                         text: msg["text"],
+                         source: msg["source"],
+                         tweeted_at: Time.parse(msg["tweeted_at"]),
+                         user: u)
+          end
           logger.debug("Created Tweet: #{msg["id"]}")
         rescue ActiveRecord::RecordNotUnique
           logger.debug("Duplicate Tweet: #{msg["id"]}")

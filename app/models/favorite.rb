@@ -6,8 +6,7 @@ class Favorite < ActiveRecord::Base
     transaction do
       t = Tweet.from_receiver(msg["tweet"])
       u = User.from_receiver(msg["user"])
-      f = self.create!(tweet: t,
-                       user: u)
+      f = logger.quietly { self.create!(tweet: t, user: u) }
       logger.debug("Created Favorite: #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
       return f
     end

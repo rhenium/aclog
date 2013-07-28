@@ -6,9 +6,7 @@ class Retweet < ActiveRecord::Base
     transaction do
       t = Tweet.from_receiver(msg["tweet"])
       u = User.from_receiver(msg["user"])
-      r = self.create!(id: msg["id"],
-                       tweet: t,
-                       user: u)
+      r = logger.quietly { self.create!(id: msg["id"], tweet: t, user: u) }
       logger.debug("Created Retweet: #{msg["id"]}: #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
       return r
     end

@@ -58,8 +58,6 @@ module Aclog
             receive_init(msg)
           when "unauthorized"
             receive_unauthorized(msg)
-          when "user"
-            receive_user(msg)
           when "tweet"
             receive_tweet(msg)
           when "favorite"
@@ -70,8 +68,6 @@ module Aclog
             receive_retweet(msg)
           when "delete"
             receive_delete(msg)
-          when "spam"
-            receive_spam(msg)
           when "quit"
             Rails.logger.info("Quit(#{@worker_number}): #{msg["reason"]}")
             send_data(type: "quit", message: "Bye")

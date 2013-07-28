@@ -17,6 +17,10 @@ class Account < ActiveRecord::Base
     account
   end
 
+  def self.set_of_collector(collector_id)
+    self.active.where("id % ? = ?", Settings.collector.count, collector_id)
+  end
+
   def notification?; self.notification end
   def private?; self.private end
   def active?; self.status == Account::ACTIVE end

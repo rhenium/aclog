@@ -113,7 +113,7 @@ module Aclog
         Rails.logger.info("Connected(#{@worker_number})")
         send_object(type: "ok", message: "Connected")
 
-        Account.where("id % ? = ?", Settings.collector.count, @worker_number).each do |account|
+        Account.set_of_collector(@worker_number).each do |account|
           send_account(account)
         end
       end

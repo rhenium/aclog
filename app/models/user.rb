@@ -54,7 +54,7 @@ class User < ActiveRecord::Base
   end
 
   def stats
-    raise Aclog::Exceptions::UserNotRegistered.new(self) unless registered?
+    raise Aclog::Exceptions::UserNotRegistered.new(self) unless registered? && account.active?
 
     Rails.cache.fetch("stats/#{self.id}", expires_in: 3.hours) do
       favorited_counts, retweeted_counts = self.tweets.pluck(:favorites_count, :retweets_count).transpose

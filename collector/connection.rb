@@ -59,6 +59,13 @@ module Aclog
             else
               @clients[account_id].update(msg)
             end
+          when "stop"
+            account_id = msg["id"]
+            if @clients[account_id]
+              @clients[account_id].stop
+              @clients.delete(account_id)
+              @logger.info("Received account stop")
+            end
           else
             @logger.info("Unknown message: #{msg}")
           end

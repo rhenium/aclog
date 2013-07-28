@@ -1,7 +1,7 @@
 class Notification
   def self.notify_favorite(tweet)
     if Settings.notification.favorites.include?(tweet.favorites.count)
-      if tweet.user.registered? && tweet.user.account.notification?
+      if tweet.user.registered? && tweet.user.account.active? && tweet.user.account.notification?
         reply_favs(tweet, tweet.favorites.count)
       end
     end

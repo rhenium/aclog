@@ -28,6 +28,12 @@ module Aclog
         Rails.logger.debug("Sent #{account.id}/#{account.user_id}")
       end
 
+      def send_stop_account(account)
+        send_object(type: "stop",
+                    id: account.id)
+        Rails.logger.debug("Sent Stop #{account.id}/#{account.user_id}")
+      end
+
       def post_init
         # なにもしない。クライアントが
       end

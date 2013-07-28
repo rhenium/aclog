@@ -18,7 +18,7 @@
   %dd= @user_twitter.listed_count
   %dt Bio
   %dd= raw @user_twitter.description.gsub(/&(?!(amp;|gt;|lt;|quot;|apos;))/, "&amp;")
-- if @user.registered?
+- if @user.registered? && @user.account.active?
   %p records
   %dl.dl-horizontal
     %dt Favorited

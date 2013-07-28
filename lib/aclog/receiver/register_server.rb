@@ -11,19 +11,14 @@ module Aclog
         con_num = account.id % Settings.collector.count
         con = @connections[con_num]
         if con
-          con.send_account(account)
-          Rails.logger.info("Sent account: connection_number: #{con_num} / account_id: #{account.id}")
+          if account.active?
+            con.send_account(account)
+          else
+            con.send_stop_account(account)
+          end
         else
           Rails.logger.info("Connection not found: connection_number: #{con_num} / account_id: #{account.id}")
         end
-      end
-
-      def unregister(account_)
-        account = Marshal.load(account_)
-      end
-
-      def unregister(account)
-        # TODO
       end
     end
   end

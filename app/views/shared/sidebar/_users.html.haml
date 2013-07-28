@@ -3,7 +3,7 @@
     = link_to user_path(@user.screen_name) do
       = image_tag @user.profile_image_url_original, alt: @user.screen_name, width: 64, height: 64, class: "icon img-rounded"
   .screen_name= link_to @user.screen_name, twitter_user_url(@user.screen_name)
-  - if @user.registered?
+  - if @user.registered? && @user.account.active?
     %ul.records
       %li
         %span favorited

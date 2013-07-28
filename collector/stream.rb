@@ -102,6 +102,7 @@ module Aclog
 
       def stop
         @client.connection.stop
+        log(:info, "Disconnected")
       end
 
       private

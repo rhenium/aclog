@@ -1,7 +1,7 @@
 require "msgpack/rpc/transport/unix"
 
 class Account < ActiveRecord::Base
-  ACTIVE = 0; DEACTIVATED = 1
+  ACTIVE = 0; INACTIVE = 1
 
   belongs_to :user
 
@@ -33,7 +33,7 @@ class Account < ActiveRecord::Base
   end
 
   def deactivate!
-    self.status = Account::DEACTIVATED
+    self.status = Account::INACTIVE
     self.save! if self.changed?
 
     update_connection
@@ -42,11 +42,7 @@ class Account < ActiveRecord::Base
   def update_connection
     transport = MessagePack::RPC::UNIXTransport.new
     client = MessagePack::RPC::Client.new(transport, Rails.root.join("tmp", "sockets", "receiver.sock").to_s)
-    if self.status == Account::ACTIVE
-      client.call(:register, Marshal.dump(self))
-    elsif self.status == Account::DEACTIVATED
-      client.call(:unregister, Marshal.dump(self))
-    end
+    client.call(:register, Marshal.dump(self))
   rescue Errno::ECONNREFUSED, Errno::ENOENT
     Rails.logger.error($!)
   end

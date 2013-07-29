@@ -134,7 +134,7 @@ module Aclog
 
       def receive_favorite(msg)
         @@queue.push -> do
-          Rails.logger.debug("Receive Favorite(#{@worker_number}): #{msg["user_id"]} => #{msg["tweet_id"]}")
+          Rails.logger.debug("Receive Favorite(#{@worker_number}): #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
           if f = Favorite.from_receiver(msg)
             f.tweet.notify_favorite
           end
@@ -143,14 +143,14 @@ module Aclog
 
       def receive_unfavorite(msg)
         @@queue.push -> do
-          Rails.logger.debug("Receive Unfavorite(#{@worker_number}): #{msg["user_id"]} => #{msg["tweet_id"]}")
+          Rails.logger.debug("Receive Unfavorite(#{@worker_number}): #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
           Favorite.delete_from_receiver(msg)
         end
       end
 
       def receive_retweet(msg)
         @@queue.push -> do
-          Rails.logger.debug("Receive Retweet(#{@worker_number}): #{msg["user_id"]} => #{msg["tweet_id"]}")
+          Rails.logger.debug("Receive Retweet(#{@worker_number}): #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
           Retweet.from_receiver(msg)
         end
       end

@@ -46,17 +46,17 @@ describe TweetsHelper do
     let(:user) { FactoryGirl.create(:user) }
     subject { helper.user_truncated?(tweet) }
     context "when full=true" do
-      before { helper.stub!(:user_limit).and_return(nil) }
+      before { helper.stub(:user_limit).and_return(nil) }
       let(:tweet) { FactoryGirl.create(:tweet, user: user, favorites_count: Settings.tweets.users.count_lot + 1, retweets_count: Settings.tweets.users.count_lot + 1) }
       it { should be false }
     end
     context "when _count equals count_default" do
-      before { helper.stub!(:user_limit).and_return(Settings.tweets.users.count_default) }
+      before { helper.stub(:user_limit).and_return(Settings.tweets.users.count_default) }
       let(:tweet) { FactoryGirl.create(:tweet, user: user, favorites_count: Settings.tweets.users.count_default, retweets_count: Settings.tweets.users.count_default) }
       it { should be false }
     end
     context "when _count is larger than count_default" do
-      before { helper.stub!(:user_limit).and_return(Settings.tweets.users.count_default) }
+      before { helper.stub(:user_limit).and_return(Settings.tweets.users.count_default) }
       let(:tweet) { FactoryGirl.create(:tweet, user: user, favorites_count: Settings.tweets.users.count_default, retweets_count: Settings.tweets.users.count_default + 1) }
       it { should be true }
     end

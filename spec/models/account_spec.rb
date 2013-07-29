@@ -29,18 +29,39 @@ describe Account do
     end
   end
 
-  describe "#update_settings!" do
-    let(:account) { FactoryGirl.create(:account_1) }
-    subject { account.update_settings!(notification: false, private: true) }
-    its(:notification) { should be false }
-    its(:private) { should be true }
+  describe ".set_of_collector" do
+    before { Settings.collector.stub(:count).and_return(3) }
+    let!(:accounts) { 10.times.map {|i| Account.create!(user_id: i, oauth_token: "abc", oauth_token_secret: "def", consumer_version: 1) } }
+    subject { Account.set_of_collector(2) }
+    it { should_not include -> m { m.id % 3 != 2 } }
   end
 
-  describe "#deactivate!" do
-    let(:account) { FactoryGirl.create(:account_1) }
-    it { account.active?.should be true }
-    subject { account.tap(&:deactivate!) }
-    its(:active?) { should be false }
+  describe "#notification?" do
+    context "when enabled" do
+      let(:account) { FactoryGirl.create(:account_1, notification: true) }
+      subject { account }
+      its(:notification?) { should be true }
+    end
+
+    context "when disabled" do
+      let(:account) { FactoryGirl.create(:account_1, notification: false) }
+      subject { account }
+      its(:notification?) { should be false }
+    end
+  end
+
+  describe "#private?" do
+    context "when private" do
+      let(:account) { FactoryGirl.create(:account_1, private: true) }
+      subject { account }
+      its(:private?) { should be true }
+    end
+
+    context "when public" do
+      let(:account) { FactoryGirl.create(:account_1, private: false) }
+      subject { account }
+      its(:private?) { should be false }
+    end
   end
 
   describe "#active?" do
@@ -54,6 +75,20 @@ describe Account do
       subject { account.tap(&:deactivate!) }
       its(:active?) { should be false }
     end
+  end
+
+  describe "#update_settings!" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    subject { account.update_settings!(notification: false, private: true) }
+    its(:notification) { should be false }
+    its(:private) { should be true }
+  end
+
+  describe "#deactivate!" do
+    let(:account) { FactoryGirl.create(:account_1) }
+    it { account.active?.should be true }
+    subject { account.tap(&:deactivate!) }
+    its(:active?) { should be false }
   end
 
   describe "#update_connection" do

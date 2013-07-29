@@ -55,20 +55,7 @@ class Account < ActiveRecord::Base
   end
 
   def import_favorites(id)
-    result = client.status_activity(id)
-
-    # favs ユーザー一覧回収
-    Favorite.from_tweet_object(result)
-
-    # favs ユーザー回収
-    client.users(result.favoriters).each do |u|
-      User.from_user_object(u)
-    end
-
-    # rts 回収・RTのステータスIDを取得する必要がある
-    client.retweets(id, count: 100).each do |status|
-      Retweet.from_tweet_object(status)
-    end
+    raise Exception, "not implemented"
   end
 
   def following?(target_user_id)

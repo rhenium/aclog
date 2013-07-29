@@ -60,13 +60,13 @@ describe ApplicationController do
         end
 
         it "as the user's follower" do
-          account.stub!(:following?).and_return(true)
+          account.stub(:following?).and_return(true)
           session[:account] = account
           subject.should be true
         end
 
         it "as not the user's follower" do
-          account.stub!(:following?).and_return(false)
+          account.stub(:following?).and_return(false)
           session[:account] = account
           subject.should be false
         end
@@ -77,25 +77,25 @@ describe ApplicationController do
       before { request.headers["X-Verify-Credentials-Authorization"] = true }
 
       it "as the user" do
-        controller.stub!(:authenticate_with_twitter_oauth_echo).and_return(user.id)
+        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user.id)
         subject.should be true
       end
 
       it "as the user's follower" do
-        controller.stub!(:authenticate_with_twitter_oauth_echo).and_return(user.id)
+        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user.id)
         user.id += 1
         Account.any_instance.stub(:following?).and_return(true)
         subject.should be true
       end
 
       it "not as the user's follower" do
-        controller.stub!(:authenticate_with_twitter_oauth_echo).and_return(user.id + 1)
+        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user.id + 1)
         Account.any_instance.stub(:following?).and_return(false)
         subject.should be false
       end
 
       it "but failed in verification" do
-        controller.stub!(:authenticate_with_twitter_oauth_echo).and_raise(Aclog::Exceptions::OAuthEchoUnauthorized)
+        controller.stub(:authenticate_with_twitter_oauth_echo).and_raise(Aclog::Exceptions::OAuthEchoUnauthorized)
         Account.any_instance.stub(:following?).and_return(false)
         subject.should be false
       end
@@ -106,14 +106,14 @@ describe ApplicationController do
     subject { user; account; !!controller.__send__(:authorized_to_show_best?, user) }
 
     context "when account is protected" do
-      before { controller.stub!(:authorized_to_show_user?).and_return(false) }
+      before { controller.stub(:authorized_to_show_user?).and_return(false) }
       let(:user) { FactoryGirl.create(:user, protected: true) }
       let(:account) { FactoryGirl.create(:account_1, user: user) }
       it { should be false }
     end
 
     context "when account is not protected" do
-      before { controller.stub!(:authorized_to_show_user?).and_return(true) }
+      before { controller.stub(:authorized_to_show_user?).and_return(true) }
       context "when account is not registered" do
         let(:user) { FactoryGirl.create(:user) }
         let(:account) { nil }
@@ -147,12 +147,12 @@ describe ApplicationController do
   describe "#authorize_to_show_user!" do
     subject { -> { controller.__send__(:authorize_to_show_user!, nil) } }
     it "when authorized to show user" do
-      controller.stub!(:authorized_to_show_user?).and_return(true)
+      controller.stub(:authorized_to_show_user?).and_return(true)
       subject.should_not raise_error
     end
 
     it "when not authorized to show user" do
-      controller.stub!(:authorized_to_show_user?).and_return(false)
+      controller.stub(:authorized_to_show_user?).and_return(false)
       subject.should raise_error(Aclog::Exceptions::UserProtected)
     end
   end
@@ -162,7 +162,7 @@ describe ApplicationController do
     subject { -> { controller.__send__(:authorize_to_show_best!, user) } }
 
     context "when user is not protected" do
-      before { controller.stub!(:authorized_to_show_user?).and_return(true) }
+      before { controller.stub(:authorized_to_show_user?).and_return(true) }
 
       it "when account is not registered" do
         subject.should raise_error(Aclog::Exceptions::UserNotRegistered)
@@ -175,7 +175,7 @@ describe ApplicationController do
     end
 
     context "when user is protected and not accessible" do
-      before { controller.stub!(:authorized_to_show_user?).and_return(false) }
+      before { controller.stub(:authorized_to_show_user?).and_return(false) }
       it { should raise_error(Aclog::Exceptions::UserProtected) }
     end
 

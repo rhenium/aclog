@@ -18,14 +18,6 @@ class Favorite < ActiveRecord::Base
     return nil
   end
 
-  def self.from_tweet_object(tweet_object)
-    if tweet_object.favoriters.is_a? Array
-      tweet_object.favoriters.reverse.map do |uid|
-        from_hash(user_id: uid, tweet_id: tweet_object.id)
-      end
-    end
-  end
-
   def self.delete_from_receiver(msg)
     where(tweet_id: msg["tweet"]["id"], user_id: msg["user"]["id"]).destroy_all
   end

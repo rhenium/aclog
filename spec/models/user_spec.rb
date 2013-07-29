@@ -68,7 +68,7 @@ describe User do
 
   describe "#profile_image_url_original" do
     let(:user) { FactoryGirl.create(:user) }
-    before { user.stub!(:profile_image_url).and_return("https://example.com/profile_image_normal.png") }
+    before { user.stub(:profile_image_url).and_return("https://example.com/profile_image_normal.png") }
     subject { user.profile_image_url_original }
     it { should eq "https://example.com/profile_image.png" }
   end

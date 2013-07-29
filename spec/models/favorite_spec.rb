@@ -1,21 +1,17 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Favorite do
-  describe ".from_hash" do
-    let(:hash) { {tweet_id: 123, user_id: 456} }
-    subject { Favorite.from_hash(hash) }
-    its(:tweet_id) { should be 123 }
-    its(:user_id) { should be 456 }
-  end
-
-  describe ".from_tweet_object" do
-    let(:user) { FactoryGirl.create(:user_1) }
-    let(:tweet) { FactoryGirl.create(:tweet, user: user) }
-    let(:tweet_object) { OpenStruct.new(
-      favoriters: [123, 456, 789, 1012, 345, 678],
-      id: tweet.id) }
-    subject { Favorite.from_tweet_object(tweet_object); tweet.favorites.map(&:user_id).sort }
-    its(:count) { should be 6 }
-    it { should eq tweet_object.favoriters.sort }
+  describe ".from_receiver" do
+    let(:user_0) { FactoryGirl.create(:user) }
+    let(:user_1) { FactoryGirl.create(:user) }
+    let(:hash) { {"tweet" => {"id" => 123,
+                              "text" => "abc",
+                              "source" => "web",
+                              "tweeted_at" => Time.now.to_s,
+                              "user" => {"id" => user_0.id}},
+                  "user" => {"id" => user_1.id}} }
+    subject { Favorite.from_receiver(hash) }
+    its(:tweet_id) { should be hash["tweet"]["id"] }
+    its(:user_id) { should be hash["user"]["id"] }
   end
 end

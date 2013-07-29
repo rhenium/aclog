@@ -52,19 +52,21 @@ describe Tweet do
     end
   end
 
-  describe ".from_hash" do
+  describe ".from_receiver" do
     let(:test_data) do
-      {text: "abc",
-       source: "web",
-       tweeted_at: Time.now,
-       user_id: @user_0.id}
+      {"id" => 123,
+       "text" => "abc",
+       "source" => "web",
+       "tweeted_at" => Time.now.to_s,
+       "user" => {"id" => @user_0.id}}
     end
 
-    subject { Tweet.from_hash(test_data) }
+    subject { Tweet.from_receiver(test_data) }
     it { should be_a Tweet }
-    its(:text) { should eq test_data[:text] }
-    its(:source) { should eq test_data[:source] }
-    its(:tweeted_at) { should eq test_data[:tweeted_at] }
+    its(:id) { should be test_data["id"] }
+    its(:text) { should eq test_data["text"] }
+    its(:source) { should eq test_data["source"] }
+    its(:tweeted_at) { should eq Time.parse(test_data["tweeted_at"]) }
     its(:user) { should eq @user_0 }
   end
 

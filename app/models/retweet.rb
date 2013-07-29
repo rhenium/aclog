@@ -17,13 +17,4 @@ class Retweet < ActiveRecord::Base
     logger.error("Unknown error while inserting retweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     return nil
   end
-
-  def self.from_tweet_object(status)
-    User.from_user_object(status.user)
-    # Tweet.from_tweet_object(status.retweeted_status)
-    # TODO: URL format...
-    from_hash(id: status.id,
-              user_id: status.user.id,
-              tweet_id: status.retweeted_status.id)
-  end
 end

@@ -8,8 +8,8 @@ module Aclog
         entities = status[:entities].map{|k, v| v.map{|n| n.update(type: k)}}.flatten.sort_by{|entity| entity[:indices].first}
 
         result = ""
-        last_index = entities.inject(0) do |last_index, entity|
-          result << text[last_index...entity[:indices].first]
+        last_index = entities.inject(0) do |last_index_, entity|
+          result << text[last_index_...entity[:indices].first]
           case entity[:type]
           when :urls, :media
             result << "<url:#{escape_colon(entity[:expanded_url])}:#{escape_colon(entity[:display_url])}>"

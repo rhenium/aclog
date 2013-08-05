@@ -13,8 +13,8 @@ module Aclog
         unless defined? @@queue
           @@queue = EM::Queue.new
 
-          _cr = -> bl { bl.call; @@queue.pop &_cr }
-          EM.defer { @@queue.pop &_cr }
+          _cr = -> bl { bl.call; @@queue.pop(&_cr) }
+          EM.defer { @@queue.pop(&_cr) }
         end
       end
 

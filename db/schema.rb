@@ -56,13 +56,21 @@ ActiveRecord::Schema.define(version: 20130805001722) do
   add_index "retweets", ["tweet_id"], name: "index_retweets_on_tweet_id", using: :btree
   add_index "retweets", ["user_id"], name: "index_retweets_on_user_id", using: :btree
 
+  create_table "stolen_tweets", force: true do |t|
+    t.integer "tweet_id",    limit: 8
+    t.integer "original_id", limit: 8
+  end
+
+  add_index "stolen_tweets", ["original_id"], name: "index_stolen_tweets_on_original_id", using: :btree
+  add_index "stolen_tweets", ["tweet_id"], name: "index_stolen_tweets_on_tweet_id", unique: true, using: :btree
+
   create_table "tweets", force: true do |t|
-    t.text     "text",                                  null: false
-    t.text     "source"
-    t.integer  "user_id",         limit: 8,             null: false
+    t.text     "text",            limit: 16777215,             null: false
+    t.text     "source",          limit: 16777215
+    t.integer  "user_id",         limit: 8,                    null: false
     t.datetime "tweeted_at"
-    t.integer  "favorites_count",           default: 0
-    t.integer  "retweets_count",            default: 0
+    t.integer  "favorites_count",                  default: 0
+    t.integer  "retweets_count",                   default: 0
   end
 
   add_index "tweets", ["user_id"], name: "index_tweets_on_user_id", using: :btree
@@ -70,7 +78,7 @@ ActiveRecord::Schema.define(version: 20130805001722) do
   create_table "users", force: true do |t|
     t.string   "screen_name"
     t.string   "name"
-    t.text     "profile_image_url"
+    t.text     "profile_image_url", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "protected"

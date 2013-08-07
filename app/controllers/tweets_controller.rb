@@ -1,7 +1,9 @@
 # -*- encoding: utf-8 -*-
 class TweetsController < ApplicationController
   def show
-    tweet_required
+    @tweets = Tweet.where(id: params[:id])
+    raise Aclog::Exceptions::TweetNotFound unless @tweets.first
+    @user = @tweets.first.user
     @caption = "#{@user.screen_name}'s Tweet"
   end
 
@@ -93,12 +95,6 @@ class TweetsController < ApplicationController
     @user_b = _require_user(params[:user_id_b], params[:screen_name_b])
   end
 
-  def tweet_required
-    @tweet = Tweet.find_by(id: params[:id])
-    raise Aclog::Exceptions::TweetNotFound unless @tweet
-    @user = _require_user(@tweet.user_id, nil)
-  end
-
   def check_public!
     authorize_to_show_best!(@user)
   end
@@ -106,6 +102,10 @@ class TweetsController < ApplicationController
   def render(*args)
     if lookup_context.exists?(params[:action], params[:controller])
       super(*args)
+    elsif request.xhr?
+      html = render_to_string(partial: "tweets/tweet", collection: @tweets.includes(:user), as: :tweet)
+      n = url_for(params[:page] ? params.merge(page: params[:page] + 1) : params.merge(max_id: @tweets.last.id - 1))
+      super json: {html: html, next: n}
     else
       super("_tweets")
     end

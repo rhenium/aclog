@@ -1,18 +1,15 @@
-//= require jquery.autopager-1.0.0-mod
+//= require html-autoload
 $(function() {
-  $(".pagination").hide();
+//  $(".pagination").hide();
   $.autopager({
-    autoLoad: true,
-    content: ".tweets",
-    start: function(current, next) {
+    content: $(".tweets"),
+    nextUrl: $("a[rel=next]").attr("href"),
+    onStart: function() {
       $(".loading").show();
     },
-    load: function(current, next) {
+    onComplete: function() {
       $(".loading").hide();
     }
   });
-  $("a[rel=next]").click(function() {
-    $.autopager("load");
-    return false;
-  });
 });
+

@@ -4,5 +4,5 @@
   .pagination
     - if params[:page]
       = link_to raw("Next &#8250;"), params.merge(page: params[:page].to_i + 1), rel: :next
-    - elsif @tweets.last
+    - else
       = link_to raw("Next &#8250;"), params.merge(max_id: @tweets.last.id - 1), rel: :next

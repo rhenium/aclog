@@ -1,1 +1,1 @@
-json.partial! "tweet", tweet: @tweet
+json.partial! "tweet", tweet: @tweets.first

@@ -19,7 +19,7 @@
         %span.data= @user.stats.since_join.to_s + "d ago"
   - else
     .alert.alert-info
-      = "@#{@user.screen_name} has never signed in to aclog"
+      = "@#{@user.screen_name} #{t("views.sidebar.user_not_registered")}"
   .user_nav
     %ul.nav.nav-tabs.nav-stacked
       - if authorized_to_show_best?(@user)

@@ -14,31 +14,31 @@ class ErrorsController < ApplicationController
       redirect_to root_path
     when Aclog::Exceptions::TweetNotFound
       @status = 404
-      @message = "ツイートが見つかりませんでした。"
+      @message = t("error.tweet_not_found")
     when Aclog::Exceptions::UserNotFound
       @status = 404
-      @message = "ユーザーが見つかりませんでした。"
+      @message = t("error.user_not_found")
     when Aclog::Exceptions::LoginRequired
       @status = 403
-      @message = "このページの表示にはログインが必要です。"
+      @message = t("error.login_required")
     when Aclog::Exceptions::OAuthEchoUnauthorized
       @status = 401
-      @message = "OAuth Echo 認証に失敗しました。"
+      @message = t("error.oauth_echo_unauthorized")
     when ActionController::RoutingError
       @status = 404
-      @message = "このページは存在しません。"
+      @message = t("error.routing_error")
     when Aclog::Exceptions::UserNotRegistered
       @status = 404
-      @message = "ユーザーは aclog に登録していません。"
+      @message = t("error.user_not_registered")
     when Aclog::Exceptions::UserProtected
       @status = 403
-      @message = "ユーザーは非公開です。"
+      @message = t("error.user_protected")
     when Aclog::Exceptions::AccountPrivate
       @status = 403
-      @message = "ユーザーの best は非公開です"
+      @message = t("error.account_private")
     else
       @status = 500
-      @message = "Internal Error: #{@exception.class}"
+      @message = "#{t("error.internal_error")}: #{@exception.class}"
     end
 
     if @exception.is_a? Aclog::Exceptions::UserError

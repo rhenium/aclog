@@ -1,0 +1,18 @@
+ja:
+  error:
+    tweet_not_found: ツイートが見つかりませんでした
+    user_not_found: ユーザーが見つかりませんでした
+    login_required: このページの表示にはログインが必要です
+    oauth_echo_unauthorized: OAuth Echo 認証に失敗しました
+    routing_error: このページは存在しません
+    user_not_registered: ユーザーは登録していません
+    user_protected: ユーザーはツイートを非公開にしています
+    account_private: ユーザーは aclog を非公開にしています
+    internal_error: 内部エラー
+  views:
+    settings:
+      enable_notification: リプライ通知を有効にする
+      hide_best: best を非公開にする
+      confirm_deactivation: 記録を停止する
+    sidebar:
+      user_not_registered: は aclog に登録していません

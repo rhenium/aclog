@@ -1,6 +1,6 @@
 //= require html-autoload
 $(function() {
-//  $(".pagination").hide();
+  $(".pagination").hide();
   $.autopager({
     content: $(".tweets"),
     nextUrl: $("a[rel=next]").attr("href"),

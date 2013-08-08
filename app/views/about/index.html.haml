@@ -1,32 +1,10 @@
-%h1 aclog
-- if Rails.env.development?
-  %h1.text-error !!!DEVELOPMENT!!!
-%p
-  aclog は Twitter でのふぁぼ・RTを集めて表示するサービスです
-%p
-  鍵垢の場合は自分またはフォロワーのみがツイートが見れるようになっています。
-%p
-  JSON の API も提供しています。API については
-  = link_to "こちら", about_api_path
-  を参照してください。
-%p
-  RSS にも対応しています。例:
-  %ul
-    %li= link_to "/cn/timeline.rss", "/cn/timeline.rss"
-    %li= link_to "/cn/discoveries.rss", "/cn/discoveries.rss"
-%h4
-  今後の予定(2013/05/20)
-%ul
-  %li 通知を細かく設定できるように
-  %li ふぁぼったー・Favstar などからのデータの取り込み
-%p
-  = link_to "ツイート", "https://twitter.com/share", class: "twitter-share-button", data: {text: "ふぁぼられ収集サービス aclog", count: "none", url: "http://aclog.koba789.com"}
-%hr
-%h5
-  連絡先
-%dl
-  %dt Twitter
-  %dd= link_to "@cn", "https://twitter.com/cn"
-  %dt メール(あんまり見ていません)
-  %dd= mail_to "contact@re4k.info"
+.index.text-center
+  %h1
+    aclog
+    - if Rails.env.development?
+      %span.text-error (dev)
+  %p
+    is a clone service of Favstar.
+  %p
+    = link_to "Tweet", "https://twitter.com/share", class: "twitter-share-button", data: {text: "aclog - Twitter ふぁぼられ収集サービス", count: "none", url: "http://aclog.koba789.com/"}
 

@@ -1,9 +1,27 @@
 %p
   Twitter API の UserStreams というものを使い、登録ユーザーのお気に入り登録・自分のツイートのお気に入り登録され・リツイート・リツイートされをリアルタイムで記録し、集計して表示することができるサービスです。
 %p
+  ツイートを非公開にしている場合は自分またはフォロワーのみがツイートが見れるようになっていますので、「Favstar.FM を使いたかったけれどもツイートを非公開にしているために使えなかった」といった方でもご利用いただけます。
+%p
+  RSS フィードも提供しております。URL の末尾に .rss をつけてご利用ください。
+  %ul
+    %li= link_to "/cn/timeline.rss", "/cn/timeline.rss"
+    %li= link_to "/cn/discoveries.rss", "/cn/discoveries.rss"
+%p
+  JSON の API も提供しています。API については
+  = link_to "こちら", about_api_path
+  を参照してください。
+%p
   = link_to "@KOBA789", "https://twitter.com/KOBA789"
   さんにサーバーを借りています。ありがとうございます...！
 %p
   The MIT License
   = link_to "GitHub", "https://github.com/rhenium/aclog"
+%hr
+%p
+  %h5
+    連絡先
+  %dl
+    %dt Twitter
+    %dd= link_to "@cn", "https://twitter.com/cn"
 

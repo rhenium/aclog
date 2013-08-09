@@ -1,6 +1,25 @@
 require "spec_helper"
 
 describe ApplicationController do
+  describe "#logged_in?" do
+    context "when logged in" do
+      before do
+        session[:account] = FactoryGirl.create(:account_1)
+        session[:user_id] = session[:account].user_id
+      end
+      subject { !!controller.__send__(:logged_in?) }
+      it { should be true }
+    end
+
+    context "when not logged in" do
+      before do
+        session[:account] = session[:user_id] = nil
+      end
+      subject { !!controller.__send__(:logged_in?) }
+      it { should be false }
+    end
+  end
+
   describe "#_get_user" do
     let(:user) { FactoryGirl.create(:user) }
 

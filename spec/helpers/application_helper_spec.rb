@@ -2,25 +2,6 @@
 require "spec_helper"
 
 describe ApplicationHelper do
-  describe "#logged_in?" do
-    context "when logged in" do
-      before do
-        session[:account] = FactoryGirl.create(:account_1)
-        session[:user_id] = session[:account].user_id
-      end
-      subject { !!helper.logged_in? }
-      it { should be true }
-    end
-
-    context "when not logged in" do
-      before do
-        session[:account] = session[:user_id] = nil
-      end
-      subject { !!helper.logged_in? }
-      it { should be false }
-    end
-  end
-
   describe "#format_time" do
     let(:str) { "2013-04-14 01:02:03" }
     let(:source) { Time.parse("#{str} +09:00") }

@@ -2,8 +2,8 @@
 $(function() {
   $(".pagination").hide();
   $.autopager({
-    content: $(".tweets"),
-    nextUrl: $("a[rel=next]").attr("href"),
+    content: ".tweets",
+    nextLink: "a[rel=next]",
     onStart: function() {
       $(".loading").show();
     },

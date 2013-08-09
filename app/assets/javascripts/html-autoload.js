@@ -2,6 +2,8 @@
     var window = this,
         options = {},
         content,
+        nextUrl,
+        page = 1,
         loading = false;
 
     $.autopager = function(_options) {
@@ -9,15 +11,14 @@
 
         var defaults = {
             content: "#content",
+            nextLink: "a[rel=next]",
             onStart: function() {},
-            onComplete: function() {},
-            page: 1,
-            currentUrl: window.location.href,
-            nextUrl: null
+            onComplete: function() {}
         };
 
         options = $.extend({}, defaults, _options);
         content = $(options.content);
+        nextUrl = $(options.nextLink).attr("href");
         
         $(window).scroll(function() {
             if (content.offset().top + content.height() < $(document).scrollTop() + $(window).height()) {
@@ -30,24 +31,23 @@
 
     $.extend($.autopager, {
         loadNext: function() {
-            if (loading || !options.nextUrl) {
+            if (loading || !nextUrl) {
                 return;
             }
 
             loading = true;
             options.onStart();
-            $.get(options.nextUrl, insertContent, "text");
+            $.getJSON(nextUrl, insertContent);
             return this;
         }
     });
 
-    function insertContent(res) {
-        var json = JSON.parse(res);
+    function insertContent(json) {
         var nextPage = $(json.html);
 
-        options.page = options.page + 1;
-        options.currentUrl = options.nextUrl;
-        options.nextUrl = json.next;
+        page = page + 1;
+        nextUrl = json.next;
+        $(options.nextLink).attr("href", nextUrl);
         content.append(nextPage);
         options.onComplete();
         loading = false;

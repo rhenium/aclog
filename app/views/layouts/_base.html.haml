@@ -15,8 +15,6 @@
           %ul.nav.pull-right
             %li
               = link_to "about", about_path
-            %li
-              = link_to "search", search_path
             - if logged_in?
               %li= link_to "settings", settings_path
               %li= link_to "logout", logout_path

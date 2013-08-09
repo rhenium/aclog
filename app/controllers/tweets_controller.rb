@@ -103,8 +103,8 @@ class TweetsController < ApplicationController
     if lookup_context.exists?(params[:action], params[:controller])
       super(*args)
     elsif request.xhr?
-      html = render_to_string(partial: "tweets/tweet", collection: @tweets.includes(:user), as: :tweet)
-      n = url_for(params[:page] ? params.merge(page: params[:page] + 1) : params.merge(max_id: @tweets.last.id - 1))
+      html = render_to_string(partial: "tweets/tweet", collection: @tweets.includes(:user), as: :tweet, formats: [:html])
+      n = url_for(params[:page] ? params.merge(page: params[:page].to_i + 1) : params.merge(max_id: @tweets.last.id - 1))
       super json: {html: html, next: n}
     else
       super("_tweets")

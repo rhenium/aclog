@@ -5,9 +5,11 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :check_format, :check_session
   after_filter :xhtml
-  helper_method :authorized_to_show_user?, :authorized_to_show_best?
+  helper_method :logged_in?, :authorized_to_show_user?, :authorized_to_show_best?
 
   protected
+  def logged_in?; session[:user_id] && session[:account] end
+
   def _get_user(id, screen_name)
     if id
       User.find(id) rescue raise Aclog::Exceptions::UserNotFound

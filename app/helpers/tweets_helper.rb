@@ -1,26 +1,18 @@
 module TweetsHelper
-  def user_limit
-    if request.format == :json
-      if params[:limit]
-        params[:limit].to_i
-      else
+  def html_favoriters_limit
+    if params[:action] == "show"
+      if params[:full] == "true"
         nil
+      else
+        Settings.tweets.users.count_lot
       end
     else
-      if params[:action] == "show"
-        if params[:full] == "true"
-          nil
-        else
-          Settings.tweets.users.count_lot
-        end
-      else
-        Settings.tweets.users.count_default
-      end
+      Settings.tweets.users.count_default
     end
   end
 
-  def user_truncated?(tweet)
-    tr = user_limit || Float::INFINITY
+  def html_favoriters_truncated?(tweet)
+    tr = html_favoriters_limit || Float::INFINITY
     tr < tweet.favorites_count || tr < tweet.retweets_count
   end
 end

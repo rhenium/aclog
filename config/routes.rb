@@ -9,8 +9,6 @@ Aclog::Application.routes.draw do
 
   # HTML only pages
   scope format: "html" do
-    get "/search" =>        "search#search",    as: "search"
-
     # Internals / SessionsController
     get "/i/import/:id" =>  "i#import",         as: "import"
     get "/i/callback" =>    "sessions#callback"
@@ -54,6 +52,7 @@ Aclog::Application.routes.draw do
       get "/best",      action: "all_best",     as: "best"
       get "/recent",    action: "all_recent",   as: "recent"
       get "/timeline",  action: "all_timeline", as: "timeline"
+      get "/search",    action: "search",       as: "search"
     end
 
     # TweetController / Tweets

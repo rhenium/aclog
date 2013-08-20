@@ -42,7 +42,7 @@
         }
     });
 
-    function insertContent(json) {
+    function insertContent(json, status) {
         var nextPage = $(json.html);
 
         page = page + 1;

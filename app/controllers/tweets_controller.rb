@@ -86,6 +86,12 @@ class TweetsController < ApplicationController
     @tweets = Tweet.reacted.order_by_id.list(params)
   end
 
+  def search
+    @caption = "Search"
+    @tweets = Tweet.parse_query(params[:query].to_s || "").reacted.order_by_id.list(params, force_page: true)
+    @tweets = @tweets.recent(7) unless @tweets.to_sql.include?("`tweets`.`id`")
+  end
+
   private
   def user_required
     @user = _require_user(params[:user_id], params[:screen_name])
@@ -100,12 +106,16 @@ class TweetsController < ApplicationController
   end
 
   def render(*args)
-    if lookup_context.exists?(params[:action], params[:controller])
-      super(*args)
-    elsif request.xhr?
-      html = render_to_string(partial: "tweets/tweet", collection: @tweets.includes(:user), as: :tweet, formats: [:html])
-      n = url_for(params[:page] ? params.merge(page: params[:page].to_i + 1) : params.merge(max_id: @tweets.last.id - 1))
+    if request.xhr?
+      html = render_to_string(partial: "tweets/tweet", collection: @tweets.includes(:user), as: :tweet, formats: :html)
+      n = @tweets.length > 0 ?
+          url_for(params[:page] ?
+                  params.merge(page: params[:page].to_i + 1) :
+                  params.merge(max_id: @tweets.last.id - 1)) :
+          nil
       super json: {html: html, next: n}
+    elsif lookup_context.exists?(params[:action], params[:controller])
+      super(*args)
     else
       super("_tweets")
     end

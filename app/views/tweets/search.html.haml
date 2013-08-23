@@ -1,7 +1,7 @@
 .search
   = form_tag({}, method: "get", class: "form-inline") do
     = field_set_tag do
-      = text_field_tag :query, params[:query]
+      = text_field_tag :q, params[:q]
       = submit_tag "search", class: "btn", name: nil
 = render partial: "tweets/tweets"
 

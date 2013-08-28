@@ -23,9 +23,8 @@ class UsersController < ApplicationController
   end
 
   def screen_name
-    raise ActionController::RoutingError unless params[:user_id]
-    user_ids = params[:user_id].split(/,/).map(&:to_i)
-    result = User.where("id IN (?)", user_ids).map {|user| {id: user.id, screen_name: user.screen_name} }
+    user_ids = (params[:id] || params[:user_id]).to_s.split(",").map(&:to_i)
+    result = User.where(id: user_ids).pluck(:id, :screen_name).map {|id, screen_name| {id: id, screen_name: screen_name} }
     render json: result
   end
 

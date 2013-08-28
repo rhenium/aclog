@@ -7,6 +7,13 @@ class TweetsController < ApplicationController
     @caption = "#{@user.screen_name}'s Tweet"
   end
 
+  # only JSON API
+  def lookup
+    ids = params[:id].to_s.split(",").map(&:to_i)
+    @tweets = Tweet.where(id: ids)
+    @caption = "Tweets"
+  end
+
   def index
     user_required
     best rescue timeline

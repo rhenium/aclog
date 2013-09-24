@@ -58,6 +58,8 @@ class User < ActiveRecord::Base
 
     Rails.cache.fetch("stats/#{self.id}", expires_in: 3.hours) do
       favorited_counts, retweeted_counts = self.tweets.pluck(:favorites_count, :retweets_count).transpose
+      favorited_counts ||= []
+      retweeted_counts ||= []
 
       ret = OpenStruct.new
       ret.updated_at = Time.now

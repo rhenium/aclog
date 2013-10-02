@@ -33,7 +33,6 @@ ActiveRecord::Schema.define(version: 20130805001722) do
   end
 
   add_index "favorites", ["tweet_id", "user_id"], name: "index_favorites_on_tweet_id_and_user_id", unique: true, using: :btree
-  add_index "favorites", ["tweet_id"], name: "index_favorites_on_tweet_id", using: :btree
   add_index "favorites", ["user_id"], name: "index_favorites_on_user_id", using: :btree
 
   create_table "issues", force: true do |t|
@@ -52,38 +51,29 @@ ActiveRecord::Schema.define(version: 20130805001722) do
     t.integer "user_id",  limit: 8, null: false
   end
 
-  add_index "retweets", ["tweet_id", "user_id"], name: "index_retweets_on_tweet_id_and_user_id", unique: true, using: :btree
   add_index "retweets", ["tweet_id"], name: "index_retweets_on_tweet_id", using: :btree
   add_index "retweets", ["user_id"], name: "index_retweets_on_user_id", using: :btree
 
-  create_table "stolen_tweets", force: true do |t|
-    t.integer "tweet_id",    limit: 8
-    t.integer "original_id", limit: 8
-  end
-
-  add_index "stolen_tweets", ["original_id"], name: "index_stolen_tweets_on_original_id", using: :btree
-  add_index "stolen_tweets", ["tweet_id"], name: "index_stolen_tweets_on_tweet_id", unique: true, using: :btree
-
   create_table "tweets", force: true do |t|
-    t.text     "text",            limit: 16777215,             null: false
-    t.text     "source",          limit: 16777215
-    t.integer  "user_id",         limit: 8,                    null: false
-    t.datetime "tweeted_at"
-    t.integer  "favorites_count",                  default: 0
-    t.integer  "retweets_count",                   default: 0
+    t.text     "text",                                  null: false
+    t.text     "source",                                null: false
+    t.integer  "user_id",         limit: 8,             null: false
+    t.datetime "tweeted_at",                            null: false
+    t.integer  "favorites_count",           default: 0, null: false
+    t.integer  "retweets_count",            default: 0, null: false
   end
 
   add_index "tweets", ["user_id"], name: "index_tweets_on_user_id", using: :btree
 
   create_table "users", force: true do |t|
-    t.string   "screen_name"
-    t.string   "name"
-    t.text     "profile_image_url", limit: 16777215
+    t.string   "screen_name",       limit: 20
+    t.string   "name",              limit: 64
+    t.text     "profile_image_url"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "protected"
   end
 
-  add_index "users", ["screen_name"], name: "index_users_on_screen_name", length: {"screen_name"=>191}, using: :btree
+  add_index "users", ["screen_name"], name: "index_users_on_screen_name", using: :btree
 
 end

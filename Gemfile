@@ -29,19 +29,16 @@ group :production do
   gem "dalli"
 end
 
-group :development, :test do
-  gem "rspec"
-  gem "rspec-rails"
-  gem "factory_girl_rails"
-  gem "coveralls", require: false
-  gem "simplecov", require: false
-end
-
 group :development do
   gem "thin"
 end
 
 group :test do
+  gem "rspec"
+  gem "rspec-rails"
+  gem "factory_girl_rails"
   gem "webmock"
+  gem "coveralls", require: false
+  gem "simplecov", require: false
 end
 

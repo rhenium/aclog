@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130805001722) do
+ActiveRecord::Schema.define(version: 20131002191729) do
 
   create_table "accounts", force: true do |t|
     t.integer  "user_id",            limit: 8,                 null: false
@@ -61,8 +61,10 @@ ActiveRecord::Schema.define(version: 20130805001722) do
     t.datetime "tweeted_at",                            null: false
     t.integer  "favorites_count",           default: 0, null: false
     t.integer  "retweets_count",            default: 0, null: false
+    t.integer  "reactions_count",           default: 0, null: false
   end
 
+  add_index "tweets", ["reactions_count"], name: "index_tweets_on_reactions_count", using: :btree
   add_index "tweets", ["user_id"], name: "index_tweets_on_user_id", using: :btree
 
   create_table "users", force: true do |t|

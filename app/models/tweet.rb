@@ -11,7 +11,7 @@ class Tweet < ActiveRecord::Base
   has_many :retweeters, -> { order("retweets.id") }, through: :retweets, source: :user
 
   scope :recent, ->(days = 3) { where("tweets.id > ?", snowflake(Time.zone.now - days.days)) }
-  scope :reacted, -> { where("tweets.favorites_count > 0 OR tweets.retweets_count > 0") }
+  scope :reacted, -> { where("tweets.reactions_count > 0") }
   scope :not_protected, -> { includes(:user).where(users: {protected: false}) }
 
   scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
@@ -21,7 +21,7 @@ class Tweet < ActiveRecord::Base
   scope :order_by_id, -> { order("tweets.id DESC") }
   scope :order_by_favorites, -> { order("tweets.favorites_count DESC") }
   scope :order_by_retweets, -> { order("tweets.retweets_count DESC") }
-  scope :order_by_reactions, -> { order("COALESCE(tweets.favorites_count, 0) + COALESCE(tweets.retweets_count, 0) DESC") }
+  scope :order_by_reactions, -> { order("tweets.reactions_count DESC") }
 
   scope :favorited_by, -> user { joins(:favorites).where(favorites: {user: user}) }
   scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user: user}) }

@@ -35,17 +35,6 @@ ActiveRecord::Schema.define(version: 20131002191729) do
   add_index "favorites", ["tweet_id", "user_id"], name: "index_favorites_on_tweet_id_and_user_id", unique: true, using: :btree
   add_index "favorites", ["user_id"], name: "index_favorites_on_user_id", using: :btree
 
-  create_table "issues", force: true do |t|
-    t.integer  "issue_type", limit: 2
-    t.integer  "status",     limit: 2
-    t.text     "data"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "issues", ["issue_type"], name: "index_issues_on_issue_type", using: :btree
-  add_index "issues", ["status"], name: "index_issues_on_status", using: :btree
-
   create_table "retweets", force: true do |t|
     t.integer "tweet_id", limit: 8, null: false
     t.integer "user_id",  limit: 8, null: false

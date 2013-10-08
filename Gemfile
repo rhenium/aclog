@@ -1,7 +1,6 @@
 ruby "1.9.3"
 source "https://rubygems.org"
 
-# Base
 gem "rails", "~> 4.0.0"
 gem "mysql2"
 gem "pry-rails"
@@ -22,6 +21,9 @@ gem "daemon-spawn", require: "daemon_spawn"
 gem "msgpack"
 gem "msgpack-rpc"
 gem "em-work_queue"
+
+# Other
+gem "activerecord-import"
 
 group :production do
   gem "unicorn"

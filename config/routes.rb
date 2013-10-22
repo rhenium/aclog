@@ -14,9 +14,6 @@ Aclog::Application.routes.draw do
     get "/i/callback" =>    "sessions#callback"
     get "/i/logout" =>      "sessions#destroy", as: "logout"
 
-    # ReportController
-    get "/i/report" => "report#index",          as: "report"
-
     get "/i/:id" =>         "tweets#show",      as: "tweet", constraints: {id: /\d+/}
 
     scope "/i/settings", controller: "settings" do

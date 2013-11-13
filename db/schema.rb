@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131002191729) do
+ActiveRecord::Schema.define(version: 20131113033645) do
 
   create_table "accounts", force: true do |t|
     t.integer  "user_id",            limit: 8,                 null: false
@@ -35,6 +35,17 @@ ActiveRecord::Schema.define(version: 20131002191729) do
   add_index "favorites", ["tweet_id", "user_id"], name: "index_favorites_on_tweet_id_and_user_id", unique: true, using: :btree
   add_index "favorites", ["user_id"], name: "index_favorites_on_user_id", using: :btree
 
+  create_table "issues", force: true do |t|
+    t.integer  "issue_type", limit: 2
+    t.integer  "status",     limit: 2
+    t.text     "data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "issues", ["issue_type"], name: "index_issues_on_issue_type", using: :btree
+  add_index "issues", ["status"], name: "index_issues_on_status", using: :btree
+
   create_table "retweets", force: true do |t|
     t.integer "tweet_id", limit: 8, null: false
     t.integer "user_id",  limit: 8, null: false
@@ -54,7 +65,7 @@ ActiveRecord::Schema.define(version: 20131002191729) do
   end
 
   add_index "tweets", ["reactions_count"], name: "index_tweets_on_reactions_count", using: :btree
-  add_index "tweets", ["user_id"], name: "index_tweets_on_user_id", using: :btree
+  add_index "tweets", ["user_id", "reactions_count"], name: "index_tweets_on_user_id_and_reactions_count", using: :btree
 
   create_table "users", force: true do |t|
     t.string   "screen_name",       limit: 20

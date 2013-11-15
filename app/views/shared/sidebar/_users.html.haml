@@ -6,14 +6,11 @@
   - if @user.registered? && @user.account.active?
     %ul.records
       %li
-        %span favorited
-        %span.data= @user.stats.favorited_count
+        %span reactions
+        %span.data= @user.stats.reactions_count
       %li
-        %span retweeted
-        %span.data= @user.stats.retweeted_count
-      %li
-        %span avg. fav
-        %span.data= @user.stats.average_favorited_count.round(2)
+        %span average
+        %span.data= @user.stats.average_reactions_count.round(2)
       %li
         %span joined
         %span.data= @user.stats.since_join.to_s + "d ago"

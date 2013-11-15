@@ -10,7 +10,7 @@ class Tweet < ActiveRecord::Base
   has_many :favoriters, ->  {order("favorites.id") }, through: :favorites, source: :user
   has_many :retweeters, -> { order("retweets.id") }, through: :retweets, source: :user
 
-  scope :recent, ->(days = 3) { where("tweets.id > ?", snowflake(Time.zone.now - days.days)) }
+  scope :recent, -> (days = 3) { where("tweets.id > ?", snowflake(Time.zone.now - days.days)) }
   scope :reacted, -> { where("tweets.reactions_count > 0") }
   scope :not_protected, -> { includes(:user).where(users: {protected: false}) }
 

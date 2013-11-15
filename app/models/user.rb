@@ -57,9 +57,8 @@ class User < ActiveRecord::Base
     raise Aclog::Exceptions::UserNotRegistered.new(self) unless registered? && account.active?
 
     Rails.cache.fetch("stats/#{self.id}", expires_in: 3.hours) do
-      favorited_counts, retweeted_counts = self.tweets.pluck(:favorites_count, :retweets_count).transpose
-      favorited_counts ||= []
-      retweeted_counts ||= []
+      sql = "SELECT SUM(favorites_count), SUM(retweets_count) FROM tweets WHERE user_id = #{self.id}"
+      favorited_count, retweeted_count = ActiveRecord::Base.connection.execute(sql).to_a(as: array).first
 
       ret = OpenStruct.new
       ret.updated_at = Time.now
@@ -67,10 +66,10 @@ class User < ActiveRecord::Base
       ret.favorites_count = self.favorites.count
       ret.retweets_count = self.retweets.count
       ret.tweets_count = self.tweets.count
-      ret.favorited_count = favorited_counts.sum
-      ret.retweeted_count = retweeted_counts.sum
-      ret.average_favorited_count = favorited_counts.inject(:+).to_f / ret.tweets_count
-      ret.average_retweeted_count = retweeted_counts.inject(:+).to_f / ret.tweets_count
+      ret.favorited_count = favorited_count
+      ret.retweeted_count = retweeted_count
+      ret.average_favorited_count = favorited_count.to_f / ret.tweets_count
+      ret.average_retweeted_count = retweeted_count.to_f / ret.tweets_count
 
       ret
     end

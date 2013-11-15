@@ -1,5 +1,5 @@
 .users
-  %ul.inline
+  %ul.list-inline
     - @result.each do |user_id, favorites_count, retweets_count|
       - target = User.find(user_id)
       %li

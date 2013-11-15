@@ -4,7 +4,7 @@
       .avatar
         = link_to user_path(tweet.user.screen_name) do
           = image_tag tweet.user.profile_image_url, alt: tweet.user.screen_name, title: tweet.user.name
-      %ul.inline.actions
+      %ul.list-inline.actions
         %li.twitter
           = link_to image_tag("reply.png", alt: "reply"), "https://twitter.com/intent/tweet?in_reply_to=#{tweet.id}"
           = link_to image_tag("retweet.png", alt: "retweet"), "https://twitter.com/intent/retweet?tweet_id=#{tweet.id}"
@@ -38,7 +38,7 @@
             %span.count= count
             %span.type= title
           %dd
-            %ul.inline
+            %ul.list-inline
               - users.limit(html_favoriters_limit).each do |m|
                 %li
                   - if !m.protected? || session[:user_id] == m.id || session[:user_id] == tweet.user.id

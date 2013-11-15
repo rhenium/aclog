@@ -9,18 +9,17 @@
     %meta{name: "viewport", content: "width=device-width, initial-scale=1.0"}
   %body
     .navbar.navbar-static-top
-      .navbar-inner
-        .container
-          .brand
-            = link_to "aclog", root_path
-          %ul.nav.pull-right
-            %li
-              = link_to "about", about_path
-            - if logged_in?
-              %li= link_to "settings", settings_path
-              %li= link_to "logout", logout_path
-              %li= link_to session[:account].user.screen_name, user_path(session[:account].user.screen_name)
-            - else
-              %li= link_to "login", "/i/login"
+      .navbar-header
+        = link_to "aclog", root_path, class: "navbar-brand"
+      .navbar-collapse.collapse
+        %ul.nav.navbar-nav.navbar-right
+          %li
+            = link_to "about", about_path
+          - if logged_in?
+            %li= link_to "settings", settings_path
+            %li= link_to "logout", logout_path
+            %li= link_to "@" + session[:account].user.screen_name, user_path(session[:account].user.screen_name)
+          - else
+            %li= link_to "login", "/i/login"
     .container
       = yield

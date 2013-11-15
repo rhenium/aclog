@@ -1,37 +1,29 @@
-.sidebar
-  .avatar
-    = link_to user_path(@user.screen_name) do
-      = image_tag @user.profile_image_url_original, alt: @user.screen_name, width: 64, height: 64, class: "icon img-rounded"
-  .screen_name= link_to @user.screen_name, twitter_user_url(@user.screen_name)
-  - if @user.registered? && @user.account.active?
-    %ul.records
-      %li
-        %span reactions
-        %span.data= @user.stats.reactions_count
-      %li
-        %span average
-        %span.data= @user.stats.average_reactions_count.round(2)
-      %li
-        %span joined
-        %span.data= @user.stats.since_join.to_s + "d ago"
-  - else
-    .alert.alert-info
-      = "@#{@user.screen_name} #{t("views.sidebar.user_not_registered")}"
-  .user_nav
-    %ul.nav.nav-tabs.nav-stacked
-      - if authorized_to_show_best?(@user)
-        %li
-          = link_to "best", user_path(@user.screen_name)
-        %li
-          = link_to "timeline", user_timeline_path(@user.screen_name)
-        %li
-          = link_to "discoveries", user_discoveries_path(@user.screen_name)
-        %li
-          = link_to "discovered by", user_discovered_by_path(@user.screen_name)
-        %li
-          = link_to "discovered users", user_discovered_users_path(@user.screen_name)
-      - else
-        %li
-          = link_to "timeline", user_path(@user.screen_name)
-        %li
-          = link_to "discoveries", user_discoveries_path(@user.screen_name)
+.avatar
+  = link_to user_path(@user.screen_name) do
+    = image_tag @user.profile_image_url_original, alt: @user.screen_name, width: 64, height: 64, class: "icon img-rounded"
+.screen_name= link_to @user.screen_name, twitter_user_url(@user.screen_name)
+- if @user.registered? && @user.account.active?
+  %ul.list-group.records
+    %li
+      %span reactions
+      %span.data= @user.stats.reactions_count
+    %li
+      %span average
+      %span.data= @user.stats.average_reactions_count.round(2)
+    %li
+      %span joined
+      %span.data= @user.stats.since_join.to_s + "d ago"
+- else
+  .alert.alert-info
+    = "@#{@user.screen_name} #{t("views.sidebar.user_not_registered")}"
+.user_nav
+  .list-group
+    - if authorized_to_show_best?(@user)
+      = link_to "best", user_path(@user.screen_name), class: "list-group-item"
+      = link_to "timeline", user_timeline_path(@user.screen_name), class: "list-group-item"
+      = link_to "discoveries", user_discoveries_path(@user.screen_name), class: "list-group-item"
+      = link_to "discovered by", user_discovered_by_path(@user.screen_name), class: "list-group-item"
+      = link_to "discovered users", user_discovered_users_path(@user.screen_name), class: "list-group-item"
+    - else
+      = link_to "timeline", user_path(@user.screen_name), class: "list-group-item"
+      = link_to "discoveries", user_discoveries_path(@user.screen_name), class: "list-group-item"

@@ -1,10 +1,13 @@
 %h1 settings
 = form_tag "/i/settings/update", method: :post do
-  = check_box_tag :notification, true, @account.notification
-  = label_tag :notification, t("views.settings.enable_notification")
-  = check_box_tag :private, true, @account.private
-  = label_tag :private, t("views.settings.hide_best")
-  = submit_tag
+  .checkbox
+    = check_box_tag :notification, true, @account.notification
+    = label_tag :notification, t("views.settings.enable_notification")
+  .checkbox
+    = check_box_tag :private, true, @account.private
+    = label_tag :private, t("views.settings.hide_best")
+  .form-group
+    = submit_tag "Submit", class: "btn btn-default"
 
 = link_to t("views.settings.confirm_deactivation"), controller: "settings", action: "confirm_deactivation"
 

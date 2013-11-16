@@ -10,14 +10,6 @@ class ApplicationController < ActionController::Base
   protected
   def logged_in?; session[:user_id] && session[:account] end
 
-  def _get_user(id, screen_name)
-    if id
-      User.find(id) rescue raise Aclog::Exceptions::UserNotFound
-    elsif screen_name
-      User.find_by(screen_name: screen_name) or raise Aclog::Exceptions::UserNotFound
-    end
-  end
-
   def authorized_to_show_user?(user)
     @authorized_to_show_user ||= {}
     @authorized_to_show_user[user.id] ||= begin

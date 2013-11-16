@@ -115,8 +115,7 @@ class TweetsController < ApplicationController
   end
 
   def _require_user(user_id, screen_name)
-    user = _get_user(user_id, screen_name)
-    raise Aclog::Exceptions::UserNotFound unless user
+    user = User.get(user_id, screen_name)
     raise Aclog::Exceptions::UserProtected.new(user) unless authorized_to_show_user?(user)
     user
   end

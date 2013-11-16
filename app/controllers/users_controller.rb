@@ -30,7 +30,7 @@ class UsersController < ApplicationController
 
   private
   def user_required
-    @user = _get_user(params[:id] || params[:user_id], params[:screen_name])
+    @user = User.get(params[:id] || params[:user_id], params[:screen_name])
     raise Aclog::Exceptions::UserNotFound unless @user
   end
 end

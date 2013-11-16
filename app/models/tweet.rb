@@ -32,6 +32,16 @@ class Tweet < ActiveRecord::Base
     end
   end
 
+  def self.get(id, screen_name)
+    if id
+      User.find(id) rescue raise Aclog::Exceptions::UserNotFound
+    elsif screen_name
+      User.where(screen_name: screen_name).order(updated_at: :desc).first or raise Aclog::Exceptions::UserNotFound
+    else
+      Aclog::Exceptions::UserNotFound
+    end
+  end
+
   def self.list(params, options = {})
     count = params[:count].to_i
     count = Settings.tweets.count_default unless (1..Settings.tweets.count_max) === count

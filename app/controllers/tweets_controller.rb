@@ -23,7 +23,7 @@ class TweetsController < ApplicationController
     user_required
     check_public!
     @caption = "#{@user.screen_name}'s Best"
-    @tweets = @user.tweets.reacted.order_by_reactions.list(params, force_page: true, cache: 3.minutes)
+    @tweets = @user.tweets.reacted.order_by_reactions.list(params, force_page: true)
   end
 
   def favorited
@@ -44,7 +44,7 @@ class TweetsController < ApplicationController
     user_required
     check_public!
     @caption = "#{@user.screen_name}'s Recent Best"
-    @tweets = @user.tweets.recent.reacted.order_by_reactions.list(params, force_page: true, cache: 3.minutes)
+    @tweets = @user.tweets.recent.reacted.order_by_reactions.list(params, force_page: true)
   end
 
   def timeline
@@ -80,12 +80,12 @@ class TweetsController < ApplicationController
 
   def all_best
     @caption = "Top Tweets"
-    @tweets = Tweet.reacted.order_by_reactions.list(params, force_page: true, cache: 3.hours)
+    @tweets = Tweet.reacted.order_by_reactions.list(params, force_page: true)
   end
 
   def all_recent
     @caption = "Recent"
-    @tweets = Tweet.recent.reacted.order_by_reactions.list(params, force_page: true, cache: 3.hours)
+    @tweets = Tweet.recent.reacted.order_by_reactions.list(params, force_page: true)
   end
 
   def all_timeline

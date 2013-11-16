@@ -1,27 +1,22 @@
-require "digest/md5"
-
 class Tweet < ActiveRecord::Base
-  extend Aclog::Twitter
-
   belongs_to :user
+
   has_many :favorites, -> { order("favorites.id") }, dependent: :delete_all
   has_many :retweets, -> { order("retweets.id") }, dependent: :delete_all
 
   has_many :favoriters, ->  {order("favorites.id") }, through: :favorites, source: :user
   has_many :retweeters, -> { order("retweets.id") }, through: :retweets, source: :user
 
-  scope :recent, ->(days = 3) { where("tweets.id > ?", snowflake(Time.zone.now - days.days)) }
-  scope :reacted, -> { where("tweets.reactions_count > 0") }
+  scope :recent, ->(days = 3) { where("tweets.id > ?", snowflake_min(Time.zone.now - days.days)) }
+  scope :reacted, -> { where.not(reactions_count: 0) }
   scope :not_protected, -> { includes(:user).where(users: {protected: false}) }
 
   scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
   scope :since_id, -> id { where("tweets.id > ?", id.to_i) if id }
   scope :page, ->(page, count) { offset((page - 1) * count) }
 
-  scope :order_by_id, -> { order("tweets.id DESC") }
-  scope :order_by_favorites, -> { order("tweets.favorites_count DESC") }
-  scope :order_by_retweets, -> { order("tweets.retweets_count DESC") }
-  scope :order_by_reactions, -> { order("tweets.reactions_count DESC") }
+  scope :order_by_id, -> { order(id: :desc) }
+  scope :order_by_reactions, -> { order(reactions_count: :desc) }
 
   scope :favorited_by, -> user { joins(:favorites).where(favorites: {user: user}) }
   scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user: user}) }
@@ -40,15 +35,14 @@ class Tweet < ActiveRecord::Base
   end
 
   def self.list(params, options = {})
-    params[:page] ||= "1" if options[:force_page]
-
     count = params[:count].to_i
     count = Settings.tweets.count_default unless (1..Settings.tweets.count_max) === count
 
     ret = limit(count)
 
-    if params[:page]
-      ret = ret.page(params[:page].to_i, count)
+    if params[:page] || options[:force_page]
+      page = [params[:page].to_i, 1].max
+      ret = ret.page(page, count)
     else
       ret = ret.max_id(params[:max_id]).since_id(params[:since_id])
     end
@@ -145,9 +139,9 @@ class Tweet < ActiveRecord::Base
       uid = u && u.id || 0
       tweets[:user_id].__send__(positive ? :eq : :not_eq, uid)
     when /^-?since:(\d{4}(-?)\d{2}\2\d{2})$/
-      tweets[:id].__send__(positive ? :gteq : :lt, snowflake(Date.parse($1)))
+      tweets[:id].__send__(positive ? :gteq : :lt, snowflake_min(Date.parse($1)))
     when /^-?until:(\d{4}(-?)\d{2}\2\d{2})$/
-      tweets[:id].__send__(positive ? :lt : :gteq, snowflake(Date.parse($1) + 1))
+      tweets[:id].__send__(positive ? :lt : :gteq, snowflake_min(Date.parse($1) + 1))
     when /^-?favs?:(\d+)$/
       tweets[:favorites_count].__send__(positive ? :gteq : :lt, $1.to_i)
     when /^-?rts?:(\d+)$/
@@ -161,6 +155,10 @@ class Tweet < ActiveRecord::Base
       search_text = escape_text.call(positive ? token : token[1..-1])
       tweets[:text].__send__(positive ? :matches : :does_not_match, "%#{search_text}%")
     end
+  end
+
+  def snowflake_min(time)
+    (time.to_datetime.to_i * 1000 - 1288834974657) << 22
   end
 end
 

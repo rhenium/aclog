@@ -5,6 +5,16 @@ class User < ActiveRecord::Base
   has_many :favorites, dependent: :delete_all
   has_many :retweets, dependent: :delete_all
 
+  def self.get(id, screen_name)
+    if id
+      find(id) rescue raise Aclog::Exceptions::UserNotFound
+    elsif screen_name
+      where(screen_name: screen_name).order(updated_at: :desc).first or raise Aclog::Exceptions::UserNotFound
+    else
+      Aclog::Exceptions::UserNotFound
+    end
+  end
+
   def self.from_receiver(msg)
     user = where(id: msg["id"]).first_or_initialize
     att = user.attributes.dup

@@ -90,8 +90,7 @@ describe User do
     its(:favorites_count) { should be 0 }
     its(:retweets_count) { should be 0 }
     its(:tweets_count) { should be 2 }
-    its(:favorited_count) { should be 2 }
-    its(:retweeted_count) { should be 1 }
+    its(:reactions_count) { should be 3 }
   end
 
   describe "#count_discovered_by" do

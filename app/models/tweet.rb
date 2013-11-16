@@ -145,7 +145,7 @@ class Tweet < ActiveRecord::Base
     when /^-?rts?:(\d+)$/
       tweets[:retweets_count].__send__(positive ? :gteq : :lt, $1.to_i)
     when /^-?(?:sum|reactions?):(\d+)$/
-      (tweets[:favorites_count] + tweets[:retweets_count]).__send__(positive ? :gteq : :lt, $1.to_i)
+      (tweets[:reactions_count]).__send__(positive ? :gteq : :lt, $1.to_i)
     when /^(?:source|via):(.+)$/
       source_text = "<url:%:#{escape_text.call($1).gsub(":", "%3A")}>"
       tweets[:source].__send__(positive ? :matches : :does_not_match, source_text)

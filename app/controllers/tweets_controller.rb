@@ -26,20 +26,6 @@ class TweetsController < ApplicationController
     @tweets = @user.tweets.reacted.order_by_reactions.list(params, force_page: true)
   end
 
-  def favorited
-    user_required
-    check_public!
-    @caption = "#{@user.screen_name}'s Most Favorited"
-    @tweets = @user.tweets.reacted.order_by_favorites.list(params, force_page: true, cache: 3.minutes)
-  end
-
-  def retweeted
-    user_required
-    check_public!
-    @caption = "#{@user.screen_name}'s Most Retweeted"
-    @tweets = @user.tweets.reacted.order_by_retweets.list(params, force_page: true, cache: 3.minutes)
-  end
-
   def recent
     user_required
     check_public!

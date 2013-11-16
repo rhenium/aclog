@@ -53,10 +53,6 @@ class Tweet < ActiveRecord::Base
       ret = ret.max_id(params[:max_id]).since_id(params[:since_id])
     end
 
-    if options[:cache] && options[:cache] > 0
-      ret = ret.cache_list(options[:cache])
-    end
-
     ret
   end
 
@@ -164,21 +160,6 @@ class Tweet < ActiveRecord::Base
     else
       search_text = escape_text.call(positive ? token : token[1..-1])
       tweets[:text].__send__(positive ? :matches : :does_not_match, "%#{search_text}%")
-    end
-  end
-
-  def self.cache_list(expires_in)
-    key = "tweets/ids/#{Digest::MD5.hexdigest(current_scope.to_sql)}"
-    ids = Rails.cache.read(key)
-    unless ids
-      ids = current_scope.pluck(:id)
-      Rails.cache.write(key, ids, expires_in: expires_in)
-    end
-    m = unscoped.where(id: ids)
-    if ids.size > 0
-      m.order("CASE tweets.id #{ids.each_with_index.map {|m, i| "WHEN #{m} THEN #{i}" }.join(" ")} END")
-    else
-      m
     end
   end
 end

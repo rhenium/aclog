@@ -34,7 +34,6 @@ Aclog::Application.routes.draw do
 
     # User pages
     scope "/:screen_name", controller: "users" do
-      get "/stats",                         action: "stats",            as: "user_stats"
       get "/discovered_by",                 action: "discovered_by",    as: "user_discovered_by"
       get "/discovered_users",              action: "discovered_users", as: "user_discovered_users"
     end
@@ -56,8 +55,6 @@ Aclog::Application.routes.draw do
     scope "/:screen_name" do
       get "/",                              action: "index",         as: "user"
       get "/best",                          action: "best",          as: "user_best"
-      get "/favorited",                     action: "favorited",     as: "user_favorited"
-      get "/retweeted",                     action: "retweeted",     as: "user_retweeted"
       get "/recent",                        action: "recent",        as: "user_recent"
       get "/timeline",                      action: "timeline",      as: "user_timeline"
       get "/discoveries",                   action: "discoveries",   as: "user_discoveries"

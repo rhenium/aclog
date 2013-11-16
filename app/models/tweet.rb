@@ -155,7 +155,7 @@ class Tweet < ActiveRecord::Base
     end
   end
 
-  def snowflake_min(time)
+  def self.snowflake_min(time)
     (time.to_datetime.to_i * 1000 - 1288834974657) << 22
   end
 end

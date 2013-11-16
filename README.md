@@ -53,8 +53,8 @@ A web service like Favstar.
 
 * Start
 
-        $ ./start.sh start receiver
-        $ ./start.sh start unicorn
+        $ ./start_receiver.sh start
+        $ ./start_unicorn start
 
 ### aclog configuration (worker)
 * In collector/

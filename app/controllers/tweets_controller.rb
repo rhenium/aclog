@@ -23,65 +23,65 @@ class TweetsController < ApplicationController
     user_required
     check_public!
     @caption = "#{@user.screen_name}'s Best"
-    @tweets = @user.tweets.reacted.order_by_reactions.list(params, force_page: true)
+    @tweets = @user.tweets.list(params, force_page: true).reacted.order_by_reactions
   end
 
   def recent
     user_required
     check_public!
     @caption = "#{@user.screen_name}'s Recent Best"
-    @tweets = @user.tweets.recent.reacted.order_by_reactions.list(params, force_page: true)
+    @tweets = @user.tweets.list(params, force_page: true).recent.reacted.order_by_reactions
   end
 
   def timeline
     user_required
     @caption = "#{@user.screen_name}'s Newest"
-    @tweets = @user.tweets.reacted.order_by_id.list(params)
+    @tweets = @user.tweets.list(params).reacted.order_by_id
   end
 
   def discoveries
     user_required
     @caption = "#{@user.screen_name}'s Discoveries"
-    @tweets = Tweet.discovered_by(@user).order_by_id.list(params)
+    @tweets = Tweet.list(params, force_page: true).discovered_by(@user).order_by_id
   end
 
   def favorites
     user_required
     @caption = "#{@user.screen_name}'s Favorites"
-    @tweets = Tweet.favorited_by(@user).order_by_id.list(params)
+    @tweets = Tweet.list(params, force_page: true).favorited_by(@user).order_by_id
   end
 
   def retweets
     user_required
     @caption = "#{@user.screen_name}'s Retweets"
-    @tweets = Tweet.retweeted_by(@user).order_by_id.list(params)
+    @tweets = Tweet.list(params, force_page: true).retweeted_by(@user).order_by_id
   end
 
   def discovered_by
     user_required
     user_b_required
     @caption = "Discovored by #{@user_b.screen_name}"
-    @tweets = @user.tweets.discovered_by(@user_b).order_by_id.list(params)
+    @tweets = @user.tweets.list(params).discovered_by(@user_b).order_by_id
   end
 
   def all_best
     @caption = "Top Tweets"
-    @tweets = Tweet.reacted.order_by_reactions.list(params, force_page: true)
+    @tweets = Tweet.list(params, force_page: true).reacted.order_by_reactions
   end
 
   def all_recent
     @caption = "Recent"
-    @tweets = Tweet.recent.reacted.order_by_reactions.list(params, force_page: true)
+    @tweets = Tweet.list(params, force_page: true).recent.reacted.order_by_reactions
   end
 
   def all_timeline
     @caption = "Newest"
-    @tweets = Tweet.reacted.order_by_id.list(params)
+    @tweets = Tweet.list(params).reacted.order_by_id
   end
 
   def search
     @caption = "Search"
-    @tweets = Tweet.parse_query(params[:q].to_s || "").reacted.not_protected.order_by_id.list(params, force_page: true)
+    @tweets = Tweet.list(params, force_page: true).parse_query(params[:q].to_s || "").reacted.not_protected.order_by_id
     @tweets = @tweets.recent(7) unless @tweets.to_sql.include?("`tweets`.`id`")
   end
 

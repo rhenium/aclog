@@ -21,11 +21,9 @@ class Tweet < ActiveRecord::Base
   scope :favorited_by, -> user { joins(:favorites).where(favorites: {user: user}) }
   scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user: user}) }
   scope :discovered_by, -> user {
-    un = "SELECT favorites.tweet_id FROM favorites WHERE favorites.user_id = #{user.id}" +
-         " UNION " +
-         "SELECT retweets.tweet_id FROM retweets WHERE retweets.user_id = #{user.id}"
+    un = [:favorites, :retweets].map {|m| user.__send__(m).select(:tweet_id).order(tweet_id: :desc).limit(all.limit_value.to_i + all.offset_value.to_i).to_sql }.join(") UNION (")
 
-    joins("INNER JOIN (#{un}) m ON m.tweet_id = tweets.id")
+    joins("INNER JOIN ((#{un})) reactions ON reactions.tweet_id = tweets.id")
   }
 
   def notify_favorite

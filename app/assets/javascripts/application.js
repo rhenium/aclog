@@ -1,4 +1,4 @@
 //= require jquery
 //= require jquery_ujs
-//= require widgets
+//= require _widgets
 

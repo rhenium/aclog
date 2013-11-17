@@ -6,14 +6,14 @@
     = stylesheet_link_tag params[:controller], media: "all"
     = javascript_include_tag "application"
     = javascript_include_tag params[:controller]
-    %meta{name: "viewport", content: "width=device-width, initial-scale=1.0"}
+    %meta{name: "viewport", content: "width=600px"}
   %body
-    .navbar.navbar-static-top
+    .navbar.navbar-default.navbar-static-top
       .container
         .navbar-header
           = link_to "aclog", root_path, class: "navbar-brand"
-        .navbar-collapse.collapse
-          %ul.nav.navbar-nav.navbar-right
+        .navbar-right
+          %ul.nav.navbar-nav
             %li
               = link_to "about", about_path
             - if logged_in?

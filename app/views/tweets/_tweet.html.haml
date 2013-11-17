@@ -35,7 +35,7 @@
   .stats
     - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
       - if count > 0
-        %dl.dl-horizontal
+        %dl
           %dt
             %span.count= count
             %span.type= title

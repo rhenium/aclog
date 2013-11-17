@@ -1,4 +1,4 @@
-//= require html-autoload
+//= require _html-autoload
 $(function() {
   $(".pagination").hide();
   $.autopager({

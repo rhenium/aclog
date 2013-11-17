@@ -17,13 +17,14 @@ A web service like Favstar.
 * Show how many favorited/retweeted by specified user
 * Protected account support
 * JSON API
+* RSS
 
 ### Not yet / will be implemented
 * New UI
 * User settings (favorites notification)
 
 ## Requirements
-* Ruby 1.9.3
+* Ruby 2.0.0/1.9.3
 * MySQL/MariaDB 5.5.14+ (must support utf8mb4)
 
 ## Setup

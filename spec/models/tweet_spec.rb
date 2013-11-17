@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 require "spec_helper"
 
-include Aclog::Twitter
-
 describe Tweet do
   before do
     @user_0, @user_1, @user_2 = FactoryGirl.create_list(:user, 3) # t/f/r = 3/1/0, 1/2/1, 0/0/1
 
-    @tweet_0_0 = FactoryGirl.create(:tweet, id: snowflake(2.days.ago) + 5000, user: @user_0, tweeted_at: 2.days.ago) # f/r = 2/0
-    @tweet_0_1 = FactoryGirl.create(:tweet, id: snowflake(4.days.ago) + 5000, user: @user_0, tweeted_at: 4.days.ago) # f/r = 0/1
-    @tweet_0_2 = FactoryGirl.create(:tweet, id: snowflake(6.days.ago) + 5000, user: @user_0, tweeted_at: 6.days.ago) # f/r = 0/0
-    @tweet_1_0 = FactoryGirl.create(:tweet, id: snowflake(1.days.ago) + 5000, user: @user_1, tweeted_at: 1.days.ago) # f/r = 1/1
+    @tweet_0_0 = FactoryGirl.create(:tweet, id: snowflake_min(2.days.ago) + 5000, user: @user_0, tweeted_at: 2.days.ago) # f/r = 2/0
+    @tweet_0_1 = FactoryGirl.create(:tweet, id: snowflake_min(4.days.ago) + 5000, user: @user_0, tweeted_at: 4.days.ago) # f/r = 0/1
+    @tweet_0_2 = FactoryGirl.create(:tweet, id: snowflake_min(6.days.ago) + 5000, user: @user_0, tweeted_at: 6.days.ago) # f/r = 0/0
+    @tweet_1_0 = FactoryGirl.create(:tweet, id: snowflake_min(1.days.ago) + 5000, user: @user_1, tweeted_at: 1.days.ago) # f/r = 1/1
 
     @tweet_0_0_f_0 = FactoryGirl.create(:favorite, user: @user_0, tweet: @tweet_0_0)
     @tweet_0_0_f_1 = FactoryGirl.create(:favorite, user: @user_1, tweet: @tweet_0_0)
@@ -23,6 +21,7 @@ describe Tweet do
     subject { @tweet_0_0.reload }
     its(:favorites_count) { should be subject.favorites.count }
     its(:retweets_count) { should be subject.retweets.count }
+    its(:reactions_count) { should be subject.favorites.count + subject.retweets.count }
   end
 
   describe ".delete_from_id" do
@@ -80,8 +79,29 @@ describe Tweet do
     describe "reacted" do
       subject { Tweet.reacted }
       it { should_not include -> tweet { tweet.favorites_count + tweet.retweets_count == 0 } }
-      it { should_not include -> tweet { tweet.favorites.count + tweet.retweets.count == 0 } }
       its(:count) { should be 3 }
+    end
+
+    describe "not_protected" do
+      subject { Tweet.not_protected.includes(:user) }
+      it { should_not include -> tweet { tweet.user.protected? } }
+    end
+
+    describe "max_id" do
+      subject { Tweet.max_id(@tweet_0_0.id - 1) }
+      its(:count) { should be 2 }
+      it { should_not include -> tweet { tweet.id > @tweet_0_0.id - 1 } }
+    end
+
+    describe "since_id" do
+      subject { Tweet.since_id(@tweet_0_0.id) }
+      its(:count) { should be 1 }
+      it { should_not include -> tweet { tweet.id <= @tweet_0_0.id } }
+    end
+
+    describe "page" do
+      subject { Tweet.limit(3).page(2) }
+      its(:count) { should be 1 }
     end
 
     describe "order_by_id" do
@@ -89,18 +109,8 @@ describe Tweet do
       it { subject.first.id.should be > subject.last.id }
     end
 
-    describe "order_by_favorites" do
-      subject { Tweet.order_by_favorites }
-      it { subject.first.favorites.count.should be >= subject.last.favorites.count }
-    end
-
-    describe "order_by_retweets" do
-      subject { Tweet.order_by_retweets }
-      it { subject.first.retweets.count.should be >= subject.last.retweets.count }
-    end
-
     describe "order_by_reactions" do
-      subject { Tweet.order_by_favorites }
+      subject { Tweet.order_by_reactions }
       it {
         (subject.first.favorites.count + subject.first.retweets.count)
            .should be >= (subject.last.favorites.count + subject.last.retweets.count)
@@ -125,23 +135,6 @@ describe Tweet do
       it { subject.select {|m| m.favorites.any? {|n| n.user_id == @user_1.id } }.count.should be 2 }
       it { subject.select {|m| m.retweets.any? {|n| n.user_id == @user_1.id } }.count.should be 1 }
       it { should_not include -> tweet { not (tweet.retweets + tweet.favorites).any? {|a| a.user_id == @user_1.id } } }
-    end
-
-    describe "not_protected" do
-      subject { Tweet.not_protected.includes(:user) }
-      it { should_not include -> tweet { tweet.user.protected? } }
-    end
-
-    describe "max_id" do
-      subject { Tweet.max_id(@tweet_0_0.id - 1) }
-      its(:count) { should be 2 }
-      it { should_not include -> tweet { tweet.id > @tweet_0_0.id - 1 } }
-    end
-
-    describe "since" do
-      subject { Tweet.since_id(@tweet_0_0.id) }
-      its(:count) { should be 1 }
-      it { should_not include -> tweet { tweet.id <= @tweet_0_0.id } }
     end
   end
 end

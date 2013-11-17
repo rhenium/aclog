@@ -36,6 +36,42 @@ describe User do
     end
   end
 
+  describe ".get" do
+    let(:user) { FactoryGirl.create(:user) }
+
+    context "when user exists" do
+      subject { User.get(id, screen_name) }
+
+      context "and specify only id" do
+        let(:id) { user.id }
+        let(:screen_name) { nil }
+        it { should eq user }
+      end
+
+      context  "and specify only screen_name" do
+        let(:id) { nil }
+        let(:screen_name) { user.screen_name }
+        it { should eq user }
+      end
+    end
+
+    context "when user not exists" do
+      subject { -> { User.get(id, screen_name) } }
+
+      context "when specify not existing id" do
+        let(:id) { user.id + 1 }
+        let(:screen_name) { nil }
+        it { should raise_error Aclog::Exceptions::UserNotFound }
+      end
+
+      context  "when specify only screen_name" do
+        let(:id) { nil }
+        let(:screen_name) { "1234567890abcdef" }
+        it { should raise_error Aclog::Exceptions::UserNotFound }
+      end
+    end
+  end
+
   describe "#protected?" do
     context "when not protected" do
       let(:user) { FactoryGirl.create(:user, protected: false) }

@@ -52,3 +52,8 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = "random"
 end
+
+def snowflake_min(time)
+  (time.to_datetime.to_i * 1000 - 1288834974657) << 22
+end
+

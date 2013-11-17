@@ -13,7 +13,7 @@ class Tweet < ActiveRecord::Base
 
   scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
   scope :since_id, -> id { where("tweets.id > ?", id.to_i) if id }
-  scope :page, ->(page, count) { offset((page - 1) * count) }
+  scope :page, ->(page) { offset((page - 1) * all.limit_value) }
 
   scope :order_by_id, -> { order(id: :desc) }
   scope :order_by_reactions, -> { order(reactions_count: :desc) }
@@ -21,7 +21,9 @@ class Tweet < ActiveRecord::Base
   scope :favorited_by, -> user { joins(:favorites).where(favorites: {user: user}) }
   scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user: user}) }
   scope :discovered_by, -> user {
-    un = [:favorites, :retweets].map {|m| user.__send__(m).select(:tweet_id).order(tweet_id: :desc).limit(all.limit_value.to_i + all.offset_value.to_i).to_sql }.join(") UNION (")
+    load_count = all.limit_value.to_i + all.offset_value.to_i
+    load_count = nil if load_count == 0
+    un = [:favorites, :retweets].map {|m| user.__send__(m).select(:tweet_id).order(tweet_id: :desc).limit(load_count).to_sql }.join(") UNION (")
 
     joins("INNER JOIN ((#{un})) reactions ON reactions.tweet_id = tweets.id")
   }
@@ -36,13 +38,11 @@ class Tweet < ActiveRecord::Base
     count = params[:count].to_i
     count = Settings.tweets.count_default unless (1..Settings.tweets.count_max) === count
 
-    ret = limit(count)
-
     if params[:page] || options[:force_page]
       page = [params[:page].to_i, 1].max
-      ret = ret.page(page, count)
+      ret = limit(count).page(page)
     else
-      ret = ret.max_id(params[:max_id]).since_id(params[:since_id])
+      ret = limit(count).max_id(params[:max_id]).since_id(params[:since_id])
     end
 
     ret

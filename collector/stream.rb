@@ -140,6 +140,7 @@ module Aclog
          text: format_text(status),
          source: format_source(status),
          tweeted_at: status[:created_at],
+         in_reply_to_status_id: status[:in_reply_to_status_id],
          user: conv_user(status[:user])}
       end
 

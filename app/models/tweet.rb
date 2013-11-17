@@ -1,6 +1,9 @@
 class Tweet < ActiveRecord::Base
   belongs_to :user
 
+  belongs_to :in_reply_to, class_name: "Tweet"
+  has_many :replies, class_name: "Tweet", foreign_key: "in_reply_to_id"
+
   has_many :favorites, -> { order("favorites.id") }, dependent: :delete_all
   has_many :retweets, -> { order("retweets.id") }, dependent: :delete_all
 
@@ -83,6 +86,7 @@ class Tweet < ActiveRecord::Base
                          text: msg["text"],
                          source: msg["source"],
                          tweeted_at: Time.parse(msg["tweeted_at"]),
+                         in_reply_to_id: msg["in_reply_to_status_id"],
                          user: u)
           end
           logger.debug("Created Tweet: #{msg["id"]}")

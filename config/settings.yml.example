@@ -28,9 +28,8 @@ default: &default
   tweets:
     count_default:    10
     count_max:        100
-    users:
-      count_default:  20
-      count_lot:      100
+    favorites:
+      truncate:       20
   
   user_ranking:
     count:            50

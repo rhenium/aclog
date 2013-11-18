@@ -1,5 +1,5 @@
-.tweets= render partial: "tweets/tweet", collection: @tweets.includes(:user), as: :tweet
-- if @tweets.count > 0 && params[:action] != "show"
+.tweets= render partial: "tweet", collection: @tweets.includes(:user), as: :tweet
+- if @tweets.count > 0
   .loading= image_tag "loading.gif", alt: "loading...", title: nil
   .pagination
     - if @tweets.offset_value != nil

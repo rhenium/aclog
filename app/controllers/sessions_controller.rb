@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  def callback
+  def create
     auth = request.env["omniauth.auth"]
 
     account = Account.create_or_update(user_id: auth["uid"],
@@ -17,7 +17,11 @@ class SessionsController < ApplicationController
     session[:account] = account
     session[:user_id] = account.user_id
 
-    redirect_to root_path
+    to = request.env["omniauth.params"]["redirect_after_login"].to_s
+    if to.include? "//" || to[0] != "/"
+      to = root_path
+    end
+    redirect_to to
   end
 
   def destroy

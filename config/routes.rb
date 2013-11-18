@@ -11,7 +11,7 @@ Aclog::Application.routes.draw do
   scope format: "html" do
     # Internals / SessionsController
     get "/i/import/:id" =>  "i#import",         as: "import"
-    get "/i/callback" =>    "sessions#callback"
+    get "/i/callback" =>    "sessions#create"
     get "/i/logout" =>      "sessions#destroy", as: "logout"
 
     get "/i/:id" =>         "tweets#show",      as: "tweet", constraints: {id: /\d+/}

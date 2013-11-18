@@ -67,8 +67,7 @@ class User < ActiveRecord::Base
     raise Aclog::Exceptions::UserNotRegistered.new(self) unless registered? && account.active?
 
     Rails.cache.fetch("stats/#{self.id}", expires_in: 3.hours) do
-      sql = "SELECT SUM(reactions_count) FROM tweets WHERE user_id = #{self.id}"
-      reactions_count = ActiveRecord::Base.connection.execute(sql).to_a(as: :array).first.first
+      reactions_count = tweets.sum(:reactions_count)
 
       ret = OpenStruct.new
       ret.updated_at = Time.now

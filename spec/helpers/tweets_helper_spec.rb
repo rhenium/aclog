@@ -2,48 +2,35 @@
 require "spec_helper"
 
 describe TweetsHelper do
-  describe "#html_favoriters_limit" do
-    subject { helper.html_favoriters_limit }
+  describe "#favorites_truncate_count" do
+    subject { helper.favorites_truncate_count }
 
-    context "when timeline" do
-      before { controller.request.format = :html }
-      it { should eq Settings.tweets.users.count_default }
+    context "when full=tree" do
+      before { params[:full] = "true" }
+      it { should eq nil }
     end
 
-    context "when tweet" do
-      before do
-        controller.request.format = :html
-        params[:action] = "show"
-      end
-      it { should eq Settings.tweets.users.count_lot }
-    end
-
-    context "when tweet with full=true parameter" do
-      before do
-        controller.request.format = :html
-        params[:action] = "show"
-        params[:full] = "true"
-      end
-      it { should be nil }
+    context "when full!=true" do
+      it { should eq Settings.tweets.favorites.truncate }
     end
   end
 
-  describe "#html_favoriters_truncated?" do
+  describe "#favorites_truncated?" do
     let(:user) { FactoryGirl.create(:user) }
-    subject { helper.html_favoriters_truncated?(tweet) }
+    subject { helper.favorites_truncated?(tweet) }
     context "when full=true" do
-      before { helper.stub(:html_favoriters_limit).and_return(nil) }
-      let(:tweet) { FactoryGirl.create(:tweet, user: user, favorites_count: Settings.tweets.users.count_lot + 1, retweets_count: Settings.tweets.users.count_lot + 1) }
+      before { helper.stub(:favorites_truncate_count).and_return(nil) }
+      let(:tweet) { FactoryGirl.create(:tweet, user: user, favorites_count: Settings.tweets.favorites.truncate + 1, retweets_count: Settings.tweets.favorites.truncate + 1) }
       it { should be false }
     end
     context "when _count equals count_default" do
-      before { helper.stub(:html_favoriters_limit).and_return(Settings.tweets.users.count_default) }
-      let(:tweet) { FactoryGirl.create(:tweet, user: user, favorites_count: Settings.tweets.users.count_default, retweets_count: Settings.tweets.users.count_default) }
+      before { helper.stub(:favorites_truncate_count).and_return(Settings.tweets.favorites.truncate) }
+      let(:tweet) { FactoryGirl.create(:tweet, user: user, favorites_count: Settings.tweets.favorites.truncate, retweets_count: Settings.tweets.favorites.truncate) }
       it { should be false }
     end
     context "when _count is larger than count_default" do
-      before { helper.stub(:html_favoriters_limit).and_return(Settings.tweets.users.count_default) }
-      let(:tweet) { FactoryGirl.create(:tweet, user: user, favorites_count: Settings.tweets.users.count_default, retweets_count: Settings.tweets.users.count_default + 1) }
+      before { helper.stub(:favorites_truncate_count).and_return(Settings.tweets.favorites.truncate) }
+      let(:tweet) { FactoryGirl.create(:tweet, user: user, favorites_count: Settings.tweets.favorites.truncate + 1, retweets_count: Settings.tweets.favorites.truncate + 1) }
       it { should be true }
     end
   end

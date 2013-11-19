@@ -27,18 +27,20 @@
           = link_to image_tag("bird_gray_16.png", alt: "Twitter"), twitter_status_url(tweet), target: "_blank"
         %span.created_at
           = link_to format_time(tweet.tweeted_at), tweet_path(tweet.id)
+        - if favorites_truncated?(tweet)
+          %span.show-full= link_to "show full", tweet_path(tweet.id, full: true)
         %span.source
-          = raw format_source_text(tweet.source)
+          = raw "via " + format_source_text(tweet.source)
   .stats
-    - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
-      - if count > 0
-        %dl
+    %dl
+      - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
+        - if count > 0
           %dt
             %span.count= count
             %span.type= title
           %dd
             %ul.list-inline
-              - users.limit(params[:action] == "show" ? nil : Settings.tweets.favorites.truncate).each do |m|
+              - users.limit(favorites_truncate_count).each do |m|
                 %li
                   - if !m.protected? || session[:user_id] == m.id || session[:user_id] == tweet.user.id
                     = link_to user_path(m.screen_name) do

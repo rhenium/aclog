@@ -28,7 +28,7 @@ module ApplicationHelper
   alias format_source_text format_tweet_text
 
   def twitter_status_url(tweet)
-    "https://twitter.com/#{tweet.user.screen_name}/status/#{tweet.id}"
+    "https://twitter.com/#{tweet.user_screen_name}/status/#{tweet.id}"
   end
 
   def twitter_user_url(screen_name)

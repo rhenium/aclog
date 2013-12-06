@@ -1,5 +1,6 @@
 class Tweet < ActiveRecord::Base
   belongs_to :user
+  delegate :screen_name, :name, :profile_image_url, to: :user, prefix: true
 
   belongs_to :in_reply_to, class_name: "Tweet"
   has_many :replies, class_name: "Tweet", foreign_key: "in_reply_to_id"

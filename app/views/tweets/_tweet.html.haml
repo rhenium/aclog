@@ -2,8 +2,8 @@
   .tweet
     .left
       .avatar
-        = link_to user_path(tweet.user.screen_name) do
-          = image_tag tweet.user.profile_image_url, alt: tweet.user.screen_name, title: tweet.user.name
+        = link_to user_path(tweet.user_screen_name) do
+          = image_tag tweet.user_profile_image_url, alt: tweet.user_screen_name, title: tweet.user_name
       %ul.list-inline.actions
         %li.twitter
           = link_to image_tag("reply.png", alt: "reply"), "https://twitter.com/intent/tweet?in_reply_to=#{tweet.id}"
@@ -12,10 +12,10 @@
     .tweet_content_fix
     .tweet_content
       .user
-        %span.name= link_to tweet.user.name, user_path(tweet.user.screen_name)
-        %span.screen_name= link_to tweet.user.screen_name, user_path(tweet.user.screen_name)
+        %span.name= link_to tweet.user_name, user_path(tweet.user_screen_name)
+        %span.screen_name= link_to tweet.user_screen_name, user_path(tweet.user_screen_name)
         - if tweet.in_reply_to
-          %span.in_reply_to= link_to "in reply to @" + tweet.in_reply_to.user.screen_name, tweet_path(tweet.in_reply_to.id)
+          %span.in_reply_to= link_to "in reply to @" + tweet.in_reply_to.user_screen_name, tweet_path(tweet.in_reply_to.id)
       .text
         - if authorized_to_show_user?(tweet.user)
           = simple_format(format_tweet_text(tweet.text))
@@ -42,7 +42,7 @@
             %ul.list-inline
               - users.limit(favorites_truncate_count).each do |m|
                 %li
-                  - if !m.protected? || session[:user_id] == m.id || session[:user_id] == tweet.user.id
+                  - if !m.protected? || session[:user_id] == m.id || session[:user_id] == tweet.user_id
                     = link_to user_path(m.screen_name) do
                       = image_tag m.profile_image_url, alt: "@#{m.screen_name}", title: "#{m.name} (@#{m.screen_name})"
                   - else

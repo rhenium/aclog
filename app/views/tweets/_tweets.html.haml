@@ -1,4 +1,4 @@
-.tweets= render partial: "tweet", collection: @tweets.includes(:user), as: :tweet
+.tweets= render @tweets.includes(:user)
 - if @tweets.count > 0
   .loading= image_tag "loading.gif", alt: "loading...", title: nil
   .pagination

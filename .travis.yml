@@ -9,7 +9,7 @@ before_script:
   - "cp config/database.yml.example config/database.yml"
   - "sed -i 's/username: aclog/username: /g' config/database.yml"
   - "cp config/initializers/secret_token.rb.example config/initializers/secret_token.rb"
-  - "sed -i s/replace_here/$(rake secret)/g config/initializers/secret_token.rb"
+  - "sed -i s/replace_here/$(bundle exec rake secret)/g config/initializers/secret_token.rb"
 script:
   - "RAILS_ENV=test bundle exec rake db:drop db:create db:migrate"
   - "RAILS_ENV=test bundle exec rake tmp:create"

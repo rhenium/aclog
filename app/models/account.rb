@@ -48,10 +48,10 @@ class Account < ActiveRecord::Base
   end
 
   def client
-    Twitter::Client.new(consumer_key: Settings.collector.consumer[consumer_version].key,
-                        consumer_secret: Settings.collector.consumer[consumer_version].secret,
-                        oauth_token: oauth_token,
-                        oauth_token_secret: oauth_token_secret)
+    Twitter::REST::Client.new(consumer_key: Settings.collector.consumer[consumer_version].key,
+                              consumer_secret: Settings.collector.consumer[consumer_version].secret,
+                              oauth_token: oauth_token,
+                              oauth_token_secret: oauth_token_secret)
   end
 
   def import_favorites(id)

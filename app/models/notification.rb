@@ -19,10 +19,10 @@ class Notification
     cur = Rails.cache.read("notification_account") || 0
     if Settings.notification.token[cur]
       begin
-        client = Twitter::Client.new(consumer_key: Settings.notification.consumer.key,
-                                     consumer_secret: Settings.notification.consumer.secret,
-                                     oauth_token: Settings.notification.token[cur].token,
-                                     oauth_token_secret: Settings.notification.token[cur].secret)
+        client = Twitter::REST::Client.new(consumer_key: Settings.notification.consumer.key,
+                                           consumer_secret: Settings.notification.consumer.secret,
+                                           oauth_token: Settings.notification.token[cur].token,
+                                           oauth_token_secret: Settings.notification.token[cur].secret)
 
 
         client.update(text, in_reply_to_status_id: reply_to)

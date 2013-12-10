@@ -92,15 +92,16 @@ module Aclog
 
       def receive_init(msg)
         secret_key = msg["secret_key"]
-        worker_number = msg["worker_number"]
         unless secret_key == Settings.collector.secret_key
-          Rails.logger.warn("Invalid secret_key(?:#{worker_number}): \"#{secret_key}\"")
+          Rails.logger.warn("Invalid secret_key: \"#{secret_key}\"")
           send_object(type: "fatal", message: "Invalid secret_key")
           close_connection_after_writing
           return
         end
-        if worker_number > Settings.collector.count
-          Rails.logger.warn("Invalid worker_number: #{worker_number}, secret_key: \"#{secret_key}\"")
+
+        worker_number = Settings.collector.count.times.find {|num| !@connections.key?(num) }
+        if worker_number == nil
+          Rails.logger.warn("Invalid worker_number: #{worker_number}")
           send_object(type: "fatal", message: "Invalid worker_number")
           close_connection_after_writing
           return

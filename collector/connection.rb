@@ -15,8 +15,7 @@ module Aclog
 
       def post_init
         send_object(type: "init",
-                    secret_key: Settings.secret_key,
-                    worker_number: Settings.worker_number)
+                    secret_key: Settings.secret_key)
       end
 
       def unbind

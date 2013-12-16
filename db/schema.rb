@@ -19,7 +19,6 @@ ActiveRecord::Schema.define(version: 20131117024504) do
     t.string   "oauth_token_secret",                           null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "consumer_version",                             null: false
     t.boolean  "notification",                 default: true,  null: false
     t.boolean  "private",                      default: false, null: false
     t.integer  "status",             limit: 2, default: 0,     null: false

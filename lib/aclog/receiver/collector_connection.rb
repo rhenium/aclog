@@ -23,8 +23,7 @@ module Aclog
                     id: account.id,
                     oauth_token: account.oauth_token,
                     oauth_token_secret: account.oauth_token_secret,
-                    user_id: account.user_id,
-                    consumer_version: account.consumer_version)
+                    user_id: account.user_id)
         Rails.logger.debug("Sent #{account.id}/#{account.user_id}")
       end
 

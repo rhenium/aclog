@@ -17,13 +17,12 @@ class Notification
   private
   def self.tweet(text, reply_to = 0)
     cur = Rails.cache.read("notification_account") || 0
-    if Settings.notification.token[cur]
+    if Settings.notification.accounts[cur]
       begin
         client = Twitter::REST::Client.new(consumer_key: Settings.notification.consumer.key,
                                            consumer_secret: Settings.notification.consumer.secret,
-                                           oauth_token: Settings.notification.token[cur].token,
-                                           oauth_token_secret: Settings.notification.token[cur].secret)
-
+                                           oauth_token: Settings.notification.accounts[cur].token,
+                                           oauth_token_secret: Settings.notification.accounts[cur].secret)
 
         client.update(text, in_reply_to_status_id: reply_to)
       rescue Exception

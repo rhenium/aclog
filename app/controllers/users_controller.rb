@@ -9,7 +9,7 @@ class UsersController < ApplicationController
   def discovered_by
     user_required
     authorize_to_show_best!(@user)
-    @result = @user.count_discovered_by.take(Settings.user_ranking.count)
+    @result = @user.count_discovered_by.take(Settings.users.count)
     @caption = "Discovered By"
     render "_user_ranking"
   end
@@ -17,7 +17,7 @@ class UsersController < ApplicationController
   def discovered_users
     user_required
     authorize_to_show_best!(@user)
-    @result = @user.count_discovered_users.take(Settings.user_ranking.count)
+    @result = @user.count_discovered_users.take(Settings.users.count)
     @caption = "Discovered Users"
     render "_user_ranking"
   end

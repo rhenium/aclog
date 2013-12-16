@@ -40,7 +40,7 @@ class Tweet < ActiveRecord::Base
 
   def self.list(params, options = {})
     count = params[:count].to_i
-    count = Settings.tweets.count_default unless (1..Settings.tweets.count_max) === count
+    count = Settings.tweets.count.default unless (1..Settings.tweets.count.max) === count
 
     if params[:page] || options[:force_page]
       page = [params[:page].to_i, 1].max

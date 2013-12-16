@@ -5,7 +5,6 @@ class CreateAccounts < ActiveRecord::Migration
       t.string :oauth_token,                    null: false
       t.string :oauth_token_secret,             null: false
       t.timestamps
-      t.integer :consumer_version,              null: false
       t.boolean :notification,                  null: false, default: true
       t.boolean :private,                       null: false, default: false
       t.integer :status,            limit: 2,   null: false, default: 0

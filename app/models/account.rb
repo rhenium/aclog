@@ -11,7 +11,6 @@ class Account < ActiveRecord::Base
     account = where(user_id: hash[:user_id]).first_or_initialize
     account.oauth_token = hash[:oauth_token]
     account.oauth_token_secret = hash[:oauth_token_secret]
-    account.consumer_version = hash[:consumer_version]
     account.status = Account::ACTIVE
     account.save if account.changed?
     account
@@ -48,8 +47,8 @@ class Account < ActiveRecord::Base
   end
 
   def client
-    Twitter::REST::Client.new(consumer_key: Settings.collector.consumer[consumer_version].key,
-                              consumer_secret: Settings.collector.consumer[consumer_version].secret,
+    Twitter::REST::Client.new(consumer_key: Settings.consumer.key,
+                              consumer_secret: Settings.consumer.secret,
                               oauth_token: oauth_token,
                               oauth_token_secret: oauth_token_secret)
   end

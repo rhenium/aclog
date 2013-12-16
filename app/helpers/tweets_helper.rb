@@ -1,6 +1,6 @@
 module TweetsHelper
   def favorites_truncate_count
-    params[:full] == "true" ? nil : Settings.tweets.favorites.truncate
+    params[:full] == "true" ? Settings.tweets.favorites.max : Settings.tweets.favorites.count
   end
 
   def favorites_truncated?(tweet)

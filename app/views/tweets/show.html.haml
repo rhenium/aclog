@@ -1,1 +1,3 @@
-.tweets= render @tweets
+- title CGI.unescapeHTML(strip_tags(format_tweet_text(@tweet.text))) + " from @" + @user.screen_name
+- caption @user.screen_name + "'s Tweet"
+.tweets= render @tweet

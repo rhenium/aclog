@@ -1,7 +1,7 @@
 !!! xml
 %html{xmlns: "http://www.w3.org/1999/xhtml"}
   %head
-    %title= title
+    %title= yield :title
     = stylesheet_link_tag "application", media: "all"
     = stylesheet_link_tag params[:controller], media: "all"
     = javascript_include_tag "application"

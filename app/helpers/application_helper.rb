@@ -45,17 +45,16 @@ module ApplicationHelper
     end
   end
 
-  def caption
-    "#{@caption}"
+  def caption(text)
+    content_for :caption do
+      text
+    end
   end
 
-  def title
-    if @tweet
-      text = CGI.unescapeHTML(strip_tags(format_tweet_text(@tweet.text)))
-      @title = "\"#{text}\" from #{@user.screen_name}"
+  def title(*args)
+    content_for :title do
+      (args.compact + ["aclog"]).join(" - ")
     end
-
-    "#{@title || @caption} - aclog"
   end
 
   # utf8, form

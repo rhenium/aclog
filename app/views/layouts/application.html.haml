@@ -3,5 +3,5 @@
     .col-sm-3
       .sidebar= render partial: "shared/sidebar/#{sidebar_type}"
     .col-sm-9
-      %h1= caption
+      %h1= yield :caption
       = yield

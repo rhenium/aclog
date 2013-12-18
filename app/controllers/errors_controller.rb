@@ -6,7 +6,6 @@ class ErrorsController < ApplicationController
 
   def render_error
     @exception = env["action_dispatch.exception"]
-    @title = "?"
 
     case @exception
     when OAuth::Unauthorized

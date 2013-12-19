@@ -1,5 +1,5 @@
 - title "Account Settings"
-%h1 settings
+- caption :title
 = form_tag "/i/settings/update", method: :post do
   .checkbox
     = check_box_tag :notification, true, @account.notification

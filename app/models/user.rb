@@ -5,6 +5,10 @@ class User < ActiveRecord::Base
   has_many :favorites, dependent: :delete_all
   has_many :retweets, dependent: :delete_all
 
+  def twitter_url
+    "https://twitter.com/#{self.screen_name}"
+  end
+
   def self.get(id, screen_name)
     if id
       find(id) rescue raise Aclog::Exceptions::UserNotFound

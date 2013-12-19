@@ -32,6 +32,10 @@ class Tweet < ActiveRecord::Base
     joins("INNER JOIN ((#{un})) reactions ON reactions.tweet_id = tweets.id")
   }
 
+  def twitter_url
+    "https://twitter.com/#{self.user.screen_name}/status/#{self.id}"
+  end
+
   def notify_favorite
     if Settings.notification.enabled
       Notification.notify_favorite(self)

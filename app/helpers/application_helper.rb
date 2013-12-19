@@ -27,21 +27,10 @@ module ApplicationHelper
   end
   alias format_source_text format_tweet_text
 
-  def twitter_status_url(tweet)
-    "https://twitter.com/#{tweet.user_screen_name}/status/#{tweet.id}"
-  end
 
-  def twitter_user_url(screen_name)
-    "https://twitter.com/#{screen_name}"
-  end
-
-  def sidebar_type
-    if @sidebar
-      return @sidebar
-    elsif @user
-      return "users"
-    else
-      params[:controller]
+  def title(*args)
+    content_for :title do
+      (args.compact + ["aclog"]).join(" - ")
     end
   end
 
@@ -51,9 +40,9 @@ module ApplicationHelper
     end
   end
 
-  def title(*args)
-    content_for :title do
-      (args.compact + ["aclog"]).join(" - ")
+  def sidebar(name)
+    content_for :sidebar do
+      render "shared/sidebar/#{name}"
     end
   end
 

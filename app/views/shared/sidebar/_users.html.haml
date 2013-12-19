@@ -1,7 +1,7 @@
 .avatar
   = link_to user_path(@user.screen_name) do
     = image_tag @user.profile_image_url_original, alt: @user.screen_name, width: 64, height: 64, class: "icon img-rounded"
-.screen_name= link_to @user.screen_name, twitter_user_url(@user.screen_name)
+.screen_name= link_to @user.screen_name, @user.twitter_url
 - if @user.registered? && @user.account.active?
   %ul.list-group.records
     %li

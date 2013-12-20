@@ -24,6 +24,11 @@ describe Tweet do
     its(:reactions_count) { should be subject.favorites.count + subject.retweets.count }
   end
 
+  describe "#twitter_url" do
+    subject { @tweet_0_0.twitter_url }
+    it { should eq "https://twitter.com/#{@tweet_0_0.user.screen_name}/status/#{@tweet_0_0.id}" }
+  end
+
   describe ".delete_from_id" do
     context "when of tweet" do
       before do
@@ -55,8 +60,9 @@ describe Tweet do
     let(:test_data) do
       {"id" => 123,
        "text" => "abc",
+       "entities" => {},
        "source" => "web",
-       "tweeted_at" => Time.now.to_s,
+       "created_at" => Time.now.to_s,
        "user" => {"id" => @user_0.id}}
     end
 
@@ -65,7 +71,7 @@ describe Tweet do
     its(:id) { should be test_data["id"] }
     its(:text) { should eq test_data["text"] }
     its(:source) { should eq test_data["source"] }
-    its(:tweeted_at) { should eq Time.parse(test_data["tweeted_at"]) }
+    its(:tweeted_at) { should eq Time.parse(test_data["created_at"]) }
     its(:user) { should eq @user_0 }
   end
 

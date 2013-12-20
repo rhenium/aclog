@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe User do
+  describe "#twitter_url" do
+    let(:user) { FactoryGirl.build(:user_1) }
+    subject { user.twitter_url }
+    it { should eq "https://twitter.com/#{user.screen_name}" }
+  end
+
   describe ".from_user_object" do
     context "when not recorded" do
       let(:user_1_model) { FactoryGirl.build(:user_1) }

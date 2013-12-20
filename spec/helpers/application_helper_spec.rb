@@ -32,26 +32,5 @@ describe ApplicationHelper do
       it { should eq "<a href=\"/cn\">@cn</a> <a href=\"https://twitter.com/search?q=%24see\">$see</a> this <a href=\"https://twitter.com/search?q=%23photo\">#photo</a> <a href=\"https://pbs.twimg.com/media/BL6UraBCIAAyBLH.png:large\">pbs.twimg.com/media/BL6UraBC…</a>" }
     end
   end
-
-  describe "#twitter_status_url" do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:tweet) { FactoryGirl.create(:tweet, user: user) }
-    subject { helper.twitter_status_url(tweet) }
-    it { should eq "https://twitter.com/#{user.screen_name}/status/#{tweet.id}" }
-  end
-
-  describe "#twitter_user_url" do
-    let(:screen_name) { "screen_name" }
-    subject { helper.twitter_user_url(screen_name) }
-    it { should eq "https://twitter.com/#{screen_name}" }
-  end
-
-  describe "#title" do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:tweet) { FactoryGirl.create(:tweet, user: user, text: "<mention:cn> <symbol:see> this <hashtag:photo> &gt; <url:https\\://pbs.twimg.com/media/BL6UraBCIAAyBLH.png\\:large:pbs.twimg.com/media/BL6UraBC…> &lt;") }
-    before { @user = user; @tweet = tweet }
-    subject { helper.title }
-    it { should eq "\"@cn $see this #photo > pbs.twimg.com/media/BL6UraBC… <\" from #{user.screen_name} - aclog" }
-  end
 end
 

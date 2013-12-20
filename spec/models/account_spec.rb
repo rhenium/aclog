@@ -9,7 +9,6 @@ describe Account do
       its(:user_id) { should be account.user_id }
       its(:oauth_token) { should eq account.oauth_token }
       its(:oauth_token_secret) { should eq account.oauth_token_secret }
-      its(:consumer_version) { should be account.consumer_version }
       its(:status) { should be Account::ACTIVE }
     end
 
@@ -22,7 +21,6 @@ describe Account do
       its(:user_id) { should be new_account.user_id }
       its(:oauth_token) { should eq new_account.oauth_token }
       its(:oauth_token_secret) { should eq new_account.oauth_token_secret }
-      its(:consumer_version) { should eq new_account.consumer_version }
       its(:notification) { should be false }
       its(:private) { should be true }
       its(:status) { should be Account::ACTIVE }
@@ -31,7 +29,7 @@ describe Account do
 
   describe ".set_of_collector" do
     before { Settings.collector.stub(:count).and_return(3) }
-    let!(:accounts) { 10.times.map {|i| Account.create!(user_id: i, oauth_token: "abc", oauth_token_secret: "def", consumer_version: 1) } }
+    let!(:accounts) { 10.times.map {|i| Account.create!(user_id: i, oauth_token: "abc", oauth_token_secret: "def") } }
     subject { Account.set_of_collector(2) }
     it { should_not include -> m { m.id % 3 != 2 } }
   end

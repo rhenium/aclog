@@ -57,7 +57,7 @@ module Aclog
           case msg["type"]
           when "unauthorized"
             @channel << -> {
-              log(:warn, "unauthorized: #{msg["user_id"]}")
+              log(:warn, "unauthorized: ##{msg["id"]}/#{msg["user_id"]}")
             }
           when "tweet"
             @channel << -> {
@@ -121,7 +121,7 @@ module Aclog
         worker_number = (Settings.collector.count.times.to_a - @connections.keys).sort.first
         if worker_number == nil
           log(:warn, "all connection alive")
-          send_object(type: "fatal", message: "all connection alive")
+          send_object(type: "error", message: "all connection alive")
           close_connection_after_writing
           return
         end

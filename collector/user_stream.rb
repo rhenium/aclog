@@ -46,7 +46,7 @@ module Aclog
 
         client.on_unauthorized do
           log(:warn, "Unauthorized")
-          callback(:unauthorized, id: @account_id)
+          callback(:unauthorized, id: @account_id, user_id: @user_id)
           stop
         end
 

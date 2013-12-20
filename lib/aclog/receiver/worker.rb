@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 require "msgpack/rpc/transport/unix"
 
 module Aclog
@@ -17,9 +16,12 @@ module Aclog
         Rails.logger.info("Receiver started")
         File.delete(_sock_path) if File.exists?(_sock_path)
         EM.run do
+          channel = EM::Channel.new
+          EM.defer { channel.subscribe(&:call) }
+
           connections = {}
 
-          collector_server = EM.start_server("0.0.0.0", Settings.collector.server_port, CollectorConnection, connections)
+          collector_server = EM.start_server("0.0.0.0", Settings.collector.server_port, CollectorConnection, channel, connections)
 
           reg_svr_listener = MessagePack::RPC::UNIXServerTransport.new(_sock_path)
           register_server = MessagePack::RPC::Server.new

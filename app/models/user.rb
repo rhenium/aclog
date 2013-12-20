@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
 
     if att["screen_name"] == user.screen_name &&
        att["name"] == user.name &&
-       att["profile_image_url"][-44..-1] == user.profile_image_url[-44..-1] &&
+       att["profile_image_url"] == user.profile_image_url &&
        att["protected"] == user.protected?
       logger.debug("User not changed: #{user.id}")
     else

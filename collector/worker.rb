@@ -1,21 +1,18 @@
-# -*- coding: utf-8 -*-
-require "logger"
+require "./settings"
 require "./connection"
 
 module Aclog
   module Collector
     class Worker
-      def initialize
-        @logger = Logger.new(STDOUT)
-        @logger.level = Settings.env == "development" ? Logger::DEBUG : Logger::INFO
+      def initialize(logger)
+        @logger = logger
       end
 
       def start
         EM.run do
-          connection = EM.connect(Settings.receiver_host, Settings.receiver_port, Aclog::Collector::Connection, @logger)
+          connection = EM.connect(Settings.receiver_host, Settings.receiver_port, Connection, @logger)
 
           stop = proc do
-            @logger.info("Quitting collector...")
             connection.quit
             EM.stop
           end

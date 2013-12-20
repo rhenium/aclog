@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 module Aclog
   module Receiver
     class RegisterServer

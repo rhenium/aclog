@@ -86,14 +86,12 @@ class Tweet < ActiveRecord::Base
       unless t
         begin
           u = User.from_receiver(msg["user"])
-          t = logger.quietly do
-            self.create!(id: msg["id"],
-                         text: msg["text"],
-                         source: msg["source"],
-                         tweeted_at: Time.parse(msg["tweeted_at"]),
-                         in_reply_to_id: msg["in_reply_to_status_id"],
-                         user: u)
-          end
+          t = self.create!(id: msg["id"],
+                           text: extract_entities(msg["text"], msg["entities"]),
+                           source: msg["source"],
+                           tweeted_at: Time.parse(msg["created_at"]),
+                           in_reply_to_id: msg["in_reply_to_status_id"],
+                           user: u)
           logger.debug("Created Tweet: #{msg["id"]}")
         rescue ActiveRecord::RecordNotUnique
           logger.debug("Duplicate Tweet: #{msg["id"]}")
@@ -129,6 +127,31 @@ class Tweet < ActiveRecord::Base
   end
 
   private
+  def self.extract_entities(text, entities)
+    escape_colon = -> str { str.gsub(":", "\\:") }
+    entities = entities.map { |k, v| v.map { |n| n.update("type" => k) } }.flatten.sort_by { |entity| entity["indices"].first }
+
+    result = ""
+    last_index = entities.inject(0) do |last_index_, entity|
+      result << text[last_index_...entity["indices"].first]
+      case entity["type"]
+      when "urls", "media"
+        result << "<url:#{escape_colon.call(entity["expanded_url"])}:#{escape_colon.call(entity["display_url"])}>"
+      when "hashtags"
+        result << "<hashtag:#{entity["text"]}>"
+      when "user_mentions"
+        result << "<mention:#{entity["screen_name"]}>"
+      when "symbols"
+        result << "<symbol:#{entity["text"]}>"
+      end
+
+      entity["indices"].last
+    end
+    result << text[last_index..-1]
+
+    result
+  end
+
   def self.parse_condition(token, strings)
     tweets = Tweet.arel_table
     escape_text = -> str do

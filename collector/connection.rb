@@ -1,83 +1,89 @@
-# -*- coding: utf-8 -*-
 require "msgpack"
 require "./settings"
-require "./stream"
+require "./user_stream"
 
-module Aclog
-  module Collector
-    class Connection < EM::Connection
-      def initialize(logger)
-        @logger = logger
-        @clients = {}
-        @pac = MessagePack::Unpacker.new
-        @connected = false
-      end
+module Aclog::Collector
+  class Connection < EM::Connection
+    def initialize(logger)
+      @logger = logger
+      @clients = {}
+      @unpacker = MessagePack::Unpacker.new
+      @reconnect = true
+    end
 
-      def post_init
-        send_object(type: "init",
-                    secret_key: Settings.secret_key)
-      end
+    def post_init
+      send_object(type: "auth",
+                  secret_key: Settings.secret_key)
+    end
 
-      def unbind
-        @logger.info("Connection closed") if @connected
+    def unbind
+      if @reconnect
+        log(:info, "reconnecting...")
+
         EM.add_timer(10) do
-          @connected = false
           reconnect(Settings.receiver_host, Settings.receiver_port)
           post_init
         end
       end
+    end
 
-      # Server
-      def receive_data(data)
-        @pac.feed_each(data) do |msg|
-          if not msg.is_a?(Hash) or not msg["type"]
-            @logger.warn("Unknown data: #{msg}")
-            close_connection_after_writing
-            return
-          end
+    def receive_data(data)
+      @unpacker.feed_each(data) do |msg|
+        unless msg.is_a?(Hash) && msg["type"]
+          log(:warn, "unknown data: #{msg}")
+          @reconnect = false
+          close_connection
+          return
+        end
 
-          case msg["type"]
-          when "ok"
-            @connected = true
-            @logger.info("Connected with server")
-          when "error"
-            @logger.info("error: #{msg["message"]}")
-          when "fatal"
-            @logger.info("fatal: #{msg["message"]}")
-            close_connection
-          when "bye"
-            close_connection
-          when "account"
-            account_id = msg["id"]
-            if not @clients[account_id]
-              user_connection = Aclog::Collector::Stream.new(@logger, method(:send_object), msg)
-              user_connection.start
-              @clients[account_id] = user_connection
-            else
-              @clients[account_id].update(msg)
-            end
-          when "stop"
-            account_id = msg["id"]
-            if @clients[account_id]
-              @clients[account_id].stop
-              @clients.delete(account_id)
-              @logger.info("Received account stop")
-            end
+        case msg["type"]
+        when "ok"
+          log(:info, "connection established")
+        when "error"
+          log(:error, "error: #{msg}")
+        when "fatal"
+          log(:fatal, "fatal: #{msg}")
+          @reconnect = false
+          close_connection
+        when "account"
+          account_id = msg["id"]
+          if @clients[account_id]
+            @clients[account_id].update(msg)
           else
-            @logger.info("Unknown message: #{msg}")
+            stream = UserStream.new(@logger, msg) do |event, data|
+              send_object(data.merge(type: event))
+            end
+            stream.start
+            @clients[account_id] = stream
+            log(:info, "registered: #{account_id}")
           end
+        when "stop"
+          account_id = msg["id"]
+          client = @clients[account_id]
+          if client
+            client.stop
+            @clients.delete(account_id)
+            log(:info, "unregistered: #{account_id}")
+          end
+        else
+          log(:warn, "unknown message: #{msg}")
         end
       end
+    end
 
-      def quit
-        send_object(type: "quit", reason: "stop")
-        @clients.values.map(&:stop)
-      end
+    def quit
+      @reconnect = false
+      send_object(type: "quit", reason: "stop")
+      @clients.values.each(&:stop)
+    end
 
-      private
-      def send_object(data)
-        send_data(data.to_msgpack)
-      end
+    private
+    def send_object(data)
+      send_data(data.to_msgpack)
+    end
+
+    def log(level, message)
+      @logger.__send__(level, "[WORKER] #{message}")
     end
   end
 end

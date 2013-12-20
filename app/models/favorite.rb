@@ -12,14 +12,14 @@ class Favorite < ActiveRecord::Base
 
   def self.from_receiver(msg)
     transaction do
-      t = Tweet.from_receiver(msg["tweet"])
-      u = User.from_receiver(msg["user"])
-      f = logger.quietly { t.favorites.create!(user: u) }
-      logger.debug("Created Favorite: #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
+      t = Tweet.from_receiver(msg["target_object"])
+      u = User.from_receiver(msg["source"])
+      f = t.favorites.create!(user: u)
+      logger.debug("Created Favorite: #{msg["source"]["id"]} => #{msg["target_object"]["id"]}")
       return f
     end
   rescue ActiveRecord::RecordNotUnique
-    logger.debug("Duplicate Favorite: #{msg["user"]["id"]} => #{msg["tweet"]["id"]}")
+    logger.debug("Duplicate Favorite: #{msg["source"]["id"]} => #{msg["target_object"]["id"]}")
     return nil
   rescue => e
     logger.error("Unknown error while inserting favorite: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
@@ -27,6 +27,6 @@ class Favorite < ActiveRecord::Base
   end
 
   def self.delete_from_receiver(msg)
-    where(tweet_id: msg["tweet"]["id"], user_id: msg["user"]["id"]).destroy_all
+    where(tweet_id: msg["target_object"]["id"], user_id: msg["source"]["id"]).destroy_all
   end
 end

@@ -1,10 +1,15 @@
 require "settingslogic"
 
-class Settings < Settingslogic
-  def self.env
-    ENV["RAILS_ENV"] || "development"
-  end
+module Aclog
+  module Collector
+    class Settings < Settingslogic
+      def self.env
+        ENV["RAILS_ENV"] || "development"
+      end
 
-  source "settings.yml"
-  namespace env
+      source "settings.yml"
+      namespace env
+    end
+  end
 end
+

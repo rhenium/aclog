@@ -27,7 +27,7 @@ default: &default
       default:        10
       max:            100
     favorites:
-      count:          20
+      default:        20
       max:            null
 
   users:

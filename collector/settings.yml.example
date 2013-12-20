@@ -1,7 +1,4 @@
 defaults: &defaults
-  consumer:
-    key:          "consumer key for collector"
-    secret:       "consumer secret"
   secret_key:     "secret key"
 development:
   <<: *defaults

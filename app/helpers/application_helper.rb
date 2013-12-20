@@ -27,16 +27,19 @@ module ApplicationHelper
   end
   alias format_source_text format_tweet_text
 
-
   def title(*args)
     content_for :title do
-      (args.compact + ["aclog"]).join(" - ")
+      (args.compact).join(" - ")
     end
   end
 
   def caption(text)
     content_for :caption do
-      text
+      if text.is_a? Symbol
+        content_for(text)
+      else
+        text
+      end
     end
   end
 

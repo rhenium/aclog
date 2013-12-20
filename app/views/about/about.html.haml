@@ -1,30 +1,19 @@
-- title "about"
+- title "about aclog"
 - caption :title
 - sidebar :i
 %p
-  Twitter API の UserStreams というものを使い、登録ユーザーのお気に入り登録・自分のツイートのお気に入り登録され・リツイート・リツイートされをリアルタイムで記録し、集計して表示することができるサービスです。
+  aclog は
+  = link_to "Twitter", "https://twitter.com"
+  に投稿されたツイート、またそれらのツイートへのお気に入り登録・リツイートを収集・集計し見やすい形で表示することができるサービスです。
 %p
-  ツイートを非公開にしている場合は自分またはフォロワーのみがツイートが見れるようになっていますので、「Favstar.FM を使いたかったけれどもツイートを非公開にしているために使えなかった」といった方でもご利用いただけます。
-%p
-  RSS フィードも提供しております。URL の末尾に .rss をつけてご利用ください。
+  %h3 特長
   %ul
-    %li= link_to "/cn/timeline.rss", "/cn/timeline.rss"
-    %li= link_to "/cn/discoveries.rss", "/cn/discoveries.rss"
-%p
-  JSON の API も提供しています。API については
-  = link_to "こちら", about_api_path
-  を参照してください。
-%p
-  = link_to "@KOBA789", "https://twitter.com/KOBA789"
-  さんにサーバーを借りています。ありがとうございます...！
-%p
-  The MIT License
-  = link_to "GitHub", "https://github.com/rhenium/aclog"
+    %li Twitter Streaming API を利用しているため、お気に入り登録・リツイート等はリアルタイムに収集・反映されます。
+    %li 各ページには RSS フィードを用意しているため、ご利用の RSS リーダーで閲覧することが可能です。
+    %li 全機能に対応する JSON 形式での API を提供しているため、Twitter クライアント開発者の方はそのクライアントに aclog を統合させることができます。
+    %li
+      The MIT License の
+      = link_to "オープンソース", "https://github.com/rhenium/aclog"
+      のサービスです。
 %hr
-%p
-  %h5
-    連絡先
-  %dl
-    %dt Twitter
-    %dd= link_to "@cn", "https://twitter.com/cn"
 

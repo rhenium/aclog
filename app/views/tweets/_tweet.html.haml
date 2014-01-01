@@ -30,7 +30,7 @@
         - if favorites_truncated?(tweet)
           %span.show-full= link_to "show full", tweet_path(tweet.id, full: true)
         %span.source
-          = raw "via " + format_source_text(tweet.source)
+          = raw "via " + link_to(*tweet.source_link_to_params)
   .stats
     %dl
       - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|

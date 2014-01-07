@@ -1,10 +1,16 @@
-GEM
-  remote: https://rubygems.org/
+GIT
+  remote: git://github.com/rhenium/em-twitter.git
+  revision: 27f4fa61b801cdcff93e476b14a948670461c088
+  branch: fix_stalling
   specs:
     em-twitter (0.3.2)
       eventmachine (~> 1.0)
       http_parser.rb (~> 0.6)
       simple_oauth (~> 0.2)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
     eventmachine (1.0.3)
     http_parser.rb (0.6.0)
     msgpack (0.5.8)
@@ -16,7 +22,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  em-twitter
+  em-twitter!
   msgpack
   settingslogic
   yajl-ruby

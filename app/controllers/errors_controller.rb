@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 class ErrorsController < ApplicationController
   skip_before_filter :check_format
   before_filter :force_format

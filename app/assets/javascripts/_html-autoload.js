@@ -1,55 +1,30 @@
 (function($) {
-    var window = this,
-        options = {},
-        content,
-        nextUrl,
-        page = 1,
-        loading = false;
+    var loading = false;
+    var opts = null;
 
-    $.autopager = function(_options) {
-        var autopager = this.autopager;
-
+    $.autopager = function(_opts) {
         var defaults = {
-            content: "#content",
-            nextLink: "a[rel=next]",
-            onStart: function() {},
-            onComplete: function() {}
+            content: $("#content"),
+            link: $("link[rel=next]"),
+            onStart: function() { },
+            onComplete: function() { }
         };
+        opts = $.extend({}, defaults, _opts);
 
-        options = $.extend({}, defaults, _options);
-        content = $(options.content);
-        nextUrl = $(options.nextLink).attr("href");
-        
         $(window).scroll(function() {
-            if (content.offset().top + content.height() < $(document).scrollTop() + $(window).height()) {
-                $.autopager.loadNext();
+            if ((opts.content.offset().top + opts.content.height()) < ($(document).scrollTop() + $(window).height())) {
+                if (loading || !opts.link) return;
+
+                opts.onStart();
+                loading = true;
+                $.getJSON(opts.link.attr("href"), function(json, status) {
+                    opts.content.append(json.html);
+                    opts.link.attr("href", json.next_url);
+                    loading = false;
+                    opts.onComplete();
+                });
             }
         });
-
-        return this;
-    };
-
-    $.extend($.autopager, {
-        loadNext: function() {
-            if (loading || !nextUrl) {
-                return;
-            }
-
-            loading = true;
-            options.onStart();
-            $.getJSON(nextUrl, insertContent);
-            return this;
-        }
-    });
-
-    function insertContent(json, status) {
-        var nextPage = $(json.html);
-
-        page = page + 1;
-        nextUrl = json.next;
-        $(options.nextLink).attr("href", nextUrl);
-        content.append(nextPage);
-        options.onComplete();
-        loading = false;
     }
-})(jQuery);
+})($);
+

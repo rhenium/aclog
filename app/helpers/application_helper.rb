@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 module ApplicationHelper
   def format_time(dt)
     dt.to_time.localtime("+09:00").strftime("%Y-%m-%d %H:%M:%S")

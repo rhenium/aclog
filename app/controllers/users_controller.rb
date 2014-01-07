@@ -1,36 +1,61 @@
 class UsersController < ApplicationController
+  param_group :user do
+    optional :id, :integer, "The numerical ID of the user for whom to return results for."
+    optional :screen_name, :string, "The username of the user for whom to return results for."
+  end
+
+  get "/users/stats"
+  description "Returns the stats of a user, specified by username or user ID."
+  param_group :user
   def stats
-    user_required
-    @caption = "Profile"
-    @user_stats = @user.stats
-    @user_twitter = @user.account.client.user if request.format == :html
+    @user = require_public_user
   end
 
+  get "/users/discovered_by"
+  description "Returns the list of the users who discovored the Tweets of a user, specified by username or user ID."
+  param_group :user
   def discovered_by
-    user_required
-    authorize_to_show_best!(@user)
+    @user = require_public_user
     @result = @user.count_discovered_by.take(Settings.users.count)
-    @caption = "Discovered By"
-    render "_user_ranking"
+
+    respond_to do |format|
+      format.html do
+        @cached_users = User.find(@result.map {|user_id, count| user_id }).map {|user| [user.id, user] }.to_h
+      end
+
+      format.json do
+        render "_users_list"
+      end
+    end
   end
 
+  get "/users/discovered_users"
+  description "Returns the list of the users discovored by a user, specified by username or user ID."
+  param_group :user
   def discovered_users
-    user_required
-    authorize_to_show_best!(@user)
+    @user = require_public_user
     @result = @user.count_discovered_users.take(Settings.users.count)
-    @caption = "Discovered Users"
-    render "_user_ranking"
+
+    respond_to do |format|
+      format.html do
+        @cached_users = User.find(@result.map {|user_id, count| user_id }).map {|user| [user.id, user] }.to_h
+      end
+
+      format.json do
+        render "_users_list"
+      end
+    end
   end
 
+  # get "/users/screen_name"
   def screen_name
-    user_ids = (params[:id] || params[:user_id]).to_s.split(",").map(&:to_i)
-    result = User.where(id: user_ids).pluck(:id, :screen_name).map {|id, screen_name| {id: id, screen_name: screen_name} }
+    user_ids = (params[:id] || params[:ids] || params[:user_id] || params[:user_ids]).split(",").map { |i| i.to_i }
+    result = User.where(id: user_ids).pluck(:id, :screen_name).map { |id, screen_name| { id: id, screen_name: screen_name } }
     render json: result
   end
 
   private
-  def user_required
-    @user = User.get(params[:id] || params[:user_id], params[:screen_name])
-    raise Aclog::Exceptions::UserNotFound unless @user
+  def require_public_user
+    require_user(user_id: (params[:id] || params[:user_id]), screen_name: params[:screen_name], public: true)
   end
 end

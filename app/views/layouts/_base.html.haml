@@ -7,6 +7,10 @@
     = javascript_include_tag "application"
     = javascript_include_tag params[:controller]
     %meta{name: "viewport", content: "width=600px"}
+    - if @next_url
+      %link{rel: "next", href: @next_url}
+    - if @prev_url
+      %link{rel: "prev", href: @prev_url}
   %body
     .navbar.navbar-default.navbar-static-top
       .container

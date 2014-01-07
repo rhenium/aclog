@@ -6,5 +6,5 @@
     = field_set_tag do
       = text_field_tag :q, params[:q]
       = submit_tag "search", class: "btn", name: nil
-= render "tweets"
+= render @tweets
 

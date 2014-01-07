@@ -1,115 +1,185 @@
 class TweetsController < ApplicationController
-  def show
-    @tweet = Tweet.find(params[:id])
-    @user = @tweet.user
-  rescue ActiveRecord::RecordNotFound
-    raise Aclog::Exceptions::TweetNotFound
+  param_group :pagination_with_page_number do
+    optional :count, :integer, "The number of tweets to retrieve. Must be less than or equal to 200, defaults to 20."
+    optional :page, :integer, "The page number of results to retrieve."
   end
 
-  def lookup
-    @tweets = Tweet.where(id: params[:id].to_s.split(",").map(&:to_i))
+  param_group :pagination_with_ids do
+    param_group :pagination_with_page_number
+    optional :since_id, :integer, "Returns results with an ID greater than the specified ID."
+    optional :max_id, :integer, "Returns results with an ID less than or equal to the specified ID."
+  end
+
+  param_group :user do
+    optional :user_id, :integer, "The numerical ID of the user for whom to return results for."
+    optional :screen_name, :string, "The username of the user for whom to return results for."
   end
 
   def index
-    user_required
     begin
       best
-    rescue
+      render :best
+    rescue Aclog::Exceptions::AccountPrivate
       timeline
-      render "timeline"
-    else
-      render "best"
+      render :timeline
     end
   end
 
+  get "tweets/show"
+  description "Returns a single Tweet, specified by ID."
+  requires :id, :integer, "The numerical ID of the desired Tweet."
+  see "tweets#lookup"
+  def show
+    @tweet = Tweet.find(params[:id])
+    @user = require_user(user_id: @tweet.user_id)
+  end
+
+  get "tweets/lookup"
+  description "Returns Tweets, specified by comma-separated IDs."
+  requires :id, /^\d+(,\d+)*,?$/, "A comma-separated list of Tweet IDs, up to #{Settings.tweets.count.max} are allowed in a single request."
+  see "tweets#show"
+  def lookup
+    @tweets = Tweet.where(id: params[:id].split(",").map(&:to_i))
+  end
+
+  get "tweets/best"
+  description "Returns the best Tweets of a user, specified by username or user ID."
+  param_group :user
+  param_group :pagination_with_page_number
   def best
-    user_required
-    check_public!
-    @tweets = @user.tweets.list(params, force_page: true).reacted.order_by_reactions
+    @user = require_user(public: true)
+    @tweets = paginate_with_page_number(@user.tweets.reacted.order_by_reactions)
   end
 
+  # get "tweets/recent"
+  # description "Returns the best Tweets in the recent three days of a user, specified by username or user ID."
+  # param_group :user
+  # param_group :pagination_with_page_number
   def recent
-    user_required
-    check_public!
-    @tweets = @user.tweets.list(params, force_page: true).recent.reacted.order_by_reactions
+    @user = require_user(public: true)
+    @tweets = paginate_with_page_number(@user.tweets.reacted.recent.order_by_reactions)
   end
 
+  get "tweets/timeline"
+  description "Returns the newest Tweets of a user, specified by username or user ID."
+  param_group :user
+  param_group :pagination_with_ids
   def timeline
-    user_required
-    @tweets = @user.tweets.list(params).reacted.order_by_id
+    @user = require_user
+    @tweets = paginate(@user.tweets.reacted.order_by_id)
   end
 
+  get "tweets/discoveries"
+  description "Returns the Tweets which a user specified by username or user ID discovered."
+  param_group :user
+  param_group :pagination_with_ids
   def discoveries
-    user_required
-    @tweets = Tweet.list(params, force_page: true).discovered_by(@user).order_by_id
+    @user = require_user
+    @tweets = paginate(Tweet.discovered_by(@user).order_by_id)
   end
 
+  get "tweets/favorites"
+  description "Returns the Tweets which a user specified by username or user ID favorited."
+  param_group :user
+  param_group :pagination_with_ids
   def favorites
-    user_required
-    @tweets = Tweet.list(params, force_page: true).favorited_by(@user).order_by_id
+    @user = require_user
+    @tweets = paginate(Tweet.favorited_by(@user).order_by_id)
   end
 
+  get "tweets/retweets"
+  description "Returns the Tweets which a user specified by username or user ID retweeted."
+  param_group :user
+  param_group :pagination_with_ids
   def retweets
-    user_required
-    @tweets = Tweet.list(params, force_page: true).retweeted_by(@user).order_by_id
+    @user = require_user
+    @tweets = paginate(Tweet.retweeted_by(@user).order_by_id)
   end
 
+  get "tweets/discovered_by"
+  description "Returns the Tweets which a user specified by username or user ID retweeted."
+  param_group :user
+  optional :source_user_id, :integer, "The numerical ID of the subject user."
+  optional :source_screen_name, :string, "The username of the subject user."
+  param_group :pagination_with_ids
   def discovered_by
-    user_required
-    user_b_required
-    @tweets = @user.tweets.list(params).discovered_by(@user_b).order_by_id
+    @user = require_user
+    @source_user = require_user(user_id: params[:source_user_id], screen_name: params[:source_screen_name])
+    @tweets = paginate(@user.tweets.discovered_by(@source_user).order_by_id)
   end
 
+  get "tweets/all_best"
+  param_group :pagination_with_page_number
   def all_best
-    @tweets = Tweet.list(params, force_page: true).reacted.order_by_reactions
+    @tweets = paginate_with_page_number(Tweet.reacted.order_by_reactions)
   end
 
+  get "tweets/all_recent"
+  param_group :pagination_with_page_number
   def all_recent
-    @tweets = Tweet.list(params, force_page: true).recent.reacted.order_by_reactions
+    @tweets = paginate_with_page_number(Tweet.recent.reacted.order_by_reactions)
   end
 
+  get "tweets/all_timeline"
+  param_group :pagination_with_ids
   def all_timeline
-    @tweets = Tweet.list(params).reacted.order_by_id
+    @tweets = paginate(Tweet.reacted.order_by_id)
   end
 
+  get "tweets/search"
+  param_group :pagination_with_ids
   def search
-    @tweets = Tweet.list(params, force_page: true).parse_query(params[:q].to_s || "").reacted.not_protected.order_by_id
-    @tweets = @tweets.recent(7) unless @tweets.to_sql.include?("`tweets`.`id`")
+    @tweets = paginate(Tweet.recent(7).parse_query(params[:q].to_s || "").reacted.not_protected.order_by_id)
   end
 
   private
-  def user_required
-    @user = _require_user(params[:user_id], params[:screen_name])
-  end
-
-  def user_b_required
-    @user_b = _require_user(params[:user_id_b], params[:screen_name_b])
-  end
-
-  def check_public!
-    authorize_to_show_best!(@user)
-  end
-
-  def render(*args)
-    if @tweets && request.xhr?
-      html = render_to_string(partial: "tweet", collection: @tweets.includes(:user), as: :tweet, formats: :html)
-      n = @tweets.length > 0 ?
-          url_for(params[:page] ?
-                  params.merge(page: params[:page].to_i + 1) :
-                  params.merge(max_id: @tweets.last.id - 1)) :
-          nil
-      super json: {html: html, next: n}
-    elsif @tweets && !lookup_context.exists?(params[:action], params[:controller]) && request.format == :json
-      super("_tweets")
+  def paginate(tweets)
+    if params[:page]
+      paginate_with_page_number(tweets)
     else
-      super(*args)
+      tweets = tweets.limit(params_count).max_id(params[:max_id]).since_id(params[:since_id])
+      if tweets.length > 0
+        @prev_url = url_for(params.tap {|h| h.delete(:max_id) }.merge(since_id: tweets.first.id))
+        @next_url = url_for(params.tap {|h| h.delete(:since_id) }.merge(max_id: tweets.last.id - 1))
+      end
+      tweets
     end
   end
 
-  def _require_user(user_id, screen_name)
-    user = User.get(user_id, screen_name)
-    raise Aclog::Exceptions::UserProtected.new(user) unless authorized_to_show_user?(user)
-    user
+  def paginate_with_page_number(tweets)
+    page = [params[:page].to_i, 1].max
+    @prev_url = page == 1 ? nil : url_for(params.merge(page: page - 1))
+    @next_url = url_for(params.merge(page: page + 1))
+    tweets.limit(params_count).page(page)
+  end
+
+  def params_count
+    @_count ||= [Settings.tweets.count.max, (params[:count] || Settings.tweets.count.default).to_i].min
+  end
+
+  def render(*args)
+    if !request.xhr? && request.format == :json
+      # JSON API / Atom
+      begin
+        super(*args)
+      rescue ActionView::MissingTemplate
+        if @tweets
+          super("_tweets")
+        elsif @tweet
+          super("_tweet")
+        else
+          raise
+        end
+      end
+    else
+      if @tweets && request.xhr?
+        super(json: { html: render_to_string(partial: "tweet", collection: @tweets, as: :tweet, formats: :html),
+                      next_url: @next_url,
+                      prev_url: @prev_url })
+      else
+        super(*args)
+      end
+    end
   end
 end
 

@@ -1,4 +1,1 @@
-json.array! @tweets do |json, tweet|
-  json.partial! "tweet", tweet: tweet
-end
-
+json.array!(@tweets, partial: "tweet", as: :tweet)

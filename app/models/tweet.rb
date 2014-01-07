@@ -42,20 +42,6 @@ class Tweet < ActiveRecord::Base
     end
   end
 
-  def self.list(params, options = {})
-    count = params[:count].to_i
-    count = Settings.tweets.count.default unless (1..Settings.tweets.count.max) === count
-
-    if params[:page] || options[:force_page]
-      page = [params[:page].to_i, 1].max
-      ret = limit(count).page(page)
-    else
-      ret = limit(count).max_id(params[:max_id]).since_id(params[:since_id])
-    end
-
-    ret
-  end
-
   def self.delete_from_id(id)
     return {} if id.is_a?(Array) && id.size == 0
     begin

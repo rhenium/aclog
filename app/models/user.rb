@@ -9,14 +9,34 @@ class User < ActiveRecord::Base
     "https://twitter.com/#{self.screen_name}"
   end
 
-  def self.get(id, screen_name)
-    if id
-      find(id) rescue raise Aclog::Exceptions::UserNotFound
-    elsif screen_name
-      where(screen_name: screen_name).order(updated_at: :desc).first or raise Aclog::Exceptions::UserNotFound
-    else
-      Aclog::Exceptions::UserNotFound
+  def following?(user)
+    raise Aclog::Exceptions::UserNotRegistered unless registered?
+    account.following?(user.id)
+  end
+
+  def private?
+    !registered? || registered? && account.private?
+  end
+
+  def self.find(*args)
+    hash = args.first
+    return super(*args) unless hash.is_a?(Hash)
+
+    hash.each do |key, value|
+      next if value.nil?
+
+      if key == :id
+        return super(value)
+      else
+        ret = where(key => value).order(updated_at: :desc).first
+        if ret
+          return ret
+        else
+          raise ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}"
+          end
+      end
     end
+    raise ActiveRecord::RecordNotFound, "Couldn't find User without any parameter"
   end
 
   def self.from_receiver(msg)
@@ -117,7 +137,7 @@ class User < ActiveRecord::Base
         ret[user_id][i] = count
       end
     end
-    ret.map(&:flatten).sort_by {|user_id, favorites_count, retweets_count| -(favorites_count + retweets_count) }
+    ret.map(&:flatten).sort_by {|user_id, *counts| -counts.sum }
   end
 end
 

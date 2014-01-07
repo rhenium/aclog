@@ -15,5 +15,7 @@ module Aclog
     class UserNotRegistered < UserError; end
     class UserProtected < UserError; end
     class AccountPrivate < UserError; end
+
+    class DocumentNotFound < StandardError; end
   end
 end

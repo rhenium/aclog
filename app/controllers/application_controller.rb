@@ -1,57 +1,58 @@
-# -*- coding: utf-8 -*-
 class ApplicationController < ActionController::Base
   include Aclog::TwitterOauthEchoAuthentication::ControllerMethods
 
   protect_from_forgery
   before_filter :check_format, :check_session
   after_filter :xhtml
-  helper_method :logged_in?, :authorized_to_show_user?, :authorized_to_show_best?
+  helper_method :current_user, :logged_in?, :allowed_to_see_user?, :allowed_to_see_best?
 
   protected
-  def logged_in?; session[:user_id] && session[:account] end
-
-  def authorized_to_show_user?(user)
-    @authorized_to_show_user ||= {}
-    @authorized_to_show_user[user.id] ||= begin
-      if !user.protected?
-        true
-      elsif session[:user_id] == user.id
-        true
-      elsif session[:account] && session[:account].following?(user.id)
-        true
-      elsif request.headers["X-Verify-Credentials-Authorization"]
-        # OAuth Echo
-        user_id = authenticate_with_twitter_oauth_echo rescue false
-        account = Account.find_by(user_id: user_id)
-        if account && (account.user_id == user.id || account.following?(user.id))
-          true
-        else
-          false
-        end
-      else
-        false
-      end
+  def current_user
+    if session[:user_id]
+      User.find(session[:user_id])
+    elsif request.headers["X-Verify-Credentials-Authorization"]
+      user_id = authenticate_with_twitter_oauth_echo
+      a = Account.find_by(user_id: user_id)
+      a.user
     end
+  rescue
+    nil
   end
 
-  def authorized_to_show_best?(user)
-    authorized_to_show_user?(user) && user.registered? && user.account.active? && (!user.account.private? || user.id == session[:user_id])
+  def logged_in?
+    !!current_user
   end
 
-  def authorize_to_show_user!(user)
-    authorized_to_show_user?(user) or raise Aclog::Exceptions::UserProtected.new(user)
+  def allowed_to_see_user?(user)
+    !user.protected? ||
+      logged_in? && (current_user == user || current_user.following?(user))
   end
 
-  def authorize_to_show_best!(user)
-    authorize_to_show_user!(user)
-    raise Aclog::Exceptions::UserNotRegistered.new(user) unless user.registered? && user.account.active?
-    raise Aclog::Exceptions::AccountPrivate.new(user) if user.account.private? && user.id != session[:user_id]
-    true
+  def allowed_to_see_best?(user)
+    !user.private? || current_user == user
+  end
+
+  def require_user(user_id: params[:user_id], screen_name: params[:screen_name], public: false)
+    begin
+      user = User.find(id: user_id, screen_name: screen_name)
+    rescue ActiveRecord::RecordNotFound
+      raise Aclog::Exceptions::UserNotFound
+    end
+
+    if !allowed_to_see_user?(user)
+      raise Aclog::Exceptions::UserProtected, user
+    end
+
+    if public && !allowed_to_see_best?(user)
+      raise Aclog::Exceptions::AccountPrivate, user
+    end
+
+    user
   end
 
   private
   def check_format
-    unless request.format == :html || request.format == :json || request.format == :rss
+    unless request.format == :html || request.format == :json || request.format == :rss || request.format == :atom
       if params[:format] == nil
         request.format = :html
       else

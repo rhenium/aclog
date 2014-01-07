@@ -1,0 +1,22 @@
+- title "API Documentation: "
+- caption nil
+- sidebar :i
+%ul.breadcrumb
+  %li= link_to "Documentation", api_docs_path
+  %li.active= @endpoint
+%h2.page-header= @endpoint
+%div
+  %div= @endpoint.description
+  %h3 Parameters
+  %table.table
+    %tbody
+      - @endpoint.parameters.each do |parameter|
+        %tr
+          %td
+            %strong= parameter.name
+            - if parameter.required?
+              %small required
+            - else
+              %small optional
+          %td
+            %p= parameter.description

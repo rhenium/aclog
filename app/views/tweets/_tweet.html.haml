@@ -17,11 +17,7 @@
         - if tweet.in_reply_to
           %span.in_reply_to= link_to "in reply to @" + tweet.in_reply_to.user_screen_name, tweet_path(tweet.in_reply_to.id)
       .text
-        - if authorized_to_show_user?(tweet.user)
-          = simple_format(format_tweet_text(tweet.text))
-        - else
-          %span.quiet
-            ユーザーは非公開です
+        = simple_format(format_tweet_text(tweet.text))
       .meta.clearfix
         %span.twitter_bird
           = link_to image_tag("bird_gray_16.png", alt: "Twitter"), tweet.twitter_url, target: "_blank"
@@ -30,7 +26,7 @@
         - if favorites_truncated?(tweet)
           %span.show-full= link_to "show full", tweet_path(tweet.id, full: true)
         %span.source
-          = raw "via " + link_to(*tweet.source_link_to_params)
+          = raw "via " + link_to_source_text(tweet.source)
   .stats
     %dl
       - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|

@@ -1,0 +1,14 @@
+- title @user.screen_name + " is Discovering ..."
+- caption :title
+- sidebar :users
+.users
+  %ul.list-inline
+    - @result.each do |user_id, reactions_count|
+      - user = @cached_users[user_id]
+      %li
+        .avatar
+          = link_to user_path(user.screen_name) do
+            = image_tag user.profile_image_url, alt: user.screen_name, title: user.name
+        .data
+          .count
+            = link_to reactions_count, user_discovered_by_user_path(user.screen_name, @user.screen_name)

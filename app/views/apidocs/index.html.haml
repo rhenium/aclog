@@ -1,0 +1,18 @@
+- title "API documentation"
+- caption nil
+- sidebar :i
+%ul.breadcrumb
+  %li.active Documentation
+%h2.page-header Resources
+- @resources.each do |name, resource|
+  %h3= resource.name
+  %table.table
+    %thead
+      %th Resource
+      %th Description
+    %tbody
+      - resource.endpoints.each do |action, endpoint|
+        %tr
+          %td= link_to endpoint, api_docs_endpoint_path(name, action)
+          %td= endpoint.description
+

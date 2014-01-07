@@ -1,13 +1,12 @@
 module Apidoc
   class Endpoint
-    attr_reader :method, :name, :parameters, :sees
+    attr_reader :method, :name, :parameters
     attr_accessor :description
 
     def initialize(method, name)
       @method = method
       @name = name
       @parameters = []
-      @sees = []
       @description = nil
     end
 

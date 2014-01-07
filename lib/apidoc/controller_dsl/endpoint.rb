@@ -20,10 +20,6 @@ module Apidoc
       def description(description)
         _apidoc_current_endpoint.description = description
       end
-
-      def see(action_name)
-        _apidoc_current_endpoint.sees << action_name.to_sym
-      end
     end
   end
 end

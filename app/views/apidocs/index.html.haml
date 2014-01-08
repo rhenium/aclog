@@ -11,7 +11,7 @@
       %th Resource
       %th Description
     %tbody
-      - resource.endpoints.each do |action, endpoint|
+      - resource.endpoints.reject {|a, e| e.nodoc }.each do |action, endpoint|
         %tr
           %td= link_to endpoint, api_docs_endpoint_path(name, action)
           %td= endpoint.description

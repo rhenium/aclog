@@ -20,6 +20,10 @@ module Apidoc
       def description(description)
         _apidoc_current_endpoint.description = description
       end
+
+      def nodoc
+        _apidoc_current_endpoint.nodoc = true
+      end
     end
   end
 end

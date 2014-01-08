@@ -21,7 +21,7 @@ class ApidocsController < ApplicationController
 
   private
   def reload_docs
-    Apidoc.reload_docs if Rails.env.development?
+    Apidoc.reload! if Rails.env.development?
   end
 end
 

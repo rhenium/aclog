@@ -7,6 +7,11 @@ module Apidoc
     @@resources ||= {}
   end
 
-  def reload_docs
+  def reload!
+    @@resources = nil
+    dir = "#{Rails.root}/app/controllers/"
+    Dir.glob("#{dir}**/*.rb") do |path|
+      ActiveSupport::Dependencies.load_file path
+    end
   end
 end

@@ -4,14 +4,14 @@ class UsersController < ApplicationController
     optional :screen_name, :string, "The username of the user for whom to return results for."
   end
 
-  get "/users/stats"
+  get "users/stats"
   description "Returns the stats of a user, specified by username or user ID."
   param_group :user
   def stats
     @user = require_public_user
   end
 
-  get "/users/discovered_by"
+  get "users/discovered_by"
   description "Returns the list of the users who discovored the Tweets of a user, specified by username or user ID."
   param_group :user
   def discovered_by
@@ -29,7 +29,7 @@ class UsersController < ApplicationController
     end
   end
 
-  get "/users/discovered_users"
+  get "users/discovered_users"
   description "Returns the list of the users discovored by a user, specified by username or user ID."
   param_group :user
   def discovered_users
@@ -47,7 +47,11 @@ class UsersController < ApplicationController
     end
   end
 
-  # get "/users/screen_name"
+  get "users/screen_name"
+  nodoc
+  [:id, :ids, :user_id, :user_ids].each do |n|
+    optional n, /^\d+(,\d+)*,?$/, "A comma-separated list of User IDs."
+  end
   def screen_name
     user_ids = (params[:id] || params[:ids] || params[:user_id] || params[:user_ids]).split(",").map { |i| i.to_i }
     result = User.where(id: user_ids).pluck(:id, :screen_name).map { |id, screen_name| { id: id, screen_name: screen_name } }

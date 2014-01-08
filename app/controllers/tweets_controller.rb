@@ -1,7 +1,7 @@
 class TweetsController < ApplicationController
   param_group :pagination_with_page_number do
-    optional :count, :integer, "The number of tweets to retrieve. Must be less than or equal to 200, defaults to 20."
-    optional :page, :integer, "The page number of results to retrieve."
+    optional :count, (1..Settings.tweets.count.max), "The number of tweets to retrieve. Must be less than or equal to #{Settings.tweets.count.max}, defaults to #{Settings.tweets.count.default}."
+    optional :page, (1..1.0/0), "The page number of results to retrieve."
   end
 
   param_group :pagination_with_ids do
@@ -28,7 +28,6 @@ class TweetsController < ApplicationController
   get "tweets/show"
   description "Returns a single Tweet, specified by ID."
   requires :id, :integer, "The numerical ID of the desired Tweet."
-  see "tweets#lookup"
   def show
     @tweet = Tweet.find(params[:id])
     @user = require_user(user_id: @tweet.user_id)
@@ -36,8 +35,7 @@ class TweetsController < ApplicationController
 
   get "tweets/lookup"
   description "Returns Tweets, specified by comma-separated IDs."
-  requires :id, /^\d+(,\d+)*,?$/, "A comma-separated list of Tweet IDs, up to #{Settings.tweets.count.max} are allowed in a single request."
-  see "tweets#show"
+  requires :ids, /^\d+(,\d+)*,?$/, "A comma-separated list of Tweet IDs, up to #{Settings.tweets.count.max} are allowed in a single request."
   def lookup
     @tweets = Tweet.where(id: params[:id].split(",").map(&:to_i))
   end
@@ -51,10 +49,11 @@ class TweetsController < ApplicationController
     @tweets = paginate_with_page_number(@user.tweets.reacted.order_by_reactions)
   end
 
-  # get "tweets/recent"
-  # description "Returns the best Tweets in the recent three days of a user, specified by username or user ID."
-  # param_group :user
-  # param_group :pagination_with_page_number
+  get "tweets/recent"
+  nodoc
+  description "Returns the best Tweets in the recent three days of a user, specified by username or user ID."
+  param_group :user
+  param_group :pagination_with_page_number
   def recent
     @user = require_user(public: true)
     @tweets = paginate_with_page_number(@user.tweets.reacted.recent.order_by_reactions)
@@ -79,6 +78,7 @@ class TweetsController < ApplicationController
   end
 
   get "tweets/favorites"
+  nodoc
   description "Returns the Tweets which a user specified by username or user ID favorited."
   param_group :user
   param_group :pagination_with_ids
@@ -88,6 +88,7 @@ class TweetsController < ApplicationController
   end
 
   get "tweets/retweets"
+  nodoc
   description "Returns the Tweets which a user specified by username or user ID retweeted."
   param_group :user
   param_group :pagination_with_ids
@@ -109,24 +110,28 @@ class TweetsController < ApplicationController
   end
 
   get "tweets/all_best"
+  nodoc
   param_group :pagination_with_page_number
   def all_best
     @tweets = paginate_with_page_number(Tweet.reacted.order_by_reactions)
   end
 
   get "tweets/all_recent"
+  nodoc
   param_group :pagination_with_page_number
   def all_recent
     @tweets = paginate_with_page_number(Tweet.recent.reacted.order_by_reactions)
   end
 
   get "tweets/all_timeline"
+  nodoc
   param_group :pagination_with_ids
   def all_timeline
     @tweets = paginate(Tweet.reacted.order_by_id)
   end
 
   get "tweets/search"
+  nodoc
   param_group :pagination_with_ids
   def search
     @tweets = paginate(Tweet.recent(7).parse_query(params[:q].to_s || "").reacted.not_protected.order_by_id)
@@ -147,14 +152,14 @@ class TweetsController < ApplicationController
   end
 
   def paginate_with_page_number(tweets)
-    page = [params[:page].to_i, 1].max
+    page = (params[:page] || 1).to_i
     @prev_url = page == 1 ? nil : url_for(params.merge(page: page - 1))
     @next_url = url_for(params.merge(page: page + 1))
     tweets.limit(params_count).page(page)
   end
 
   def params_count
-    @_count ||= [Settings.tweets.count.max, (params[:count] || Settings.tweets.count.default).to_i].min
+    (params[:count] || Settings.tweets.count.default).to_i
   end
 
   def render(*args)

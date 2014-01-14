@@ -58,14 +58,14 @@ Aclog::Application.routes.draw do
 
     # TweetController / Tweets
     scope "/:screen_name" do
-      get "/",                                   action: "index",         as: "user"
-      get "/best",                               action: "best",          as: "user_best"
-      get "/recent",                             action: "recent",        as: "user_recent"
-      get "/timeline",                           action: "timeline",      as: "user_timeline"
-      get "/discoveries",                        action: "discoveries",   as: "user_discoveries"
-      get "/favorites",                          action: "favorites",     as: "user_favorites"
-      get "/retweets",                           action: "retweets",      as: "user_retweets"
-      get "/discovered_by/:source_screen_name",  action: "discovered_by", as: "user_discovered_by_user"
+      get "/",                              action: "index",         as: "user"
+      get "/best",                          action: "best",          as: "user_best"
+      get "/recent",                        action: "recent",        as: "user_recent"
+      get "/timeline",                      action: "timeline",      as: "user_timeline"
+      get "/discoveries",                   action: "discoveries",   as: "user_discoveries"
+      get "/favorites",                     action: "favorites",     as: "user_favorites"
+      get "/retweets",                      action: "retweets",      as: "user_retweets"
+      get "/discovered_by/:screen_name_b",  action: "discovered_by", as: "user_discovered_by_user"
     end
   end
 end

@@ -1,5 +1,5 @@
 class SettingsController < ApplicationController
-  before_filter :authenticate!
+  before_action :set_account
   layout "index"
 
   def index
@@ -20,8 +20,8 @@ class SettingsController < ApplicationController
   end
 
   private
-  def authenticate!
-    raise Aclog::Exceptions::LoginRequired unless session[:user_id]
-    @account = session[:account]
+  def set_account
+    @account = logged_in? && current_user.account
+    raise Aclog::Exceptions::LoginRequired unless @account
   end
 end

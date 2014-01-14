@@ -8,14 +8,15 @@ class UsersController < ApplicationController
   description "Returns the stats of a user, specified by username or user ID."
   param_group :user
   def stats
-    @user = require_public_user
+    @user = require_user
   end
 
   get "users/discovered_by"
   description "Returns the list of the users who discovored the Tweets of a user, specified by username or user ID."
   param_group :user
   def discovered_by
-    @user = require_public_user
+    @user = require_user
+    authorize_to_show_user_best! @user
     @result = @user.count_discovered_by.take(Settings.users.count)
 
     respond_to do |format|
@@ -33,7 +34,8 @@ class UsersController < ApplicationController
   description "Returns the list of the users discovored by a user, specified by username or user ID."
   param_group :user
   def discovered_users
-    @user = require_public_user
+    @user = require_user
+    authorize_to_show_user_best! @user
     @result = @user.count_discovered_users.take(Settings.users.count)
 
     respond_to do |format|
@@ -59,7 +61,7 @@ class UsersController < ApplicationController
   end
 
   private
-  def require_public_user
-    require_user(user_id: (params[:id] || params[:user_id]), screen_name: params[:screen_name], public: true)
+  def require_user
+    User.find(id: (params[:id] || params[:user_id]), screen_name: params[:screen_name])
   end
 end

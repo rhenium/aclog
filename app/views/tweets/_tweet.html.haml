@@ -1,45 +1,70 @@
 .tweet
-  .tweet
-    .left
-      .avatar
-        = link_to user_path(tweet.user_screen_name) do
-          = image_tag tweet.user_profile_image_url, alt: tweet.user_screen_name, title: tweet.user_name
-      %ul.list-inline.actions
-        %li.twitter
-          = link_to image_tag("reply.png", alt: "reply"), "https://twitter.com/intent/tweet?in_reply_to=#{tweet.id}"
-          = link_to image_tag("retweet.png", alt: "retweet"), "https://twitter.com/intent/retweet?tweet_id=#{tweet.id}"
-          = link_to image_tag("favorite.png", alt: "favorite"), "https://twitter.com/intent/favorite?tweet_id=#{tweet.id}"
-    .tweet_content_fix
-    .tweet_content
-      .user
-        %span.name= link_to tweet.user_name, user_path(tweet.user_screen_name)
-        %span.screen_name= link_to tweet.user_screen_name, user_path(tweet.user_screen_name)
-        - if tweet.in_reply_to
-          %span.in_reply_to= link_to "in reply to @" + tweet.in_reply_to.user_screen_name, tweet_path(tweet.in_reply_to.id)
-      .text
-        = simple_format(format_tweet_text(tweet.text))
-      .meta.clearfix
-        %span.twitter_bird
-          = link_to image_tag("bird_gray_16.png", alt: "Twitter"), tweet.twitter_url, target: "_blank"
-        %span.created_at
-          = link_to format_time(tweet.tweeted_at), tweet_path(tweet.id)
-        - if favorites_truncated?(tweet)
-          %span.show-full= link_to "show full", tweet_path(tweet.id, full: true)
-        %span.source
-          = raw "via " + link_to_source_text(tweet.source)
-  .stats
-    %dl
-      - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
-        - if count > 0
-          %dt
-            %span.count= count
-            %span.type= title
-          %dd
-            %ul.list-inline
-              - users.limit(favorites_truncate_count).each do |m|
-                %li
-                  - if !m.protected? || session[:user_id] == m.id || session[:user_id] == tweet.user_id
-                    = link_to user_path(m.screen_name) do
-                      = image_tag m.profile_image_url, alt: "@#{m.screen_name}", title: "#{m.name} (@#{m.screen_name})"
-                  - else
-                    = image_tag "missing_profile_image.png", alt: "protected", title: "protected user"
+  - unless authorized_to_show_user? tweet.user
+    .tweet
+      .left
+        .avatar
+          = image_tag "missing_profile_image.png", alt: "protected", title: "protected user"
+      .tweet_content_fix
+      .tweet_content
+        .user
+          %span.name Protected
+          %span.screen_name -
+        .text
+          .quiet
+            ユーザーは非公開です
+        .meta.clearfix
+          %span.twitter_bird= image_tag("bird_gray_16.png", alt: "Twitter")
+          %span.created_at= format_time(tweet.tweeted_at)
+          %span.source via -
+    .stats
+      %dl
+        - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
+          - if count > 0
+            %dt
+              %span.count= count
+              %span.type= title
+  - else
+    .tweet
+      .left
+        .avatar
+          = link_to user_path(tweet.user_screen_name) do
+            = image_tag tweet.user_profile_image_url, alt: tweet.user_screen_name, title: tweet.user_name
+        %ul.list-inline.actions
+          %li.twitter
+            = link_to image_tag("reply.png", alt: "reply"), "https://twitter.com/intent/tweet?in_reply_to=#{tweet.id}"
+            = link_to image_tag("retweet.png", alt: "retweet"), "https://twitter.com/intent/retweet?tweet_id=#{tweet.id}"
+            = link_to image_tag("favorite.png", alt: "favorite"), "https://twitter.com/intent/favorite?tweet_id=#{tweet.id}"
+      .tweet_content_fix
+      .tweet_content
+        .user
+          %span.name= link_to tweet.user_name, user_path(tweet.user_screen_name)
+          %span.screen_name= link_to tweet.user_screen_name, user_path(tweet.user_screen_name)
+          - if tweet.in_reply_to
+            %span.in_reply_to= link_to "in reply to @" + tweet.in_reply_to.user_screen_name, tweet_path(tweet.in_reply_to.id)
+        .text
+          = simple_format(format_tweet_text(tweet.text))
+        .meta.clearfix
+          %span.twitter_bird
+            = link_to image_tag("bird_gray_16.png", alt: "Twitter"), tweet.twitter_url, target: "_blank"
+          %span.created_at
+            = link_to format_time(tweet.tweeted_at), tweet_path(tweet.id)
+          - if favorites_truncated?(tweet)
+            %span.show-full= link_to "show full", tweet_path(tweet.id, full: true)
+          %span.source
+            = raw "via " + link_to_source_text(tweet.source)
+    .stats
+      %dl
+        - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
+          - if count > 0
+            %dt
+              %span.count= count
+              %span.type= title
+            %dd
+              %ul.list-inline
+                - users.limit(favorites_truncate_count).each do |m|
+                  %li
+                    - if !m.protected? || session[:user_id] == m.id || session[:user_id] == tweet.user_id
+                      = link_to user_path(m.screen_name) do
+                        = image_tag m.profile_image_url, alt: "@#{m.screen_name}", title: "#{m.name} (@#{m.screen_name})"
+                    - else
+                      = image_tag "missing_profile_image.png", alt: "protected", title: "protected user"

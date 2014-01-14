@@ -30,14 +30,15 @@ class TweetsController < ApplicationController
   requires :id, :integer, "The numerical ID of the desired Tweet."
   def show
     @tweet = Tweet.find(params[:id])
-    @user = require_user(user_id: @tweet.user_id)
+    @user = @tweet.user
+    authorize_to_show_user! @user
   end
 
   get "tweets/lookup"
   description "Returns Tweets, specified by comma-separated IDs."
   requires :ids, /^\d+(,\d+)*,?$/, "A comma-separated list of Tweet IDs, up to #{Settings.tweets.count.max} are allowed in a single request."
   def lookup
-    @tweets = Tweet.where(id: params[:id].split(",").map(&:to_i))
+    @tweets = Tweet.where(id: (params[:ids] || params[:id]).split(",").map(&:to_i))
   end
 
   get "tweets/best"
@@ -45,7 +46,9 @@ class TweetsController < ApplicationController
   param_group :user
   param_group :pagination_with_page_number
   def best
-    @user = require_user(public: true)
+    @user = require_user
+    authorize_to_show_user! @user
+    authorize_to_show_user_best! @user
     @tweets = paginate_with_page_number(@user.tweets.reacted.order_by_reactions)
   end
 
@@ -55,7 +58,9 @@ class TweetsController < ApplicationController
   param_group :user
   param_group :pagination_with_page_number
   def recent
-    @user = require_user(public: true)
+    @user = require_user
+    authorize_to_show_user! @user
+    authorize_to_show_user_best! @user
     @tweets = paginate_with_page_number(@user.tweets.reacted.recent.order_by_reactions)
   end
 
@@ -65,6 +70,7 @@ class TweetsController < ApplicationController
   param_group :pagination_with_ids
   def timeline
     @user = require_user
+    authorize_to_show_user! @user
     @tweets = paginate(@user.tweets.reacted.order_by_id)
   end
 
@@ -74,6 +80,7 @@ class TweetsController < ApplicationController
   param_group :pagination_with_ids
   def discoveries
     @user = require_user
+    authorize_to_show_user! @user
     @tweets = paginate(Tweet.discovered_by(@user).order_by_id)
   end
 
@@ -84,6 +91,7 @@ class TweetsController < ApplicationController
   param_group :pagination_with_ids
   def favorites
     @user = require_user
+    authorize_to_show_user! @user
     @tweets = paginate(Tweet.favorited_by(@user).order_by_id)
   end
 
@@ -94,18 +102,21 @@ class TweetsController < ApplicationController
   param_group :pagination_with_ids
   def retweets
     @user = require_user
+    authorize_to_show_user! @user
     @tweets = paginate(Tweet.retweeted_by(@user).order_by_id)
   end
 
   get "tweets/discovered_by"
   description "Returns the Tweets which a user specified by username or user ID retweeted."
   param_group :user
-  optional :source_user_id, :integer, "The numerical ID of the subject user."
-  optional :source_screen_name, :string, "The username of the subject user."
+  optional :user_id_b, :integer, "The numerical ID of the subject user."
+  optional :screen_name_b, :string, "The username of the subject user."
   param_group :pagination_with_ids
   def discovered_by
     @user = require_user
-    @source_user = require_user(user_id: params[:source_user_id], screen_name: params[:source_screen_name])
+    authorize_to_show_user! @user
+    @source_user = User.find(id: params[:user_id_b], screen_name: params[:screen_name_b])
+    authorize_to_show_user! @source_user
     @tweets = paginate(@user.tweets.discovered_by(@source_user).order_by_id)
   end
 
@@ -138,6 +149,10 @@ class TweetsController < ApplicationController
   end
 
   private
+  def require_user
+    User.find(id: params[:user_id], screen_name: params[:screen_name])
+  end
+
   def paginate(tweets)
     if params[:page]
       paginate_with_page_number(tweets)
@@ -159,7 +174,7 @@ class TweetsController < ApplicationController
   end
 
   def params_count
-    (params[:count] || Settings.tweets.count.default).to_i
+    [(params[:count] || Settings.tweets.count.default).to_i, Settings.tweets.count.max].min
   end
 
   def render(*args)

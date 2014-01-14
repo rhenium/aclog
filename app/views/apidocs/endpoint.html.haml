@@ -20,3 +20,7 @@
               %small optional
           %td
             %p= parameter.description
+            - if parameter.example
+              %p
+                Example Value:
+                = parameter.example

@@ -14,11 +14,5 @@ module Apidoc
     def to_s
       "#{method.to_s.upcase} #{name}"
     end
-
-    def validate!(params)
-      parameters.each do |parameter|
-        parameter.validate!(params)
-      end
-    end
   end
 end

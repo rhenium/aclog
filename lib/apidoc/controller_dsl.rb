@@ -9,15 +9,8 @@ module Apidoc
       super(method_name)
 
       if _apidoc_endpoint_started?
-        orig_method = self.instance_method(method_name)
-        current_endpoint = _apidoc_current_endpoint
         _apidoc_resource.endpoints[method_name] = _apidoc_current_endpoint
         self._apidoc_current_endpoint = nil
-
-        define_method(method_name) do |*args|
-          current_endpoint.validate!(params)
-          orig_method.bind(self).call(*args)
-        end
       end
     end
 

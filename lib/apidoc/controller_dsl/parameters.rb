@@ -1,12 +1,12 @@
 module Apidoc
   module ControllerDsl
     module Parameters
-      def requires(name, validation, description)
-        _apidoc_current_endpoint.parameters << Parameter.new(name, validation, description, required: true)
+      def requires(name, example, description)
+        _apidoc_current_endpoint.parameters << Parameter.new(name, example, description, required: true)
       end
 
-      def optional(name, validation, description)
-        _apidoc_current_endpoint.parameters << Parameter.new(name, validation, description, required: false)
+      def optional(name, example, description)
+        _apidoc_current_endpoint.parameters << Parameter.new(name, example, description, required: false)
       end
 
       def param_group(name, &blk)

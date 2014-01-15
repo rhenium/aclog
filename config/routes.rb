@@ -2,9 +2,9 @@ Aclog::Application.routes.draw do
   root to: "about#index"
 
   # JSON API
-  scope "/api", format: "json" do
-    get "/users/:action",  controller: "users"
-    get "/tweets/:action", controller: "tweets"
+  scope "/api", format: false, defaults: { format: "json" } do
+    get "/users/:action.json",  controller: "users"
+    get "/tweets/:action.json", controller: "tweets"
   end
 
   # Internals / SessionsController

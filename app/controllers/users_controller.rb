@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   param_group :user do
-    optional :id, :integer, "The numerical ID of the user for whom to return results for."
-    optional :screen_name, :string, "The username of the user for whom to return results for."
+    optional :id, 15926668, "The numerical ID of the user for whom to return results for."
+    optional :screen_name, "toshi_a", "The username of the user for whom to return results for."
   end
 
   get "users/stats"
@@ -52,7 +52,7 @@ class UsersController < ApplicationController
   get "users/screen_name"
   nodoc
   [:id, :ids, :user_id, :user_ids].each do |n|
-    optional n, /^\d+(,\d+)*,?$/, "A comma-separated list of User IDs."
+    optional n, "230367516,280414022", "A comma-separated list of User IDs."
   end
   def screen_name
     user_ids = (params[:id] || params[:ids] || params[:user_id] || params[:user_ids]).split(",").map { |i| i.to_i }

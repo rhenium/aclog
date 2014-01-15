@@ -1,18 +1,18 @@
 class TweetsController < ApplicationController
   param_group :pagination_with_page_number do
-    optional :count, (1..Settings.tweets.count.max), "The number of tweets to retrieve. Must be less than or equal to #{Settings.tweets.count.max}, defaults to #{Settings.tweets.count.default}."
-    optional :page, (1..1.0/0), "The page number of results to retrieve."
+    optional :count, 5, "The number of tweets to retrieve. Must be less than or equal to #{Settings.tweets.count.max}, defaults to #{Settings.tweets.count.default}."
+    optional :page, 2, "The page number of results to retrieve."
   end
 
   param_group :pagination_with_ids do
     param_group :pagination_with_page_number
-    optional :since_id, :integer, "Returns results with an ID greater than the specified ID."
-    optional :max_id, :integer, "Returns results with an ID less than or equal to the specified ID."
+    optional :since_id, 12345, "Returns results with an ID greater than the specified ID."
+    optional :max_id, 54321, "Returns results with an ID less than or equal to the specified ID."
   end
 
   param_group :user do
-    optional :user_id, :integer, "The numerical ID of the user for whom to return results for."
-    optional :screen_name, :string, "The username of the user for whom to return results for."
+    optional :user_id, 15926668, "The numerical ID of the user for whom to return results for."
+    optional :screen_name, "toshi_a", "The username of the user for whom to return results for."
   end
 
   def index
@@ -27,7 +27,7 @@ class TweetsController < ApplicationController
 
   get "tweets/show"
   description "Returns a single Tweet, specified by ID."
-  requires :id, :integer, "The numerical ID of the desired Tweet."
+  requires :id, 43341783446466560, "The numerical ID of the desired Tweet."
   def show
     @tweet = Tweet.find(params[:id])
     @user = @tweet.user
@@ -36,7 +36,7 @@ class TweetsController < ApplicationController
 
   get "tweets/lookup"
   description "Returns Tweets, specified by comma-separated IDs."
-  requires :ids, /^\d+(,\d+)*,?$/, "A comma-separated list of Tweet IDs, up to #{Settings.tweets.count.max} are allowed in a single request."
+  requires :ids, "43341783446466560,50220624609685505", "A comma-separated list of Tweet IDs, up to #{Settings.tweets.count.max} are allowed in a single request."
   def lookup
     @tweets = Tweet.where(id: (params[:ids] || params[:id]).split(",").map(&:to_i))
   end
@@ -109,8 +109,8 @@ class TweetsController < ApplicationController
   get "tweets/discovered_by"
   description "Returns the Tweets which a user specified by username or user ID retweeted."
   param_group :user
-  optional :user_id_b, :integer, "The numerical ID of the subject user."
-  optional :screen_name_b, :string, "The username of the subject user."
+  optional :user_id_b, 280414022, "The numerical ID of the subject user."
+  optional :screen_name_b, "cn", "The username of the subject user."
   param_group :pagination_with_ids
   def discovered_by
     @user = require_user

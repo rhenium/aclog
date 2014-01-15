@@ -1,72 +1,52 @@
 Aclog::Application.routes.draw do
   root to: "about#index"
 
-  # JSON
+  # JSON API
   scope "/api", format: "json" do
-    get "/users/:action", controller: "users"
+    get "/users/:action",  controller: "users"
     get "/tweets/:action", controller: "tweets"
   end
 
-  # HTML only pages
-  scope format: "html" do
-    # Internals / SessionsController
-    get "/i/import/:id" =>  "i#import",         as: "import"
-    get "/i/callback" =>    "sessions#create"
-    get "/i/logout" =>      "sessions#destroy", as: "logout"
+  # Internals / SessionsController
+  get "/i/callback" =>                          "sessions#create"
+  get "/i/logout" =>                            "sessions#destroy",                 as: "logout"
 
-    get "/i/:id" =>         "tweets#show",      as: "tweet", constraints: {id: /\d+/}
+  get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
 
-    scope "/i/settings", controller: "settings" do
-      get "/",                      action: "index", as: "settings"
-      post "/update",               action: "update"
-      get "/confirm_deactivation",  action: "confirm_deactivation"
-      post "/deactivate",           action: "deactivate"
-    end
+  get "/i/settings" =>                          "settings#index",                   as: "settings"
+  post "/i/settings/update" =>                  "settings#update"
+  get "/i/settings/confirm_deactivation" =>     "settings#confirm_deactivation"
+  post "/i/settings/deactivate" =>              "settings#deactivate"
 
-    scope "/about", controller: "about" do
-      get "/",              action: "about",    as: "about"
-      get "/api",           action: "api",      as: "about_api"
-      scope "/api/docs", controller: "apidocs" do
-        get "/",                    action: "index",    as: "api_docs"
-        get "/:resource/:name",     action: "endpoint", as: "api_docs_endpoint"
-      end
-    end
+  get "/i/best" =>                              "tweets#all_best",                  as: "best"
+  get "/i/recent" =>                            "tweets#all_recent",                as: "recent"
+  get "/i/timeline" =>                          "tweets#all_timeline",              as: "timeline"
+  get "/i/search" =>                            "tweets#search",                    as: "search"
 
-    scope "/help", controller: "help" do
-      get "/search",        action: "search",   as: "help_search"
-    end
+  get "/about" =>                               "about#about",                      as: "about"
+  get "/about/api" =>                           "about#api",                        as: "about_api"
+  get "/about/api/docs" =>                      "apidocs#index",                    as: "api_docs"
+  get "/about/api/docs/:resource/:name" =>      "apidocs#endpoint",                 as: "api_docs_endpoint"
 
-    # User pages
-    scope "/:screen_name", controller: "users" do
-      get "/discovered_by",                 action: "discovered_by",    as: "user_discovered_by"
-      get "/discovered_users",              action: "discovered_users", as: "user_discovered_users"
-      get "/stats",                         action: "stats",            as: "user_stats"
-    end
+  get "/help/search" =>                         "help#search",                      as: "help_search"
 
-    # Twitter redirect
-    get "/:screen_name/status(es)/:id" => redirect("/i/%{id}")
+  # User pages
+  scope "/:screen_name" do
+    get "/" =>                                  "tweets#index",                     as: "user"
+    get "/best" =>                              "tweets#best",                      as: "user_best"
+    get "/recent" =>                            "tweets#recent",                    as: "user_recent"
+    get "/timeline" =>                          "tweets#timeline",                  as: "user_timeline"
+    get "/discoveries" =>                       "tweets#discoveries",               as: "user_discoveries"
+    get "/favorites" =>                         "tweets#favorites",                 as: "user_favorites"
+    get "/retweets" =>                          "tweets#retweets",                  as: "user_retweets"
+    get "/discovered_by/:screen_name_b" =>      "tweets#discovered_by",             as: "user_discovered_by_user"
+
+    get "/discovered_by" =>                     "users#discovered_by",              as: "user_discovered_by"
+    get "/discovered_users" =>                  "users#discovered_users",           as: "user_discovered_users"
+    get "/stats" =>                             "users#stats",                      as: "user_stats"
   end
 
-  # HTML or RSS
-  scope controller: "tweets", constraints: {format: /(html|atom)/} do
-    scope "i" do
-      get "/best",      action: "all_best",     as: "best"
-      get "/recent",    action: "all_recent",   as: "recent"
-      get "/timeline",  action: "all_timeline", as: "timeline"
-      get "/search",    action: "search",       as: "search"
-    end
-
-    # TweetController / Tweets
-    scope "/:screen_name" do
-      get "/",                              action: "index",         as: "user"
-      get "/best",                          action: "best",          as: "user_best"
-      get "/recent",                        action: "recent",        as: "user_recent"
-      get "/timeline",                      action: "timeline",      as: "user_timeline"
-      get "/discoveries",                   action: "discoveries",   as: "user_discoveries"
-      get "/favorites",                     action: "favorites",     as: "user_favorites"
-      get "/retweets",                      action: "retweets",      as: "user_retweets"
-      get "/discovered_by/:screen_name_b",  action: "discovered_by", as: "user_discovered_by_user"
-    end
-  end
+  # Twitter redirect
+  get "/:screen_name/status(es)/:id" =>         redirect("/i/%{id}")
 end
 

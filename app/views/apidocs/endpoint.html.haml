@@ -4,10 +4,12 @@
 %ul.breadcrumb
   %li= link_to "Documentation", api_docs_path
   %li.active= @endpoint
-%h2.page-header= @endpoint
+%h1.page-header= @endpoint
 %div
   %div= @endpoint.description
-  %h3 Parameters
+  %h2 Resource URL
+  %div= url_for(controller: params[:resource], action: params[:name], only_path: false)
+  %h2 Parameters
   %table.table
     %tbody
       - @endpoint.parameters.each do |parameter|

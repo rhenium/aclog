@@ -14,7 +14,7 @@ class ApidocsController < ApplicationController
 
     @endpoint = @resource.endpoints[params[:name].to_sym]
 
-    unless @endpoint && !@endpoint.nodoc
+    unless @endpoint
       raise Aclog::Exceptions::DocumentNotFound
     end
   end

@@ -8,7 +8,7 @@ class Account < ActiveRecord::Base
   scope :active, -> { where(status: Account::ACTIVE) }
 
   def self.create_or_update(hash)
-    account = where(user_id: hash[:user_id]).first_or_initialize
+    account = self.where(user_id: hash[:user_id]).first_or_initialize
     account.oauth_token = hash[:oauth_token]
     account.oauth_token_secret = hash[:oauth_token_secret]
     account.status = Account::ACTIVE
@@ -43,7 +43,7 @@ class Account < ActiveRecord::Base
     client = MessagePack::RPC::Client.new(transport, Rails.root.join("tmp", "sockets", "receiver.sock").to_s)
     client.call(:register, Marshal.dump(self))
   rescue Errno::ECONNREFUSED, Errno::ENOENT
-    Rails.logger.error($!)
+    Rails.logger.error "Account#update_connection: couldn't connect to the receiver"
   end
 
   def client
@@ -51,10 +51,6 @@ class Account < ActiveRecord::Base
                               consumer_secret: Settings.consumer.secret,
                               oauth_token: oauth_token,
                               oauth_token_secret: oauth_token_secret)
-  end
-
-  def import_favorites(id)
-    raise Exception, "not implemented"
   end
 
   def following?(target_user_id)
@@ -67,11 +63,11 @@ class Account < ActiveRecord::Base
 
   private
   def api_friendship?(source_user_id, target_user_id)
-    return nil unless source_user_id && source_user_id.is_a?(Integer)
-    return nil unless target_user_id && target_user_id.is_a?(Integer)
+    return nil unless source_user_id.is_a?(Integer)
+    return nil unless target_user_id.is_a?(Integer)
 
     Rails.cache.fetch("friendship/#{source_user_id}-#{target_user_id}", expires_in: 3.days) do
-      client.friendship?(source_user_id, target_user_id) rescue nil
+      self.client.friendship?(source_user_id, target_user_id) rescue nil
     end
   end
 end

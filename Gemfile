@@ -1,8 +1,8 @@
 source "https://rubygems.org"
 
-gem "rails", "~> 4.0.1"
+gem "rails", "~> 4.0.2"
 gem "mysql2"
-gem "pry-rails"
+gem "activerecord-import"
 gem "settingslogic"
 gem "yajl-ruby", require: "yajl"
 gem "twitter"
@@ -14,15 +14,11 @@ gem "coffee-rails"
 gem "uglifier"
 gem "jquery-rails"
 gem "bootstrap-sass-rails"
-
-# Receiver
 gem "daemon-spawn", require: "daemon_spawn"
 gem "msgpack"
 gem "msgpack-rpc"
 gem "em-work_queue"
-
-# Other
-gem "activerecord-import"
+gem "pry-rails"
 
 group :production do
   gem "unicorn"

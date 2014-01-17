@@ -55,6 +55,7 @@ module Arel
   end
 end
 
+# insert_ignore
 module ActiveRecord
   # activerecord/lib/active_record/relation.rb
   class Relation
@@ -102,13 +103,78 @@ module ActiveRecord
         binds)
     end
   end
+end
 
-  # from activerecord/lib/active_record/persistence.rb
+# save!
+module ActiveRecord
+  # activerecord/lib/active_record/transactions.rb
+  module Transactions
+    def save_ignore!(*)
+      with_transaction_returning_status { super }
+    end
+  end
+
+  # activerecord/lib/active_record/attribute_methods/dirty.rb
+  module AttributeMethods
+    module Dirty
+      def save_ignore!(*)
+        super.tap do
+          @previously_changed = changes
+          @changed_attributes.clear
+        end
+      end
+    end
+  end
+
+  # activerecord/lib/active_record/validations.rb
+  module Validations
+    def save_ignore!(options={})
+      perform_validations(options) ? super : raise(RecordInvalid.new(self))
+    end
+  end
+
+  # activerecord/lib/active_record/persistence.rb
   module Persistence
     def save_ignore!(*)
       create_ignore_or_update || raise(RecordNotSaved)
     end
+  end
+end
 
+# create_ignore_or_update / create_record_ignore
+module ActiveRecord
+  # activerecord/lib/active_record/callbacks.rb
+  module Callbacks
+    private
+    def create_ignore_or_update
+      run_callbacks(:save) { super }
+    end
+
+    def create_record_ignore
+      run_callbacks(:create) { super }
+    end
+  end
+
+  # activerecord/lib/active_record/timestamp.rb
+  module Timestamps
+    private
+    def create_record_ignore
+      if self.record_timestamps
+        current_time = current_time_from_proper_timezone
+
+        all_timestamp_attributes.each do |column|
+          if respond_to?(column) && respond_to?("#{column}=") && self.send(column).nil?
+            write_attribute(column.to_s, current_time)
+          end
+        end
+      end
+
+      super
+    end
+  end
+
+  # activerecord/lib/active_record/persistence.rb
+  module Persistence
     private
     def create_ignore_or_update
       raise ReadOnlyRecord if readonly?

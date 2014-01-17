@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authorized_to_show_user?(user)
-    !user.protected? || current_user == user || current_user.try(:following?, user)
+    !user.protected? || current_user == user || current_user.try(:following?, user) || false
   end
 
   def authorized_to_show_user_best?(user)
@@ -46,6 +46,8 @@ class ApplicationController < ActionController::Base
   end
 
   def tidy_response_body
-    response.body = ActiveSupport::Multibyte::Unicode.tidy_bytes(response.body)
+    if [:html, :xml, :rss, :atom].any? {|s| request.format == s }
+      response.body = ActiveSupport::Multibyte::Unicode.tidy_bytes(response.body)
+    end
   end
 end

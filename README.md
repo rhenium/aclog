@@ -1,79 +1,88 @@
 # Aclog [![Build Status](https://travis-ci.org/rhenium/aclog.png?branch=master)](https://travis-ci.org/rhenium/aclog) [![Coverage Status](https://coveralls.io/repos/rhenium/aclog/badge.png)](https://coveralls.io/r/rhenium/aclog)
 Collects favs and retweets in real time by UserStreams.
-A web service like Favstar.
 
 ## Aclog is
-* Powered by Ruby on Rails
-* Free and open source (MIT License)
+* powered by Ruby on Rails
+* completely free and open source (The MIT License)
 
 ## Status
 * *unstable*
 * Working on [aclog.koba789.com](http://aclog.koba789.com)
 
 ## Features
-* Register with a Twitter account
-* Collect favorites and retweets by UserStreams
-* List user's best/newest favorited or retweeted tweets
-* Show how many favorited/retweeted by specified user
+* Collecting favorites and retweets from Twitter Streaming API
 * Protected account support
-* JSON API
-* RSS
+* JSON API (OAuth Echo)
+* Atom feed
 
 ### Not yet / will be implemented
 * New UI
-* User settings (favorites notification)
+* Import tweets from Favstar / Favotter / tweets.zip / ..
 
 ## Requirements
-* Ruby 2.0.0/1.9.3
-* MySQL/MariaDB 5.5.14+ (must support utf8mb4)
+* Ruby 2.1.0/2.0.0
+* MySQL/MariaDB 5.5.14+ (needs utf8mb4 support)
 
-## Setup
-### MySQL
+## Installation
+### Database
 * Create MySQL user
 
-### aclog configuration (application)
-* Install packages
+### Aclog (Application Server)
+* Clone the source
 
-        $ bundle install
+        $ # We'll install aclog into /var/webapps/aclog
+        $ cd /var/webapps
+        $ git clone https://github.com/rhenium/aclog.git
+        $ cd /var/webapps/aclog
 
-* Set consumer keys, base URL, ..
+* Configure it
 
+        $ # Copy the example aclog config
         $ cp config/settings.yml.example config/settings.yml
+        $ # Edit it
         $ vi config/settings.yml
 
-* Setup database
-
+        $ # Copy the example aclog database config
         $ cp config/database.yml.example config/database.yml
         $ vi config/database.yml
-        $ rake db:setup
 
-* Set secret token
-
+        $ # Set random secret_token
         $ cp config/initializers/secret_token.rb.example config/initializers/secret_token.rb
         $ sed -i s/replace_here/$(rake secret)/g config/initializers/secret_token.rb
 
-* Start
+        $ # Setup database. This will create database and tables on MySQL server.
+        $ rake db:setup
 
-        $ ./start_receiver.sh start
-        $ ./start_unicorn start
-
-### aclog configuration (worker)
-* In collector/
-
-        $ cd collector
-
-* Install packages
+* Install Gems
 
         $ bundle install
 
-* Set consumer keys, secret key
+* Start your aclog
 
+        $ # Start Unicorn (Web server)
+        $ ./start_unicorn.sh start
+        $ # Start Background server
+        $ ./start_receiver.sh start
+
+### Aclog (Collector Clusters)
+* Chdir
+
+        $ cd /var/webapps/collector
+
+* Configure it
+
+        $ # Copy the example collector config
         $ cp settings.yml.example settings.yml
+        $ # Edit it
         $ vi settings.yml
 
-* Start
+* Install Gems
 
-        $ RAILS_ENV=production ./start.sh
+        $ bundle install
+
+* Start collector
+
+        $ RAILS_ENV=production bundle exec ./start.rb
 
 
 ## Contributing

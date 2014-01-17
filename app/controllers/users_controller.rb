@@ -21,7 +21,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @cached_users = User.find(@result.map {|user_id, count| user_id }).map {|user| [user.id, user] }.to_h
+        @cached_users = Hash[User.find(@result.map {|user_id, count| user_id }).map {|user| [user.id, user] }]
       end
 
       format.json do
@@ -40,7 +40,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @cached_users = User.find(@result.map {|user_id, count| user_id }).map {|user| [user.id, user] }.to_h
+        @cached_users = Hash[User.find(@result.map {|user_id, count| user_id }).map {|user| [user.id, user] }]
       end
 
       format.json do

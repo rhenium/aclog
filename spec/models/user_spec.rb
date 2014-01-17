@@ -42,11 +42,11 @@ describe User do
     end
   end
 
-  describe ".get" do
+  describe ".find" do
     let(:user) { FactoryGirl.create(:user) }
 
     context "when user exists" do
-      subject { User.get(id, screen_name) }
+      subject { User.find(id: id, screen_name: screen_name) }
 
       context "and specify only id" do
         let(:id) { user.id }
@@ -62,18 +62,18 @@ describe User do
     end
 
     context "when user not exists" do
-      subject { -> { User.get(id, screen_name) } }
+      subject { -> { User.find(id: id, screen_name: screen_name) } }
 
       context "when specify not existing id" do
         let(:id) { user.id + 1 }
         let(:screen_name) { nil }
-        it { should raise_error Aclog::Exceptions::UserNotFound }
+        it { should raise_error ActiveRecord::RecordNotFound }
       end
 
       context  "when specify only screen_name" do
         let(:id) { nil }
         let(:screen_name) { "1234567890abcdef" }
-        it { should raise_error Aclog::Exceptions::UserNotFound }
+        it { should raise_error ActiveRecord::RecordNotFound }
       end
     end
   end

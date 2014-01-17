@@ -4,7 +4,8 @@ describe ApplicationController do
   describe "#logged_in?" do
     context "when logged in" do
       before do
-        session[:account] = FactoryGirl.create(:account_1)
+        user = FactoryGirl.create(:user_1)
+        session[:account] = FactoryGirl.create(:account_1, user: user)
         session[:user_id] = session[:account].user_id
       end
       subject { !!controller.__send__(:logged_in?) }
@@ -21,12 +22,9 @@ describe ApplicationController do
   end
 
   describe "#authorized_to_show_user?" do
-    before do
-      @user = FactoryGirl.create(:user, protected: true)
-      @account = FactoryGirl.create(:account_1, user: @user)
-    end
-    let(:user) { @user }
-    let(:account) { @account }
+    let!(:user) { FactoryGirl.create(:user, protected: true) }
+    let!(:user_b) { FactoryGirl.create(:user, protected: true) }
+    let!(:account_b) { FactoryGirl.create(:account_1, user: user_b) }
 
     subject { controller.__send__(:authorized_to_show_user?, user) }
 
@@ -43,14 +41,14 @@ describe ApplicationController do
         end
 
         it "as the user's follower" do
-          account.stub(:following?).and_return(true)
-          session[:account] = account
+          session[:user_id] = user_b.id
+          Account.any_instance.stub(:following?).and_return(true)
           subject.should be true
         end
 
         it "as not the user's follower" do
-          account.stub(:following?).and_return(false)
-          session[:account] = account
+          session[:user_id] = user_b.id
+          Account.any_instance.stub(:following?).and_return(false)
           subject.should be false
         end
       end
@@ -65,35 +63,26 @@ describe ApplicationController do
       end
 
       it "as the user's follower" do
-        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user.id)
-        user.id += 1
+        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user_b.id)
         Account.any_instance.stub(:following?).and_return(true)
         subject.should be true
       end
 
       it "not as the user's follower" do
-        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user.id + 1)
+        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user_b.id)
         Account.any_instance.stub(:following?).and_return(false)
         subject.should be false
       end
 
       it "but failed in verification" do
         controller.stub(:authenticate_with_twitter_oauth_echo).and_raise(Aclog::Exceptions::OAuthEchoUnauthorized)
-        Account.any_instance.stub(:following?).and_return(false)
         subject.should be false
       end
     end
   end
 
-  describe "#authorized_to_show_best?" do
-    subject { user; account; !!controller.__send__(:authorized_to_show_best?, user) }
-
-    context "when account is protected" do
-      before { controller.stub(:authorized_to_show_user?).and_return(false) }
-      let(:user) { FactoryGirl.create(:user, protected: true) }
-      let(:account) { FactoryGirl.create(:account_1, user: user) }
-      it { should be false }
-    end
+  describe "#authorized_to_show_user_best?" do
+    subject { user; account; controller.__send__(:authorized_to_show_user_best?, user) }
 
     context "when account is not protected" do
       before { controller.stub(:authorized_to_show_user?).and_return(true) }
@@ -140,26 +129,21 @@ describe ApplicationController do
     end
   end
 
-  describe "#authorize_to_show_best!" do
+  describe "#authorize_to_show_user_best!" do
     let(:user) { FactoryGirl.create(:user) }
-    subject { -> { controller.__send__(:authorize_to_show_best!, user) } }
+    subject { -> { controller.__send__(:authorize_to_show_user_best!, user) } }
 
     context "when user is not protected" do
       before { controller.stub(:authorized_to_show_user?).and_return(true) }
 
       it "when account is not registered" do
-        subject.should raise_error(Aclog::Exceptions::UserNotRegistered)
+        subject.should raise_error(Aclog::Exceptions::AccountPrivate)
       end
 
       it "when account is private and not logged in as the account" do
         FactoryGirl.create(:account_1, user: user, private: true)
         subject.should raise_error(Aclog::Exceptions::AccountPrivate)
       end
-    end
-
-    context "when user is protected and not accessible" do
-      before { controller.stub(:authorized_to_show_user?).and_return(false) }
-      it { should raise_error(Aclog::Exceptions::UserProtected) }
     end
 
     it "when user is not protected and not private" do
@@ -175,69 +159,7 @@ describe ApplicationController do
     end
   end
 
-  # private
-  describe "#check_format" do
-    subject { -> { controller.__send__(:check_format) } }
-    it "when html" do
-      request.format = :html
-      subject.should_not raise_error
-      request.format.should eq :html
-    end
-
-    it "when json" do
-      request.format = :json
-      subject.should_not raise_error
-      request.format.should eq :json
-    end
-
-    it "when rss" do
-      request.format = :rss
-      subject.should_not raise_error
-      request.format.should eq :rss
-    end
-
-    it "when nil" do
-      request.format = nil
-      controller.params[:format] = nil
-      subject.should_not raise_error
-      request.format.should eq :html
-    end
-
-    it "when else" do
-      request.format = :xml
-      controller.params[:format] = "xml"
-      subject.should raise_error(ActionController::RoutingError)
-    end
-  end
-
-  describe "#check_session" do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:account) { FactoryGirl.create(:account_1, user: user) }
-    subject { controller.__send__(:check_session) }
-
-    it "when valid session" do
-      session[:user_id] = user.id
-      session[:account] = account
-      subject.should be true
-    end
-
-    it "when valid session (not logged in)" do
-      session[:user_id] = nil
-      session[:account] = nil
-      session[:test] = true
-      subject.should be true
-      session[:test].should be true
-    end
-
-    it "when invalid session" do
-      session[:user_id] = user.id
-      session[:account] = nil
-      subject.should be false
-      session.key?(:user_id).should be false
-    end
-  end
-
-  describe "#xhtml" do
+  describe "#tidy_response_body" do
     controller do
       def index; render text: nil end
     end
@@ -249,19 +171,19 @@ describe ApplicationController do
 
     it "when xhtml" do
       request.format = :html
-      controller.__send__(:xhtml)
+      controller.__send__(:tidy_response_body)
       response.body.should eq "abc\u{ff}\u{e3}def"
     end
 
     it "when json" do
       request.format = :json
-      controller.__send__(:xhtml)
+      controller.__send__(:tidy_response_body)
       response.body.should eq "abc\xff\xe3def"
     end
 
-    it "when rss" do
-      request.format = :rss
-      controller.__send__(:xhtml)
+    it "when atom" do
+      request.format = :atom
+      controller.__send__(:tidy_response_body)
       response.body.should eq "abc\u{ff}\u{e3}def"
     end
   end

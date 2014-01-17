@@ -14,13 +14,11 @@ class Favorite < ActiveRecord::Base
     transaction do
       t = Tweet.from_receiver(msg["target_object"])
       u = User.from_receiver(msg["source"])
-      f = t.favorites.create!(user: u)
+      f = t.favorites.new(user: u)
+      f.save_ignore!
       logger.debug("Created Favorite: #{msg["source"]["id"]} => #{msg["target_object"]["id"]}")
       return f
     end
-  rescue ActiveRecord::RecordNotUnique
-    logger.debug("Duplicate Favorite: #{msg["source"]["id"]} => #{msg["target_object"]["id"]}")
-    return nil
   rescue => e
     logger.error("Unknown error while inserting favorite: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     return nil

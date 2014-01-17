@@ -14,13 +14,11 @@ class Retweet < ActiveRecord::Base
     transaction do
       t = Tweet.from_receiver(msg["retweeted_status"])
       u = User.from_receiver(msg["user"])
-      r = t.retweets.create!(id: msg["id"], user: u)
+      r = t.retweets.new(id: msg["id"], user: u)
+      r.save_ignore!
       logger.debug("Created Retweet: #{msg["id"]}: #{msg["user"]["id"]} => #{msg["retweeted_status"]["id"]}")
       return r
     end
-  rescue ActiveRecord::RecordNotUnique
-    logger.debug("Duplicate Retweet: #{msg["id"]}: #{msg["user"]["id"]} => #{msg["retweeted_status"]["id"]}")
-    return nil
   rescue => e
     logger.error("Unknown error while inserting retweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
     return nil

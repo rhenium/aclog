@@ -28,8 +28,6 @@ Aclog::Application.routes.draw do
   get "/about/api/docs" =>                      "apidocs#index",                    as: "api_docs"
   get "/about/api/docs/:resource/:name" =>      "apidocs#endpoint",                 as: "api_docs_endpoint"
 
-  get "/help/search" =>                         "help#search",                      as: "help_search"
-
   # User pages
   scope "/:screen_name" do
     get "/" =>                                  "tweets#index",                     as: "user"

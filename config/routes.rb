@@ -21,7 +21,7 @@ Aclog::Application.routes.draw do
   get "/i/best" =>                              "tweets#all_best",                  as: "best"
   get "/i/recent" =>                            "tweets#all_recent",                as: "recent"
   get "/i/timeline" =>                          "tweets#all_timeline",              as: "timeline"
-  get "/i/search" =>                            "tweets#search",                    as: "search"
+  get "/i/filter" =>                            "tweets#filter",                    as: "filter"
 
   get "/about" =>                               "about#about",                      as: "about"
   get "/about/api" =>                           "about#api",                        as: "about_api"

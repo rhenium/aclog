@@ -90,26 +90,44 @@ class Tweet < ActiveRecord::Base
     return nil
   end
 
-  def self.parse_query(query)
-    str = query.dup
+  def self.filter_by_query(query)
     strings = []
-    str.gsub!(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; "##{strings.size - 1}" }
-    groups = []
-    while str.sub!(/\(([^()]*?)\)/) {|m| groups << $1; " $#{groups.size - 1} " }; end
+    query.gsub!(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; "##{strings.size - 1}" }
 
-    conv = -> s do
-      s.scan(/\S+(?: +OR +\S+)*/).map {|co|
-        co.split(/ +OR +/).map {|token|
-          if /^\$(\d+)$/ =~ token
-            conv.call(groups[$1.to_i])
-          else
-            parse_condition(token, strings)
-          end
-        }.inject(&:or)
-      }.inject(&:and)
+    escape_text = -> str do
+      str.gsub(/#(\d+)/) { strings[$1.to_i] }
+         .gsub("%", "\\%")
+         .gsub("*", "%")
+         .gsub("_", "\\_")
+         .gsub("?", "_")
     end
 
-    where(conv.call(str))
+    parse_condition = ->(scoped, token) do
+      p positive = !token.slice!(/^[-!]/)
+
+      where_args = case token
+      when /^(?:user|from):([A-Za-z0-9_]{1,20})$/
+        u = User.find_by(screen_name: $1)
+        uid = u && u.id || -1
+        { user_id: uid }
+      when /^fav(?:orite)?s?:(\d+)$/
+        ["favorites_count >= ?", $1.to_i]
+      when /^(?:retweet|rt)s?:(\d+)$/
+        ["retweets_count >= ?", $1.to_i]
+      when /^(?:sum|(?:re)?act(?:ion)?s?):(\d+)$/
+        ["reactions_count >= ?", $1.to_i]
+      when /^(?:source|via):(.+)$/
+        ["source LIKE ?", escape_text.call($1)]
+      when /^text:(.+)$/
+        ["text LIKE ?", "%" + escape_text.call($1) + "%"]
+      else
+        nil
+      end
+
+      positive ? scoped.where(where_args) : scoped.where.not(where_args)
+    end
+
+    query.scan(/\S+/).inject(self.scoped) {|s, token| parse_condition.call(s, token) }
   end
 
   private
@@ -136,41 +154,6 @@ class Tweet < ActiveRecord::Base
     result << text[last_index..-1]
 
     result
-  end
-
-  def self.parse_condition(token, strings)
-    tweets = Tweet.arel_table
-    escape_text = -> str do
-      str.gsub(/#(\d+)/) { strings[$1.to_i] }
-         .gsub("%", "\\%")
-         .gsub("*", "%")
-         .gsub("_", "\\_")
-         .gsub("?", "_")
-    end
-
-    positive = token[0] != "-"
-    case token
-    when /^-?(?:user|from):([A-Za-z0-9_]{1,20})$/
-      u = User.find_by(screen_name: $1)
-      uid = u && u.id || 0
-      tweets[:user_id].__send__(positive ? :eq : :not_eq, uid)
-    when /^-?since:(\d{4}(-?)\d{2}\2\d{2})$/
-      tweets[:id].__send__(positive ? :gteq : :lt, snowflake_min(Date.parse($1)))
-    when /^-?until:(\d{4}(-?)\d{2}\2\d{2})$/
-      tweets[:id].__send__(positive ? :lt : :gteq, snowflake_min(Date.parse($1) + 1))
-    when /^-?favs?:(\d+)$/
-      tweets[:favorites_count].__send__(positive ? :gteq : :lt, $1.to_i)
-    when /^-?rts?:(\d+)$/
-      tweets[:retweets_count].__send__(positive ? :gteq : :lt, $1.to_i)
-    when /^-?(?:sum|reactions?):(\d+)$/
-      (tweets[:reactions_count]).__send__(positive ? :gteq : :lt, $1.to_i)
-    when /^(?:source|via):(.+)$/
-      source_text = "<url:%:#{escape_text.call($1).gsub(":", "%3A")}>"
-      tweets[:source].__send__(positive ? :matches : :does_not_match, source_text)
-    else
-      search_text = escape_text.call(positive ? token : token[1..-1])
-      tweets[:text].__send__(positive ? :matches : :does_not_match, "%#{search_text}%")
-    end
   end
 
   def self.snowflake_min(time)

@@ -141,11 +141,11 @@ class TweetsController < ApplicationController
     @tweets = paginate(Tweet.reacted.order_by_id)
   end
 
-  get "tweets/search"
+  get "tweets/filter"
   nodoc
   param_group :pagination_with_ids
-  def search
-    @tweets = paginate(Tweet.recent(7).parse_query(params[:q].to_s || "").reacted.not_protected.order_by_id)
+  def filter
+    @tweets = paginate(Tweet.reacted.recent(7).filter_by_query(params[:q].to_s).not_protected.order_by_id)
   end
 
   private

@@ -13,7 +13,7 @@
 
         $(window).scroll(function() {
             if ((opts.content.offset().top + opts.content.height()) < ($(document).scrollTop() + $(window).height())) {
-                if (loading || !opts.link) return;
+                if (loading || !opts.link || !opts.link.attr("href")) return;
 
                 opts.onStart();
                 loading = true;

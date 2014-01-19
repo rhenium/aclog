@@ -25,6 +25,8 @@ class Notification
                                            oauth_token_secret: Settings.notification.accounts[cur].secret)
 
         client.update(text, in_reply_to_status_id: reply_to)
+      rescue Twitter::Error::AlreadyPosted
+        # Status is a duplicate.
       rescue Exception
         cur += 1
         doretry = true

@@ -81,7 +81,7 @@ class TweetsController < ApplicationController
   def discoveries
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate(Tweet.discovered_by(@user).order_by_id)
+    @tweets = paginate(Tweet).discovered_by(@user).order_by_id
   end
 
   get "tweets/favorites"
@@ -92,7 +92,7 @@ class TweetsController < ApplicationController
   def favorites
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate(Tweet.favorited_by(@user).order_by_id)
+    @tweets = paginate(Tweet).favorited_by(@user).order_by_id
   end
 
   get "tweets/retweets"
@@ -103,7 +103,7 @@ class TweetsController < ApplicationController
   def retweets
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate(Tweet.retweeted_by(@user).order_by_id)
+    @tweets = paginate(Tweet).retweeted_by(@user).order_by_id
   end
 
   get "tweets/discovered_by"
@@ -146,6 +146,15 @@ class TweetsController < ApplicationController
   param_group :pagination_with_ids
   def filter
     @tweets = paginate(Tweet.reacted.recent(7).filter_by_query(params[:q].to_s).not_protected.order_by_id)
+  end
+
+  get "tweets/import"
+  nodoc
+  requires :id, 43341783446466560, "The numerical ID of the desired Tweet."
+  def import
+    raise Aclog::Exceptions::LoginRequired unless logged_in?
+    tweet = current_user.account.import(params[:id])
+    redirect_to tweet
   end
 
   private

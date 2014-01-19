@@ -47,10 +47,15 @@ class Account < ActiveRecord::Base
   end
 
   def client
-    Twitter::REST::Client.new(consumer_key: Settings.consumer.key,
-                              consumer_secret: Settings.consumer.secret,
-                              oauth_token: oauth_token,
-                              oauth_token_secret: oauth_token_secret)
+    @client ||= Twitter::REST::Client.new(consumer_key: Settings.consumer.key,
+                                          consumer_secret: Settings.consumer.secret,
+                                          oauth_token: oauth_token,
+                                          oauth_token_secret: oauth_token_secret)
+  end
+
+  def import(id)
+    obj = client.status(id)
+    Tweet.from_twitter_object(obj)
   end
 
   def following?(target_user_id)

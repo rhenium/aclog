@@ -90,6 +90,16 @@ class Tweet < ActiveRecord::Base
     return nil
   end
 
+  def self.from_twitter_object(obj)
+    self.from_receiver("id" => obj.id,
+                       "text" => obj.text,
+                       "source" => obj.source,
+                       "created_at" => obj.created_at,
+                       "in_reply_to_id" => obj.in_reply_to_status_id,
+                       "user_id" => obj.user_id,
+                       "entities" => obj.attrs[:entities])
+  end
+
   def self.filter_by_query(query)
     strings = []
     query.gsub!(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; "##{strings.size - 1}" }

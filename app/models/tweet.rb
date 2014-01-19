@@ -42,62 +42,27 @@ class Tweet < ActiveRecord::Base
     end
   end
 
-  def self.delete_from_id(id)
-    return {} if id.is_a?(Array) && id.size == 0
-    begin
-      # counter_cache の無駄を省くために delete_all で
-      deleted_tweets = Tweet.where(id: id).delete_all
-      if deleted_tweets > 0
-        deleted_favorites = Favorite.where(tweet_id: id).delete_all
-        deleted_retweets = Retweet.where(tweet_id: id).delete_all
-      end
-
-      unless id.is_a?(Integer) && deleted_tweets == 1
-        deleted_retweets = Retweet.where(id: id).destroy_all.size # counter_cache
-      end
-
-      return {tweets: deleted_tweets, favorites: deleted_favorites, retweets: deleted_retweets}
-    rescue
-      logger.error("Unknown error while deleting tweet: #{$!}/#{$@}")
+  def self.from_json(msg)
+    find_by(id: msg[:id]) || begin
+      user = User.from_json(msg[:user])
+      create!(id: msg[:id],
+              text: extract_entities(msg),
+              source: msg[:source],
+              tweeted_at: msg[:created_at],
+              in_reply_to_id: msg[:in_reply_to_status_id],
+              user: user)
     end
-  end
-
-  def self.delete_from_receiver(msg)
-    delete_from_id(msg["id"])
-  end
-
-  def self.from_receiver(msg)
-    transaction do
-      t = self.find_by(id: msg["id"])
-      unless t
-        begin
-          u = User.from_receiver(msg["user"])
-          t = self.create!(id: msg["id"],
-                           text: extract_entities(msg["text"], msg["entities"]),
-                           source: msg["source"],
-                           tweeted_at: Time.parse(msg["created_at"]),
-                           in_reply_to_id: msg["in_reply_to_status_id"],
-                           user: u)
-          logger.debug("Created Tweet: #{msg["id"]}")
-        rescue ActiveRecord::RecordNotUnique
-          logger.debug("Duplicate Tweet: #{msg["id"]}")
-        end
-      end
-      return t
-    end
+  rescue ActiveRecord::RecordNotUnique
+    logger.debug("Duplicate Tweet: #{msg[:id]}")
   rescue => e
     logger.error("Unknown error while inserting tweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
-    return nil
   end
 
   def self.from_twitter_object(obj)
-    self.from_receiver("id" => obj.id,
-                       "text" => obj.text,
-                       "source" => obj.source,
-                       "created_at" => obj.created_at,
-                       "in_reply_to_id" => obj.in_reply_to_status_id,
-                       "user_id" => obj.user_id,
-                       "entities" => obj.attrs[:entities])
+    tweet = from_json(obj.attrs)
+    tweet.update!(favorites_count: obj.favorites_count,
+                  retweets_count: obj.retweets_count,
+                  reactions_count: obj.favorites_count + obj.retweets_count)
   end
 
   def self.filter_by_query(query)
@@ -141,27 +106,21 @@ class Tweet < ActiveRecord::Base
   end
 
   private
-  def self.extract_entities(text, entities)
-    escape_colon = -> str { str.gsub(":", "\\:") }
-    entities = entities.map { |k, v| v.map { |n| n.update("type" => k) } }.flatten.sort_by { |entity| entity["indices"].first }
+  def self.extract_entities(json)
+    entity_values = json[:entities].values.sort_by {|v| v[:indices].first }
 
     result = ""
-    last_index = entities.inject(0) do |last_index_, entity|
-      result << text[last_index_...entity["indices"].first]
-      case entity["type"]
-      when "urls", "media"
-        result << "<url:#{escape_colon.call(entity["expanded_url"])}:#{escape_colon.call(entity["display_url"])}>"
-      when "hashtags"
-        result << "<hashtag:#{entity["text"]}>"
-      when "user_mentions"
-        result << "<mention:#{entity["screen_name"]}>"
-      when "symbols"
-        result << "<symbol:#{entity["text"]}>"
+    last_index = entity_values.inject(0) do |last_index, entity|
+      result << json[:text][last_index...entity["indices"].first]
+      if entity.key?(:url)
+        result << entity[:expanded_url]
+      else
+        result << entity[:text]
       end
 
-      entity["indices"].last
+      entity[:indices].last
     end
-    result << text[last_index..-1]
+    result << json[:text][last_index..-1]
 
     result
   end

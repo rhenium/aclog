@@ -12,6 +12,7 @@ Aclog::Application.routes.draw do
   get "/i/logout" =>                            "sessions#destroy",                 as: "logout"
 
   get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
+  get "/i/:id/import" =>                        "tweets#import",                    as: "import", constraints: { id: /\d+/ }
 
   get "/i/settings" =>                          "settings#index",                   as: "settings"
   post "/i/settings/update" =>                  "settings#update"

@@ -50,6 +50,8 @@
             = link_to format_time(tweet.tweeted_at), tweet_path(tweet.id)
           - if favorites_truncated?(tweet)
             %span.show-full= link_to "show full", tweet_path(tweet.id, full: true)
+          - if logged_in?
+            %span.import= link_to "import", import_path(tweet.id)
           %span.source
             = raw "via " + link_to_source_text(tweet.source)
     .stats

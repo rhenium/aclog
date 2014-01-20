@@ -6,7 +6,7 @@ module Aclog
         @connections = connections
 
         @worker_number = nil
-        @unpacker = MessagePack::Unpacker.new
+        @unpacker = MessagePack::Unpacker.new(symbolize_keys: true)
       end
 
       def send_account(account)
@@ -36,7 +36,7 @@ module Aclog
 
       def receive_data(data)
         @unpacker.feed_each(data) do |msg|
-          unless msg.is_a?(Hash) && msg["type"]
+          unless msg.is_a?(Hash) && msg[:type]
             log(:error, "unknown data: #{msg}")
             send_object(type: "fatal", message: "unknown data")
             close_connection_after_writing
@@ -44,7 +44,7 @@ module Aclog
           end
 
           unless @authorized
-            if msg["type"] == "auth"
+            if msg[:type] == "auth"
               auth(msg)
             else
               log(:warn, "not authorized client: #{msg}")
@@ -54,44 +54,45 @@ module Aclog
             return
           end
 
-          case msg["type"]
+          case msg[:type]
           when "unauthorized"
             @channel << -> {
-              log(:warn, "unauthorized: ##{msg["id"]}/#{msg["user_id"]}")
+              log(:warn, "unauthorized: ##{msg[:id]}/#{msg[:user_id]}")
             }
           when "tweet"
             @channel << -> {
-              log(:debug, "receive tweet: #{msg["id"]}")
-              Tweet.from_receiver(msg)
+              log(:debug, "receive tweet: #{msg[:id]}")
+              Tweet.from_json(msg)
             }
           when "favorite"
             @channel << -> {
-              log(:debug, "receive favorite: #{msg["source"]["id"]} => #{msg["target_object"]["id"]}")
-              if f = Favorite.from_receiver(msg)
+              log(:debug, "receive favorite: #{msg[:source][:id]} => #{msg[:target_object][:id]}")
+              if f = Favorite.from_json(msg)
                 f.tweet.notify_favorite
               end
             }
           when "unfavorite"
             @channel << -> {
-              log(:debug, "receive unfavorite: #{msg["source"]["id"]} => #{msg["target_object"]["id"]}")
-              Favorite.delete_from_receiver(msg)
+              log(:debug, "receive unfavorite: #{msg[:source][:id]} => #{msg[:target_object][:id]}")
+              Favorite.where(user_id: msg[:source][:id], tweet_id: msg[:target_object][:id]).destroy_all
             }
           when "retweet"
             @channel << -> {
-              log(:debug, "receive retweet: #{msg["user"]["id"]} => #{msg["retweeted_status"]["id"]}")
-              Retweet.from_receiver(msg)
+              log(:debug, "receive retweet: #{msg[:user][:id]} => #{msg[:retweeted_status][:id]}")
+              Retweet.from_json(msg)
             }
           when "delete"
             @channel << -> {
-              log(:debug, "receive delete: #{msg["id"]}")
-              Tweet.delete_from_receiver(msg)
+              log(:debug, "receive delete: #{msg[:id]}")
+              Tweet.where(id: msg[:id]).destroy_all
+              Retweet.where(id: msg[:id]).destroy_all
             }
           when "quit"
-            log(:info, "receive quit: #{msg["reason"]}")
+            log(:info, "receive quit: #{msg[:reason]}")
             send_data(type: "quit", message: "Bye")
             close_connection_after_writing
           else
-            log(:warn, "unknown message: #{msg["type"]}")
+            log(:warn, "unknown message: #{msg[:type]}")
             send_object(type: "error", message: "Unknown message type")
           end
         end
@@ -110,7 +111,7 @@ module Aclog
       end
 
       def auth(msg)
-        secret_key = msg["secret_key"]
+        secret_key = msg[:secret_key]
         unless secret_key == Settings.collector.secret_key
           log(:warn, "Invalid secret_key: \"#{secret_key}\"")
           send_object(type: "fatal", message: "invalid secret_key")

@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
     user.protected = json[:protected]
 
     if user.attributes == orig
-      logger.debug("User was not updated: #{user.id}"
+      logger.debug("User was not updated: #{user.id}")
     else
       user.save!
       logger.debug("Successfully saved an user: #{user.id}")

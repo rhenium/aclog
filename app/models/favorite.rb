@@ -10,21 +10,16 @@ class Favorite < ActiveRecord::Base
     Tweet.update_counters(self.tweet_id, favorites_count: -1, reactions_count: -1)
   end
 
-  def self.from_receiver(msg)
-    transaction do
-      t = Tweet.from_receiver(msg["target_object"])
-      u = User.from_receiver(msg["source"])
-      f = t.favorites.new(user: u)
-      f.save_ignore!
-      logger.debug("Created Favorite: #{msg["source"]["id"]} => #{msg["target_object"]["id"]}")
-      return f
+  def self.from_json(json)
+    tweet = Tweet.from_json(json[:target_object])
+    user = User.from_json(json[:source])
+    favorite = Favorite.new(tweet: tweet, user: user)
+    if favorite.save
+      logger.debug("Successfully created a favorite: #{favorite.id}")
+    else
+      logger.debug("Failed to create a favorite: #{favorite}")
     end
-  rescue => e
-    logger.error("Unknown error while inserting favorite: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
-    return nil
-  end
 
-  def self.delete_from_receiver(msg)
-    where(tweet_id: msg["target_object"]["id"], user_id: msg["source"]["id"]).destroy_all
+    favorite
   end
 end

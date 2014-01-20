@@ -39,36 +39,23 @@ class User < ActiveRecord::Base
     raise ActiveRecord::RecordNotFound, "Couldn't find User without any parameter"
   end
 
-  def self.from_receiver(msg)
-    user = where(id: msg["id"]).first_or_initialize
-    att = user.attributes.dup
+  def self.from_json(json)
+    user = where(id: json[:id]).first_or_initialize
+    orig = user.attributes.dup
 
-    user.screen_name = msg["screen_name"]
-    user.name = msg["name"]
-    user.profile_image_url = msg["profile_image_url"]
-    user.protected = msg["protected"]
+    user.screen_name = json[:screen_name]
+    user.name = json[:name]
+    user.profile_image_url = json[:profile_image_url]
+    user.protected = json[:protected]
 
-    if att["screen_name"] == user.screen_name &&
-       att["name"] == user.name &&
-       att["profile_image_url"] == user.profile_image_url &&
-       att["protected"] == user.protected?
-      logger.debug("User not changed: #{user.id}")
+    if user.attributes == orig
+      logger.debug("User was not updated: #{user.id}"
     else
       user.save!
-      logger.debug("User saved: #{user.id}")
+      logger.debug("Successfully saved an user: #{user.id}")
     end
 
-    return user
-  rescue
-    logger.error("Unknown error while inserting user: #{$!}/#{$@}")
-  end
-
-  def self.from_user_object(user_object)
-    from_receiver("id" => user_object.id,
-                  "screen_name" => user_object.screen_name,
-                  "name" => user_object.name,
-                  "profile_image_url" => user_object.profile_image_url_https,
-                  "protected" => user_object.protected)
+    user
   end
 
   def protected?

@@ -42,18 +42,18 @@ class Tweet < ActiveRecord::Base
     end
   end
 
-  def self.from_json(msg)
-    find_by(id: msg[:id]) || begin
-      user = User.from_json(msg[:user])
-      create!(id: msg[:id],
-              text: extract_entities(msg),
-              source: msg[:source],
-              tweeted_at: msg[:created_at],
-              in_reply_to_id: msg[:in_reply_to_status_id],
+  def self.from_json(json)
+    find_by(id: json[:id]) || begin
+      user = User.from_json(json[:user])
+      create!(id: json[:id],
+              text: extract_entities(json),
+              source: json[:source],
+              tweeted_at: json[:created_at],
+              in_reply_to_id: json[:in_reply_to_status_id],
               user: user)
     end
   rescue ActiveRecord::RecordNotUnique
-    logger.debug("Duplicate Tweet: #{msg[:id]}")
+    logger.debug("Duplicate Tweet: #{json[:id]}")
   rescue => e
     logger.error("Unknown error while inserting tweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
   end
@@ -78,7 +78,7 @@ class Tweet < ActiveRecord::Base
     end
 
     parse_condition = ->(scoped, token) do
-      p positive = !token.slice!(/^[-!]/)
+      positive = !token.slice!(/^[-!]/)
 
       where_args = case token
       when /^(?:user|from):([A-Za-z0-9_]{1,20})$/
@@ -107,7 +107,7 @@ class Tweet < ActiveRecord::Base
 
   private
   def self.extract_entities(json)
-    entity_values = json[:entities].values.sort_by {|v| v[:indices].first }
+    entity_values = json[:entities].values.sort_by {|v| v[:indices].first }.flatten
 
     result = ""
     last_index = entity_values.inject(0) do |last_index, entity|

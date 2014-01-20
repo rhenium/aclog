@@ -10,17 +10,16 @@ class Retweet < ActiveRecord::Base
     Tweet.update_counters(self.tweet_id, retweets_count: -1, reactions_count: -1)
   end
 
-  def self.from_receiver(msg)
-    transaction do
-      t = Tweet.from_receiver(msg["retweeted_status"])
-      u = User.from_receiver(msg["user"])
-      r = t.retweets.new(id: msg["id"], user: u)
-      r.save_ignore!
-      logger.debug("Created Retweet: #{msg["id"]}: #{msg["user"]["id"]} => #{msg["retweeted_status"]["id"]}")
-      return r
+  def self.from_json(json)
+    tweet = Tweet.from_json(json[:retweeted_status])
+    user = User.from_json(json[:user])
+    retweet = Retweet.new(tweet: tweet, user: user)
+    if retweet.save
+      logger.debug("Successfully created a retweet: #{retweet.id}")
+    else
+      logger.debug("Failed to create a retweet: #{retweet}")
     end
-  rescue => e
-    logger.error("Unknown error while inserting retweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
-    return nil
+
+    retweet
   end
 end

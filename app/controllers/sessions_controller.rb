@@ -7,11 +7,11 @@ class SessionsController < ApplicationController
                                        oauth_token_secret: auth["credentials"]["secret"])
     account.update_connection
 
-    User.from_receiver("id" => account.user_id,
-                       "screen_name" => auth["extra"]["raw_info"]["screen_name"],
-                       "name" => auth["extra"]["raw_info"]["name"],
-                       "profile_image_url" => auth["extra"]["raw_info"]["profile_image_url_https"],
-                       "protected" => auth["extra"]["raw_info"]["protected"])
+    User.from_json(id: account.user_id,
+                   screen_name: auth["extra"]["raw_info"]["screen_name"],
+                   name: auth["extra"]["raw_info"]["name"],
+                   profile_image_url: auth["extra"]["raw_info"]["profile_image_url_https"],
+                   protected: auth["extra"]["raw_info"]["protected"])
 
     session[:account] = account
     session[:user_id] = account.user_id

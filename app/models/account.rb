@@ -6,8 +6,8 @@ class Account < ActiveRecord::Base
   belongs_to :user
   scope :active, -> { where(status: Account::ACTIVE) }
 
-  alias notification? notification
-  alias private? private
+  def notification?; notification end
+  def private?; private end
   def active?; status == Account::ACTIVE end
 
   def self.create_or_update(hash)

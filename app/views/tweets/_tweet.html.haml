@@ -42,7 +42,7 @@
           - if tweet.in_reply_to
             %span.in_reply_to= link_to "in reply to @" + tweet.in_reply_to.user_screen_name, tweet_path(tweet.in_reply_to.id)
         .text
-          = simple_format(format_tweet_text(tweet.text))
+          = format_tweet_text tweet.text
         .meta.clearfix
           %span.twitter_bird
             = link_to image_tag("bird_gray_16.png", alt: "Twitter"), tweet.twitter_url, target: "_blank"

@@ -5,7 +5,7 @@ class Account < ActiveRecord::Base
 
   belongs_to :user
   scope :active, -> { where(status: Account::ACTIVE) }
-  scope :set_of_collector, -> { active.where("id % ? = ?", Settings.collector.count, collector_id) }
+  scope :set_of_collector, ->(collector_id) { active.where("id % ? = ?", Settings.collector.count, collector_id) }
 
   def notification?; notification end
   def private?; private end

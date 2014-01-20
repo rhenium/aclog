@@ -106,18 +106,15 @@ class Tweet < ActiveRecord::Base
   end
 
   private
+  # replace t.co with expanded_url
   def self.extract_entities(json)
-    entity_values = json[:entities].values.sort_by {|v| v[:indices].first }.flatten
+    entity_values = json[:entities].values.flatten.sort_by {|v| v[:indices].first }
+    entity_values.select! {|e| e[:url] }
 
     result = ""
     last_index = entity_values.inject(0) do |last_index, entity|
-      result << json[:text][last_index...entity["indices"].first]
-      if entity.key?(:url)
-        result << entity[:expanded_url]
-      else
-        result << entity[:text]
-      end
-
+      result << json[:text][last_index...entity[:indices].first]
+      result << entity[:expanded_url]
       entity[:indices].last
     end
     result << json[:text][last_index..-1]

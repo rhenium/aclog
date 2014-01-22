@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 gem "settingslogic"
-gem "em-twitter", github: "rhenium/em-twitter", branch: "fix_stalling"
+gem "em-twitter", github: "tweetstream/em-twitter"
 gem "msgpack"
 gem "yajl-ruby", require: "yajl"
 

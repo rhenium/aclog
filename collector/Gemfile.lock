@@ -1,9 +1,9 @@
 GIT
-  remote: git://github.com/rhenium/em-twitter.git
-  revision: 27f4fa61b801cdcff93e476b14a948670461c088
-  branch: fix_stalling
+  remote: git://github.com/tweetstream/em-twitter.git
+  revision: f3edace100a67e80342e544193285902d82ba56f
   specs:
     em-twitter (0.3.2)
+      buftok (~> 0.2)
       eventmachine (~> 1.0)
       http_parser.rb (~> 0.6)
       simple_oauth (~> 0.2)
@@ -11,6 +11,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    buftok (0.2.0)
     eventmachine (1.0.3)
     http_parser.rb (0.6.0)
     msgpack (0.5.8)

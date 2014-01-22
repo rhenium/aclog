@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  include Aclog::TwitterOauthEchoAuthentication::ControllerMethods
+  include TwitterOauthEchoAuthentication
 
   protect_from_forgery
   after_action :set_content_type_to_xhtml, :tidy_response_body
@@ -8,14 +8,18 @@ class ApplicationController < ActionController::Base
 
   protected
   def current_user
-    if session[:user_id]
-      User.find(session[:user_id])
-    elsif request.headers["X-Verify-Credentials-Authorization"]
-      user_id = authenticate_with_twitter_oauth_echo
-      User.find(user_id)
+    return @_current_user if defined? @_current_user
+
+    @_current_user = begin
+      if session[:user_id]
+        User.find(session[:user_id])
+      elsif request.headers["X-Verify-Credentials-Authorization"]
+        user_id = authenticate_with_twitter_oauth_echo
+        User.find(user_id)
+      end
+    rescue
+      nil
     end
-  rescue
-    nil
   end
 
   def logged_in?

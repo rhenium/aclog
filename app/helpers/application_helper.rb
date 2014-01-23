@@ -1,10 +1,6 @@
 module ApplicationHelper
   include Twitter::Autolink
 
-  def format_time(dt)
-    dt.to_time.localtime("+09:00").strftime("%Y-%m-%d %H:%M:%S")
-  end
-
   def title(*args)
     content_for :title do
       (args.compact).join(" - ")

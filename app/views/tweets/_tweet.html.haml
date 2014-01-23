@@ -14,7 +14,8 @@
             ユーザーは非公開です
         .meta.clearfix
           %span.twitter_bird= image_tag("bird_gray_16.png", alt: "Twitter")
-          %span.created_at= format_time(tweet.tweeted_at)
+          %span.created_at
+            %time{datetime: tweet.tweeted_at.to_datetime.rfc3339}
           %span.source via -
     .stats
       %dl
@@ -47,7 +48,8 @@
           %span.twitter_bird
             = link_to image_tag("bird_gray_16.png", alt: "Twitter"), tweet.twitter_url, target: "_blank"
           %span.created_at
-            = link_to format_time(tweet.tweeted_at), tweet_path(tweet.id)
+            = link_to tweet_path(tweet.id) do
+              %time{datetime: tweet.tweeted_at.to_datetime.rfc3339}
           - if favorites_truncated?(tweet)
             %span.show-full= link_to "show full", tweet_path(tweet.id, full: true)
           - if logged_in?

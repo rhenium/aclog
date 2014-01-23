@@ -1,6 +1,9 @@
 //= require _html-autoload
 $(function() {
-    $(".pagination").hide();
+    var format_tweet = function() {
+        $("time").text(new Date($("time").attr("datetime")).toLocaleString());
+    };
+
     $.autopager({
         content: $(".tweets"),
         link: $("link[rel=next]"),
@@ -9,7 +12,10 @@ $(function() {
         },
         onComplete: function() {
             $(".loading").hide();
+            format_tweet();
         }
     });
+
+    format_tweet();
 });
 

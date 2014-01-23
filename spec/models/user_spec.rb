@@ -7,41 +7,6 @@ describe User do
     it { should eq "https://twitter.com/#{user.screen_name}" }
   end
 
-  describe ".from_user_object" do
-    context "when not recorded" do
-      let(:user_1_model) { FactoryGirl.build(:user_1) }
-      let(:user_object) { OpenStruct.new(id: user_1_model.id,
-                                         screen_name: user_1_model.screen_name,
-                                         name: user_1_model.name,
-                                         profile_image_url_https: user_1_model.profile_image_url,
-                                         protected: user_1_model.protected) }
-      subject { User.from_user_object(user_object) }
-      its(:id) { should be user_object.id }
-      its(:screen_name) { should eq user_object.screen_name }
-      its(:name) { should eq user_object.name }
-      its(:profile_image_url) { should eq user_object.profile_image_url_https }
-      its(:protected) { should be user_object.protected }
-    end
-
-    context "when already recorded" do
-      let!(:user_1) { FactoryGirl.create(:user_1) }
-      let(:user_2_model) { FactoryGirl.build(:user_2) }
-      let(:user_object) { OpenStruct.new(id: user_2_model.id,
-                                         screen_name: user_2_model.screen_name,
-                                         name: user_2_model.name,
-                                         profile_image_url_https: user_2_model.profile_image_url,
-                                         protected: user_2_model.protected) }
-      subject { User.from_user_object(user_object) }
-      its(:id) { should be user_object.id }
-      its(:id) { should be user_1.id }
-      its(:screen_name) { should eq user_object.screen_name }
-      its(:screen_name) { should eq user_1.screen_name }
-      its(:name) { should eq user_object.name }
-      its(:profile_image_url) { should eq user_object.profile_image_url_https }
-      its(:protected) { should be user_object.protected }
-    end
-  end
-
   describe ".find" do
     let(:user) { FactoryGirl.create(:user) }
 

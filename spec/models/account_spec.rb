@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 require 'spec_helper'
 
 describe Account do
@@ -13,7 +12,10 @@ describe Account do
     end
 
     context "when already recorded" do
-      before { @old_account = FactoryGirl.create(:account_1).update_settings!(notification: false, private: true) }
+      before {
+        @old_account = FactoryGirl.create(:account_1)
+        @old_account.update!(notification: false, private: true)
+      }
       let(:new_account) { FactoryGirl.build(:account_2) }
       subject { Account.create_or_update(new_account.attributes.symbolize_keys) }
       its(:id) { should be @old_account.id }
@@ -73,13 +75,6 @@ describe Account do
       subject { account.tap(&:deactivate!) }
       its(:active?) { should be false }
     end
-  end
-
-  describe "#update_settings!" do
-    let(:account) { FactoryGirl.create(:account_1) }
-    subject { account.update_settings!(notification: false, private: true) }
-    its(:notification) { should be false }
-    its(:private) { should be true }
   end
 
   describe "#deactivate!" do

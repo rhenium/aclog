@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 require "spec_helper"
 
 describe Tweet do
@@ -29,49 +28,22 @@ describe Tweet do
     it { should eq "https://twitter.com/#{@tweet_0_0.user.screen_name}/status/#{@tweet_0_0.id}" }
   end
 
-  describe ".delete_from_id" do
-    context "when of tweet" do
-      before do
-        @id = @tweet_1_0.id
-        @result = OpenStruct.new(Tweet.delete_from_id(@id))
-      end
-      it { @result.tweets.should be 1 }
-      it { @result.favorites.should be 1 }
-      it { @result.retweets.should be 1 }
-      it { Tweet.find_by(id: @id).should be nil }
-      it { Favorite.where(tweet_id: @id).count.should be 0 }
-      it { Retweet.where(tweet_id: @id).count.should be 0 }
-    end
-
-    context "when of retweet" do
-      before do
-        @id = @tweet_1_0_r_2.id
-        @result = OpenStruct.new(Tweet.delete_from_id(@id))
-      end
-      it { @result.tweets.should be 0 }
-      it { @result.retweets.should be 1 }
-      it { Tweet.find_by(id: @tweet_1_0).retweets_count.should be 0 }
-      it { Favorite.where(tweet_id: @id).count.should be 0 }
-      it { Retweet.where(id: @id).count.should be 0 }
-    end
-  end
-
-  describe ".from_receiver" do
+  describe ".from_json" do
     let(:test_data) do
-      {"id" => 123,
-       "text" => "abc",
-       "entities" => {},
-       "source" => "web",
-       "created_at" => Time.now.to_s,
-       "user" => {"id" => @user_0.id}}
+      { id: 123,
+        text: "abc",
+        entities: {},
+        source: "web",
+        created_at: Time.now.to_s,
+        user: { id: @user_0.id } }
     end
 
-    subject { Tweet.from_receiver(test_data) }
+    subject { Tweet.from_json(test_data) }
     it { should be_a Tweet }
-    its(:id) { should be test_data["id"] }
-    its(:text) { should eq test_data["text"] }
-    its(:source) { should eq test_data["source"] }
-    its(:tweeted_at) { should eq Time.parse(test_data["created_at"]) }
+    its(:id) { should be test_data[:id] }
+    its(:text) { should eq test_data[:text] }
+    its(:source) { should eq test_data[:source] }
+    its(:tweeted_at) { should eq Time.parse(test_data[:created_at]) }
     its(:user) { should eq @user_0 }
   end
 

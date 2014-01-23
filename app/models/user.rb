@@ -22,21 +22,9 @@ class User < ActiveRecord::Base
     hash = args.first
     return super(*args) unless hash.is_a?(Hash)
 
-    hash.each do |key, value|
-      next if value.nil?
+    key, value = hash.delete_if {|k, v| v.nil? }.first
 
-      if key == :id
-        return super(value)
-      else
-        ret = where(key => value).order(updated_at: :desc).first
-        if ret
-          return ret
-        else
-          raise ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}"
-          end
-      end
-    end
-    raise ActiveRecord::RecordNotFound, "Couldn't find User without any parameter"
+    where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
   end
 
   def self.from_json(json)

@@ -1,6 +1,5 @@
 class ErrorsController < ApplicationController
-  skip_before_filter :check_format
-  before_filter :force_format
+  before_action :force_format
   layout :select_layout
 
   def render_error

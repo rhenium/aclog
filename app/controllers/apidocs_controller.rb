@@ -1,5 +1,5 @@
 class ApidocsController < ApplicationController
-  before_filter :reload_docs
+  before_action :reload_docs
 
   def index
     @resources = Apidoc.resources

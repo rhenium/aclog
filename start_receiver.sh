@@ -1,7 +1,7 @@
 #!/bin/sh
 
 export RAILS_ENV=production
-receiver="bundle exec rails runner script/start.rb"
+receiver="bundle exec rails runner bin/start.rb"
 
 case "$1" in
     start)

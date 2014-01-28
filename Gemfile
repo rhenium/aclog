@@ -2,7 +2,6 @@ source "https://rubygems.org"
 
 gem "rails", "~> 4.0.2"
 gem "mysql2"
-gem "activerecord-import"
 gem "settingslogic"
 gem "yajl-ruby", require: "yajl"
 gem "twitter"

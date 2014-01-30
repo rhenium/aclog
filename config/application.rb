@@ -35,7 +35,8 @@ module Aclog
       ErrorsController.action(:render_error).call(env)
     end
 
-    config.assets.precompile += %w(*.js *.css *.png *.gif)
+    config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
+    config.assets.precompile += [Proc.new { |path, fn| fn =~ /app\/assets/ && %w(.js).include?(File.extname(path)) }]
 
     config.generators do |g|
       g.test_framework :rspec

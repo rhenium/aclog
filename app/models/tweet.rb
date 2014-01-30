@@ -59,11 +59,15 @@ class Tweet < ActiveRecord::Base
   end
 
   def self.from_twitter_object(obj)
-    tweet = from_json(obj.attrs)
-    tweet.update!(favorites_count: obj.favorite_count,
-                  retweets_count: obj.retweet_count,
-                  reactions_count: obj.favorite_count + obj.retweet_count)
-    tweet
+    transaction do
+      tweet = from_json(obj.attrs)
+      favs = [obj.favorite_count, tweet.favorites_count].max
+      rts = [obj.retweet_count, tweet.retweets_count].max
+      tweet.update!(favorites_count: favs,
+                    retweets_count: rts,
+                    reactions_count: favs + rts)
+      tweet
+    end
   end
 
   def self.filter_by_query(query)

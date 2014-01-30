@@ -1,120 +1,120 @@
 @import "bootstrap/mixins"
 
 .tweets
-  :width 572px
+  width: 572px
   .tweet
-    :margin 15px 0
+    margin: 15px 0
     .tweet
-      :overflow hidden
-      :background #ffffff
-      :border 1px solid #c1c5cb
-      :border-width 1px 0
-      :padding 15px
+      overflow: hidden
+      background: #ffffff
+      border: 1px solid #c1c5cb
+      border-width: 1px 0
+      padding: 15px
       .left
-        :float left
-        :width 60px
+        float: left
+        width: 60px
         .avatar
           img
-            :width 48px
-            :height 48px
+            width: 48px
+            height: 48px
         ul.actions
           li
-            :padding 0
-            :margin 0
+            padding: 0
+            margin: 0
           li.twitter
             a
-              :float left
+              float: left
               img
-                :width 16px
-                :height 16px
-                :vertical-align bottom
+                width: 16px
+                height: 16px
+                vertical-align: bottom
       .tweet_content_fix
-        :float left
-        :width 0
-        :height 85px
+        float: left
+        width: 0
+        height: 85px
       .tweet_content
-        :float left
-        :width 473px
+        float: left
+        width: 473px
         .user
-          :padding 0 5px 15px
-          :color #666666
+          padding: 0 5px 15px
+          color: #666666
           a
-            :color #666666
+            color: #666666
           .name
-            :font-size 14px
+            font-size: 14px
           .screen_name
-            :font-size 12px
+            font-size: 12px
           .in_reply_to
-            :float right
-            :font-size 12px
+            float: right
+            font-size: 12px
         .text
-          :font-size 18px
-          :line-height 25px
-          :padding 0 5px 15px
-          :word-wrap break-word
+          font-size: 18px
+          line-height: 25px
+          padding: 0 5px 15px
+          word-wrap: break-word
           .quiet
-            :font-size 14px
-            :color #999999
-            :line-height inherit
+            font-size: 14px
+            color: #999999
+            line-height: inherit
         .meta
-          :padding 0 5px
-          :color #666666
-          :font-size 12px
+          padding: 0 5px
+          color: #666666
+          font-size: 12px
           span
-            :margin 0 2px
+            margin: 0 2px
           .twitter_bird
-            :display block
-            :float left
+            display: block
+            float: left
             img
-              :vertical-align top
-              :margin-top 1px
+              vertical-align: top
+              margin-top: 1px
           .created_at
-            :display block
-            :float left
+            display: block
+            float: left
           .show-full
-            :font-size 10px
+            font-size: 10px
           .source
-            :display block
-            :float right
+            display: block
+            float: right
     .stats
-      :background #ffffff
-      :padding 15px
+      background: #ffffff
+      padding: 15px
       dl
         @include clearfix()
-        :margin 0 0 3px 0
+        margin: 0 0 3px 0
         dt
-          :float left
-          :text-align left
-          :width 60px
+          float: left
+          text-align: left
+          width: 60px
           .count, .type
-            :color #666666
-            :display block
+            color: #666666
+            display: block
           .count
-            :font-weight bold
-            :font-size 14px
+            font-weight: bold
+            font-size: 14px
           .type
-            :font-weight normal
-            :font-size 10px
-            :text-transform uppercase
+            font-weight: normal
+            font-size: 10px
+            text-transform: uppercase
           .full
-            :font-weight normal
-            :font-size 9px
+            font-weight: normal
+            font-size: 9px
         dd
-          :float left
-          :margin 0
+          float: left
+          margin: 0
           ul
             @include clearfix()
-            :margin 0
-            :width 480px
+            margin: 0
+            width: 480px
             li
-              :float left
-              :padding 0
-              :width 48px
-              :height 48px
+              float: left
+              padding: 0
+              width: 48px
+              height: 48px
               img
-                :width 48px
-                :height 48px
-                :vertical-align bottom
+                width: 48px
+                height: 48px
+                vertical-align: bottom
 .loading
-  :margin 30px
-  :display none
+  margin: 30px
+  display: none

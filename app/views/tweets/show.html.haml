@@ -2,3 +2,6 @@
 - caption @user.screen_name + "'s Tweet"
 - sidebar :users
 = render @tweet
+- if logged_in?
+  .pull-right
+    %span.import= link_to "update", import_path(@tweet.id)

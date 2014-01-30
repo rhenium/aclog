@@ -14,12 +14,11 @@ class Retweet < ActiveRecord::Base
     tweet = Tweet.from_json(json[:retweeted_status])
     user = User.from_json(json[:user])
     retweet = Retweet.new(id: json[:id], tweet: tweet, user: user)
-    if retweet.save
-      logger.debug("Successfully created a retweet: #{retweet.id}")
-    else
-      logger.debug("Failed to create a retweet: #{retweet}")
-    end
-
+    retweet.save!
+    logger.debug("Successfully created a retweet: #{retweet.id}")
+  rescue
+    logger.debug("Failed to create a retweet: #{retweet}")
+  ensure
     retweet
   end
 end

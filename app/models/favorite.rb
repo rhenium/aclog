@@ -14,12 +14,11 @@ class Favorite < ActiveRecord::Base
     tweet = Tweet.from_json(json[:target_object])
     user = User.from_json(json[:source])
     favorite = Favorite.new(tweet: tweet, user: user)
-    if favorite.save
-      logger.debug("Successfully created a favorite: #{favorite.id}")
-    else
-      logger.debug("Failed to create a favorite: #{favorite}")
-    end
-
+    favorite.save!
+    logger.debug("Successfully created a favorite: #{favorite.id}")
+  rescue
+    logger.debug("Failed to create a favorite: #{favorite}")
+  ensure
     favorite
   end
 end

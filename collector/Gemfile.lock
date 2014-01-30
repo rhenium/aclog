@@ -1,17 +1,12 @@
-GIT
-  remote: git://github.com/tweetstream/em-twitter.git
-  revision: f3edace100a67e80342e544193285902d82ba56f
-  specs:
-    em-twitter (0.3.2)
-      buftok (~> 0.2)
-      eventmachine (~> 1.0)
-      http_parser.rb (~> 0.6)
-      simple_oauth (~> 0.2)
-
 GEM
   remote: https://rubygems.org/
   specs:
     buftok (0.2.0)
+    em-twitter (0.3.3)
+      buftok (~> 0.2)
+      eventmachine (~> 1.0)
+      http_parser.rb (~> 0.6)
+      simple_oauth (~> 0.2)
     eventmachine (1.0.3)
     http_parser.rb (0.6.0)
     msgpack (0.5.8)
@@ -23,7 +18,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  em-twitter!
+  em-twitter
   msgpack
   settingslogic
   yajl-ruby

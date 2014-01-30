@@ -16,9 +16,11 @@ class Favorite < ActiveRecord::Base
     favorite = Favorite.new(tweet: tweet, user: user)
     favorite.save!
     logger.debug("Successfully created a favorite: #{favorite.id}")
-  rescue
-    logger.debug("Failed to create a favorite: #{favorite}")
+  rescue ActiveRecord::RecordNotUnique => e
+    logger.debug("Failed to create a favorite: #{favorite}: #{e.class}")
+  rescue => e
+    logger.error("Failed to create a favorite: #{favorite}: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
   ensure
-    favorite
+    return favorite
   end
 end

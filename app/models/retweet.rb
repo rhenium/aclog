@@ -16,9 +16,11 @@ class Retweet < ActiveRecord::Base
     retweet = Retweet.new(id: json[:id], tweet: tweet, user: user)
     retweet.save!
     logger.debug("Successfully created a retweet: #{retweet.id}")
-  rescue
-    logger.debug("Failed to create a retweet: #{retweet}")
+  rescue ActiveRecord::RecordNotUnique => e
+    logger.debug("Failed to create a retweet: #{retweet}: #{e.class}")
+  rescue => e
+    logger.error("Failed to create a retweet: #{retweet}: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
   ensure
-    retweet
+    return retweet
   end
 end

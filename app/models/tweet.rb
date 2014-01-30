@@ -45,17 +45,21 @@ class Tweet < ActiveRecord::Base
   def self.from_json(json)
     find_by(id: json[:id]) || begin
       user = User.from_json(json[:user])
-      create!(id: json[:id],
-              text: extract_entities(json),
-              source: json[:source],
-              tweeted_at: json[:created_at],
-              in_reply_to_id: json[:in_reply_to_status_id],
-              user: user)
+      tweet = Tweet.new(id: json[:id],
+                        text: extract_entities(json),
+                        source: json[:source],
+                        tweeted_at: json[:created_at],
+                        in_reply_to_id: json[:in_reply_to_status_id],
+                        user: user)
+      tweet.save!
+      logger.debug("Successfully created a tweet: #{tweet.id}")
+    rescue ActiveRecord::RecordNotUnique => e
+      logger.debug("Failed to create a tweet: #{tweet}: #{e.class}")
+    rescue => e
+      logger.error("Failed to create a tweet: #{tweet}: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
+    ensure
+      return tweet
     end
-  rescue ActiveRecord::RecordNotUnique
-    logger.debug("Duplicate Tweet: #{json[:id]}")
-  rescue => e
-    logger.error("Unknown error while inserting tweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
   end
 
   def self.from_twitter_object(obj)

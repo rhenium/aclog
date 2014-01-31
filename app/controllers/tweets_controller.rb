@@ -15,6 +15,10 @@ class TweetsController < ApplicationController
     optional :screen_name, "toshi_a", "The username of the user for whom to return results for."
   end
 
+  param_group :threshold do
+    optional :reactions, 5, "Returns Tweets which has received reactions more than (or equal to) the specified number of times."
+  end
+
   def index
     begin
       best
@@ -68,10 +72,11 @@ class TweetsController < ApplicationController
   description "Returns the newest Tweets of a user, specified by username or user ID."
   param_group :user
   param_group :pagination_with_ids
+  param_group :threshold
   def timeline
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate(@user.tweets.reacted.order_by_id)
+    @tweets = paginate(@user.tweets.reacted(params[:reactions]).order_by_id)
   end
 
   get "tweets/discoveries"
@@ -137,8 +142,9 @@ class TweetsController < ApplicationController
   get "tweets/all_timeline"
   nodoc
   param_group :pagination_with_ids
+  param_group :threshold
   def all_timeline
-    @tweets = paginate(Tweet.reacted.order_by_id)
+    @tweets = paginate(Tweet.reacted(params[:reactions]).order_by_id)
   end
 
   get "tweets/filter"

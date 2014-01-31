@@ -21,7 +21,7 @@ Aclog::Application.routes.draw do
 
   get "/i/best" =>                              "tweets#all_best",                  as: "best"
   get "/i/recent" =>                            "tweets#all_recent",                as: "recent"
-  get "/i/timeline" =>                          "tweets#all_timeline",              as: "timeline"
+  get "/i/timeline(/:reactions)" =>             "tweets#all_timeline",              as: "timeline", constraints: { reactions: /\d+/ }
   get "/i/filter" =>                            "tweets#filter",                    as: "filter"
 
   get "/about" =>                               "about#about",                      as: "about"
@@ -34,7 +34,7 @@ Aclog::Application.routes.draw do
     get "/" =>                                  "tweets#index",                     as: "user"
     get "/best" =>                              "tweets#best",                      as: "user_best"
     get "/recent" =>                            "tweets#recent",                    as: "user_recent"
-    get "/timeline" =>                          "tweets#timeline",                  as: "user_timeline"
+    get "/timeline(/:reactions)" =>             "tweets#timeline",                  as: "user_timeline", constraints: { reactions: /\d+/ }
     get "/discoveries" =>                       "tweets#discoveries",               as: "user_discoveries"
     get "/favorites" =>                         "tweets#favorites",                 as: "user_favorites"
     get "/retweets" =>                          "tweets#retweets",                  as: "user_retweets"

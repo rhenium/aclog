@@ -1,0 +1,7 @@
+.thresholds
+  .btn-group
+    - counts.sort.each do |c|
+      - if [params[:reactions].to_i, 1].max == c
+        %button.btn.btn-default.active{type: "button"}= "#{c} acts"
+      - else
+        = link_to "#{c} acts", params.merge(reactions: c), class: "btn btn-default"

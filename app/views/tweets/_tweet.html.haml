@@ -1,6 +1,6 @@
 .tweet
   - unless authorized_to_show_user? tweet.user
-    .tweet
+    .content
       .left
         .avatar
           = image_tag "missing_profile_image.png", alt: "protected", title: "protected user"

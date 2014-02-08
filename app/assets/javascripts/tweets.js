@@ -1,7 +1,11 @@
 //= require _html-autoload
 $(function() {
     var format_tweet = function() {
-        $("time").text(new Date($("time").attr("datetime")).toLocaleString());
+        $("time").each(
+            function() {
+                $(this).text(new Date($(this).attr("datetime"))
+                             .toLocaleString())
+            });
     };
 
     $.autopager({

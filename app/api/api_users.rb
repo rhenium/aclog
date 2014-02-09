@@ -35,9 +35,12 @@ class ApiUsers < Grape::API
       @result = user.count_discovered_users.take(Settings.users.count)
     end
 
-    desc "", nodoc: true, example_params: { id: "280414022,99008565" }
+    desc "", nodoc: true, example_params: { ids: "280414022,99008565" }
     params do
-      requires :id, type: String
+      optional :id, type: String, desc: "Use ids"
+      optional :ids, type: String, desc: "Use this"
+      optional :user_id, type: String, desc: "Use ids"
+      optional :user_ids, type: String, desc: "Use ids"
     end
     get "screen_name" do
       # does not use RABL

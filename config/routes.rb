@@ -1,7 +1,7 @@
 Aclog::Application.routes.draw do
   root to: "about#index"
 
-  mount Aclog::Api => "/api"
+  mount Api => "/api"
 
   # Internals / SessionsController
   get "/i/callback" =>                          "sessions#create"

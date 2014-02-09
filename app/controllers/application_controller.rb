@@ -1,37 +1,31 @@
 class ApplicationController < ActionController::Base
-  include TwitterOauthEchoAuthentication
-
   protect_from_forgery
+
   after_action :set_content_type_to_xhtml, :tidy_response_body
-  helper_method :current_user, :logged_in?
+  helper_method :logged_in?, :current_user
   helper_method :authorized_to_show_user?, :authorized_to_show_user_best?
 
   protected
-  def current_user
-    return @_current_user if defined? @_current_user
+  def logged_in?
+    !!session[:user_id]
+  end
 
-    @_current_user = begin
-      if session[:user_id]
+  def current_user
+    @_current_user ||= begin
+      if logged_in?
         User.find(session[:user_id])
-      elsif request.headers["X-Verify-Credentials-Authorization"]
-        user_id = authenticate_with_twitter_oauth_echo
-        User.find(user_id)
+      else
+        nil
       end
-    rescue
-      nil
     end
   end
 
-  def logged_in?
-    !!current_user
-  end
-
   def authorized_to_show_user?(user)
-    !user.protected? || current_user == user || current_user.try(:following?, user) || false
+    !user.protected? || (logged_in? && current_user.permitted_to_see?(user))
   end
 
   def authorized_to_show_user_best?(user)
-    !user.private? || current_user == user
+    (!user.private? || current_user == user) && authorized_to_show_user?(user)
   end
 
   def authorize_to_show_user!(user)

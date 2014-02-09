@@ -24,7 +24,7 @@ class User < ActiveRecord::Base
 
     key, value = hash.delete_if {|k, v| v.nil? }.first
 
-    where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
+    key && where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
   end
 
   def self.from_json(json)
@@ -52,6 +52,10 @@ class User < ActiveRecord::Base
 
   def registered?
     !!account
+  end
+
+  def permitted_to_see?(user)
+    !user.protected? || user.id == self.id || self.account.try(:following?, user.id) || false
   end
 
   def account

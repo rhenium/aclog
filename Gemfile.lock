@@ -26,20 +26,25 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 0.3.37)
     addressable (2.3.5)
-    arel (4.0.1)
+    arel (4.0.2)
     atomic (1.1.14)
-    bootstrap-sass (3.0.3.0)
+    axiom-types (0.0.5)
+      descendants_tracker (~> 0.0.1)
+      ice_nine (~> 0.9)
+    bootstrap-sass (3.1.0.2)
       sass (~> 3.2)
     buftok (0.2.0)
     builder (3.1.4)
     coderay (1.1.0)
+    coercible (1.0.0)
+      descendants_tracker (~> 0.0.1)
     coffee-rails (4.0.1)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0, < 5.0)
     coffee-script (2.2.0)
       coffee-script-source
       execjs
-    coffee-script-source (1.6.3)
+    coffee-script-source (1.7.0)
     cool.io (1.1.1)
       iobuffer (>= 1.0.0)
     coveralls (0.7.0)
@@ -48,14 +53,14 @@ GEM
       simplecov (>= 0.7)
       term-ansicolor
       thor
-    crack (0.4.1)
-      safe_yaml (~> 0.9.0)
+    crack (0.4.2)
+      safe_yaml (~> 1.0.0)
     daemon-spawn (0.4.2)
     daemons (1.1.9)
     dalli (2.7.0)
     descendants_tracker (0.0.3)
     diff-lcs (1.2.5)
-    docile (1.1.2)
+    docile (1.1.3)
     em-work_queue (0.0.1)
       eventmachine
     equalizer (0.0.9)
@@ -69,6 +74,21 @@ GEM
       railties (>= 3.0.0)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
+    grape (0.6.1)
+      activesupport
+      builder
+      hashie (>= 1.2.0)
+      multi_json (>= 1.3.2)
+      multi_xml (>= 0.5.2)
+      rack (>= 1.3.0)
+      rack-accept
+      rack-mount
+      virtus (>= 1.0.0)
+    grape-rabl (0.2.2)
+      grape
+      i18n
+      rabl
+      tilt
     haml (4.0.5)
       tilt
     haml-rails (0.5.3)
@@ -82,15 +102,13 @@ GEM
       http_parser.rb
     http_parser.rb (0.6.0)
     i18n (0.6.9)
+    ice_nine (0.11.0)
     iobuffer (1.1.2)
-    jbuilder (2.0.2)
-      activesupport (>= 3.0.0)
-      multi_json (>= 1.2.0)
-    jquery-rails (3.0.4)
+    jquery-rails (3.1.0)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
     json (1.8.1)
-    kgio (2.8.1)
+    kgio (2.9.1)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -104,6 +122,7 @@ GEM
       cool.io (~> 1.1.1)
       msgpack (~> 0.5.8)
     multi_json (1.8.4)
+    multi_xml (0.5.5)
     multipart-post (2.0.0)
     mysql2 (0.3.15)
     naught (1.0.0)
@@ -118,7 +137,7 @@ GEM
       multi_json (~> 1.3)
       omniauth-oauth (~> 1.0)
     polyglot (0.3.3)
-    pry (0.9.12.5)
+    pry (0.9.12.6)
       coderay (~> 1.0)
       method_source (~> 0.8)
       slop (~> 3.4)
@@ -126,7 +145,13 @@ GEM
       pry (>= 0.9.10)
     quiet_assets (1.0.2)
       railties (>= 3.1, < 5.0)
+    rabl (0.9.3)
+      activesupport (>= 2.3.14)
     rack (1.5.2)
+    rack-accept (0.4.5)
+      rack (>= 0.4)
+    rack-mount (0.8.3)
+      rack (>= 1.0.0)
     rack-test (0.6.2)
       rack (>= 1.0)
     rails (4.0.2)
@@ -151,9 +176,9 @@ GEM
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
     rspec-core (2.14.7)
-    rspec-expectations (2.14.4)
+    rspec-expectations (2.14.5)
       diff-lcs (>= 1.1.3, < 2.0)
-    rspec-mocks (2.14.4)
+    rspec-mocks (2.14.5)
     rspec-rails (2.14.1)
       actionpack (>= 3.0)
       activemodel (>= 3.0)
@@ -162,7 +187,7 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
-    safe_yaml (0.9.7)
+    safe_yaml (1.0.1)
     sass (3.2.14)
     sass-rails (4.0.1)
       railties (>= 4.0.0, < 5.0)
@@ -185,8 +210,8 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (~> 2.8)
-    term-ansicolor (1.2.2)
-      tins (~> 0.8)
+    term-ansicolor (1.3.0)
+      tins (~> 1.0)
     thin (1.6.1)
       daemons (>= 1.0.9)
       eventmachine (>= 1.0.0)
@@ -195,7 +220,7 @@ GEM
     thread_safe (0.1.3)
       atomic
     tilt (1.4.1)
-    tins (0.13.1)
+    tins (1.0.0)
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
@@ -220,13 +245,18 @@ GEM
     unf (0.1.3)
       unf_ext
     unf_ext (0.0.6)
-    unicorn (4.8.0)
+    unicorn (4.8.2)
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
     unicorn-worker-killer (0.4.2)
       unicorn (~> 4)
-    webmock (1.17.1)
+    virtus (1.0.1)
+      axiom-types (~> 0.0.5)
+      coercible (~> 1.0)
+      descendants_tracker (~> 0.0.1)
+      equalizer (~> 0.0.7)
+    webmock (1.17.2)
       addressable (>= 2.2.7)
       crack (>= 0.3.2)
     yajl-ruby (1.2.0)
@@ -242,8 +272,9 @@ DEPENDENCIES
   dalli
   em-work_queue
   factory_girl_rails
+  grape
+  grape-rabl
   haml-rails
-  jbuilder
   jquery-rails
   msgpack
   msgpack-rpc

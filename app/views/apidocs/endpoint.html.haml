@@ -2,27 +2,35 @@
 - caption nil
 - sidebar :i
 %ul.breadcrumb
-  %li= link_to "Documentation", api_docs_path
-  %li.active= @endpoint
-%h1.page-header= @endpoint
+  %li= link_to "Documentation", about_api_path
+  %li.active= format_endpoint_name(@endpoint)
+%h1.page-header= format_endpoint_name(@endpoint)
 %div
-  %div= @endpoint.description
+  %div= @endpoint.route_description
   %h2 Resource URL
-  %div= url_for(controller: params[:resource], action: params[:name], only_path: false)
+  %div= api_url + @endpoint.route_path
   %h2 Parameters
   %table.table
     %tbody
-      - @endpoint.parameters.each do |parameter|
+      - @endpoint.route_params.each do |name, options|
         %tr
           %td
-            %strong= parameter.name
-            - if parameter.required?
+            %strong= name
+            - if options[:required]
               %small required
             - else
               %small optional
           %td
-            %p= parameter.description
-            - if parameter.example
-              %p
-                Example Value:
-                = parameter.example
+            %p= options[:desc]
+            %p
+              Type:
+              = options[:type]
+  - if @example_request_uri
+    %h2 Example Request
+    .request
+      %span= @endpoint.route_method
+      %code#example_request_uri= @example_request_uri
+    .response
+      %pre
+        %code
+          #example_request_loading= image_tag "loading.gif", alt: "loading..."

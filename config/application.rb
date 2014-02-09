@@ -6,7 +6,6 @@ require "action_controller/railtie"
 require "action_mailer/railtie"
 require "sprockets/railtie"
 # require "rails/test_unit/railtie"
-require "./lib/apidoc"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -17,6 +16,10 @@ module Aclog
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
+
+    # Configure grape
+    config.paths.add "app/api", eager_load: true
+    config.paths.add "app/api/concerns", eager_load: true
 
     # Custom directories with classes and modules you want to be autoloadable.
     config.autoload_paths += Dir["#{config.root}/lib/", "#{config.root}/lib/**/"]
@@ -41,6 +44,10 @@ module Aclog
     config.generators do |g|
       g.test_framework :rspec
       g.fixture_replacement :factory_girl
+    end
+
+    config.middleware.use(Rack::Config) do |env|
+      env["api.tilt.root"] = "#{config.root}/app/api/templates"
     end
   end
 end

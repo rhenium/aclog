@@ -1,11 +1,7 @@
 Aclog::Application.routes.draw do
   root to: "about#index"
 
-  # JSON API
-  scope "/api", format: false, defaults: { format: "json" } do
-    get "/users/:action.json",  controller: "users"
-    get "/tweets/:action.json", controller: "tweets"
-  end
+  mount Aclog::Api => "/api"
 
   # Internals / SessionsController
   get "/i/callback" =>                          "sessions#create"
@@ -25,9 +21,8 @@ Aclog::Application.routes.draw do
   get "/i/filter" =>                            "tweets#filter",                    as: "filter"
 
   get "/about" =>                               "about#about",                      as: "about"
-  get "/about/api" =>                           "about#api",                        as: "about_api"
-  get "/about/api/docs" =>                      "apidocs#index",                    as: "api_docs"
-  get "/about/api/docs/:resource/:name" =>      "apidocs#endpoint",                 as: "api_docs_endpoint"
+  get "/about/api" =>                           "apidocs#index",                    as: "about_api"
+  get "/about/api/:method/:namespace/:path" =>  "apidocs#endpoint",                 as: "about_api_endpoint", constraints: { namespace: /[\w\/]+/ }
 
   # User pages
   scope "/:screen_name" do

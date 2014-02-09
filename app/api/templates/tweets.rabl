@@ -1,0 +1,3 @@
+collection @tweets
+extends "tweet"
+

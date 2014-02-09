@@ -3,16 +3,34 @@
 - sidebar :i
 %ul.breadcrumb
   %li.active Documentation
-%h2.page-header Resources
-- @resources.each do |name, resource|
-  %h3= resource.name
+%h1.page-header Aclog API
+%p
+  Aclog では JSON 形式の API を提供しています。
+%hr
+%p
+  ツイートを非公開にしているアカウントの情報にアクセスするには本人であるか、対象のアカウントをフォローしている必要があります。Aclog API では、その認証に OAuth Echo を使用します。
+%p
+  OAuth Echo を使用するには以下のリクエストヘッダを使用します。
+  %pre
+    %code
+      :preserve
+        X-Auth-Service-Provider: https://api.twitter.com/1.1/account/verify_credentials.json
+        X-Verify-Credentials-Authorization: OAuth rea...
+%p
+  OAuth Echo の詳細については
+  = link_to "Twitter のドキュメント", "https://dev.twitter.com/pages/oauth_echo"
+  を参照してください。
+
+%h2.page-header Endpoints
+- @routes.values.inject(:merge).each do |namespace, endpoints|
+  %h3= namespace.titleize
   %table.table
     %thead
       %th Resource
       %th Description
     %tbody
-      - resource.endpoints.reject {|a, e| e.nodoc }.each do |action, endpoint|
+      - endpoints.select {|_, e| !e.route_nodoc }.each do |path, endpoint|
         %tr
-          %td= link_to endpoint, api_docs_endpoint_path(name, action)
-          %td= endpoint.description
+          %td= link_to format_endpoint_name(endpoint), about_api_endpoint_path(endpoint.route_method.downcase, namespace, path)
+          %td= endpoint.route_description
 

@@ -17,5 +17,10 @@ module Aclog
     class AccountPrivate < UserError; end
 
     class DocumentNotFound < StandardError; end
+
+    class AclogError < StandardError; end
+    class NotFound < AclogError; end
+    class Forbidden < AclogError; end
+    class OAuthEchoError < AclogError; end
   end
 end

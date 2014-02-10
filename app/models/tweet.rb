@@ -42,6 +42,30 @@ class Tweet < ActiveRecord::Base
     end
   end
 
+  def reply_ancestors(max_level = Float::INFINITY)
+    nodes = []
+    node = self
+    level = 0
+
+    while node.in_reply_to && level < max_level
+      nodes.unshift(node = node.in_reply_to)
+      level += 1
+    end
+    nodes
+  end
+
+  def reply_descendants(max_level = Float::INFINITY)
+    nodes = []
+    c_nodes = [self]
+    level = 0
+
+    while c_nodes.size > 0 && level < max_level
+      nodes.concat(c_nodes.map! {|node| node.replies }.flatten!)
+      level += 1
+    end
+    nodes.sort_by {|t| t.id }
+  end
+
   def self.from_json(json)
     find_by(id: json[:id]) || begin
       user = User.from_json(json[:user])

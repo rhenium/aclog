@@ -1,7 +1,11 @@
 - title CGI.unescapeHTML(strip_tags(format_tweet_text(@tweet.text))) + " from @" + @user.screen_name
 - caption @user.screen_name + "'s Tweet"
 - sidebar :users
+= render partial: "tweet_without_stats", collection: @replies_before, as: :tweet
+%hr
 = render @tweet
+%hr
+= render partial: "tweet_without_stats", collection: @replies_after, as: :tweet
 - if logged_in?
   .pull-right
     %span.import= link_to "update", import_path(@tweet.id)

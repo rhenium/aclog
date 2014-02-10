@@ -13,6 +13,8 @@ class TweetsController < ApplicationController
     @tweet = Tweet.find(params[:id])
     @user = @tweet.user
     authorize_to_show_user! @user
+    @replies_before = @tweet.reply_ancestors(2)
+    @replies_after = @tweet.reply_descendants(2)
   end
 
   def best
@@ -58,7 +60,7 @@ class TweetsController < ApplicationController
     authorize_to_show_user! @user
     @source_user = User.find(id: params[:user_id_b], screen_name: params[:screen_name_b])
     authorize_to_show_user! @source_user
-    @tweets = paginate(@user.tweets.discovered_by(@source_user).order_by_id)
+    @tweets = paginate(@user.tweets).discovered_by(@source_user).order_by_id
   end
 
   def all_best

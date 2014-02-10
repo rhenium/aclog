@@ -1,0 +1,47 @@
+- unless authorized_to_show_user? tweet.user
+  .content
+    .left
+      .avatar
+        = image_tag "missing_profile_image.png", alt: "protected", title: "protected user"
+    .tweet_content_fix
+    .tweet_content
+      .user
+        %span.name Protected
+        %span.screen_name -
+      .text
+        .quiet
+          ユーザーは非公開です
+      .meta.clearfix
+        %span.twitter_bird= image_tag("bird_gray_16.png", alt: "Twitter")
+        %span.created_at
+          %time{datetime: tweet.tweeted_at.to_datetime.rfc3339}= tweet.tweeted_at
+        %span.source via -
+- else
+  .content
+    .left
+      .avatar
+        = link_to user_path(tweet.user_screen_name) do
+          = image_tag tweet.user_profile_image_url, alt: tweet.user_screen_name, title: tweet.user_name
+      %ul.list-inline.actions
+        %li.twitter
+          = link_to image_tag("reply.png", alt: "reply"), "https://twitter.com/intent/tweet?in_reply_to=#{tweet.id}"
+          = link_to image_tag("retweet.png", alt: "retweet"), "https://twitter.com/intent/retweet?tweet_id=#{tweet.id}"
+          = link_to image_tag("favorite.png", alt: "favorite"), "https://twitter.com/intent/favorite?tweet_id=#{tweet.id}"
+    .tweet_content_fix
+    .tweet_content
+      .user
+        %span.name= link_to tweet.user_name, user_path(tweet.user_screen_name)
+        %span.screen_name= link_to tweet.user_screen_name, user_path(tweet.user_screen_name)
+        - if tweet.in_reply_to
+          %span.in_reply_to= link_to "in reply to @" + tweet.in_reply_to.user_screen_name, tweet_path(tweet.in_reply_to.id)
+      .text
+        = format_tweet_text tweet.text
+      .meta.clearfix
+        %span.twitter_bird
+          = link_to image_tag("bird_gray_16.png", alt: "Twitter"), tweet.twitter_url, target: "_blank"
+        %span.created_at
+          = link_to tweet_path(tweet.id) do
+            %time{datetime: tweet.tweeted_at.to_datetime.rfc3339}= tweet.tweeted_at
+        %span.source
+          via
+          = link_to_source_text(tweet.source)

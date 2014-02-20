@@ -13,9 +13,9 @@ module TweetsHelper
     text.gsub(/\r\n|\r|\n/, "<br />").html_safe
   end
 
-  def link_to_source_text(source)
+  def link_to_source_text(source, *args)
     if /^<a href="(.+?)" rel="nofollow">(.+?)<\/a>/ =~ source
-      link_to $2, $1
+      link_to $2, $1, *args
     else
       source
     end

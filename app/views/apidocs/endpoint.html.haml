@@ -1,36 +1,30 @@
 - title "API Documentation: "
-- caption nil
-- sidebar :i
-%ul.breadcrumb
-  %li= link_to "Documentation", about_api_path
-  %li.active= format_endpoint_name(@endpoint)
-%h1.page-header= format_endpoint_name(@endpoint)
-%div
-  %div= @endpoint.route_description
-  %h2 Resource URL
-  %div= api_url + @endpoint.route_path
-  %h2 Parameters
-  %table.table
-    %tbody
-      - @endpoint.route_params.each do |name, options|
-        %tr
-          %td
-            %strong= name
-            - if options[:required]
-              %small required
-            - else
-              %small optional
-          %td
-            %p= options[:desc]
-            %p
-              Type:
-              = options[:type]
-  - if @example_request_uri
-    %h2 Example Request
-    .request
-      %span= @endpoint.route_method
-      %code#example_request_uri= @example_request_uri
-    .response
-      %pre
-        %code
-          #example_request_loading= image_tag "loading.gif", alt: "loading..."
+%h1= format_endpoint_name(@endpoint)
+%p= @endpoint.route_description
+%h2 Resource URL
+%p= api_url + @endpoint.route_path
+%h2 Parameters
+%table.table.api-params
+  %tbody
+    - @endpoint.route_params.each do |name, options|
+      %tr
+        %th
+          = name
+          - if options[:required]
+            %small required
+          - else
+            %small optional
+        %td
+          %p= options[:desc]
+          %p
+            %b> Type
+            \:
+            = options[:type]
+- if @example_request_uri
+  %h2 Example Request
+  %p
+    %span= @endpoint.route_method
+    %code#example_request_uri= @example_request_uri
+  %pre
+    %code
+      #example_request_loading= image_tag "loading.gif", alt: "loading..."

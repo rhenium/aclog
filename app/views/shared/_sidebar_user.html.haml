@@ -1,0 +1,36 @@
+.sidebar
+  %p
+    %img.icon.img-rounded{alt: user.screen_name, src: user.profile_image_url_original, height: 64, width: 64}
+  %p= "@" + user.screen_name
+  %p
+    %a.aclogicon.aclogicon-twitter{href: user.twitter_url}
+  - if user.registered?
+    %ul.records
+      %li
+        %span Reactions
+        %span.data= user.stats.reactions_count
+      %li
+        %span Average
+        %span.data= user.stats.average_reactions_count.round(2)
+      %li
+        %span Joined
+        %span.data
+          = user.stats.since_join
+          %span> d ago
+  - else
+    .alert.alert-aclog @#{user.screen_name} は aclog に登録していません
+  - _show_thresholds = ["timeline", "discoveries", "discovored_by"].include?(params[:action])
+  .sidebar-list{class: _show_thresholds ? "row" : ""}
+    .list-group{class: _show_thresholds ? "col-xs-6 col-sm-12" : ""}
+      - if authorized_to_show_user_best?(user)
+        = link_to_with_active "Best", user_path(user.screen_name), class: "list-group-item"
+        = link_to_with_active "Timeline", user_timeline_path(user.screen_name), class: "list-group-item"
+      - else
+        = link_to_with_active "Timeline", user_path(user.screen_name), class: "list-group-item"
+      = link_to_with_active "Discoveries", user_discoveries_path(user.screen_name), class: "list-group-item"
+      - if authorized_to_show_user_best?(user)
+        = link_to_with_active "Discovered by", user_discovered_by_path(user.screen_name), class: "list-group-item"
+        = link_to_with_active "Discovered users", user_discovered_users_path(user.screen_name), class: "list-group-item"
+    - if _show_thresholds
+      .list-group.col-xs-6.col-sm-12
+        = render "shared/_sidebar_thresholds", counts: [1, 3, 10, 30, 50, 100]

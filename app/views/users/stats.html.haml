@@ -1,6 +1,4 @@
 - title "Stats"
-- caption :title
-- sidebar :users
 .avatar
   = image_tag @user.profile_image_url_original, alt: @user.screen_name, width: 128, height: 128
 - if @user.registered? && @user.account.active?
@@ -9,6 +7,6 @@
     %dt Received reactions
     %dd= @user.stats.reactions_count
     %dt Registered
-    %dd= format_time @user.account.created_at
+    %dd= @user.account.created_at
     %dt Last update
-    %dd= format_time @user.stats.updated_at
+    %dd= @user.stats.updated_at

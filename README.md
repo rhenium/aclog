@@ -3,7 +3,8 @@ Collects favs and retweets in real time by UserStreams.
 
 ## Aclog is
 * powered by Ruby on Rails
-* completely free and open source (The MIT License)
+* completely free and open source ([The MIT License](https://github.com/rhenium/aclog/blob/master/LICENSE.txt))
+* designed by rot (@rot2048)
 
 ## Status
 * *unstable*
@@ -16,7 +17,6 @@ Collects favs and retweets in real time by UserStreams.
 * Atom feed
 
 ### Not yet / will be implemented
-* New UI
 * Import tweets from Favstar / Favotter / tweets.zip / ..
 
 ## Requirements

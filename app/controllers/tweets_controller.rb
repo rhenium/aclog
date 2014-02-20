@@ -94,20 +94,13 @@ class TweetsController < ApplicationController
     if params[:page]
       paginate_with_page_number(tweets)
     else
-      tweets = tweets.limit(params_count).max_id(params[:max_id]).since_id(params[:since_id])
-      if tweets.length > 0
-        @prev_url = url_for(params.tap {|h| h.delete(:max_id) }.merge(since_id: tweets.first.id))
-        @next_url = url_for(params.tap {|h| h.delete(:since_id) }.merge(max_id: tweets.last.id - 1))
-      end
-      tweets
+      tweets.limit(params_count).max_id(params[:max_id]).since_id(params[:since_id])
     end
   end
 
   def paginate_with_page_number(tweets)
-    page = (params[:page] || 1).to_i
-    @prev_url = page == 1 ? nil : url_for(params.merge(page: page - 1))
-    @next_url = url_for(params.merge(page: page + 1))
-    tweets.limit(params_count).page(page)
+    @page = (params[:page] || 1).to_i
+    tweets.limit(params_count).page(@page)
   end
 
   def params_count
@@ -115,6 +108,18 @@ class TweetsController < ApplicationController
   end
 
   def render(*args)
+    if @tweets
+      if @page
+        @prev_url = @page == 1 ? nil : url_for(params.merge(page: @page - 1))
+        @next_url = url_for(params.merge(page: @page + 1))
+      else
+        if @tweets.length > 0
+          @prev_url = url_for(params.tap {|h| h.delete(:max_id) }.merge(since_id: @tweets.first.id))
+          @next_url = url_for(params.tap {|h| h.delete(:since_id) }.merge(max_id: @tweets.last.id - 1))
+        end
+      end
+    end
+
     if @tweets && request.xhr?
       super(json: { html: render_to_string(partial: "tweet", collection: @tweets, as: :tweet, formats: :html),
                     next_url: @next_url,

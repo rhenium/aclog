@@ -26,14 +26,14 @@ Aclog::Application.routes.draw do
 
   # User pages
   scope "/:screen_name" do
-    get "/" =>                                  "tweets#index",                     as: "user"
-    get "/best" =>                              "tweets#best",                      as: "user_best"
-    get "/recent" =>                            "tweets#recent",                    as: "user_recent"
-    get "/timeline" =>                          "tweets#timeline",                  as: "user_timeline"
-    get "/discoveries" =>                       "tweets#discoveries",               as: "user_discoveries"
-    get "/favorites" =>                         "tweets#favorites",                 as: "user_favorites"
-    get "/retweets" =>                          "tweets#retweets",                  as: "user_retweets"
-    get "/discovered_by/:screen_name_b" =>      "tweets#discovered_by",             as: "user_discovered_by_user"
+    get "/" =>                                  "tweets#user_index",                as: "user"
+    get "/best" =>                              "tweets#user_best",                 as: "user_best"
+    get "/recent" =>                            "tweets#user_recent",               as: "user_recent"
+    get "/timeline" =>                          "tweets#user_timeline",             as: "user_timeline"
+    get "/discoveries" =>                       "tweets#user_discoveries",          as: "user_discoveries"
+    get "/favorites" =>                         "tweets#user_favorites",            as: "user_favorites"
+    get "/retweets" =>                          "tweets#user_retweets",             as: "user_retweets"
+    get "/discovered_by/:screen_name_b" =>      "tweets#user_discovered_by",        as: "user_discovered_by_user"
 
     get "/discovered_by" =>                     "users#discovered_by",              as: "user_discovered_by"
     get "/discovered_users" =>                  "users#discovered_users",           as: "user_discovered_users"

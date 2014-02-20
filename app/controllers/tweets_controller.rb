@@ -1,14 +1,4 @@
 class TweetsController < ApplicationController
-  def index
-    begin
-      best
-      render :best
-    rescue Aclog::Exceptions::AccountPrivate
-      timeline
-      render :timeline
-    end
-  end
-
   def show
     @tweet = Tweet.find(params[:id])
     @user = @tweet.user
@@ -17,45 +7,55 @@ class TweetsController < ApplicationController
     @replies_after = @tweet.reply_descendants(2)
   end
 
-  def best
+  def user_index
+    begin
+      user_best
+      render :user_best
+    rescue Aclog::Exceptions::AccountPrivate
+      user_timeline
+      render :user_timeline
+    end
+  end
+
+  def user_best
     @user = require_user
     authorize_to_show_user! @user
     authorize_to_show_user_best! @user
     @tweets = paginate_with_page_number(@user.tweets.reacted.order_by_reactions)
   end
 
-  def recent
+  def user_recent
     @user = require_user
     authorize_to_show_user! @user
     authorize_to_show_user_best! @user
     @tweets = paginate_with_page_number(@user.tweets.reacted.recent.order_by_reactions)
   end
 
-  def timeline
+  def user_timeline
     @user = require_user
     authorize_to_show_user! @user
     @tweets = paginate(@user.tweets.reacted(params[:reactions]).order_by_id)
   end
 
-  def discoveries
+  def user_discoveries
     @user = require_user
     authorize_to_show_user! @user
     @tweets = paginate(Tweet).discovered_by(@user).order_by_id
   end
 
-  def favorites
+  def user_favorites
     @user = require_user
     authorize_to_show_user! @user
     @tweets = paginate(Tweet).favorited_by(@user).order_by_id
   end
 
-  def retweets
+  def user_retweets
     @user = require_user
     authorize_to_show_user! @user
     @tweets = paginate(Tweet).retweeted_by(@user).order_by_id
   end
 
-  def discovered_by
+  def user_discovered_by
     @user = require_user
     authorize_to_show_user! @user
     @source_user = User.find(id: params[:user_id_b], screen_name: params[:screen_name_b])

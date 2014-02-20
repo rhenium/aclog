@@ -7,6 +7,7 @@
             content: $("#content"),
             link: $("link[rel=next]"),
             onStart: function() { },
+            onReceived: function(obj) { },
             onComplete: function() { }
         };
         opts = $.extend({}, defaults, _opts);
@@ -18,7 +19,9 @@
                 opts.onStart();
                 loading = true;
                 $.getJSON(opts.link.attr("href"), function(json, status) {
-                    opts.content.append(json.html);
+                    var obj = $(json.html)
+                    opts.onReceived(obj);
+                    opts.content.append(obj);
                     opts.link.attr("href", json.next_url);
                     loading = false;
                     opts.onComplete();

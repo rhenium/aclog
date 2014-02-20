@@ -1,7 +1,4 @@
 = render layout: "layouts/base" do
-  .row
-    .col-sm-3
-      .sidebar= yield :sidebar
-    .col-sm-9
-      %h1= yield :caption
+  .container
+    .row
       = yield

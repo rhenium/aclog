@@ -48,28 +48,28 @@ class ApiDeprecated < Grape::API
       end
     end
 
-    desc "Deprecated. Use GET tweets/user_best"
+    desc "Deprecated. Use GET tweets/user_best", deprecated: true
     params_user[]
     params_pagination[]
     get "best", rabl: "tweets" do
       @tweets = paginate user.tweets.reacted.order_by_reactions
     end
 
-    desc "Deprecated. Use GET tweets/user_timeline"
+    desc "Deprecated. Use GET tweets/user_timeline", deprecated: true
     params_user[]
     params_pagination_with_ids[]
     get "timeline", rabl: "tweets" do
       @tweets = paginate_with_ids user.tweets.reacted.order_by_id
     end
 
-    desc "Deprecated. Use GET tweets/user_discoveries"
+    desc "Deprecated. Use GET tweets/user_discoveries", deprecated: true
     params_user[]
     params_pagination_with_ids[]
     get "discoveries", rabl: "tweets" do
       @tweets = paginate_with_ids(Tweet).discovered_by(user).order_by_id
     end
 
-    desc "Deprecated. Use GET tweets/user_discovered_by"
+    desc "Deprecated. Use GET tweets/user_discovered_by", deprecated: true
     params_user[]
     params_user_b[]
     params_pagination_with_ids[]

@@ -1,0 +1,14 @@
+= render layout: "layouts/base" do
+  .container
+    .row
+      .col-sm-3.sidebar
+        %h1 aclog API
+        .sidebar-list
+          .list-group.list-group-scroll
+            = link_to_with_active "Index", about_api_path, class: "list-group-item"
+            - @routes.values.inject(:merge).each do |namespace, endpoints|
+              %span.list-group-head= namespace.titleize
+              - endpoints.select {|_, e| !e.route_nodoc }.each do |path, endpoint|
+                = link_to_with_active format_endpoint_name(endpoint), about_api_endpoint_path(endpoint.route_method.downcase, namespace, path), class: "list-group-item"
+      .col-sm-9
+        = yield

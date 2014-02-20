@@ -20,7 +20,6 @@ Aclog::Application.routes.draw do
   get "/i/timeline" =>                          "tweets#all_timeline",              as: "timeline"
   get "/i/filter" =>                            "tweets#filter",                    as: "filter"
 
-  get "/about" =>                               "about#about",                      as: "about"
   get "/about/api" =>                           "apidocs#index",                    as: "about_api"
   get "/about/api/:method/:namespace/:path" =>  "apidocs#endpoint",                 as: "about_api_endpoint", constraints: { namespace: /[\w\/]+/ }
 

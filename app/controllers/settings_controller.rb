@@ -1,6 +1,5 @@
 class SettingsController < ApplicationController
   before_action :set_account
-  layout "index"
 
   def index
   end

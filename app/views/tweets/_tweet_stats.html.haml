@@ -1,26 +1,26 @@
-- if authorized_to_show_user? tweet.user
-  .stats
-    %dl
-      - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
-        - if count > 0
+.status-responses
+  - [["Favs", tweet.favorites_count, tweet.favoriters], ["RTs", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
+    - if count > 0
+      - if authorized_to_show_user?(tweet.user)
+        %dl
           %dt
             = link_to tweet_path(tweet.id, full: true) do
-              %span.count= count
-              %span.type= title
-          %dd
-            %ul.list-inline
+              %span>= count
+              = title
+          %dd{class: params[:action] != "show" ? "timeline" : ""}
+            %ul
               - users.limit(favorites_truncate_count).each do |m|
                 %li
-                  - if !m.protected? || session[:user_id] == m.id || session[:user_id] == tweet.user_id
-                    = link_to user_path(m.screen_name) do
-                      = image_tag m.profile_image_url, alt: "@#{m.screen_name}", title: "#{m.name} (@#{m.screen_name})"
+                  - if !m.protected? || (logged_in? && (m.id == current_user.id || tweet.user.id == current_user.id))
+                    %a{href: user_path(m.screen_name), title: "#{m.name} (@#{m.screen_name})"}
+                      %img{alt: "@" + m.screen_name, src: m.profile_image_url}
                   - else
-                    = image_tag "missing_profile_image.png", alt: "protected", title: "protected user"
-- else
-  .stats
-    %dl
-      - [["favs", tweet.favorites_count, tweet.favoriters], ["retweets", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
-        - if count > 0
+                    %a{href: "#", title: "Protected User"}
+                      %img{alt: "Protected User", src: image_path("protected_profile_image.png")}
+      - else
+        %dl
           %dt
-            %span.count= count
-            %span.type= title
+            = link_to "#" do
+              %span>= count
+              = title
+          %dd{class: params[:action] != "show" ? "timeline" : ""}

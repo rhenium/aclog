@@ -1,4 +1,9 @@
 - title "Top Recent Tweets"
-- caption :title
-- sidebar :i
-= render @tweets
+.col-sm-3.col-md-offset-1
+  = render "shared/sidebar_all"
+.col-sm-9.col-md-7.col-lg-6
+  %h1
+    Recent Best Tweets
+    %small of All
+  .statuses= render @tweets
+  %p.loading= image_tag "loading.gif", width: 16, height: 16, alt: "Loading..."

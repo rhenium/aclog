@@ -1,9 +1,54 @@
 - title "aclog"
-.index.text-center
-  %h1
-    aclog
-    - if Rails.env.development?
-      %span.text-error (dev)
+.front-hero
+  .container
+    %p
+      %img{alt: "aclog", src: image_path("logo.png"), height: 200, width: 200}
+    %h1 aclog
+    %p
+      %a.twitter-share-button{href: "https://twitter.com/share", data: { count: "none", lang: "en" }} ツイート
+.front-feature
+  .container
+    .row
+      .col-sm-6.col-sm-push-6
+        %img{alt: "Collect activities", src: image_path("feature_1.png"), height: 200, width: 400}
+      .col-sm-6.col-sm-pull-6
+        %h1 Collect Activities
+        %p aclogに一度サインアップするだけで、ツイート、お気に入り、リツイートをリアルタイムで自動収集。
+.front-feature-right
+  .container
+    .row
+      .col-sm-6
+        %img{alt: "Discover topics easily", src: image_path("feature_2.png"), height: 200, width: 400}
+      .col-sm-6
+        %h1 Discover Topics
+        %p aclogの見やすいUIで、話題のツイートを発見できます。自分のツイートがどれくらい話題になっているかも一目瞭然。
+.front-feature
+  .container
+    .row
+      .col-sm-6.col-sm-push-6
+        %img{alt: "Protected account is OK", src: image_path("feature_3.png"), height: 200, width: 400}
+      .col-sm-6.col-sm-pull-6
+        %h1 Protected User Available
+        %p Twitterで非公開設定にしている方でもご利用いただけます。ツイートは自分とフォロワーしか見られないので安心です。
+.front-feature-misc
+  .container
+    .row
+      .col-sm-3
+        %h1 Notification
+        %p 一定数のふぁぼ&amp;RTが集まると、通知アカウントがリプライで通知します。もちろん無効にすることもできます。
+      .col-sm-3
+        %h1 RSS Feeds
+        %p RSSを配信しているので、今日のベストツイートを購読できます。
+      .col-sm-3
+        %h1 aclog API
+        %p
+          JSONな aclog API を用意。
+          = link_to "APIドキュメント", about_api_path
+          をご覧下さい。
+      .col-sm-3
+        %h1 OSS
+        %p aclog は MIT License のオープンソース・サービスです。
+.front-footer
   %p
-    = link_to "Tweet", "https://twitter.com/share", class: "twitter-share-button", data: {text: "aclog - Twitter ふぁぼられ収集サービス", count: "none", url: "http://aclog.koba789.com/"}
-
+    /%a.aclogicon.aclogicon-twitter{href: "https://twitter.com/aclog3"}
+    %a.aclogicon.aclogicon-github{href: "https://github.com/rhenium/aclog"}

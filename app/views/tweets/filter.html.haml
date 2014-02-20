@@ -1,10 +1,11 @@
 - title "Filter"
-- caption :title
-- sidebar :i
-.search
-  = form_tag({}, method: "get", class: "form-inline") do
-    = field_set_tag do
-      = text_field_tag :q, params[:q]
-      = submit_tag "filter", class: "btn", name: nil
-= render @tweets
-
+.col-sm-3.col-md-offset-1
+  = render "shared/sidebar_all"
+.col-sm-9.col-md-7.col-lg-6
+  .search
+    = form_tag({}, method: "get", class: "form-inline") do
+      = field_set_tag do
+        = text_field_tag :q, params[:q]
+        = submit_tag "filter", class: "btn", name: nil
+  .statuses= render @tweets
+  %p.loading= image_tag "loading.gif", width: 16, height: 16, alt: "Loading..."

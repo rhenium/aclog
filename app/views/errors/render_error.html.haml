@@ -1,4 +1,11 @@
 - title "Error"
-- sidebar @user ? :users : :i
-.lead
-  = @message
+- if @user
+  .col-sm-3.col-md-offset-1
+    = render "shared/sidebar_user", user: @user
+  .col-sm-9.col-md-7.col-lg-6.error-page
+    %h1= response.status
+    %p= @message
+- else
+  .container.error-page
+    %h1= response.status
+    %p= @message

@@ -1,5 +1,9 @@
-- title "Newest"
-- caption :title
-- sidebar :i
-= render "timeline_thresholds", counts: [1, 10, 50, 100, 500, 1000]
-= render @tweets
+- title "Timeline of All"
+.col-sm-3.col-md-offset-1
+  = render "shared/sidebar_all"
+.col-sm-9.col-md-7.col-lg-6
+  %h1
+    Timeline
+    %small of All
+  .statuses= render @tweets
+  %p.loading= image_tag "loading.gif", width: 16, height: 16, alt: "Loading..."

@@ -7,28 +7,19 @@ class ErrorsController < ApplicationController
 
     case @exception
     when OAuth::Unauthorized
-      # /i/callback
+      # only /i/callback: when Cancel pressed on Twitter's OAuth
       redirect_to root_path
-    when Aclog::Exceptions::LoginRequired
+    when Aclog::Exceptions::LoginRequired,
+         Aclog::Exceptions::UserProtected,
+         Aclog::Exceptions::AccountPrivate
       @status = 403
-      @message = t("error.login_required")
-    when Aclog::Exceptions::OAuthEchoUnauthorized
-      @status = 401
-      @message = t("error.oauth_echo_unauthorized")
+      @message = t("error.forbidden")
     when ActionController::RoutingError,
          ActiveRecord::RecordNotFound,
-         ActionView::MissingTemplate
+         ActionView::MissingTemplate,
+         Aclog::Exceptions::UserNotRegistered
       @status = 404
-      @message = t("error.routing_error")
-    when Aclog::Exceptions::UserNotRegistered
-      @status = 404
-      @message = t("error.user_not_registered")
-    when Aclog::Exceptions::UserProtected
-      @status = 403
-      @message = t("error.user_protected")
-    when Aclog::Exceptions::AccountPrivate
-      @status = 403
-      @message = t("error.account_private")
+      @message = t("error.not_found")
     else
       @status = 500
       @message = "#{t("error.internal_error")}: #{@exception.class}"

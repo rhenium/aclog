@@ -1,4 +1,9 @@
 - title @user.screen_name + "'s Discoveries"
-- caption :title
-- sidebar :users
-= render @tweets
+.col-sm-3.col-md-offset-1
+  = render "shared/sidebar_user", user: @user
+.col-sm-9.col-md-7.col-lg-6
+  %h1
+    %small #{@user.screen_name} 's
+    Discoveries
+  .statuses= render @tweets
+  %p.loading= image_tag "loading.gif", width: 16, height: 16, alt: "Loading..."

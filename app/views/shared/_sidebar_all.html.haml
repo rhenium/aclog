@@ -1,0 +1,11 @@
+.sidebar
+  %h1 All
+  - _show_thresholds = ["all_timeline"].include?(params[:action])
+  .sidebar-list{class: _show_thresholds ? "row" : ""}
+    .list-group{class: _show_thresholds ? "col-xs-6 col-sm-12" : ""}
+      = link_to_with_active "Best", best_path, class: "list-group-item"
+      = link_to_with_active "Recent", recent_path, class: "list-group-item"
+      = link_to_with_active "Timeline", timeline_path, class: "list-group-item"
+    - if _show_thresholds
+      .list-group.col-xs-6.col-sm-12
+        = render "shared/_sidebar_thresholds", counts: [1, 10, 50, 100, 500, 1000]

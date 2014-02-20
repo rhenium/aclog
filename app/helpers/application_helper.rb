@@ -7,20 +7,12 @@ module ApplicationHelper
     end
   end
 
-  def caption(text)
-    content_for :caption do
-      if text.is_a? Symbol
-        content_for(text)
-      else
-        text
-      end
+  def link_to_with_active(name, options = {}, html_options = {}, &block)
+    if current_page?(options)
+      html_options[:class] = (html_options[:class].to_s + " active").strip
     end
-  end
 
-  def sidebar(name)
-    content_for :sidebar do
-      render "shared/sidebar/#{name}"
-    end
+    link_to name, options, html_options, &block
   end
 
   # utf8, form

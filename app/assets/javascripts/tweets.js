@@ -1,25 +1,31 @@
-//= require _html-autoload
-$(function() {
-    var format_tweet = function() {
-        $("time").each(
-            function() {
-                $(this).text(new Date($(this).attr("datetime"))
-                             .toLocaleString())
-            });
-    };
+Application.tweets = {
+    _: function() {
+        if ($("#statuses")) {
+            var format_tweet = function(d) {
+                $("time", d).each(
+                    function() {
+                        $(this).text(new Date($(this).attr("datetime"))
+                                     .toLocaleString());
+                    });
+            };
+            format_tweet($(".statuses"));
 
-    $.autopager({
-        content: $(".tweets"),
-        link: $("link[rel=next]"),
-        onStart: function() {
-            $(".loading").show();
-        },
-        onComplete: function() {
-            $(".loading").hide();
-            format_tweet();
+            if ($("link[rel=next]")) {
+                $.autopager({
+                    content: $(".statuses"),
+                    link: $("link[rel=next]"),
+                    onStart: function() {
+                        $(".loading").show();
+                    },
+                    onReceived: function(obj) {
+                        format_tweet(obj);
+                    },
+                    onComplete: function() {
+                        $(".loading").hide();
+                    }
+                });
+            }
         }
-    });
-
-    format_tweet();
-});
+    }
+};
 

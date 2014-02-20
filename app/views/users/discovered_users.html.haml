@@ -1,14 +1,15 @@
 - title @user.screen_name + " is Discovering ..."
-- caption :title
-- sidebar :users
-.users
-  %ul.list-inline
-    - @result.each do |user_id, *counts|
-      - user = @cached_users[user_id]
-      %li
-        .avatar
-          = link_to user_path(user.screen_name) do
-            = image_tag user.profile_image_url, alt: user.screen_name, title: user.name
-        .data
-          .count
-            = link_to counts.sum, user_discovered_by_user_path(screen_name: user.screen_name, screen_name_b: @user.screen_name)
+.col-sm-3.col-md-offset-1
+  = render "shared/sidebar_user", user: @user
+.col-sm-9.col-md-7.col-lg-6
+  %h1
+    %small #{@user.screen_name} is
+    Discovering ...
+  .users
+    %ul.user-list
+      - @result.each do |user_id, *counts|
+        - user = @cached_users[user_id]
+        %li
+          %a{href: user_discovered_by_user_path(screen_name: user.screen_name, screen_name_b: @user.screen_name), title: "#{user.name} (@#{user.screen_name})"}
+            = image_tag user.profile_image_url, alt: "@" + user.screen_name
+            %span= counts.sum

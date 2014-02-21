@@ -28,9 +28,11 @@ class Tweet < ActiveRecord::Base
     load_count = all.limit_value.to_i + all.offset_value.to_i
     load_count = nil if load_count == 0
 
-    un = [:favorites, :retweets].map {|m| joins(m).where(m => { user: user }).order(id: :desc).limit(load_count).to_sql }.map {|m| "(#{m})" }.join(" UNION ")
+    un = [:favorites, :retweets].map {|m|
+      user.__send__(m).select(:tweet_id).order(tweet_id: :desc).limit(load_count)
+    }.map {|m| "(#{m.to_sql})" }.join(" UNION ")
 
-    from("(#{un}) AS tweets")
+    joins("INNER JOIN ((#{un})) reactions ON reactions.tweet_id = tweets.id")
   }
 
   def twitter_url

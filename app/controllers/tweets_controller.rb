@@ -40,7 +40,7 @@ class TweetsController < ApplicationController
   def user_discoveries
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate(Tweet).discovered_by(@user).order_by_id
+    @tweets = paginate_with_page_number(Tweet).discovered_by(@user).order_by_id
   end
 
   def user_discovered_by
@@ -48,7 +48,7 @@ class TweetsController < ApplicationController
     authorize_to_show_user! @user
     @source_user = User.find(id: params[:source_user_id], screen_name: params[:source_screen_name])
     authorize_to_show_user! @source_user
-    @tweets = paginate(@user.tweets).discovered_by(@source_user).order_by_id
+    @tweets = paginate_with_page_number(@user.tweets).discovered_by(@source_user).order_by_id
   end
 
   def all_best
@@ -96,15 +96,13 @@ class TweetsController < ApplicationController
   end
 
   def render(*args)
-    if @tweets
+    if @tweets && @tweets.length > 0
       if @page
         @prev_url = @page == 1 ? nil : url_for(params.merge(page: @page - 1))
         @next_url = url_for(params.merge(page: @page + 1))
       else
-        if @tweets.length > 0
-          @prev_url = url_for(params.tap {|h| h.delete(:max_id) }.merge(since_id: @tweets.first.id))
-          @next_url = url_for(params.tap {|h| h.delete(:since_id) }.merge(max_id: @tweets.last.id - 1))
-        end
+        @prev_url = url_for(params.tap {|h| h.delete(:max_id) }.merge(since_id: @tweets.first.id))
+        @next_url = url_for(params.tap {|h| h.delete(:since_id) }.merge(max_id: @tweets.last.id - 1))
       end
     end
 

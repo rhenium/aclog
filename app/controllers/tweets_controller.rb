@@ -43,22 +43,10 @@ class TweetsController < ApplicationController
     @tweets = paginate(Tweet).discovered_by(@user).order_by_id
   end
 
-  def user_favorites
-    @user = require_user
-    authorize_to_show_user! @user
-    @tweets = paginate(Tweet).favorited_by(@user).order_by_id
-  end
-
-  def user_retweets
-    @user = require_user
-    authorize_to_show_user! @user
-    @tweets = paginate(Tweet).retweeted_by(@user).order_by_id
-  end
-
   def user_discovered_by
     @user = require_user
     authorize_to_show_user! @user
-    @source_user = User.find(id: params[:user_id_b], screen_name: params[:screen_name_b])
+    @source_user = User.find(id: params[:source_user_id], screen_name: params[:source_screen_name])
     authorize_to_show_user! @source_user
     @tweets = paginate(@user.tweets).discovered_by(@source_user).order_by_id
   end

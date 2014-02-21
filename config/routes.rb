@@ -32,7 +32,7 @@ Aclog::Application.routes.draw do
     get "/discoveries" =>                       "tweets#user_discoveries",          as: "user_discoveries"
     get "/favorites" =>                         "tweets#user_favorites",            as: "user_favorites"
     get "/retweets" =>                          "tweets#user_retweets",             as: "user_retweets"
-    get "/discovered_by/:screen_name_b" =>      "tweets#user_discovered_by",        as: "user_discovered_by_user"
+    get "/discovered_by/:source_screen_name" => "tweets#user_discovered_by",        as: "user_discovered_by_user"
 
     get "/discovered_by" =>                     "users#discovered_by",              as: "user_discovered_by"
     get "/discovered_users" =>                  "users#discovered_users",           as: "user_discovered_users"

@@ -1,6 +1,6 @@
 atom_feed do |feed|
   feed.title yield :title
-  feed.subtitle yield :caption
+  feed.subtitle yield :title
   feed.updated DateTime.now
 
   @tweets.each do |tweet|

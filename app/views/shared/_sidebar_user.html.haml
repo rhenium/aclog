@@ -19,7 +19,7 @@
           %span> d ago
   - else
     .alert.alert-aclog @#{user.screen_name} は aclog に登録していません
-  - _show_thresholds = ["timeline", "discoveries", "discovored_by"].include?(params[:action])
+  - _show_thresholds = ["user_timeline", "user_discoveries", "user_discovored_by"].include?(params[:action])
   .sidebar-list{class: _show_thresholds ? "row" : ""}
     .list-group{class: _show_thresholds ? "col-xs-6 col-sm-12" : ""}
       - if authorized_to_show_user_best?(user)

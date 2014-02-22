@@ -1,25 +1,25 @@
 - if authorized_to_show_user? tweet.user
   .status-tweet
-    %a.status-user{href: user_path(tweet.user_screen_name), title: "#{tweet.user_name} (@#{tweet.user_screen_name})"}
-      = image_tag tweet.user_profile_image_url, alt: "@" + tweet.user_screen_name, height: 48, width: 48
+    %a.status-user{href: user_path(tweet.user_screen_name), title: "#{tweet.user_name} (@#{tweet.user_screen_name})"}<
+      %img{alt: "@" + tweet.user_screen_name, src: tweet.user_profile_image_url}
     .status-content
       .status-head
         %a.user{href: user_path(tweet.user_screen_name)}
           %span= tweet.user_name
           %span= "@" + tweet.user_screen_name
-        %span.time
-          %a{href: tweet_path(tweet), title: "このツイートの詳細を見る"}
+        %span.time<
+          %a{href: tweet_path(tweet), title: "このツイートの詳細を見る"}<
             %time{datetime: tweet.tweeted_at.to_datetime.rfc3339}= tweet.tweeted_at
           %a.source.aclogicon.aclogicon-twitter{href: tweet.twitter_url, title: "Twitter で見る"}
       %p.status-text= format_tweet_text tweet.text
       .status-foot
         = link_to_source_text(tweet.source, class: "source")
         %ul
-          %li
+          %li<
             %a.aclogicon.aclogicon-fav{href: "https://twitter.com/intent/favorite?tweet_id=#{tweet.id}", title: "お気に入り登録"}
-          %li
+          %li<
             %a.aclogicon.aclogicon-retweet{href: "https://twitter.com/intent/retweet?tweet_id=#{tweet.id}", title: "リツイート"}
-          %li
+          %li<
             %a.aclogicon.aclogicon-reply{href: "https://twitter.com/intent/tweet?in_reply_to=#{tweet.id}", title: "返信"}
 - else
   .status-tweet

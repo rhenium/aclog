@@ -8,7 +8,7 @@
     %link{rel: "apple-touch-icon-precomposed", href: image_path("apple-touch-icon-precomposed.png")}
     %meta{name: "msapplication-TileImage", content: image_path("tile-image.png")}
     %meta{name: "msapplication-TileColor", content: "#f0eadb"}
-    = stylesheet_link_tag "application", media: "all"
+    = stylesheet_link_tag "application", media: nil
     = javascript_include_tag "application"
     - if @next_url
       %link{rel: "next", href: @next_url}
@@ -21,48 +21,37 @@
           = link_to "aclog", root_path, class: "navbar-brand"
         %ul.nav.navbar-nav.navbar-right
           %li.dropdown.omittable
-            %a.dropdown-toggle{href: "#", data: { toggle: "dropdown" }}
+            %a.dropdown-toggle{href: "#", data: { toggle: "dropdown" }}<
               All
-              %b.caret
+              %span.caret/
             %ul.dropdown-menu
-              %li
-                = link_to "Best", best_path
-              %li
-                = link_to "Recent", recent_path
-              %li
-                = link_to "Timeline", timeline_path
+              %li= link_to "Best", best_path
+              %li= link_to "Recent", recent_path
+              %li= link_to "Timeline", timeline_path
           %li.dropdown.omittable
-            %a.dropdown-toggle#jump_to_dropdown_toggle{href: "#", data: { toggle: "dropdown" }}
+            %a.dropdown-toggle#jump_to_dropdown_toggle{href: "#", data: { toggle: "dropdown" }}<
               User
-              %b.caret
+              %span.caret/
             %form.dropdown-menu#jump_to_form
               .input-group
-                %input.form-control{id: "jump_to_textbox", type: "text", placeholder: "Username"}
+                %input.form-control#jump_to_textbox{type: "text", placeholder: "Username"}
                 %span.input-group-btn
                   %button.btn{type: "submit"} Go
           - if logged_in?
             %li.dropdown
-              %a.dropdown-toggle{href: "#", data: { toggle: "dropdown" }}
-                %img{src: current_user.profile_image_url, alt: "@" + current_user.screen_name, height: "24", width: "24"}
-                %b.caret
+              %a.dropdown-toggle{href: "#", data: { toggle: "dropdown" }}<
+                %img{src: current_user.profile_image_url_mini, alt: "@" + current_user.screen_name, height: "24", width: "24"}
+                %span.caret/
               %ul.dropdown-menu
-                %li
-                  = link_to "Best", user_path(current_user.screen_name)
-                %li
-                  = link_to "Timeline", user_timeline_path(current_user.screen_name)
-                %li
-                  = link_to "Discoveries", user_discoveries_path(current_user.screen_name)
-                %li
-                  = link_to "Discovered by", user_discovered_by_path(current_user.screen_name)
-                %li
-                  = link_to "Discovered users", user_discovered_users_path(current_user.screen_name)
+                %li= link_to "Best", user_path(current_user.screen_name)
+                %li= link_to "Timeline", user_timeline_path(current_user.screen_name)
+                %li= link_to "Discoveries", user_discoveries_path(current_user.screen_name)
+                %li= link_to "Discovered by", user_discovered_by_path(current_user.screen_name)
+                %li= link_to "Discovered users", user_discovered_users_path(current_user.screen_name)
                 %li.divider
-                %li
-                  = link_to "Setting", settings_path
-                %li
-                  = link_to "API", about_api_path
-                %li
-                  = link_to "Sign out", logout_path
+                %li= link_to "Setting", settings_path
+                %li= link_to "API", about_api_path
+                %li= link_to "Sign out", logout_path
           - else
             %li= link_to "Sign in", "/i/login?redirect_after_login=" + CGI.escape(request.fullpath), method: :post, class: "signup"
     = yield

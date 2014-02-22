@@ -53,32 +53,6 @@ describe ApplicationController do
         end
       end
     end
-
-    context "when using OAuth Echo" do
-      before { request.headers["X-Verify-Credentials-Authorization"] = true }
-
-      it "as the user" do
-        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user.id)
-        subject.should be true
-      end
-
-      it "as the user's follower" do
-        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user_b.id)
-        Account.any_instance.stub(:following?).and_return(true)
-        subject.should be true
-      end
-
-      it "not as the user's follower" do
-        controller.stub(:authenticate_with_twitter_oauth_echo).and_return(user_b.id)
-        Account.any_instance.stub(:following?).and_return(false)
-        subject.should be false
-      end
-
-      it "but failed in verification" do
-        controller.stub(:authenticate_with_twitter_oauth_echo).and_raise(Aclog::Exceptions::OAuthEchoUnauthorized)
-        subject.should be false
-      end
-    end
   end
 
   describe "#authorized_to_show_user_best?" do

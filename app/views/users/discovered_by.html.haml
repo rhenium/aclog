@@ -1,10 +1,10 @@
-- title @user.screen_name + " is Discovered by ..."
+- title "@#{@user.screen_name} is Discovered By ..."
 .col-sm-3.col-md-offset-1
   = render "shared/sidebar_user", user: @user
 .col-sm-9.col-md-7.col-lg-6
   %h1
     %small #{@user.screen_name} is
-    Discovered by ...
+    Discovered By ...
   .users
     %ul.user-list
       - @result.each do |user_id, *counts|

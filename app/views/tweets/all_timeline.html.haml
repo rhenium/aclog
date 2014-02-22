@@ -1,9 +1,8 @@
-- title "Timeline of All"
+- title "Public Timeline"
 .col-sm-3.col-md-offset-1
-  = render "shared/sidebar_all"
+  = render "shared/sidebar_all", thresholds: [1, 10, 50, 100, 500, 1000]
 .col-sm-9.col-md-7.col-lg-6
   %h1
-    Timeline
-    %small of All
+    Public Timeline
   .statuses= render @tweets
   %p.loading= image_tag "loading.gif", width: 16, height: 16, alt: "Loading..."

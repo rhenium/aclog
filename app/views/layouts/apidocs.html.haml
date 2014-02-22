@@ -5,7 +5,6 @@
         %h1 aclog API
         .sidebar-list
           .list-group.list-group-scroll
-            = link_to_with_active "Index", about_api_path, class: "list-group-item"
             - @routes.values.inject(:merge).each do |namespace, endpoints|
               %span.list-group-head= namespace.titleize
               - endpoints.select {|_, e| !e.route_nodoc }.each do |path, endpoint|

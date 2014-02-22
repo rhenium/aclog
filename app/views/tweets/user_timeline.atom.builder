@@ -1,3 +1,3 @@
-title @user.screen_name + "'s Newest"
+title "@#{@user.screen_name}'s Timeline"
 xml << render("tweets")
 

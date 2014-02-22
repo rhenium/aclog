@@ -1,3 +1,3 @@
-title "Newest"
+title "Public Timeline"
 xml << render("tweets")
 

@@ -40,7 +40,7 @@ class TweetsController < ApplicationController
   def user_discoveries
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate_with_page_number(Tweet).discovered_by(@user).order_by_id
+    @tweets = paginate_with_page_number(Tweet).reacted(params[:reactions]).discovered_by(@user).order_by_id
   end
 
   def user_discovered_by
@@ -48,7 +48,7 @@ class TweetsController < ApplicationController
     authorize_to_show_user! @user
     @source_user = User.find(id: params[:source_user_id], screen_name: params[:source_screen_name])
     authorize_to_show_user! @source_user
-    @tweets = paginate_with_page_number(@user.tweets).discovered_by(@source_user).order_by_id
+    @tweets = paginate_with_page_number(@user.tweets).reacted(params[:reactions]).discovered_by(@source_user).order_by_id
   end
 
   def all_best

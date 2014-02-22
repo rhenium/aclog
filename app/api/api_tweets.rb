@@ -96,16 +96,18 @@ class ApiTweets < Grape::API
     desc "Returns the Tweets which a user specified by username or user ID discovered.", example_params: { user_id: 120726371, count: 2 }
     params_user[]
     params_pagination[]
+    params_threshold[]
     get "user_discoveries", rabl: "tweets" do
-      @tweets = paginate_with_ids(Tweet).discovered_by(user).order_by_id
+      @tweets = paginate_with_ids(Tweet).reacted(params[:reactions]).discovered_by(user).order_by_id
     end
 
     desc "Returns the specified user's Tweets which another specified user discovered.", example_params: { user_id: 120726371, count: 2, source_screen_name: "cn" }
     params_user[]
     params_source_user[]
     params_pagination[]
+    params_threshold[]
     get "user_discovered_by", rabl: "tweets" do
-      @tweets = paginate_with_ids(user.tweets).discovered_by(source_user).order_by_id
+      @tweets = paginate_with_ids(user.tweets).reacted(params[:reactions]).discovered_by(source_user).order_by_id
     end
   end
 end

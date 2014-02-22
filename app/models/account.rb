@@ -20,6 +20,10 @@ class Account < ActiveRecord::Base
     account
   end
 
+  def self.random
+    self.active.order("RAND()").first
+  end
+
   def deactivate!
     self.status = Account::INACTIVE
     self.save! if self.changed?
@@ -40,11 +44,6 @@ class Account < ActiveRecord::Base
                                           consumer_secret: Settings.consumer.secret,
                                           oauth_token: oauth_token,
                                           oauth_token_secret: oauth_token_secret)
-  end
-
-  def import(id)
-    obj = client.status(id)
-    Tweet.from_twitter_object(obj)
   end
 
   def following?(target_id)

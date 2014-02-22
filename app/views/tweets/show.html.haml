@@ -9,3 +9,6 @@
     = render partial: "tweet_reply", collection: @replies_before, as: :tweet
     = render @tweet
     = render partial: "tweet_reply", collection: @replies_after, as: :tweet
+  %p.refresh<
+    %a{href: import_path(@tweet.id), title: "Refresh tweet"}<
+      %span.glyphicon.glyphicon-refresh/

@@ -101,6 +101,27 @@ class Tweet < ActiveRecord::Base
     end
   end
 
+  def self.import(id, account = nil)
+    account ||= Account.random
+
+    tweet = self.from_twitter_object(account.client.status(id))
+
+    begin
+      nt = tweet
+      while !nt.in_reply_to && nt.in_reply_to_id
+        nt = self.from_twitter_object(account.client.status(nt.in_reply_to_id))
+      end
+    rescue Twitter::Error
+      Rails.logger.warn($!)
+      return tweet
+    end
+
+    tweet.reload
+  rescue Twitter::Error
+    Rails.logger.warn($!)
+    return nil
+  end
+
   def self.filter_by_query(query)
     strings = []
     query.gsub!(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; "##{strings.size - 1}" }

@@ -1,6 +1,6 @@
 class TweetsController < ApplicationController
   def show
-    @tweet = Tweet.find(params[:id])
+    @tweet = Tweet.find(params[:id]) || Tweet.import(params[:id], current_user.account)
     @user = @tweet.user
     authorize_to_show_user! @user
     @replies_before = @tweet.reply_ancestors(2)
@@ -68,8 +68,7 @@ class TweetsController < ApplicationController
   end
 
   def import
-    raise Aclog::Exceptions::LoginRequired unless logged_in?
-    tweet = current_user.account.import(params[:id])
+    tweet = Tweet.import(params[:id], current_user.account)
     redirect_to tweet
   end
 

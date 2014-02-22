@@ -42,8 +42,8 @@ class Account < ActiveRecord::Base
   def client
     @client ||= Twitter::REST::Client.new(consumer_key: Settings.consumer.key,
                                           consumer_secret: Settings.consumer.secret,
-                                          oauth_token: oauth_token,
-                                          oauth_token_secret: oauth_token_secret)
+                                          access_token: oauth_token,
+                                          access_token_secret: oauth_token_secret)
   end
 
   def following?(target_id)

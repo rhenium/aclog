@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   has_many :tweets, dependent: :delete_all
   has_many :favorites, dependent: :delete_all
   has_many :retweets, dependent: :delete_all
+  has_one :account
 
   def twitter_url
     "https://twitter.com/#{self.screen_name}"
@@ -58,8 +59,8 @@ class User < ActiveRecord::Base
     !user.protected? || user.id == self.id || self.account.try(:following?, user.id) || false
   end
 
-  def account
-    Account.where(user_id: id).first
+  def profile_image_url_mini
+    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_mini\\1")
   end
 
   def profile_image_url_original

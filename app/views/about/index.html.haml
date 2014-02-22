@@ -1,15 +1,15 @@
 - title "aclog"
 .front-hero
   .container
-    %p
+    %p<
       %img{alt: "aclog", src: image_path("logo.png"), height: 200, width: 200}
     %h1 aclog
-    %p
+    %p<
       %a.twitter-share-button{href: "https://twitter.com/share", data: { count: "none", lang: "en" }} ツイート
 .front-feature
   .container
     .row
-      .col-sm-6.col-sm-push-6
+      .col-sm-6.col-sm-push-6<
         %img{alt: "Collect activities", src: image_path("feature_1.png"), height: 200, width: 400}
       .col-sm-6.col-sm-pull-6
         %h1 Collect Activities
@@ -17,7 +17,7 @@
 .front-feature-right
   .container
     .row
-      .col-sm-6
+      .col-sm-6<
         %img{alt: "Discover topics easily", src: image_path("feature_2.png"), height: 200, width: 400}
       .col-sm-6
         %h1 Discover Topics
@@ -25,7 +25,7 @@
 .front-feature
   .container
     .row
-      .col-sm-6.col-sm-push-6
+      .col-sm-6.col-sm-push-6<
         %img{alt: "Protected account is OK", src: image_path("feature_3.png"), height: 200, width: 400}
       .col-sm-6.col-sm-pull-6
         %h1 Protected User Available
@@ -43,12 +43,12 @@
         %h1 aclog API
         %p
           JSON 形式の API を用意。
-          = link_to "API ドキュメント", about_api_path
+          %a{href: about_api_path}>< API ドキュメント
           をご覧下さい。
       .col-sm-3
         %h1 OSS
         %p aclog は The MIT License のオープンソース・サービスです。
 .front-footer
   %p
-    /%a.aclogicon.aclogicon-twitter{href: "https://twitter.com/aclog3"}
+    %a.aclogicon.aclogicon-twitter{href: "https://twitter.com/aclog_service"}
     %a.aclogicon.aclogicon-github{href: "https://github.com/rhenium/aclog"}

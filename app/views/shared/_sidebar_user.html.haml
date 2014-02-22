@@ -1,20 +1,20 @@
 .sidebar
-  %p
+  %p<
     %img.icon.img-rounded{alt: user.screen_name, src: user.profile_image_url_original, height: 64, width: 64}
   %p= "@" + user.screen_name
-  %p
+  %p<
     %a.aclogicon.aclogicon-twitter{href: user.twitter_url}
   - if user.registered?
     %ul.records
-      %li
-        %span Reactions
-        %span.data= user.stats.reactions_count
-      %li
-        %span Average
-        %span.data= user.stats.average_reactions_count.round(2)
-      %li
-        %span Joined
-        %span.data
+      %li<
+        %span> Reactions
+        %span.data>= user.stats.reactions_count
+      %li<
+        %span> Average
+        %span.data>= user.stats.average_reactions_count.round(2)
+      %li<
+        %span> Joined
+        %span.data>
           = user.stats.since_join
           %span> d ago
   - else

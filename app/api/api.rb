@@ -1,6 +1,4 @@
 class Api < Grape::API
-  extend TwitterOauthEchoAuthentication
-
   format :json
   formatter :json, Grape::Formatter::Rabl
   error_formatter :json, ->(message, backtrace, options, env) do
@@ -19,15 +17,18 @@ class Api < Grape::API
 
   rescue_from :all
 
+  helpers TwitterOauthEchoAuthentication
+
   helpers do
     def current_user
       @_current_user ||= begin
-        if request.headers["X-Verify-Credentials-Authorization"]
+        if headers["X-Verify-Credentials-Authorization"]
           user_id = authenticate_with_twitter_oauth_echo
           User.find(user_id)
         end
       end
     rescue
+      p $!
       raise Aclog::Exceptions::OAuthEchoError
     end
 

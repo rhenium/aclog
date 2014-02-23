@@ -4,8 +4,8 @@ module TwitterOauthEchoAuthentication
   def authenticate_with_twitter_oauth_echo
     twitter_provider = "https://api.twitter.com/1.1/account/verify_credentials.json"
 
-    provider = request.headers["X-Auth-Service-Provider"]
-    credentials = request.headers["X-Verify-Credentials-Authorization"]
+    provider = headers["X-Auth-Service-Provider"]
+    credentials = headers["X-Verify-Credentials-Authorization"]
     unless provider == twitter_provider && credentials
       raise Aclog::Exceptions::OAuthEchoUnauthorized, "X-Auth-Service-Provider is invalid"
     end

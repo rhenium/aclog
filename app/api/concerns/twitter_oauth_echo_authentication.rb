@@ -15,8 +15,14 @@ module TwitterOauthEchoAuthentication
     }
 
     json["id"]
-  rescue
-    raise Aclog::Exceptions::OAuthEchoUnauthorized, $!
+  rescue Aclog::Exceptions::OAuthEchoUnauthorized
+    raise $!
+  rescue OpenURI::HTTPError
+    if $!.message.include?("401")
+      raise Aclog::Exceptions::OAuthEchoUnauthorized, $!
+    else
+      raise $!
+    end
   end
 end
 

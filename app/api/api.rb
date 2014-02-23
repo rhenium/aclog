@@ -27,9 +27,8 @@ class Api < Grape::API
           User.find(user_id)
         end
       end
-    rescue
-      p $!
-      raise Aclog::Exceptions::OAuthEchoError
+    rescue Aclog::Exceptions::OAuthEchoUnauthorized
+      raise Aclog::Exceptions::OAuthEchoError, $!
     end
 
     def permitted_to_see?(user_or_tweet)

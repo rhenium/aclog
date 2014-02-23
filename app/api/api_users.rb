@@ -23,15 +23,15 @@ class ApiUsers < Grape::API
       @user = user
     end
 
-    desc "Returns the list of the users who discovored the Tweets of a user, specified by username or user ID.", example_params: { user_id: 99008565 }
+    desc "Returns the list of the users who discovered the Tweets of a user, specified by username or user ID.", example_params: { user_id: 99008565 }
     params_user[]
-    get "discovored_by", rabl: "user_discovored_by_and_users" do
+    get "discovered_by", rabl: "user_discovered_by_and_users" do
       @result = user.count_discovered_by.take(Settings.users.count)
     end
 
-    desc "Returns the list of the users discovored by a user, specified by username or user ID.", example_params: { screen_name: "cn" }
+    desc "Returns the list of the users discovered by a user, specified by username or user ID.", example_params: { screen_name: "cn" }
     params_user[]
-    get "discovored_users", rabl: "user_discovored_by_and_users" do
+    get "discovered_users", rabl: "user_discovered_by_and_users" do
       @result = user.count_discovered_users.take(Settings.users.count)
     end
 

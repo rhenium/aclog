@@ -39,12 +39,6 @@ class Tweet < ActiveRecord::Base
     "https://twitter.com/#{self.user.screen_name}/status/#{self.id}"
   end
 
-  def notify_favorite
-    if Settings.notification.enabled
-      Notification.notify_favorite(self)
-    end
-  end
-
   def reply_ancestors(max_level = Float::INFINITY)
     nodes = []
     node = self
@@ -69,57 +63,68 @@ class Tweet < ActiveRecord::Base
     nodes.sort_by {|t| t.id }
   end
 
-  def self.from_json(json)
-    find_by(id: json[:id]) || begin
-      user = User.from_json(json[:user])
-      tweet = Tweet.new(id: json[:id],
-                        text: extract_entities(json),
-                        source: json[:source],
-                        tweeted_at: json[:created_at],
-                        in_reply_to_id: json[:in_reply_to_status_id],
-                        user: user)
-      tweet.save!
-      logger.debug("Successfully created a tweet: #{tweet.id}")
-    rescue ActiveRecord::RecordNotUnique => e
-      logger.debug("Failed to create a tweet: #{tweet}: #{e.class}")
-    rescue => e
-      logger.error("Failed to create a tweet: #{tweet}: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
-    ensure
-      return tweet
+  def self.create_from_json(json)
+    tweet = transaction do
+      self.find_by(id: json[:id]) ||
+        self.create!(id: json[:id],
+                     text: extract_entities(json),
+                     source: json[:source],
+                     tweeted_at: json[:created_at],
+                     in_reply_to_id: json[:in_reply_to_status_id],
+                     user: User.create_from_json(json[:user]))
+    end
+  rescue ActiveRecord::RecordNotUnique => e
+    logger.debug("Duplicate tweet: #{tweet}: #{e.class}")
+  rescue => e
+    logger.error("Failed to create a tweet: #{tweet}: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
+  ensure
+    return tweet
+  end
+
+  def self.create_from_twitter_object(obj)
+    t = self.create_from_json(obj.attrs)
+    t.update_reactions_count(json: obj.attrs)
+    t
+  end
+
+  def self.destroy_from_json(json)
+    deleted_count = self.delete(json[:delete][:status][:id])
+
+    if deleted_count > 0
+      Favorite.where(tweet_id: json[:delete][:status][:id]).delete_all
+      Retweet.where(tweet_id: json[:delete][:status][:id]).delete_all
+      true
+    else
+      false
     end
   end
 
-  def self.from_twitter_object(obj)
-    transaction do
-      tweet = from_json(obj.attrs)
-      favs = [obj.favorite_count, tweet.favorites_count].max
-      rts = [obj.retweet_count, tweet.retweets_count].max
-      tweet.update!(favorites_count: favs,
-                    retweets_count: rts,
-                    reactions_count: favs + rts)
-      tweet
-    end
+  def update_reactions_count(favorites_count: 0, retweets_count: 0, json: {})
+    fav_op = favorites_count >= 0 ? "+" : "-"
+    rts_op = retweets_count >= 0 ? "+" : "-"
+    Tweet.where(id: self.id)
+      .update_all("favorites_count = GREATEST(favorites_count #{fav_op} #{favorites_count.abs}, #{(json[:favorite_count] || 0).to_i}), " +
+                  "retweets_count = GREATEST(retweets_count #{rts_op} #{retweets_count.abs}, #{(json[:retweet_count] || 0).to_i}), " +
+                  "reactions_count = favorites_count + retweets_count")
   end
 
-  def self.import(id, account = nil)
-    account ||= Account.random
+  def self.import(id, client = nil)
+    client ||= Account.random.client
 
-    tweet = self.from_twitter_object(account.client.status(id))
+    st = client.status(id)
+    tweet = self.create_from_twitter_object(st)
+    tweet.update(text: extract_entities(st.attrs),
+                 source: st.attrs[:source],
+                 in_reply_to_id: st.attrs[:in_reply_to_status_id])
 
     begin
       nt = tweet
-      while !nt.in_reply_to && nt.in_reply_to_id
-        nt = self.from_twitter_object(account.client.status(nt.in_reply_to_id))
-      end
+      nt = self.create_from_twitter_object(client.status(nt.in_reply_to_id)) while !nt.in_reply_to && nt.in_reply_to_id
     rescue Twitter::Error
-      Rails.logger.warn($!)
-      return tweet
+      logger.warn($!)
     end
 
     tweet.reload
-  rescue Twitter::Error
-    Rails.logger.warn($!)
-    return nil
   end
 
   def self.filter_by_query(query)

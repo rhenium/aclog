@@ -7,8 +7,8 @@ module Aclog::Collector
     def initialize(logger)
       @logger = logger
       @clients = {}
-      @unpacker = MessagePack::Unpacker.new
-      @reconnect = true
+      @unpacker = MessagePack::Unpacker.new(symbolize_keys: true)
+      @exiting = false
     end
 
     def post_init
@@ -17,7 +17,7 @@ module Aclog::Collector
     end
 
     def unbind
-      if @reconnect
+      if !@exiting
         log(:info, "reconnecting...")
 
         EM.add_timer(10) do
@@ -29,36 +29,31 @@ module Aclog::Collector
 
     def receive_data(data)
       @unpacker.feed_each(data) do |msg|
-        unless msg.is_a?(Hash) && msg["type"]
+        unless msg.is_a?(Hash) && msg[:type]
           log(:warn, "unknown data: #{msg}")
-          @reconnect = false
-          close_connection
           return
         end
 
-        case msg["type"]
+        case msg[:type]
         when "ok"
           log(:info, "connection established")
         when "error"
           log(:error, "error: #{msg}")
         when "fatal"
           log(:fatal, "fatal: #{msg}")
-          @reconnect = false
-          close_connection
         when "account"
-          account_id = msg["id"]
+          account_id = msg[:id]
           if @clients[account_id]
             @clients[account_id].update(msg)
+            log(:info, "updated: #{account_id}")
           else
-            stream = UserStream.new(@logger, msg) do |event, data|
-              send_object(data.merge(type: event))
-            end
+            stream = UserStream.new(@logger, msg, ->(event, data) { send_object(data.merge(type: event)) })
             stream.start
             @clients[account_id] = stream
             log(:info, "registered: #{account_id}")
           end
         when "stop"
-          account_id = msg["id"]
+          account_id = msg[:id]
           client = @clients[account_id]
           if client
             client.stop
@@ -72,7 +67,7 @@ module Aclog::Collector
     end
 
     def quit
-      @reconnect = false
+      @exiting = true
       send_object(type: "quit", reason: "stop")
       @clients.values.each(&:stop)
     end

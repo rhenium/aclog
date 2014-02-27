@@ -62,30 +62,28 @@ module Aclog
           when "tweet"
             @channel << -> {
               log(:debug, "receive tweet: #{msg[:id]}")
-              Tweet.from_json(msg)
+              Tweet.create_from_json(msg)
             }
           when "favorite"
             @channel << -> {
               log(:debug, "receive favorite: #{msg[:source][:id]} => #{msg[:target_object][:id]}")
-              if f = Favorite.from_json(msg)
-                f.tweet.notify_favorite
-              end
+              f = Favorite.create_from_json(msg)
+              Notification.notify_favorites_count(f.tweet)
             }
           when "unfavorite"
             @channel << -> {
               log(:debug, "receive unfavorite: #{msg[:source][:id]} => #{msg[:target_object][:id]}")
-              Favorite.where(user_id: msg[:source][:id], tweet_id: msg[:target_object][:id]).destroy_all
+              Favorite.destroy_from_json(msg)
             }
           when "retweet"
             @channel << -> {
               log(:debug, "receive retweet: #{msg[:user][:id]} => #{msg[:retweeted_status][:id]}")
-              Retweet.from_json(msg)
+              Retweet.create_from_json(msg)
             }
           when "delete"
             @channel << -> {
-              log(:debug, "receive delete: #{msg[:id]}")
-              Tweet.where(id: msg[:id]).destroy_all
-              Retweet.where(id: msg[:id]).destroy_all
+              log(:debug, "receive delete: #{msg[:delete][:status][:id]}")
+              Tweet.destroy_from_json(msg) || Retweet.destroy_from_json(msg)
             }
           when "quit"
             log(:info, "receive quit: #{msg[:reason]}")

@@ -1,8 +1,10 @@
 class Notification
-  def self.notify_favorite(tweet)
-    if Settings.notification.favorites.include?(tweet.favorites.count)
+  def self.notify_favorites_count(tweet)
+    return unless Settings.notification.enabled
+
+    if Settings.notification.favorites.include?(tweet.favorites_count)
       if tweet.user.registered? && tweet.user.account.active? && tweet.user.account.notification?
-        reply_favs(tweet, tweet.favorites.count)
+        reply_favs(tweet, tweet.favorites_count)
       end
     end
   end
@@ -21,8 +23,8 @@ class Notification
       begin
         client = Twitter::REST::Client.new(consumer_key: Settings.notification.consumer.key,
                                            consumer_secret: Settings.notification.consumer.secret,
-                                           oauth_token: Settings.notification.accounts[cur].token,
-                                           oauth_token_secret: Settings.notification.accounts[cur].secret)
+                                           access_token: Settings.notification.accounts[cur].token,
+                                           access_token_secret: Settings.notification.accounts[cur].secret)
 
         client.update(text, in_reply_to_status_id: reply_to)
       rescue Twitter::Error::AlreadyPosted

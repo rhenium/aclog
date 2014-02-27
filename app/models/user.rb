@@ -28,7 +28,7 @@ class User < ActiveRecord::Base
     key && where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
   end
 
-  def self.from_json(json)
+  def self.create_from_json(json)
     user = where(id: json[:id]).first_or_initialize
     orig = user.attributes.dup
 

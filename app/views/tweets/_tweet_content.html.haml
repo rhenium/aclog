@@ -1,19 +1,21 @@
 - if authorized_to_show_user? tweet.user
   .status-tweet
-    %a.status-user{href: user_path(tweet.user_screen_name), title: "#{tweet.user_name} (@#{tweet.user_screen_name})"}<
-      %img{alt: "@" + tweet.user_screen_name, src: tweet.user_profile_image_url}
+    .status-user
+      %a{href: user_path(tweet.user_screen_name), title: "#{tweet.user_name} (@#{tweet.user_screen_name})"}<
+        %img{alt: "@" + tweet.user_screen_name, src: tweet.user_profile_image_url}
     .status-content
       .status-head
-        %a.user{href: user_path(tweet.user_screen_name)}
-          %span= tweet.user_name
-          %span= "@" + tweet.user_screen_name
+        %span.user<
+          %a{href: user_path(tweet.user_screen_name)}<
+            %span= tweet.user_name
+            %span= "@" + tweet.user_screen_name
         %span.time<
           %a{href: tweet_path(tweet), title: "このツイートの詳細を見る"}<
             %time{datetime: tweet.tweeted_at.to_datetime.rfc3339}= tweet.tweeted_at
           %a.source.aclogicon.aclogicon-twitter{href: tweet.twitter_url, title: "Twitter で見る"}
-      %p.status-text= format_tweet_text tweet.text
+      .status-text= format_tweet_text tweet.text
       .status-foot
-        = link_to_source_text(tweet.source, class: "source")
+        %span.source= link_to_source_text(tweet.source, rel: "nofollow")
         %ul
           %li<
             %a.aclogicon.aclogicon-fav{href: "https://twitter.com/intent/favorite?tweet_id=#{tweet.id}", title: "お気に入り登録"}
@@ -23,13 +25,12 @@
             %a.aclogicon.aclogicon-reply{href: "https://twitter.com/intent/tweet?in_reply_to=#{tweet.id}", title: "返信"}
 - else
   .status-tweet
-    %a.status-user{href: "#", title: "非公開のユーザー"}
+    .status-user{title: "非公開のユーザー"}
       = image_tag "protected_profile_image.png", alt: "非公開のユーザー", height: 48, width: 48
     .status-content
       .status-head
         %span.time
-          %a{href: "#", title: "aclogでこのツイートの詳細を見る"}
-            %time{datetime: tweet.tweeted_at.to_datetime.rfc3339}= tweet.tweeted_at
-          %a.source.aclogicon.aclogicon-twitter{href: "#", title: "Twitter公式サイトで見る"}
-      %p.status-text ユーザーはツイートを非公開にしています
+          %time{datetime: tweet.tweeted_at.to_datetime.rfc3339}= tweet.tweeted_at
+          .source.aclogicon.aclogicon-twitter
+      .status-text.protected ユーザーはツイートを非公開にしています
       .status-foot

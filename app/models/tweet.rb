@@ -1,6 +1,5 @@
 class Tweet < ActiveRecord::Base
   belongs_to :user
-  delegate :screen_name, :name, :profile_image_url, to: :user, prefix: true
 
   belongs_to :in_reply_to, class_name: "Tweet"
   has_many :replies, class_name: "Tweet", foreign_key: "in_reply_to_id"
@@ -13,7 +12,7 @@ class Tweet < ActiveRecord::Base
 
   scope :recent, ->(days = 3) { where("tweets.id > ?", snowflake_min(Time.zone.now - days.days)) }
   scope :reacted, ->(count = nil) { where("reactions_count >= ?", (count || 1).to_i) }
-  scope :not_protected, -> { includes(:user).where(users: {protected: false}) }
+  scope :not_protected, -> { includes(:user).references(:user).where(users: { protected: false }) }
 
   scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
   scope :since_id, -> id { where("tweets.id > ?", id.to_i) if id }
@@ -22,9 +21,9 @@ class Tweet < ActiveRecord::Base
   scope :order_by_id, -> { order(id: :desc) }
   scope :order_by_reactions, -> { order(reactions_count: :desc) }
 
-  scope :favorited_by, -> user { joins(:favorites).where(favorites: {user: user}) }
-  scope :retweeted_by, -> user { joins(:retweets).where(retweets: {user: user}) }
-  scope :discovered_by, -> user {
+  scope :favorited_by, ->(user) { joins(:favorites).where(favorites: { user: user }) }
+  scope :retweeted_by, ->(user) { joins(:retweets).where(retweets: { user: user }) }
+  scope :discovered_by, ->(user) {
     load_count = all.limit_value.to_i + all.offset_value.to_i
     load_count = nil if load_count == 0
 
@@ -63,6 +62,15 @@ class Tweet < ActiveRecord::Base
     nodes.sort_by {|t| t.id }
   end
 
+  def update_reactions_count(favorites_count: 0, retweets_count: 0, json: {})
+    fav_op = favorites_count >= 0 ? "+" : "-"
+    rts_op = retweets_count >= 0 ? "+" : "-"
+    Tweet.where(id: self.id)
+      .update_all("favorites_count = GREATEST(favorites_count #{fav_op} #{favorites_count.abs}, #{(json[:favorite_count] || 0).to_i}), " +
+                  "retweets_count = GREATEST(retweets_count #{rts_op} #{retweets_count.abs}, #{(json[:retweet_count] || 0).to_i}), " +
+                  "reactions_count = favorites_count + retweets_count")
+  end
+
   def self.create_from_json(json)
     tweet = transaction do
       self.find_by(id: json[:id]) ||
@@ -97,15 +105,6 @@ class Tweet < ActiveRecord::Base
     else
       false
     end
-  end
-
-  def update_reactions_count(favorites_count: 0, retweets_count: 0, json: {})
-    fav_op = favorites_count >= 0 ? "+" : "-"
-    rts_op = retweets_count >= 0 ? "+" : "-"
-    Tweet.where(id: self.id)
-      .update_all("favorites_count = GREATEST(favorites_count #{fav_op} #{favorites_count.abs}, #{(json[:favorite_count] || 0).to_i}), " +
-                  "retweets_count = GREATEST(retweets_count #{rts_op} #{retweets_count.abs}, #{(json[:retweet_count] || 0).to_i}), " +
-                  "reactions_count = favorites_count + retweets_count")
   end
 
   def self.import(id, client = nil)
@@ -164,7 +163,7 @@ class Tweet < ActiveRecord::Base
       positive ? scoped.where(where_args) : scoped.where.not(where_args)
     end
 
-    query.scan(/\S+/).inject(self.scoped) {|s, token| parse_condition.call(s, token) }
+    query.scan(/\S+/).inject(self.all) {|s, token| parse_condition.call(s, token) }
   end
 
   private
@@ -188,4 +187,3 @@ class Tweet < ActiveRecord::Base
     (time.to_datetime.to_i * 1000 - 1288834974657) << 22
   end
 end
-

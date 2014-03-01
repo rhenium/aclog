@@ -1,14 +1,14 @@
 - if authorized_to_show_user? tweet.user
   .status-tweet
     .status-user
-      %a{href: user_path(tweet.user_screen_name), title: "#{tweet.user_name} (@#{tweet.user_screen_name})"}<
-        %img{alt: "@" + tweet.user_screen_name, src: tweet.user_profile_image_url}
+      %a{href: user_path(tweet.user.screen_name), title: "#{tweet.user.name} (@#{tweet.user.screen_name})"}<
+        %img{alt: "@" + tweet.user.screen_name, src: tweet.user.profile_image_url}
     .status-content
       .status-head
         %span.user<
-          %a{href: user_path(tweet.user_screen_name)}<
-            %span= tweet.user_name
-            %span= "@" + tweet.user_screen_name
+          %a{href: user_path(tweet.user.screen_name)}<
+            %span= tweet.user.name
+            %span= "@" + tweet.user.screen_name
         %span.time<
           %a{href: tweet_path(tweet), title: "このツイートの詳細を見る"}<
             %time{datetime: tweet.tweeted_at.to_datetime.rfc3339}= tweet.tweeted_at

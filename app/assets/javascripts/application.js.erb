@@ -13,6 +13,11 @@ $(function() {
     $("#jump_to_form").on("submit", function() {
         $(this).attr("action", "/" + $("#jump_to_textbox").val());
     });
+
+    // Style: when failed to load profile image
+    $(".twitter-icon").on("error", function() {
+        $(this).attr("src", "<%= image_path("profile_image_missing.png") %>");
+    });
 });
 
 $(function() {

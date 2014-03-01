@@ -2,7 +2,7 @@
   .status-tweet
     .status-user
       %a{href: user_path(tweet.user.screen_name), title: "#{tweet.user.name} (@#{tweet.user.screen_name})"}<
-        %img{alt: "@" + tweet.user.screen_name, src: tweet.user.profile_image_url}
+        %img.twitter-icon{alt: "@" + tweet.user.screen_name, src: tweet.user.profile_image_url}
     .status-content
       .status-head
         %span.user<

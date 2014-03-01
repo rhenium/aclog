@@ -15,7 +15,7 @@
                     %a{href: user_path(m.screen_name), title: "#{m.name} (@#{m.screen_name})"}<
                       %img{alt: "@" + m.screen_name, src: m.profile_image_url}
                   - else
-                    %img{alt: "Protected User", src: image_path("protected_profile_image.png")}
+                    %img{alt: "Protected User", src: image_path("profile_image_protected.png")}
       - else
         %dl
           %dt

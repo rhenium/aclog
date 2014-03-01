@@ -11,7 +11,7 @@
         %span.data>= user.stats.reactions_count
       %li<
         %span> Average
-        %span.data>= user.stats.average_reactions_count.round(2)
+        %span.data>= "%.2f" % user.stats.average_reactions_count
       %li<
         %span> Joined
         %span.data>

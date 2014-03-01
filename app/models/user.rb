@@ -52,7 +52,7 @@ class User < ActiveRecord::Base
   end
 
   def registered?
-    !!account
+    !!account && account.active?
   end
 
   def permitted_to_see?(user)

@@ -21,11 +21,14 @@ class ApplicationController < ActionController::Base
   end
 
   def authorized_to_show_user?(user)
-    !user.protected? || (logged_in? && current_user.permitted_to_see?(user))
+    !user.protected? ||
+      (logged_in? && current_user.permitted_to_see?(user))
   end
 
   def authorized_to_show_user_best?(user)
-    (!user.private? || current_user == user) && authorized_to_show_user?(user)
+    user.registered? &&
+      (!user.private? || current_user == user) &&
+        authorized_to_show_user?(user)
   end
 
   def authorize_to_show_user!(user)

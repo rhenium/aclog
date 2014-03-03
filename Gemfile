@@ -22,9 +22,9 @@ gem "em-work_queue"
 gem "pry-rails"
 
 group :production do
-  gem "unicorn"
-  gem "unicorn-worker-killer"
+  gem "puma"
   gem "dalli"
+  gem "connection_pool"
 end
 
 group :development do

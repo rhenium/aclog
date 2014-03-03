@@ -20,4 +20,3 @@ case "$1" in
         echo "usage: $0 {start|stop|restart|status}"
         exit 1
 esac
-

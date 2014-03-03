@@ -14,7 +14,7 @@ error () {
     exit 1
 }
 
-puma_start="bundle exec -d -e $RAILS_ENV -C $RAILS_ROOT/config/puma.rb --pidfile $PID"
+puma_start="bundle exec puma -d -e $RAILS_ENV -C $RAILS_ROOT/config/puma.rb --pidfile $PID"
 
 case "$1" in
     start)

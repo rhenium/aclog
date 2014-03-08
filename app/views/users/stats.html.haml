@@ -1,6 +1,6 @@
 - title "@#{@user.screen_name}'s Stats"
 .avatar
-  = image_tag @user.profile_image_url_original, alt: @user.screen_name, width: 128, height: 128, class: "twitter-icon"
+  = profile_image_tag @user, :original
 - if @user.registered? && @user.account.active?
   %p records
   %dl.dl-horizontal

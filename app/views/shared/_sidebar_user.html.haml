@@ -1,6 +1,6 @@
 .sidebar
   %p<
-    %img.twitter-icon.img-rounded{alt: user.screen_name, src: user.profile_image_url_original, height: 64, width: 64}
+    = profile_image_tag user, :original, class: "img-rounded", width: 64, height: 64
   %p= "@" + user.screen_name
   %p<
     %a.aclogicon.aclogicon-twitter{href: user.twitter_url}

@@ -658,6 +658,11 @@ ul.records li:after {
     width: 48px;
 }
 
+.status-user img {
+    width: 48px;
+    height: 48px;
+}
+
 .status-head {
     margin-left: 68px;
 }
@@ -897,13 +902,14 @@ ul.user-list li {
     display: inline-block;
 }
 
-ul.user-list img,
-ul.user-list span {
-    display: block;
+ul.user-list img {
+    width: 48px;
+    height: 48px;
     margin-bottom: 5px;
 }
 
 ul.user-list span {
+    display: block;
     margin-bottom: 0;
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 }

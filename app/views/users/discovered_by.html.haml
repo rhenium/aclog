@@ -11,5 +11,5 @@
         - user = @cached_users[user_id]
         %li
           %a{href: user_discovered_by_user_path(screen_name: @user.screen_name, source_screen_name: user.screen_name), title: "#{user.name} (@#{user.screen_name})"}
-            %img.twitter-icon{alt: "@" + user.screen_name, src: user.profile_image_url}
+            = profile_image_tag user
             %span= counts.sum

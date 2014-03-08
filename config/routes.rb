@@ -7,6 +7,8 @@ Aclog::Application.routes.draw do
   get "/i/callback" =>                          "sessions#create"
   get "/i/logout" =>                            "sessions#destroy",                 as: "logout"
 
+  get "/i/user_jump_suggest" =>                 "users#user_jump_suggest",          as: "user_jump_suggest"
+
   get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
   get "/i/:id/import" =>                        "tweets#import",                    as: "import", constraints: { id: /\d+/ }
 

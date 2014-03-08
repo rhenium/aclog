@@ -32,11 +32,13 @@
             %a.dropdown-toggle#jump_to_dropdown_toggle{href: "#", data: { toggle: "dropdown" }}<
               User
               %span.caret/
-            %form.dropdown-menu#jump_to_form
-              .input-group
-                %input.form-control#jump_to_textbox{type: "text", placeholder: "Username"}
-                %span.input-group-btn
-                  %button.btn{type: "submit"} Go
+            %ul.dropdown-menu#jump_to_user
+              %li
+                %form#jump_to_form{autocomplete: "off"}
+                  .input-group
+                    %input.form-control#jump_to_textbox{type: "text", placeholder: "Username"}
+                    %span.input-group-btn
+                      %button.btn{type: "submit"} Go
           - if logged_in?
             %li.dropdown
               %a.dropdown-toggle{href: "#", data: { toggle: "dropdown" }}<

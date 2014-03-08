@@ -10,6 +10,22 @@ $(function() {
     $("#jump_to_dropdown_toggle").click(function() {
         setTimeout(function() { $("#jump_to_textbox").focus(); }, 0);
     });
+    var previous_jump_to_text;
+    $("#jump_to_textbox").on("keyup", function() {
+        var p = $("#jump_to_user");
+        if ($(this).val() != previous_jump_to_text) {
+            previous_jump_to_text = $(this).val();
+            $("#jump_to_user .jump_to_user_suggestion").remove();
+            if ($(this).val().length > 0) {
+                $.getJSON("/i/user_jump_suggest.json", { head: $(this).val() }, function(json) {
+                    json.forEach(function(s) {
+                        p.append($("<li />").addClass("jump_to_user_suggestion")
+                            .append($("<a />").attr("href", "/" + s).text("@" + s)));
+                    });
+                });
+            }
+        }
+    });
     $("#jump_to_form").on("submit", function() {
         $(this).attr("action", "/" + $("#jump_to_textbox").val());
     });

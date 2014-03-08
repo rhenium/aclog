@@ -190,12 +190,12 @@ pre {
     background-color: #777;
 }
 
-.navbar-nav .open form.dropdown-menu {
+.navbar-nav .open .dropdown-menu form {
     min-width: 240px;
     padding: 15px;
 }
 
-.navbar-nav .open form.dropdown-menu input {
+.navbar-nav .open .dropdown-menu form input {
     color: #ccc;
     background-color: #222;
     border: none;
@@ -255,7 +255,7 @@ pre {
     box-shadow: inset 0 3px 5px rgba(0,0,0,0.125);
 }
 
-.navbar-nav .open form.dropdown-menu .btn {
+.navbar-nav .open .dropdown-menu form .btn {
     padding-left: 12px;
     padding-right: 12px;
 }

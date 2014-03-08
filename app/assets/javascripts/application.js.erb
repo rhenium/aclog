@@ -20,7 +20,9 @@ $(function() {
                 $.getJSON("/i/user_jump_suggest.json", { head: $(this).val() }, function(json) {
                     json.forEach(function(s) {
                         p.append($("<li />").addClass("jump_to_user_suggestion")
-                            .append($("<a />").attr("href", "/" + s).text("@" + s)));
+                            .append($("<a />").attr("href", "/" + s.screen_name).attr("title", s.name + " (@" + s.screen_name + ")")
+                                .append($("<img />").addClass("twitter-icon").attr("src", s.profile_image_url).attr("alt", "@" + s.screen_name))
+                                .append($("<span />").text("@" + s.screen_name))));
                     });
                 });
             }

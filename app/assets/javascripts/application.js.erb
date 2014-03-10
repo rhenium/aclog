@@ -10,18 +10,18 @@ $(function() {
     $("#jump_to_dropdown_toggle").click(function() {
         setTimeout(function() { $("#jump_to_textbox").focus(); }, 0);
     });
+
     var previous_jump_to_text;
     $("#jump_to_textbox").on("keyup", function() {
-        var p = $("#jump_to_user");
         if ($(this).val() != previous_jump_to_text) {
             previous_jump_to_text = $(this).val();
             $("#jump_to_user .jump_to_user_suggestion").remove();
             if ($(this).val().length > 0) {
                 $.getJSON("/i/user_jump_suggest.json", { head: $(this).val() }, function(json) {
                     json.forEach(function(s) {
-                        p.append($("<li />").addClass("jump_to_user_suggestion")
+                        $("#jump_to_user").append($("<li />").addClass("jump_to_user_suggestion")
                             .append($("<a />").attr("href", "/" + s.screen_name).attr("title", s.name + " (@" + s.screen_name + ")")
-                                .append($("<img />").addClass("twitter-icon").attr("src", s.profile_image_url).attr("alt", "@" + s.screen_name))
+                                .append($("<img />").addClass("twitter-icon").attr("src", s.profile_image_url).attr("alt", "@" + s.screen_name).attr("onerror", "this.src = '<%= image_path("profile_image_missing.png") %>'"))
                                 .append($("<span />").text("@" + s.screen_name))));
                     });
                 });

@@ -18,7 +18,8 @@ class UsersController < ApplicationController
   end
 
   def user_jump_suggest
-    users = User.where("screen_name LIKE ?", "#{params[:head].to_s.delete("%_")}%").order(screen_name: :asc).limit(10)
+    q = params[:head].to_s.gsub(/(_|%)/) {|x| "\\" + x }
+    users = User.where("screen_name LIKE ?", "#{q}%").order(screen_name: :asc).limit(10)
     filtered = users.map {|user| { name: user.name, screen_name: user.screen_name, profile_image_url: user.profile_image_url_mini } }
     render json: filtered
   end

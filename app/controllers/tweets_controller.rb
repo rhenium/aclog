@@ -52,11 +52,11 @@ class TweetsController < ApplicationController
   end
 
   def all_best
-    @tweets = paginate_with_page_number(Tweet.reacted.order_by_reactions)
+    @tweets = paginate_with_page_number(Tweet.not_protected.registered.reacted.order_by_reactions)
   end
 
   def all_recent
-    @tweets = paginate_with_page_number(Tweet.recent.reacted.order_by_reactions)
+    @tweets = paginate_with_page_number(Tweet.not_protected.registered.recent.reacted.order_by_reactions)
   end
 
   def all_timeline
@@ -64,7 +64,7 @@ class TweetsController < ApplicationController
   end
 
   def filter
-    @tweets = paginate(Tweet.reacted.recent(7).filter_by_query(params[:q].to_s).not_protected.order_by_id)
+    @tweets = paginate(Tweet.reacted.recent(7).filter_by_query(params[:q].to_s).order_by_id)
   end
 
   def import

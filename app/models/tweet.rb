@@ -13,6 +13,7 @@ class Tweet < ActiveRecord::Base
   scope :recent, ->(days = 3) { where("tweets.id > ?", snowflake_min(Time.zone.now - days.days)) }
   scope :reacted, ->(count = nil) { where("reactions_count >= ?", (count || 1).to_i) }
   scope :not_protected, -> { includes(:user).references(:user).where(users: { protected: false }) }
+  scope :registered, -> { joins(user: :account).references(:account).where(accounts: { status: Account::ACTIVE }) }
 
   scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
   scope :since_id, -> id { where("tweets.id > ?", id.to_i) if id }

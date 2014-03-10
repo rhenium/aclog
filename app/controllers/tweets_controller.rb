@@ -7,6 +7,15 @@ class TweetsController < ApplicationController
     @replies_after = @tweet.reply_descendants(2)
   end
 
+  def import
+    if logged_in?
+      tweet = Tweet.import(params[:id], current_user.account.client)
+    else
+      tweet = Tweet.import(params[:id])
+    end
+    redirect_to tweet
+  end
+
   def user_index
     begin
       user_best
@@ -21,26 +30,26 @@ class TweetsController < ApplicationController
     @user = require_user
     authorize_to_show_user! @user
     authorize_to_show_user_best! @user
-    @tweets = paginate_with_page_number(@user.tweets.reacted.order_by_reactions)
+    @tweets = paginate_with_page_number(@user.tweets.reacted.order_by_reactions).eager_load_for_html
   end
 
   def user_recent
     @user = require_user
     authorize_to_show_user! @user
     authorize_to_show_user_best! @user
-    @tweets = paginate_with_page_number(@user.tweets.reacted.recent.order_by_reactions)
+    @tweets = paginate_with_page_number(@user.tweets.reacted.recent.order_by_reactions).eager_load_for_html
   end
 
   def user_timeline
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate(@user.tweets.reacted(params[:reactions]).order_by_id)
+    @tweets = paginate(@user.tweets.reacted(params[:reactions]).order_by_id).eager_load_for_html
   end
 
   def user_discoveries
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate_with_page_number(Tweet).reacted(params[:reactions]).discovered_by(@user).order_by_id
+    @tweets = paginate_with_page_number(Tweet).reacted(params[:reactions]).discovered_by(@user).order_by_id.eager_load_for_html
   end
 
   def user_discovered_by
@@ -48,32 +57,23 @@ class TweetsController < ApplicationController
     authorize_to_show_user! @user
     @source_user = User.find(id: params[:source_user_id], screen_name: params[:source_screen_name])
     authorize_to_show_user! @source_user
-    @tweets = paginate_with_page_number(@user.tweets).reacted(params[:reactions]).discovered_by(@source_user).order_by_id
+    @tweets = paginate_with_page_number(@user.tweets).reacted(params[:reactions]).discovered_by(@source_user).order_by_id.eager_load_for_html
   end
 
   def all_best
-    @tweets = paginate_with_page_number(Tweet.not_protected.registered.reacted.order_by_reactions)
+    @tweets = paginate_with_page_number(Tweet.not_protected.registered.reacted.order_by_reactions).eager_load_for_html
   end
 
   def all_recent
-    @tweets = paginate_with_page_number(Tweet.not_protected.registered.recent.reacted.order_by_reactions)
+    @tweets = paginate_with_page_number(Tweet.not_protected.registered.recent.reacted.order_by_reactions).eager_load_for_html
   end
 
   def all_timeline
-    @tweets = paginate(Tweet.reacted(params[:reactions]).order_by_id)
+    @tweets = paginate(Tweet.reacted(params[:reactions]).order_by_id).eager_load_for_html
   end
 
   def filter
-    @tweets = paginate(Tweet.reacted.recent(7).filter_by_query(params[:q].to_s).order_by_id)
-  end
-
-  def import
-    if logged_in?
-      tweet = Tweet.import(params[:id], current_user.account.client)
-    else
-      tweet = Tweet.import(params[:id])
-    end
-    redirect_to tweet
+    @tweets = paginate(Tweet.reacted.recent(7).filter_by_query(params[:q].to_s).order_by_id).eager_load_for_html
   end
 
   private

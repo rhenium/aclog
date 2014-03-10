@@ -12,7 +12,7 @@ class Tweet < ActiveRecord::Base
 
   scope :recent, ->(days = 3) { where("tweets.id > ?", snowflake_min(Time.zone.now - days.days)) }
   scope :reacted, ->(count = nil) { where("reactions_count >= ?", (count || 1).to_i) }
-  scope :not_protected, -> { includes(:user).references(:user).where(users: { protected: false }) }
+  scope :not_protected, -> { joins(:user).references(:user).where(users: { protected: false }) }
   scope :registered, -> { joins(user: :account).references(:account).where(accounts: { status: Account::ACTIVE }) }
 
   scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
@@ -125,6 +125,10 @@ class Tweet < ActiveRecord::Base
     end
 
     tweet.reload
+  end
+
+  def self.eager_load_for_html
+    self.includes(:user).preload(:favoriters, :retweeters)
   end
 
   def self.filter_by_query(query)

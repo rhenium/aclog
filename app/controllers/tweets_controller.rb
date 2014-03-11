@@ -1,8 +1,12 @@
 class TweetsController < ApplicationController
   def show
-    @tweet = Tweet.find(params[:id]) || Tweet.import(params[:id], current_user.account)
-    @user = @tweet.user
-    authorize_to_show_user! @user
+    @tweet = Tweet.find_by(id: params[:id])
+    if @tweet
+      @user = @tweet.user
+      authorize_to_show_user! @user
+    else
+      import
+    end
   end
 
   def import

@@ -7,10 +7,10 @@ class Tweet < ActiveRecord::Base
   has_many :favorites, -> { order("favorites.id") }, dependent: :delete_all
   has_many :retweets, -> { order("retweets.id") }, dependent: :delete_all
 
-  has_many :favoriters, ->  {order("favorites.id") }, through: :favorites, source: :user
+  has_many :favoriters, ->  { order("favorites.id") }, through: :favorites, source: :user
   has_many :retweeters, -> { order("retweets.id") }, through: :retweets, source: :user
 
-  scope :recent, ->(days = 3) { where("tweets.id > ?", snowflake_min(Time.zone.now - days.days)) }
+  scope :recent, ->(period = 3.days) { where("tweets.id > ?", snowflake_min(Time.zone.now - period)) }
   scope :reacted, ->(count = nil) { where("reactions_count >= ?", (count || 1).to_i) }
   scope :not_protected, -> { joins(:user).references(:user).where(users: { protected: false }) }
   scope :registered, -> { joins(user: :account).references(:account).where(accounts: { status: Account::ACTIVE }) }
@@ -128,7 +128,7 @@ class Tweet < ActiveRecord::Base
   end
 
   def self.eager_load_for_html
-    self.includes(:user).preload(:favoriters, :retweeters)
+    self.eager_load(:user)
   end
 
   def self.filter_by_query(query)

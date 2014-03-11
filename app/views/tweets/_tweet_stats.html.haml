@@ -9,7 +9,7 @@
               = title
           %dd{class: params[:action] != "show" ? "timeline" : ""}
             %ul
-              - users.each do |m|
+              - users.limit(favorites_truncate_count).each do |m|
                 %li<
                   - if !m.protected? || (logged_in? && (m.id == current_user.id || tweet.user.id == current_user.id))
                     %a{href: user_path(m.screen_name), title: "#{m.name} (@#{m.screen_name})"}<

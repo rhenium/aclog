@@ -96,7 +96,7 @@ class TweetsController < ApplicationController
 
   def paginate_with_page_number(tweets)
     @page = (params[:page] || 1).to_i
-    tweets.limit(params_count).page(@page)
+    tweets.page(@page, params_count)
   end
 
   def params_count

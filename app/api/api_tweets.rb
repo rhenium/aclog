@@ -52,7 +52,7 @@ class ApiTweets < Grape::API
 
       def paginate(tweets)
         count = [(params[:count] || Settings.tweets.count.default).to_i, Settings.tweets.count.max].min
-        tweets.limit(count).page((params[:page] || 1).to_i)
+        tweets.page((params[:page] || 1).to_i, count)
       end
 
       def paginate_with_ids(tweets)

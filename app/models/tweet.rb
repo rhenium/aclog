@@ -17,7 +17,7 @@ class Tweet < ActiveRecord::Base
 
   scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
   scope :since_id, -> id { where("tweets.id > ?", id.to_i) if id }
-  scope :page, ->(page) { offset((page - 1) * all.limit_value) }
+  scope :page, ->(page, page_per) { limit(page_per).offset((page - 1) * page_per) }
 
   scope :order_by_id, -> { order(id: :desc) }
   scope :order_by_reactions, -> { order(reactions_count: :desc) }

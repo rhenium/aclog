@@ -3,8 +3,6 @@ class TweetsController < ApplicationController
     @tweet = Tweet.find(params[:id]) || Tweet.import(params[:id], current_user.account)
     @user = @tweet.user
     authorize_to_show_user! @user
-    @replies_before = @tweet.reply_ancestors(2)
-    @replies_after = @tweet.reply_descendants(2)
   end
 
   def import

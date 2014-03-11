@@ -7,7 +7,7 @@ module TwitterOauthEchoAuthentication
     provider = headers["X-Auth-Service-Provider"]
     credentials = headers["X-Verify-Credentials-Authorization"]
     unless provider == twitter_provider && credentials
-      raise Aclog::Exceptions::OAuthEchoUnauthorized, "X-Auth-Service-Provider is invalid"
+      raise Aclog::Exceptions::OAuthEchoError, "X-Auth-Service-Provider is invalid"
     end
 
     json = open(twitter_provider, "Authorization" => credentials) {|res|
@@ -15,7 +15,7 @@ module TwitterOauthEchoAuthentication
     }
 
     json["id"]
-  rescue Aclog::Exceptions::OAuthEchoUnauthorized
+  rescue Aclog::Exceptions::OAuthEchoError
     raise $!
   rescue OpenURI::HTTPError
     if $!.message.include?("401")

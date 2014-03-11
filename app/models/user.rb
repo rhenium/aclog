@@ -68,7 +68,7 @@ class User < ActiveRecord::Base
   end
 
   def stats
-    raise Aclog::Exceptions::UserNotRegistered.new(self) unless registered? && account.active?
+    raise(Aclog::Exceptions::UserNotRegistered, self) unless registered? && account.active?
 
     Rails.cache.fetch("stats/#{self.id}", expires_in: 3.hours) do
       reactions_count = tweets.sum(:reactions_count)

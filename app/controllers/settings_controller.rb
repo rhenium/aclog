@@ -21,6 +21,6 @@ class SettingsController < ApplicationController
   private
   def set_account
     @account = logged_in? && current_user.account
-    raise Aclog::Exceptions::LoginRequired unless @account
+    redirect_to "/i/login" unless @account
   end
 end

@@ -5,13 +5,13 @@ class Api < Grape::API
     { error: { message: message } }.to_json
   end
 
-  rescue_from ActiveRecord::RecordNotFound, Aclog::Exceptions::NotFound do
+  rescue_from ActiveRecord::RecordNotFound, Aclog::Exceptions::NotFound, rescue_subclasses: true do
     error_response message: "That page does not exists.", status: 404
   end
-  rescue_from Aclog::Exceptions::Forbidden do
+  rescue_from Aclog::Exceptions::Forbidden, rescue_subclasses: true do
     error_response message: "You do not have permission to access this page.", status: 403
   end
-  rescue_from Aclog::Exceptions::OAuthEchoError do
+  rescue_from Aclog::Exceptions::OAuthEchoError, rescue_subclasses: true do
     error_response message: "Invalid OAuth Echo data.", status: 401
   end
 
@@ -27,8 +27,6 @@ class Api < Grape::API
           User.find(user_id)
         end
       end
-    rescue Aclog::Exceptions::OAuthEchoUnauthorized
-      raise Aclog::Exceptions::OAuthEchoError, $!
     end
 
     def permitted_to_see?(user_or_tweet)

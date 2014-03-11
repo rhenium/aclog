@@ -39,14 +39,14 @@ class ApiTweets < Grape::API
       def user
         @_user ||= begin
           user = User.find(id: params[:user_id], screen_name: params[:screen_name])
-          raise Aclog::Exceptions::Forbidden unless permitted_to_see?(user)
+          raise Aclog::Exceptions::UserProtected unless permitted_to_see?(user)
           user
         end
       end
 
       def source_user
         user = User.find(id: params[:source_user_id], screen_name: params[:source_screen_name])
-        raise Aclog::Exceptions::Forbidden unless permitted_to_see?(user)
+        raise Aclog::Exceptions::UserProtected unless permitted_to_see?(user)
         user
       end
 
@@ -66,7 +66,7 @@ class ApiTweets < Grape::API
     end
     get "show", rabl: "tweet" do
       @tweet = Tweet.find(params[:id])
-      raise Aclog::Exceptions::Forbidden unless permitted_to_see?(@tweet)
+      raise Aclog::Exceptions::UserProtected unless permitted_to_see?(@tweet)
     end
 
     desc "Returns Tweets, specified by comma-separated IDs.", example_params: { ids: "43341783446466560,50220624609685505" }

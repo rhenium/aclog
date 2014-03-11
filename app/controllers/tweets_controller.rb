@@ -19,10 +19,13 @@ class TweetsController < ApplicationController
   end
 
   def user_index
-    begin
+    @user = require_user
+    authorize_to_show_user! @user
+
+    if authorized_to_show_user_best? @user
       user_best
       render :user_best
-    rescue Aclog::Exceptions::AccountPrivate
+    else
       user_timeline
       render :user_timeline
     end

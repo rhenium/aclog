@@ -791,13 +791,11 @@ ul.records li:after {
 .status-responses dd li {
     float: left;
     display: block;
-    width: 44px;
-    height: 44px;
 }
 
 .status-responses dd img {
-    width: 100%;
-    height: 100%;
+    width: 44px;
+    height: 44px;
 }
 
 .loading {
@@ -865,15 +863,15 @@ ul.records li:after {
         margin-top: 0;
     }
 
-    .status-responses dl {
-        min-height: 42px;
-    }
-
     .status-responses dd.timeline {
         max-height: none;
     }
 
-    .status-responses dd li {
+    .status-responses dl {
+        min-height: 42px;
+    }
+
+    .status-responses dd img {
         width: 42px;
         height: 42px;
     }
@@ -884,7 +882,7 @@ ul.records li:after {
         min-height: 44px;
     }
 
-    .status-responses dd li {
+    .status-responses dd img {
         width: 44px;
         height: 44px;
     }

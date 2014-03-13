@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
 
-  after_action :set_content_type_to_xhtml, :tidy_response_body
+  after_action :tidy_response_body
   helper_method :logged_in?, :current_user
   helper_method :authorized_to_show_user?, :authorized_to_show_user_best?
 
@@ -46,12 +46,6 @@ class ApplicationController < ActionController::Base
   end
 
   private
-  def set_content_type_to_xhtml
-    if request.format == :html
-      response.content_type = "application/xhtml+xml"
-    end
-  end
-
   def tidy_response_body
     if [:html, :xml, :rss, :atom].any? {|s| request.format == s }
       response.body = ActiveSupport::Multibyte::Unicode.tidy_bytes(response.body)

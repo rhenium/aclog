@@ -21,5 +21,12 @@ module ControllerErrorHandling
       @message = t("error.not_found")
       render "shared/common_error", status: 404, formats: :html
     end
+
+    rescue_from ActionView::MissingTemplate do
+      if request.format != :html
+        @message = t("error.not_found")
+        render "shared/common_error", status: 404, formats: :html
+      end
+    end
   end
 end

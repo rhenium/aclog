@@ -2,6 +2,7 @@ ja:
   error:
     not_found: このページは存在しません
     forbidden: このページを表示する権限がありません
+    unauthorized: このページを表示する権限がありません
     internal_error: エラー
   views:
     settings:

@@ -1,9 +1,15 @@
 class ApplicationController < ActionController::Base
+  include ControllerErrorHandling
+
   protect_from_forgery
 
   after_action :set_content_type_to_xhtml, :tidy_response_body
   helper_method :logged_in?, :current_user
   helper_method :authorized_to_show_user?, :authorized_to_show_user_best?
+
+  def routing_error
+    raise ActionController::RoutingError, "No route matches #{params[:unmatched_route]}"
+  end
 
   protected
   def logged_in?

@@ -34,10 +34,6 @@ module Aclog
     config.i18n.default_locale = :ja
     config.i18n.fallbacks = true
 
-    config.exceptions_app = -> env do
-      ErrorsController.action(:render_error).call(env)
-    end
-
     config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif *.eot *.woff *.ttf *.svg)
     config.assets.precompile += [Proc.new { |path, fn| fn =~ /app\/assets/ && %w(.js).include?(File.extname(path)) }]
 

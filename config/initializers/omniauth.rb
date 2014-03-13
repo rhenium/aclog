@@ -16,4 +16,3 @@ Rails.application.config.middleware.use OmniAuth::Builder do
            request_path: "/i/login",
            callback_path: "/i/callback"
 end
-

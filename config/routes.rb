@@ -1,5 +1,5 @@
-Aclog::Application.routes.draw do
-  root to: "about#index"
+Rails.application.routes.draw do
+  root "about#index"
 
   mount Api => "/api"
 

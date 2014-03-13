@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   include ControllerErrorHandling
 
-  protect_from_forgery
+  protect_from_forgery with: :exception
 
   after_action :tidy_response_body
   helper_method :logged_in?, :current_user

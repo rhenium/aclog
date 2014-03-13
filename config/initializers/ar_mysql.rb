@@ -5,5 +5,3 @@ ActiveRecord::ConnectionAdapters::Mysql2Adapter::NATIVE_DATABASE_TYPES[:primary_
 
 # MySQL / utf8mb4
 ActiveRecord::Base.connection.initialize_schema_migrations_table
-
-

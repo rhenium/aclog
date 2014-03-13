@@ -20,7 +20,7 @@ Collects favs and retweets in real time by UserStreams.
 * Import tweets from Favstar / Favotter / tweets.zip / ..
 
 ## Requirements
-* Ruby 2.1.0/2.0.0
+* Ruby 2.0.0+
 * MySQL/MariaDB 5.5.14+ (needs utf8mb4 support)
 
 ## Installation
@@ -47,8 +47,8 @@ Collects favs and retweets in real time by UserStreams.
         $ vi config/database.yml
 
         $ # Set random secret_token
-        $ cp config/initializers/secret_token.rb.example config/initializers/secret_token.rb
-        $ sed -i s/replace_here/$(rake secret)/g config/initializers/secret_token.rb
+        $ cp config/secrets.yml.example config/secrets.yml
+        $ sed -i s/replace_here/$(rake secret)/g config/secrets.yml
 
         $ # Setup database. This will create database and tables on MySQL server.
         $ rake db:setup
@@ -59,8 +59,8 @@ Collects favs and retweets in real time by UserStreams.
 
 * Start your aclog
 
-        $ # Start Unicorn (Web server)
-        $ ./start_unicorn.sh start
+        $ # Start Puma (Web server)
+        $ ./start_webserver.sh start
         $ # Start Background server
         $ ./start_receiver.sh start
 

@@ -19,4 +19,5 @@
 !.gitkeep
 !/.coveralls.yml
 !/.travis.yml
+!/.rspec
 

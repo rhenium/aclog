@@ -6,45 +6,54 @@ class User < ActiveRecord::Base
   has_many :retweets, dependent: :delete_all
   has_one :account
 
+  class << self
+    def find(*args)
+      hash = args.first
+      return super(*args) unless hash.is_a?(Hash)
+
+      key, value = hash.delete_if {|k, v| v.nil? }.first
+
+      key && where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
+    end
+
+    def create_from_json(json)
+      user = where(id: json[:id]).first_or_initialize
+      orig = user.attributes.dup
+
+      user.screen_name = json[:screen_name]
+      user.name = json[:name]
+      user.profile_image_url = json[:profile_image_url]
+      user.protected = json[:protected]
+
+      if user.attributes == orig
+        logger.debug("User was not updated: #{user.id}")
+      else
+        user.save!
+        logger.debug("Successfully saved an user: #{user.id}")
+      end
+
+      user
+    end
+  end
+
   def twitter_url
     "https://twitter.com/#{self.screen_name}"
   end
 
-  def following?(user)
-    raise Aclog::Exceptions::UserNotRegistered unless registered?
-    account.following?(user.id)
+  def profile_image_url_original
+    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "\\1")
   end
 
-  def private?
-    !registered? || registered? && account.private?
+  def profile_image_url_reasonably_small
+    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_reasonably_small\\1")
   end
 
-  def self.find(*args)
-    hash = args.first
-    return super(*args) unless hash.is_a?(Hash)
-
-    key, value = hash.delete_if {|k, v| v.nil? }.first
-
-    key && where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
+  def profile_image_url_bigger
+    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_bigger\\1")
   end
 
-  def self.create_from_json(json)
-    user = where(id: json[:id]).first_or_initialize
-    orig = user.attributes.dup
-
-    user.screen_name = json[:screen_name]
-    user.name = json[:name]
-    user.profile_image_url = json[:profile_image_url]
-    user.protected = json[:protected]
-
-    if user.attributes == orig
-      logger.debug("User was not updated: #{user.id}")
-    else
-      user.save!
-      logger.debug("Successfully saved an user: #{user.id}")
-    end
-
-    user
+  def profile_image_url_mini
+    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_mini\\1")
   end
 
   def protected?
@@ -55,35 +64,34 @@ class User < ActiveRecord::Base
     !!account && account.active?
   end
 
+  def private?
+    !registered? || registered? && account.private?
+  end
+
+  def following?(user)
+    raise Aclog::Exceptions::UserNotRegistered unless registered?
+    account.following?(user.id)
+  end
+
   def permitted_to_see?(user)
-    !user.protected? || user.id == self.id || self.account.try(:following?, user.id) || false
-  end
-
-  def profile_image_url_mini
-    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_mini\\1")
-  end
-
-  def profile_image_url_original
-    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "\\1")
+    !user.protected? || user.id == self.id || self.following?(user) || false
   end
 
   def stats
     raise(Aclog::Exceptions::UserNotRegistered, self) unless registered? && account.active?
 
-    Rails.cache.fetch("stats/#{self.id}", expires_in: 3.hours) do
-      reactions_count = tweets.sum(:reactions_count)
+    reactions_count = tweets.sum(:reactions_count)
 
-      ret = OpenStruct.new
-      ret.updated_at = Time.now
-      ret.since_join = (DateTime.now.utc - self.account.created_at.to_datetime).to_i
-      ret.favorites_count = self.favorites.count
-      ret.retweets_count = self.retweets.count
-      ret.tweets_count = self.tweets.count
-      ret.reactions_count = reactions_count
-      ret.average_reactions_count = reactions_count.to_f / ret.tweets_count
+    ret = OpenStruct.new
+    ret.updated_at = Time.now
+    ret.since_join = (DateTime.now.utc - self.account.created_at.to_datetime).to_i
+    ret.favorites_count = self.favorites.count
+    ret.retweets_count = self.retweets.count
+    ret.tweets_count = self.tweets.count
+    ret.reactions_count = reactions_count
+    ret.average_reactions_count = reactions_count.to_f / ret.tweets_count
 
-      ret
-    end
+    ret
   end
 
   def count_discovered_by

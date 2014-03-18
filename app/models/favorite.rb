@@ -6,18 +6,15 @@ class Favorite < ActiveRecord::Base
     tweet = Tweet.create_from_json(json[:target_object])
     user = User.create_from_json(json[:source])
 
-    favorite = Favorite.new(tweet: tweet, user: user)
-
     transaction do
-      favorite.save!
+      favorite = Favorite.create!(tweet: tweet, user: user)
       tweet.update_reactions_count(favorites_count: 1, json: json[:target_object])
+
+      favorite
     end
   rescue ActiveRecord::RecordNotUnique => e
-    logger.debug("Duplicate favorite: #{favorite.user_id} => #{favorite.tweet_id}")
-  rescue => e
-    logger.error("Failed to create a favorite: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
-  ensure
-    return favorite
+    logger.debug("Duplicate favorite: #{user.id} => #{tweet.id}")
+    self.where(tweet: tweet, user: user).first
   end
 
   def self.destroy_from_json(json)
@@ -27,7 +24,5 @@ class Favorite < ActiveRecord::Base
         Tweet.find(json[:target_object][:id]).update_reactions_count(favorites_count: -1, json: json[:target_object])
       end
     end
-  rescue => e
-    logger.error("Failed to destroy a favorite: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
   end
 end

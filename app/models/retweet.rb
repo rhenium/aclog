@@ -6,18 +6,15 @@ class Retweet < ActiveRecord::Base
     tweet = Tweet.create_from_json(json[:retweeted_status])
     user = User.create_from_json(json[:user])
 
-    retweet = Retweet.new(id: json[:id], tweet: tweet, user: user)
-
     transaction do
-      retweet.save!
+      retweet = Retweet.create!(id: json[:id], tweet: tweet, user: user)
       tweet.update_reactions_count(retweets_count: 1, json: json[:retweeted_status])
+
+      retweet
     end
   rescue ActiveRecord::RecordNotUnique => e
-    logger.debug("Duplicate retweet: #{retweet.id}: #{retweet.user_id} => #{retweet.tweet_id}")
-  rescue => e
-    logger.error("Failed to create a retweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
-  ensure
-    return retweet
+    logger.debug("Duplicate retweet: #{json[:id]}: #{user.id} => #{tweet.id}")
+    self.find(json[:id])
   end
 
   def self.destroy_from_json(json)
@@ -31,7 +28,5 @@ class Retweet < ActiveRecord::Base
         end
       end
     end
-  rescue => e
-    logger.error("Failed to destroy a retweet: #{e.class}: #{e.message}/#{e.backtrace.join("\n")}")
   end
 end

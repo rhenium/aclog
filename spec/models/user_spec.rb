@@ -1,136 +1,217 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe User do
-  describe "#twitter_url" do
-    let(:user) { FactoryGirl.build(:user_1) }
-    subject { user.twitter_url }
-    it { should eq "https://twitter.com/#{user.screen_name}" }
-  end
+  subject(:user) { create(:user) }
 
   describe ".find" do
-    let(:user) { FactoryGirl.create(:user) }
-
-    context "when user exists" do
-      subject { User.find(id: id, screen_name: screen_name) }
-
-      context "and specify only id" do
-        let(:id) { user.id }
-        let(:screen_name) { nil }
-        it { should eq user }
+    context "when specify Fixnum" do
+      it "returns user if exists" do
+        expect(User.find(user.id)).to eq user
       end
-
-      context  "and specify only screen_name" do
-        let(:id) { nil }
-        let(:screen_name) { user.screen_name }
-        it { should eq user }
+      it "raises ActiveRecord::RecordNotFound if doesn't exist" do
+        expect { User.find(-1) }.to raise_error ActiveRecord::RecordNotFound
       end
     end
-
-    context "when user not exists" do
-      subject { -> { User.find(id: id, screen_name: screen_name) } }
-
-      context "when specify not existing id" do
-        let(:id) { user.id + 1 }
-        let(:screen_name) { nil }
-        it { should raise_error ActiveRecord::RecordNotFound }
+    context "when specify Hash" do
+      it "returns user specified by id when both specified" do
+        user2 = create(:user)
+        expect(User.find(id: user.id, screen_name: user2.screen_name)).to eq user
       end
-
-      context  "when specify only screen_name" do
-        let(:id) { nil }
-        let(:screen_name) { "1234567890abcdef" }
-        it { should raise_error ActiveRecord::RecordNotFound }
+      it "returns user when only id specified" do
+        expect(User.find(id: user.id)).to eq user
+      end
+      it "returns user when only screen_name specified" do
+        expect(User.find(screen_name: user.screen_name)).to eq user
+      end
+      it "raises ActiveRecord::RecordNotFound if user with specified id doesn't exist" do
+        expect { User.find(id: -1) }.to raise_error ActiveRecord::RecordNotFound
+      end
+      it "raises ActiveRecord::RecordNotFound if user with specified screen_name doesn't exist" do
+        expect { User.find(screen_name: "123456789012345678901") }.to raise_error ActiveRecord::RecordNotFound
       end
     end
   end
 
-  describe "#protected?" do
-    context "when not protected" do
-      let(:user) { FactoryGirl.create(:user, protected: false) }
-      subject { user }
-      its(:protected?) { should be false }
+  describe ".create_from_json" do
+    it "updates the record if already exists" do
+      s = user.screen_name + "_new"
+      expect(User.create_from_json(build(:user, screen_name: s)).reload.screen_name).to eq s
     end
-
-    context "when protected" do
-      let(:user) { FactoryGirl.create(:user, protected: true) }
-      subject { user }
-      its(:protected?) { should be true }
+    it "creates new record if doesn't exist" do
+      expect(User.create_from_json(build(:user, id: user.id + 1)).reload.id).to be(user.id + 1)
     end
   end
 
-  describe "#account" do
-    context "when exists" do
-      let!(:account) { FactoryGirl.create(:account_1) }
-      let(:user) { FactoryGirl.create(:user_1) }
-      subject { user.account }
-      it { should eq account }
-    end
-
-    context "when not exists" do
-      let!(:account) { FactoryGirl.create(:account_1) }
-      let(:user) { FactoryGirl.create(:user_exists) }
-      subject { user.account }
-      it { should be nil }
+  describe "#twitter_url" do
+    it "returns URL of user's own user page on twitter.com" do
+      expect(user.twitter_url).to eq "https://twitter.com/#{user.screen_name}"
     end
   end
 
   describe "#profile_image_url_original" do
-    let(:user) { FactoryGirl.create(:user) }
-    before { user.stub(:profile_image_url).and_return("https://example.com/profile_image_normal.png") }
-    subject { user.profile_image_url_original }
-    it { should eq "https://example.com/profile_image.png" }
+    it "returns the URL of user's profile image with no size option" do
+      user.profile_image_url = "https://pbs.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_normal.png"
+      expect(user.profile_image_url_original).to eq "https://pbs.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx.png"
+    end
+  end
+
+  describe "#profile_image_url_reasonably_small" do
+    it "returns the URL of user's profile image with no size option" do
+      user.profile_image_url = "https://pbs.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_normal.png"
+      expect(user.profile_image_url_reasonably_small).to eq "https://pbs.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_reasonably_small.png"
+    end
+  end
+
+  describe "#profile_image_url_bigger" do
+    it "returns the URL of user's profile image with no size option" do
+      user.profile_image_url = "https://pbs.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_normal.png"
+      expect(user.profile_image_url_bigger).to eq "https://pbs.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_bigger.png"
+    end
+  end
+
+  describe "#profile_image_url_mini" do
+    it "returns the URL of user's profile image with no size option" do
+      user.profile_image_url = "https://pbs.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_normal.png"
+      expect(user.profile_image_url_mini).to eq "https://pbs.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_mini.png"
+    end
+  end
+
+  describe "#protected?" do
+    it "returns true if user (Twitter) is protected" do
+      user.protected = true
+      expect(user.protected?).to be true
+    end
+    it "returns false if user (Twitter) isn't protected" do
+      expect(user.protected?).to be false
+    end
+  end
+
+  describe "#registered?" do
+    context "user's record does exist" do
+      before do
+        @account = create(:account, user: user)
+      end
+      it "return true if user is active" do
+        expect(user.registered?).to be true
+      end
+      it "return false if user is inactive" do
+        @account.status = Account::INACTIVE
+        expect(user.registered?).to be false
+      end
+    end
+    it "returns false if user's record doesn't exist" do
+      expect(user.registered?).to be false
+    end
+  end
+
+  describe "#private?" do
+    context "user is registered" do
+      it "returns true if user (aclog) is private" do
+        account = create(:account, user: user, private: true)
+        expect(user.private?).to be true
+      end
+      it "returns false if user (aclog) isn't private" do
+        account = create(:account, user: user, private: false)
+        expect(user.private?).to be false
+      end
+    end
+    it "returns true if user (aclog) isn't registered" do
+      expect(user.private?).to be true
+    end
+  end
+
+  describe "#following?" do
+    it "returns true if the user is following target" do
+      user2 = create(:user)
+      account = create(:account, user: user)
+      account.stub(:following?).and_return(true)
+      expect(user.following?(user2)).to be true
+    end
+    it "returns false if the user isn't following target" do
+      user2 = create(:user)
+      account = create(:account, user: user)
+      allow(account).to receive(:following?) { false }
+      expect(user.following?(user2)).to be false
+    end
+  end
+
+  describe "#permitted_to_see?" do
+    it "returns true unless the user is protected" do
+      user2 = create(:user)
+      expect(user.permitted_to_see?(user2)).to be true
+    end
+    it "returns true if the target user is the user" do
+      expect(user.permitted_to_see?(user)).to be true
+    end
+    it "returns true if user is following the target user" do
+      user2 = create(:user, protected: true)
+      allow(user).to receive(:following?) { true }
+      expect(user.permitted_to_see?(user2)).to be true
+    end
+    it "returns false if the target user is protected, not same, not following" do
+      user2 = create(:user, protected: true)
+      allow(user).to receive(:following?) { false }
+      expect(user.permitted_to_see?(user2)).to be false
+    end
   end
 
   describe "#stats" do
-    let!(:account) { FactoryGirl.create(:account_1) }
-    let(:user) { FactoryGirl.create(:user_1) }
-    before do
-      user_2, user_3 = FactoryGirl.create_list(:user, 2)
-      tweet_1, tweet_2 = FactoryGirl.create_list(:tweet, 2, user: user)
-      FactoryGirl.create(:favorite, tweet: tweet_1, user: user_2)
-      FactoryGirl.create(:favorite, tweet: tweet_1, user: user_3)
-      FactoryGirl.create(:retweet,  tweet: tweet_2, user: user_2)
-    end
+    it "returns the user's stats if registered" do
+      create(:account, user: user)
+      user_2, user_3 = create_list(:user, 2)
+      tweet_1, tweet_2 = create_list(:tweet, 2, user: user)
+      create(:favorite, tweet: tweet_1, user: user_2)
+      create(:favorite, tweet: tweet_1, user: user_3)
+      create(:favorite, tweet: tweet_1, user: user)
+      create(:retweet,  tweet: tweet_2, user: user_2)
+      tweet_1.update(favorites_count: 3, retweets_count: 0, reactions_count: 3)
+      tweet_2.update(favorites_count: 0, retweets_count: 1, reactions_count: 1)
 
-    subject { user.stats }
-    its(:updated_at) { should_not be nil }
-    its(:since_join) { should be_a Integer }
-    its(:favorites_count) { should be 0 }
-    its(:retweets_count) { should be 0 }
-    its(:tweets_count) { should be 2 }
-    its(:reactions_count) { should be 3 }
+      stats = user.stats
+
+      expect(stats.updated_at).to be_truthy
+      expect(stats.since_join).to be_a Integer
+      expect(stats.favorites_count).to be 1
+      expect(stats.retweets_count).to be 0
+      expect(stats.tweets_count).to be 2
+      expect(stats.reactions_count).to be 4
+    end
+    it "raises Aclog::Exceptions::UserNotRegistered unless registered" do
+      expect { user.stats }.to raise_error Aclog::Exceptions::UserNotRegistered
+    end
   end
 
   describe "#count_discovered_by" do
-    before do
-      @user = FactoryGirl.create_list(:user, 3)
-      tweet_1, tweet_2 = FactoryGirl.create_list(:tweet, 2, user: @user[0])
-      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[0])
-      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[1])
-      FactoryGirl.create(:retweet, tweet: tweet_1, user: @user[1])
-      FactoryGirl.create(:favorite, tweet: tweet_2, user: @user[1])
-      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[2])
-      FactoryGirl.create(:favorite, tweet: tweet_2, user: @user[2])
+    it "returns array of discoverer" do
+      user_1, user_2 = create_list(:user, 2)
+      tweet_1, tweet_2 = create_list(:tweet, 2, user: user)
+      create(:favorite, tweet: tweet_1, user: user)
+      create(:favorite, tweet: tweet_1, user: user_1)
+      create(:retweet, tweet: tweet_1, user: user_1)
+      create(:favorite, tweet: tweet_2, user: user_1)
+      create(:favorite, tweet: tweet_1, user: user_2)
+      create(:favorite, tweet: tweet_2, user: user_2)
+
+      ret = user.count_discovered_by
+      expect(ret).to eq [[user_1.id, 2, 1], [user_2.id, 2, 0], [user.id, 1, 0]]
     end
-    subject { @user.first.count_discovered_by }
-    its(:size) { should be 3 }
-    it { should eq [[@user[1].id, 2, 1], [@user[2].id, 2, 0], [@user[0].id, 1, 0]] }
   end
 
   describe "#count_discovered_users" do
-    before do
-      @user = FactoryGirl.create_list(:user, 3)
-      tweet_1 = FactoryGirl.create(:tweet, user: @user[1])
-      tweet_2 = FactoryGirl.create(:tweet, user: @user[2])
-      tweet_3 = FactoryGirl.create(:tweet, user: @user[2])
-      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[0])
-      FactoryGirl.create(:favorite, tweet: tweet_1, user: @user[1])
-      FactoryGirl.create(:retweet, tweet: tweet_1, user: @user[0])
-      FactoryGirl.create(:favorite, tweet: tweet_2, user: @user[0])
-      FactoryGirl.create(:retweet, tweet: tweet_2, user: @user[0])
-      FactoryGirl.create(:favorite, tweet: tweet_3, user: @user[0])
+    it "returns array of discovered by the user" do
+      user_1, user_2 = create_list(:user, 2)
+      tweet_1 = create(:tweet, user: user_1)
+      tweet_2 = create(:tweet, user: user_2)
+      tweet_3 = create(:tweet, user: user_2)
+      create(:favorite, tweet: tweet_1, user: user)
+      create(:favorite, tweet: tweet_1, user: user_1)
+      create(:retweet, tweet: tweet_1, user: user)
+      create(:favorite, tweet: tweet_2, user: user)
+      create(:retweet, tweet: tweet_2, user: user)
+      create(:favorite, tweet: tweet_3, user: user)
+
+      ret = user.count_discovered_users
+      expect(ret).to eq [[user_2.id, 2, 1], [user_1.id, 1, 1]]
     end
-    subject { @user[0].count_discovered_users }
-    its(:size) { should be 2 }
-    it { should eq [[@user[2].id, 2, 1], [@user[1].id, 1, 1]] }
   end
 end

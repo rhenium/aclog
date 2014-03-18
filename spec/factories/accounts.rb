@@ -1,4 +1,9 @@
 FactoryGirl.define do
+  factory :account do |account|
+    account.oauth_token "oauth_token"
+    account.oauth_token_secret "oauth_token_secret"
+  end
+
   factory :account_1, class: Account do |f|
     f.user_id 1326331596
     f.oauth_token "1326331596-ELn8lmw2WnACmBfdrLrqjGTlEsrw2kICXwcKy3Z"

@@ -1,18 +1,38 @@
 require "spec_helper"
 
-describe Favorite do
-  describe ".from_json" do
-    let(:user_0) { FactoryGirl.create(:user) }
-    let(:user_1) { FactoryGirl.create(:user) }
-    let(:hash) { { target_object: { id: 123,
-                                    text: "abc",
-                                    entities: {},
-                                    source: "web",
-                                    created_at: Time.now.to_s,
-                                    user: { id: user_0.id } },
-                   source: { id: user_1.id } } }
-    subject { Favorite.from_json(hash) }
-    its(:tweet_id) { should be hash[:target_object][:id] }
-    its(:user_id) { should be hash[:source][:id] }
+describe Retweet do
+  subject(:user) { create(:user) }
+  subject(:tweet) { create(:tweet, user: user, favorites_count: 1, reactions_count: 1) }
+  subject(:favoriter) { create(:user) }
+  subject(:favorite) { create(:favorite, tweet: tweet, user: favoriter) }
+
+  describe "create_from_json" do
+    before do
+      @args = { source: {},
+                target_object: {} }
+      allow(Tweet).to receive(:create_from_json) { tweet }
+      allow(User).to receive(:create_from_json) { favoriter }
+    end
+    it "creates new favorite and increment favorites_count" do
+      favorite.destroy
+      old_favs = tweet.reload.favorites_count
+      ret = Favorite.create_from_json(@args)
+      expect(ret.tweet).to eq tweet
+      expect(ret.user).to eq favoriter
+      expect(tweet.reload.favorites_count).to be(old_favs + 1)
+    end
+    it "ignores ActiveRecord::RecordNotUnique and returns favorite" do
+      expect { Favorite.create_from_json(@args) }.to_not raise_error
+      expect(Favorite.create_from_json(@args).user).to eq favoriter
+    end
+  end
+
+  describe "destroy_from_json" do
+    it "destorys the favorite and decrement favorites_count" do
+      old_favs = tweet.reload.favorites_count
+      Favorite.destroy_from_json(source: { id: favorite.user_id }, target_object: { id: favorite.tweet_id })
+      expect { favorite.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect(tweet.reload.favorites_count).to be(old_favs - 1)
+    end
   end
 end

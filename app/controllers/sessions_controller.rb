@@ -13,7 +13,6 @@ class SessionsController < ApplicationController
                           profile_image_url: auth["extra"]["raw_info"]["profile_image_url_https"],
                           protected: auth["extra"]["raw_info"]["protected"])
 
-    session[:account] = account
     session[:user_id] = account.user_id
 
     to = request.env["omniauth.params"]["redirect_after_login"].to_s

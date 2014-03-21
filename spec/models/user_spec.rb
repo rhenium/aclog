@@ -40,6 +40,11 @@ describe User do
     it "creates new record if doesn't exist" do
       expect(User.create_from_json(build(:user, id: user.id + 1)).reload.id).to be(user.id + 1)
     end
+    it "doesn't update the record if not changed" do
+      user.update(updated_at: user.updated_at - 1000)
+      old_updated_at = user.reload.updated_at
+      expect(User.create_from_json(user.attributes.symbolize_keys).reload.updated_at).to eq old_updated_at
+    end
   end
 
   describe "#twitter_url" do

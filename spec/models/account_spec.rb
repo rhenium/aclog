@@ -1,4 +1,14 @@
-require 'spec_helper'
+require "spec_helper"
+
+describe Account do
+  pending "create_or_update"
+  pending "random"
+  pending "#deactivate!"
+  pending "#update_connection"
+  pending "#client"
+  pending "#following?"
+  pending "#followed_by?"
+end
 
 =begin
 describe Account do
@@ -27,54 +37,6 @@ describe Account do
       its(:notification) { should be false }
       its(:private) { should be true }
       its(:status) { should be Account::ACTIVE }
-    end
-  end
-
-  describe ".set_of_collector" do
-    before { Settings.collector.stub(:count).and_return(3) }
-    let!(:accounts) { 10.times.map {|i| Account.create!(user_id: i, oauth_token: "abc", oauth_token_secret: "def") } }
-    subject { Account.set_of_collector(2) }
-    it { should_not include -> m { m.id % 3 != 2 } }
-  end
-
-  describe "#notification?" do
-    context "when enabled" do
-      let(:account) { FactoryGirl.create(:account_1, notification: true) }
-      subject { account }
-      its(:notification?) { should be true }
-    end
-
-    context "when disabled" do
-      let(:account) { FactoryGirl.create(:account_1, notification: false) }
-      subject { account }
-      its(:notification?) { should be false }
-    end
-  end
-
-  describe "#private?" do
-    context "when private" do
-      let(:account) { FactoryGirl.create(:account_1, private: true) }
-      subject { account }
-      its(:private?) { should be true }
-    end
-
-    context "when public" do
-      let(:account) { FactoryGirl.create(:account_1, private: false) }
-      subject { account }
-      its(:private?) { should be false }
-    end
-  end
-
-  describe "#active?" do
-    let(:account) { FactoryGirl.create(:account_1) }
-    context "when active" do
-      subject { account }
-      its(:active?) { should be true }
-    end
-
-    context "when inactive" do
-      subject { account.tap(&:deactivate!) }
-      its(:active?) { should be false }
     end
   end
 

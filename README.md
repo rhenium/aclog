@@ -60,14 +60,14 @@ Collects favs and retweets in real time by UserStreams.
 * Start your aclog
 
         $ # Start Puma (Web server)
-        $ ./start_webserver.sh start
-        $ # Start Background server
-        $ ./start_receiver.sh start
+        $ rake web:start
+        $ # Start Background worker
+        $ rake collector:start
 
-### Aclog (Collector Clusters)
+### Aclog (Collector worker nodes)
 * Chdir
 
-        $ cd /var/webapps/collector
+        $ cd /var/webapps/worker_nodes
 
 * Configure it
 

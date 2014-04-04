@@ -67,7 +67,7 @@ Collects favs and retweets in real time by UserStreams.
 ### Aclog (Collector worker nodes)
 * Chdir
 
-        $ cd /var/webapps/worker_nodes
+        $ cd /var/webapps/worker_node
 
 * Configure it
 
@@ -80,9 +80,9 @@ Collects favs and retweets in real time by UserStreams.
 
         $ bundle install
 
-* Start collector
+* Start worker
 
-        $ RAILS_ENV=production bundle exec ./start.rb
+        $ rake worker_node:run
 
 
 ## Contributing

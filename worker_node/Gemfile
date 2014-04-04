@@ -1,7 +1,6 @@
 source "https://rubygems.org"
 
-gem "settingslogic"
+gem "rake"
 gem "em-twitter"
 gem "msgpack"
 gem "yajl-ruby", require: "yajl"
-

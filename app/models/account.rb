@@ -5,7 +5,7 @@ class Account < ActiveRecord::Base
 
   belongs_to :user
   scope :active, -> { where(status: Account::ACTIVE) }
-  scope :set_of_collector, ->(collector_id) { active.where("id % ? = ?", Settings.collector.count, collector_id) }
+  scope :for_node, ->(block_number) { active.where("id % ? = ?", Settings.collector.nodes_count, block_number) }
 
   def notification?; notification end
   def private?; private end
@@ -34,7 +34,11 @@ class Account < ActiveRecord::Base
   def update_connection
     transport = MessagePack::RPC::UNIXTransport.new
     client = MessagePack::RPC::Client.new(transport, Rails.root.join("tmp", "sockets", "receiver.sock").to_s)
-    client.call(:register, Marshal.dump(self))
+    if active?
+      client.call(:register_account, Marshal.dump(self))
+    else
+      client.call(:deactivate_account, Marshal.dump(self))
+    end
   rescue Errno::ECONNREFUSED, Errno::ENOENT
     logger.error("Account#update_connection: couldn't connect to the receiver")
   end

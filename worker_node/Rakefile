@@ -1,0 +1,13 @@
+$:.unshift File.expand_path("../lib/", __FILE__)
+require "worker_node"
+
+$stdout.sync = true
+$stderr.sync = true
+
+namespace :worker_node do
+  desc "Run an aclog worker node."
+  task :run do
+    worker = WorkerNode::Worker.new
+    worker.run
+  end
+end

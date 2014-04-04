@@ -11,7 +11,7 @@
 /config/secrets.yml
 /config/database.yml
 
-/collector/settings.yml
+/worker_node/settings.yml
 
 .*
 *~

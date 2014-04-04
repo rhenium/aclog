@@ -7,7 +7,7 @@ default: &default
   collector:
     server_port:      42106
     secret_key:       "secret key to authorize workers"
-    count:            1 # workers count
+    nodes_count:      1 # workers count
 
   notification:
     enabled:          false
@@ -45,7 +45,7 @@ test:
   collector:
     server_port:      42106
     secret_key:       "secret"
-    count:            1
+    nodes_count:      1
 
 production:
   <<: *default

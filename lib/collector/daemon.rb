@@ -2,35 +2,35 @@ require "msgpack/rpc/transport/unix"
 
 module Collector
   class Daemon
-    def self.start
-      _logger = Logger.new(STDOUT)
-      _logger.level = Rails.env.production? ? Logger::INFO : Logger::DEBUG
-      ActiveRecord::Base.logger = Rails.logger = _logger
+    class << self
+      def start
+        set_loggers
 
-      _sock_path = File.join(Rails.root, "tmp", "sockets", "receiver.sock")
+        EM.run do
+          sock_path = File.join(Rails.root, "tmp", "sockets", "receiver.sock")
+          File.delete(sock_path) if File.exists?(sock_path)
+          control = MessagePack::RPC::Server.new
+          control.listen(MessagePack::RPC::UNIXServerTransport.new(sock_path), Collector::ControlServer.new)
+          EM.defer { control.run }
 
-      Rails.logger.info("Receiver started")
-      File.delete(_sock_path) if File.exists?(_sock_path)
-      EM.run do
-        channel = EM::Channel.new
-        EM.defer { channel.subscribe(&:call) }
+          nodes = EM.start_server("0.0.0.0", Settings.collector.server_port, Collector::NodeConnection)
 
-        connections = {}
+          stop = -> _ do
+            control.stop
+            EM.stop_server(nodes)
+            EM.stop
+          end
 
-        collector_server = EM.start_server("0.0.0.0", Settings.collector.server_port, CollectorConnection, channel, connections)
-
-        reg_svr_listener = MessagePack::RPC::UNIXServerTransport.new(_sock_path)
-        register_server = MessagePack::RPC::Server.new
-        register_server.listen(reg_svr_listener, RegisterServer.new(connections))
-        EM.defer { register_server.run }
-
-        stop = Proc.new do
-          EM.stop_server(collector_server)
-          register_server.close
-          EM.stop
+          Signal.trap("INT", &stop)
+          Signal.trap("TERM", &stop)
         end
-        Signal.trap(:INT, &stop)
-        Signal.trap(:TERM, &stop)
+      end
+
+      private
+      def set_loggers
+        _logger = Logger.new(STDOUT)
+        _logger.level = Rails.env.production? ? Logger::INFO : Logger::DEBUG
+        ActiveRecord::Base.logger = Rails.logger = _logger
       end
     end
   end

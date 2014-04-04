@@ -1,0 +1,4 @@
+secret_key: secret key
+collector_host: localhost
+collector_port: 42106
+log_level: debug

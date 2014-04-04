@@ -1,8 +1,8 @@
 namespace :web do
-  @pid_file = Rails.root.join("tmp", "pids", "puma.pid").to_s
+  @web_pid_file = Rails.root.join("tmp", "pids", "puma.pid").to_s
   
-  def read_pid
-    Integer(File.read(@pid_file)) rescue nil
+  def web_read_pid
+    Integer(File.read(@web_pid_file)) rescue nil
   end
   
   def process_alive?(pid)
@@ -11,17 +11,17 @@ namespace :web do
 
   desc "Start web server (puma)"
   task :start do
-    pid = read_pid
+    pid = web_read_pid
     if pid && process_alive?(pid)
       STDERR.puts "Puma is already started (PID: #{pid})"
       next
     end
-    echo `puma -d -e #{Rails.env} -C #{Rails.root}/config/puma.rb --pidfile #{@pid_file}`
+    puts `puma -d -e #{Rails.env} -C #{Rails.root}/config/puma.rb --pidfile #{@web_pid_file}`
   end
 
   desc "Stop web server (puma)"
   task :stop do
-    pid = read_pid
+    pid = web_read_pid
     unless process_alive?(pid)
       STDERR.puts "Puma is not running."
       next
@@ -35,7 +35,7 @@ namespace :web do
 
   desc "Retart web server (puma)"
   task :restart do
-    pid = read_pid
+    pid = web_read_pid
     unless process_alive?(pid)
       STDERR.puts "Puma is not running."
       Rake::Task["web:start"].invoke
@@ -46,7 +46,7 @@ namespace :web do
 
   desc "Show status of web server (puma)"
   task :status do
-    pid = read_pid
+    pid = web_read_pid
     if pid && process_alive?(pid)
       STDOUT.puts "Puma is running."
     else

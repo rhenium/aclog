@@ -1,9 +1,9 @@
 namespace :collector do
-  @pid_file = Rails.root.join("tmp", "pids", "collector.pid").to_s
-  @log_file = Rails.root.join("log", "collector.log").to_s
+  @collector_pid_file = Rails.root.join("tmp", "pids", "collector.pid").to_s
+  @collector_log_file = Rails.root.join("log", "collector.log").to_s
   
-  def read_pid
-    Integer(File.read(@pid_file)) rescue nil
+  def collector_read_pid
+    Integer(File.read(@collector_pid_file)) rescue nil
   end
   
   def process_alive?(pid)
@@ -17,16 +17,16 @@ namespace :collector do
   
   desc "Start aclog collector (master)"
   task start: :environment do
-    pid = read_pid
+    pid = collector_read_pid
     if pid && process_alive?(pid)
       STDERR.puts "Collector daemon is already started (PID: #{pid})"
       next
     end
 
     Process.daemon
-    File.open(@pid_file, "w").write(Process.pid)
+    File.open(@collector_pid_file, "w").write(Process.pid)
 
-    log = File.open(@log_file, "a")
+    log = File.open(@collector_log_file, "a")
     log.sync = true
     STDOUT.reopen(log)
     STDERR.reopen(STDOUT)
@@ -36,7 +36,7 @@ namespace :collector do
 
   desc "Stop aclog collector (master)"
   task :stop do
-    pid = read_pid
+    pid = collector_read_pid
     unless process_alive?(pid)
       puts "Collector daemon is not started."
       next
@@ -47,7 +47,7 @@ namespace :collector do
       sleep 0.1
     end
 
-    File.delete(@pid_file)
+    File.delete(@collector_pid_file)
   end
 
   desc "Retart aclog collector (master)"
@@ -58,7 +58,7 @@ namespace :collector do
 
   desc "Show status of running aclog collector (master)"
   task :status do
-    pid = read_pid
+    pid = collector_read_pid
     if pid && process_alive?(pid)
       puts "Collector is running."
     else

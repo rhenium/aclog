@@ -72,8 +72,10 @@ module Collector
         Tweet.create_from_json(msg)
       when "favorite"
         log(:debug, "Receive favorite: #{msg[:source][:id]} => #{msg[:target_object][:id]}")
-        f = Favorite.create_from_json(msg)
-        Notification.notify_favorites_count(f.tweet)
+        Tweet.transaction do
+          f = Favorite.create_from_json(msg)
+          Notification.notify_favorites_count(f.tweet)
+        end
       when "unfavorite"
         log(:debug, "Receive unfavorite: #{msg[:source][:id]} => #{msg[:target_object][:id]}")
         Favorite.destroy_from_json(msg)

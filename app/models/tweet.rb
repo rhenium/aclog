@@ -88,7 +88,7 @@ class Tweet < ActiveRecord::Base
 
     def filter_by_query(query)
       strings = []
-      query.gsub!(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; "##{strings.size - 1}" }
+      query = query.gsub(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; "##{strings.size - 1}" }
 
       escape_text = -> str do
         str.gsub(/#(\d+)/) { strings[$1.to_i] }

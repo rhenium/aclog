@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
 gem "rails", "~> 4.1.0"
+gem "tzinfo-data"
 gem "mysql2"
 gem "settingslogic"
 gem "yajl-ruby", require: "yajl"

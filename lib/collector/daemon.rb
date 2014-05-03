@@ -10,7 +10,7 @@ module Collector
         set_loggers
 
         EM.run do
-          sock_path = File.join(Rails.root, "tmp", "sockets", "receiver.sock")
+          sock_path = File.join(Rails.root, "tmp", "sockets", "collector.sock")
           File.delete(sock_path) if File.exists?(sock_path)
           control = MessagePack::RPC::Server.new
           control.listen(MessagePack::RPC::UNIXServerTransport.new(sock_path), Collector::ControlServer.new)

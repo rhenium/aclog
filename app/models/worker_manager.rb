@@ -21,10 +21,10 @@ class WorkerManager
     def client
       @client ||= begin
         transport = MessagePack::RPC::UNIXTransport.new
-        client = MessagePack::RPC::Client.new(transport, Rails.root.join("tmp", "sockets", "receiver.sock").to_s)
+        MessagePack::RPC::Client.new(transport, Rails.root.join("tmp", "sockets", "collector.sock").to_s)
+      rescue Errno::ECONNREFUSED, Errno::ENOENT
+        raise Aclog::Exceptions::WorkerConnectionError, "Couldn't connect to the background worker"
       end
-    rescue Errno::ECONNREFUSED, Errno::ENOENT
-      raise Aclog::Exceptions::WorkerConnectionError, "Couldn't connect to the background worker"
     end
   end
 end

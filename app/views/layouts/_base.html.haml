@@ -53,7 +53,6 @@
                 %li= link_to "Discovered users", user_discovered_users_path(current_user.screen_name)
                 %li.divider
                 %li= link_to "Setting", settings_path
-                %li= link_to "API", about_api_path
                 %li= link_to "Sign out", logout_path
           - else
             %li= link_to "Sign in", "/i/login?redirect_after_login=" + CGI.escape(request.fullpath), method: :post, class: "signup"

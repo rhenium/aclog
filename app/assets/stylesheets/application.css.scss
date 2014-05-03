@@ -504,16 +504,23 @@ a.list-group-item.active:focus {
     margin-bottom: 0;
 }
 
+.front-footer a {
+    color: #777;
+    text-decoration: none;
+    padding: 2px;
+    transition: all .25s ease;
+}
+
+.front-footer a:hover {
+    color: #edc63c;
+}
+
 .front-footer a.aclogicon {
     display: inline-block;
     margin-right: 15px;
-    padding: 2px;
-    color: #777;
     font-size: 28px;
-    text-decoration: none;
     border: 2px solid #777;
     border-radius: 50%;
-    transition: all .25s ease;
 }
 
 .front-footer a.aclogicon:last-child {
@@ -521,7 +528,6 @@ a.list-group-item.active:focus {
 }
 
 .front-footer a.aclogicon:hover {
-    color: #edc63c;
     border-color: #edc63c;
 }
 

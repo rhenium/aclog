@@ -5,8 +5,8 @@ class SettingsController < ApplicationController
   end
 
   def update
-    @account.update_settings!(notification: params[:notification] == "true",
-                              private: params[:private] == "true")
+    @account.update(notification: params[:notification] == "true",
+                    private: params[:private] == "true")
     redirect_to action: "index"
   end
 

@@ -66,11 +66,11 @@ class TweetsController < ApplicationController
   end
 
   def all_best
-    @tweets = paginate_with_page_number(Tweet.not_protected.registered.reacted.order_by_reactions).eager_load_for_html
+    @tweets = paginate_with_page_number(Tweet.reacted.order_by_reactions).eager_load_for_html
   end
 
   def all_recent
-    @tweets = paginate_with_page_number(Tweet.not_protected.registered.recent.reacted.order_by_reactions).eager_load_for_html
+    @tweets = paginate_with_page_number(Tweet.recent.reacted.order_by_reactions).eager_load_for_html
   end
 
   def all_timeline

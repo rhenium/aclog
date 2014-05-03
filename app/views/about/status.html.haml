@@ -1,0 +1,28 @@
+- title "Status"
+.container
+  %h1 Status
+  - if @worker_status
+    %h2 Worker Status
+    %table.table
+      %thead
+        %tr
+          %th Group
+          %th Status
+          %th Uptime
+      %tbody
+        - @worker_status[:active_node_statuses].each_with_index do |node, i|
+          - if node
+            %tr
+              %td= i
+              %td Working
+              %td= "#{(Time.now - node[:start_time]).to_i / 60} minutes"
+          - else
+            %tr.danger
+              %td= i
+              %td Down
+              %td -
+    - if logged_in?
+      %p Your group is #{@your_node_number}.
+  - else
+    .alert.alert-danger
+      %strong Couldn't communicate with the collector service.

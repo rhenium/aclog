@@ -3,6 +3,8 @@ Rails.application.routes.draw do
 
   mount Api => "/api"
 
+  get "/i/status" =>                            "about#status",                     as: "status"
+
   # Internals / SessionsController
   get "/i/callback" =>                          "sessions#create"
   get "/i/logout" =>                            "sessions#destroy",                 as: "logout"

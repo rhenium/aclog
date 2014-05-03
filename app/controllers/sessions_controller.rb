@@ -5,7 +5,10 @@ class SessionsController < ApplicationController
     account = Account.create_or_update(user_id: auth["uid"],
                                        oauth_token: auth["credentials"]["token"],
                                        oauth_token_secret: auth["credentials"]["secret"])
-    account.update_connection
+    begin
+      WorkerManager.update_account(account)
+    rescue Aclog::Exceptions::WorkerConnectionError
+    end
 
     User.create_from_json(id: account.user_id,
                           screen_name: auth["extra"]["raw_info"]["screen_name"],

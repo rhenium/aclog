@@ -16,5 +16,7 @@ module Aclog
     class OAuthEchoError < Unauthorized; end
 
     class OAuthEchoUnauthorized < OAuthEchoError; end
+
+    class WorkerConnectionError < AclogError; end
   end
 end

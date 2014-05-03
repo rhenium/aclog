@@ -1,6 +1,6 @@
 module Collector
   class NodeConnection < EM::Connection
-    attr_reader :connection_id
+    attr_reader :connection_id, :start_time
 
     @@_id = 0
 
@@ -9,6 +9,7 @@ module Collector
       @connection_id = (@@_id += 1)
       @authenticated = false
       @closing = false
+      @start_time = Time.now
     end
 
     def unbind

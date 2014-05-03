@@ -1,9 +1,12 @@
 require "msgpack/rpc/transport/unix"
 
 module Collector
-  class Daemon
+  module Daemon
     class << self
+      attr_reader :start_time
+
       def start
+        @start_time = Time.now
         set_loggers
 
         EM.run do

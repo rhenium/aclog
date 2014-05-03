@@ -26,21 +26,10 @@ class Account < ActiveRecord::Base
 
   def deactivate!
     self.status = Account::INACTIVE
-    self.save! if self.changed?
+    self.save!
 
-    update_connection
-  end
-
-  def update_connection
-    transport = MessagePack::RPC::UNIXTransport.new
-    client = MessagePack::RPC::Client.new(transport, Rails.root.join("tmp", "sockets", "receiver.sock").to_s)
-    if active?
-      client.call(:register_account, Marshal.dump(self))
-    else
-      client.call(:deactivate_account, Marshal.dump(self))
-    end
-  rescue Errno::ECONNREFUSED, Errno::ENOENT
-    logger.error("Account#update_connection: couldn't connect to the receiver")
+    WorkerManager.update_account(self)
+  rescue Aclog::Exceptions::WorkerConnectionError
   end
 
   def client

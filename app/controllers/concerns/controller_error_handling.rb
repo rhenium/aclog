@@ -22,7 +22,11 @@ module ControllerErrorHandling
       render "shared/user_forbidden_error", status: 403, formats: :html
     end
 
-    rescue_from ActionController::RoutingError, ActiveRecord::RecordNotFound, Aclog::Exceptions::NotFound do |exception|
+    rescue_from \
+      ActionController::RoutingError,
+      ActiveRecord::RecordNotFound,
+      Aclog::Exceptions::NotFound,
+      Twitter::Error::NotFound do |exception|
       @message = t("error.not_found")
       render "shared/common_error", status: 404, formats: :html
     end

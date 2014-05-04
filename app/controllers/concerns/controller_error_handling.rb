@@ -12,18 +12,9 @@ module ControllerErrorHandling
       render "shared/common_error", status: 500, formats: :html
     end
 
-    rescue_from Aclog::Exceptions::Forbidden do |exception|
-      @message = t("error.forbidden")
-      render "shared/common_error", status: 403, formats: :html
-    end
-
-    rescue_from Aclog::Exceptions::UserProtected do |exception|
-      @message = t("error.forbidden")
-      render "shared/user_forbidden_error", status: 403, formats: :html
-    end
-
     rescue_from \
       ActionController::RoutingError,
+      ActionView::MissingTemplate,
       ActiveRecord::RecordNotFound,
       Aclog::Exceptions::NotFound,
       Twitter::Error::NotFound do |exception|
@@ -31,11 +22,17 @@ module ControllerErrorHandling
       render "shared/common_error", status: 404, formats: :html
     end
 
-    rescue_from ActionView::MissingTemplate do
-      if request.format != :html
-        @message = t("error.not_found")
-        render "shared/common_error", status: 404, formats: :html
-      end
+    rescue_from \
+      Aclog::Exceptions::Forbidden,
+      Twitter::Error::Unauthorized,
+      Twitter::Error::Forbidden do |exception|
+      @message = t("error.forbidden")
+      render "shared/common_error", status: 403, formats: :html
+    end
+
+    rescue_from Aclog::Exceptions::UserProtected do |exception|
+      @message = t("error.forbidden")
+      render "shared/user_forbidden_error", status: 403, formats: :html
     end
   end
 end

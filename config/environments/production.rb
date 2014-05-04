@@ -46,10 +46,13 @@ Rails.application.configure do
   config.log_level = :info
 
   # Prepend all log lines with the following tags.
-  # config.log_tags = [ :subdomain, :uuid ]
+  config.log_tags = [proc { Time.now }, :uuid, :remote_ip]
 
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+
+  # Do not log "Rendered */*.html.haml (25.0ms)"
+  config.action_view.logger = nil
 
   # Use a different cache store in production.
   config.cache_store = :dalli_store, { pool_size: 5 }
@@ -76,7 +79,7 @@ Rails.application.configure do
   # config.autoflush_log = false
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
-  config.log_formatter = ::Logger::Formatter.new
+  # config.log_formatter = ::Logger::Formatter.new
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false

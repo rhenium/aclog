@@ -1,21 +1,19 @@
 require "msgpack/rpc/transport/unix"
 
 class Account < ActiveRecord::Base
-  ACTIVE = 0; INACTIVE = 1
+  enum status: { active: 0, inactive: 1 }
 
   belongs_to :user
-  scope :active, -> { where(status: Account::ACTIVE) }
   scope :for_node, ->(block_number) { active.where("id % ? = ?", Settings.collector.nodes_count, block_number) }
 
   def notification?; notification end
   def private?; private end
-  def active?; status == Account::ACTIVE end
 
   def self.create_or_update(hash)
     account = where(user_id: hash[:user_id]).first_or_initialize
     account.oauth_token = hash[:oauth_token]
     account.oauth_token_secret = hash[:oauth_token_secret]
-    account.status = Account::ACTIVE
+    account.status = :active
     account.save if account.changed?
     account
   end
@@ -25,8 +23,7 @@ class Account < ActiveRecord::Base
   end
 
   def deactivate!
-    self.status = Account::INACTIVE
-    self.save!
+    self.inactive!
 
     WorkerManager.update_account(self)
   rescue Aclog::Exceptions::WorkerConnectionError

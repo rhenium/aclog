@@ -100,7 +100,7 @@ describe User do
         expect(user.registered?).to be true
       end
       it "return false if user is inactive" do
-        @account.status = Account::INACTIVE
+        @account.status = :inactive
         expect(user.registered?).to be false
       end
     end

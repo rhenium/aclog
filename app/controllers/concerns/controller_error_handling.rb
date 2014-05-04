@@ -8,7 +8,7 @@ module ControllerErrorHandling
       message << "  " << exception.backtrace.join("\n  ")
       logger.fatal("#{message}\n\n")
 
-      @message = "#{t("error.internal_error")}: #{exception.class}"
+      @message = "#{t("error.internal_error")}: #{request.uuid}"
       render "shared/common_error", status: 500, formats: :html
     end
 

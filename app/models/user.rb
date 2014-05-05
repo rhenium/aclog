@@ -81,13 +81,13 @@ class User < ActiveRecord::Base
     @_stats ||= begin
       raise(Aclog::Exceptions::UserNotRegistered, self) unless registered? && account.active?
 
-      reactions_count_s = self.tweets.pluck(:reactions_count)
+      plucked = self.tweets.select("COUNT(*) AS count, SUM(reactions_count) AS sum").first.attributes
 
       ret = OpenStruct.new
       ret.updated_at = Time.now
       ret.since_join = (DateTime.now.utc - self.account.created_at.to_datetime).to_i
-      ret.tweets_count = reactions_count_s.size
-      ret.reactions_count = reactions_count_s.inject(:+)
+      ret.tweets_count = plucked["count"]
+      ret.reactions_count = plucked["sum"]
       
       ret
     end

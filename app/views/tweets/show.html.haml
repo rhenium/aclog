@@ -10,5 +10,5 @@
     = render @tweet
     = render partial: "tweet_reply", collection: @tweet.reply_descendants(2), as: :tweet
   %p.refresh<
-    %a{href: import_path(@tweet.id), title: "Refresh tweet"}<
+    = link_to import_path(@tweet.id), method: :post, title: "Refresh tweet" do
       %span.glyphicon.glyphicon-refresh/

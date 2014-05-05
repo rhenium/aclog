@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   get "/i/user_jump_suggest" =>                 "users#user_jump_suggest",          as: "user_jump_suggest"
 
   get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
-  get "/i/:id/import" =>                        "tweets#import",                    as: "import", constraints: { id: /\d+/ }
+  post "/i/:id/import" =>                       "tweets#import",                    as: "import", constraints: { id: /\d+/ }
 
   get "/i/settings" =>                          "settings#index",                   as: "settings"
   post "/i/settings/update" =>                  "settings#update"

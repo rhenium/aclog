@@ -7,11 +7,11 @@
   - if user.registered?
     %ul.records
       %li<
-        %span> Reactions
+        %span> Received
         %span.data>= user.stats.reactions_count
       %li<
         %span> Average
-        %span.data>= "%.2f" % user.stats.average_reactions_count
+        %span.data>= "%.2f" % (user.stats.reactions_count.to_f / user.stats.tweets_count)
       %li<
         %span> Joined
         %span.data>

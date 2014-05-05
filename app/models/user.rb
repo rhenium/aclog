@@ -78,20 +78,19 @@ class User < ActiveRecord::Base
   end
 
   def stats
-    raise(Aclog::Exceptions::UserNotRegistered, self) unless registered? && account.active?
+    @_stats ||= begin
+      raise(Aclog::Exceptions::UserNotRegistered, self) unless registered? && account.active?
 
-    reactions_count = tweets.sum(:reactions_count)
+      reactions_count_s = self.tweets.pluck(:reactions_count)
 
-    ret = OpenStruct.new
-    ret.updated_at = Time.now
-    ret.since_join = (DateTime.now.utc - self.account.created_at.to_datetime).to_i
-    ret.favorites_count = self.favorites.count
-    ret.retweets_count = self.retweets.count
-    ret.tweets_count = self.tweets.count
-    ret.reactions_count = reactions_count
-    ret.average_reactions_count = reactions_count.to_f / ret.tweets_count
-
-    ret
+      ret = OpenStruct.new
+      ret.updated_at = Time.now
+      ret.since_join = (DateTime.now.utc - self.account.created_at.to_datetime).to_i
+      ret.tweets_count = reactions_count_s.size
+      ret.reactions_count = reactions_count_s.inject(:+)
+      
+      ret
+    end
   end
 
   def count_discovered_by

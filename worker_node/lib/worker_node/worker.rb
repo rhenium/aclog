@@ -7,7 +7,7 @@ module WorkerNode
         stop = proc do
           puts "Stopping all connections...."
           connection.exit
-          EM.add_timer(2) do
+          EM.add_timer(0.1) do
             EM.stop
           end
         end

@@ -3,10 +3,10 @@ require "yajl"
 
 module WorkerNode
   class UserStream
-    def initialize(msg, send_message)
+    def initialize(msg, queue)
       @user_id = msg[:user_id]
       @account_id = msg[:id]
-      @send_message = send_message
+      @queue = queue
       prepare_client(msg)
     end
 
@@ -27,10 +27,6 @@ module WorkerNode
     end
 
     private
-    def send_message(event, data)
-      @send_message.call(event, data)
-    end
-
     def prepare_client(msg)
       client = EM::Twitter::Client.new(client_opts(msg))
 
@@ -53,7 +49,7 @@ module WorkerNode
 
       client.on_unauthorized do
         log(:warn, "Unauthorized")
-        send_message(:unauthorized, id: @account_id, user_id: @user_id)
+        @queue.push(:unauthorized, id: @account_id, user_id: @user_id)
         self.stop
       end
 
@@ -94,34 +90,39 @@ module WorkerNode
 
     def on_tweet(json)
       log(:debug, "Tweet: #{json[:user][:id]} => #{json[:id]}")
-      send_message(:tweet, reduce_tweet(json))
+      @queue.push(:tweet,
+                  reduce_tweet(json).merge(
+                  unique_id: json[:id]))
     end
 
     def on_retweet(json)
       log(:debug, "Retweet: #{json[:user][:id]} => #{json[:retweeted_status][:id]}")
-      send_message(:retweet,
-                   id: json[:id],
-                   user: reduce_user(json[:user]),
-                   retweeted_status: reduce_tweet(json[:retweeted_status]))
+      @queue.push(:retweet,
+                  id: json[:id],
+                  user: reduce_user(json[:user]),
+                  retweeted_status: reduce_tweet(json[:retweeted_status]),
+                  unique_id: json[:id])
     end
 
     def on_favorite(json)
       log(:debug, "Favorite: #{json[:source][:id]} => #{json[:target_object][:id]}")
-      send_message(:favorite,
-                   source: reduce_user(json[:source]),
-                   target_object: reduce_tweet(json[:target_object]))
+      @queue.push(:favorite,
+                  source: reduce_user(json[:source]),
+                  target_object: reduce_tweet(json[:target_object]),
+                  unique_id: "fav-#{json[:created_at]}-#{json[:source][:id]}-#{json[:target_object][:id]}")
     end
 
     def on_unfavorite(json)
       log(:debug, "Unfavorite: #{json[:source][:id]} => #{json[:target_object][:id]}")
-      send_message(:unfavorite,
-                   source: reduce_user(json[:source]),
-                   target_object: reduce_tweet(json[:target_object]))
+      @queue.push(:unfavorite,
+                  source: reduce_user(json[:source]),
+                  target_object: reduce_tweet(json[:target_object]),
+                  unique_id: "unfav-#{json[:created_at]}-#{json[:source][:id]}-#{json[:target_object][:id]}")
     end
 
     def on_delete(json)
       log(:debug, "Delete: #{json[:delete][:status]}")
-      send_message(:delete, json)
+      @queue.push(:delete, json)
     end
 
     def client_opts(msg)
@@ -129,7 +130,6 @@ module WorkerNode
         method: :get,
         host: "userstream.twitter.com",
         path: "/1.1/user.json",
-        params: { with: "user" },
         oauth: {
           consumer_key: msg[:consumer_key],
           consumer_secret: msg[:consumer_secret],

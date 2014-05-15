@@ -130,8 +130,8 @@ module WorkerNode
         method: :get,
         host: "userstream.twitter.com",
         path: "/1.1/user.json",
+        params: { include_followings_activity: true },
         oauth: {
-          params: { include_followings_activity: true },
           consumer_key: msg[:consumer_key],
           consumer_secret: msg[:consumer_secret],
           token: msg[:oauth_token],

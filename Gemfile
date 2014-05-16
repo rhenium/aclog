@@ -14,7 +14,8 @@ gem "jquery-rails"
 gem "bootstrap-sass"
 gem "turbolinks"
 
-gem "puma"
+gem "unicorn"
+gem "unicorn-worker-killer"
 gem "dalli"
 gem "connection_pool"
 

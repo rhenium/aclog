@@ -59,7 +59,7 @@ Collects favs and retweets in real time by UserStreams.
 
 * Start your aclog
 
-        $ # Start Puma (Web server)
+        $ # Start Unicorn (Web server)
         $ rake web:start
         $ # Start Background worker
         $ rake collector:start

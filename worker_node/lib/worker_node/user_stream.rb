@@ -122,7 +122,9 @@ module WorkerNode
 
     def on_delete(json)
       log(:debug, "Delete: #{json[:delete][:status]}")
-      @queue.push(:delete, json)
+      @queue.push(:delete,
+                  json.merge(
+                  unique_id: "delete-#{json[:delete][:status][:id]}"))
     end
 
     def client_opts(msg)

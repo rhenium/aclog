@@ -17,7 +17,7 @@ module Collector
           EM.defer { control.run }
 
           event_queue = Collector::EventQueue.new
-          EM.add_periodic_timer(1) do
+          EM.add_periodic_timer(Settings.collector.flush_interval) do
             event_queue.flush
           end
 

@@ -44,25 +44,25 @@ module Collector
     end
 
     def push_favorite(event)
-      push_tweet(event[:target_object])
-      push_user(event[:source])
       caching(:favorite, "#{event[:created_at]}-#{event[:source][:id]}-#{event[:target_object][:id]}") do
+        push_tweet(event[:target_object])
+        push_user(event[:source])
         @queue_favorite << event
       end
     end
 
     def push_retweet(status)
-      push_user(status[:user])
-      push_tweet(status[:retweeted_status])
       caching(:retweet, status[:id]) do
+        push_user(status[:user])
+        push_tweet(status[:retweeted_status])
         @queue_retweet << status
       end
     end
 
     def push_unfavorite(event)
-      push_tweet(event[:target_object])
-      push_user(event[:source])
       caching(:unfavorite, "#{event[:created_at]}-#{event[:source][:id]}-#{event[:target_object][:id]}") do
+        push_tweet(event[:target_object])
+        push_user(event[:source])
         @queue_unfavorite << event
       end
     end

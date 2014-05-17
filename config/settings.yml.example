@@ -33,6 +33,9 @@ default: &default
   users:
     count:            50
 
+  cache:
+    stats:            900 # sec
+
 development:
   <<: *default
 

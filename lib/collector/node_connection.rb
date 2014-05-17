@@ -5,12 +5,13 @@ module Collector
 
     @@_id = 0
 
-    def initialize
+    def initialize(queue)
       @unpacker = MessagePack::Unpacker.new(symbolize_keys: true)
       @connection_id = (@@_id += 1)
       @authenticated = false
       @closing = false
       @activated_time = nil
+      @queue = queue
     end
 
     def unbind
@@ -71,22 +72,19 @@ module Collector
         log(:info, "Received unauthorized: ##{msg[:id]}/#{msg[:user_id]}")
       when "tweet"
         log(:debug, "Received tweet: #{msg[:id]}")
-        Tweet.create_from_json(msg)
+        @queue.push_tweet(msg)
       when "favorite"
         log(:debug, "Receive favorite: #{msg[:source][:id]} => #{msg[:target_object][:id]}")
-        Tweet.transaction do
-          f = Favorite.create_from_json(msg)
-          Notification.notify_favorites_count(f.tweet)
-        end
+        @queue.push_favorite(msg)
       when "unfavorite"
         log(:debug, "Receive unfavorite: #{msg[:source][:id]} => #{msg[:target_object][:id]}")
-        Favorite.destroy_from_json(msg)
+        @queue.push_unfavorite(msg)
       when "retweet"
         log(:debug, "Receive retweet: #{msg[:user][:id]} => #{msg[:retweeted_status][:id]}")
-        Retweet.create_from_json(msg)
+        @queue.push_retweet(msg)
       when "delete"
         log(:debug, "Receive delete: #{msg[:delete][:status][:id]}")
-        Tweet.destroy_from_json(msg) || Retweet.destroy_from_json(msg)
+        @queue.push_delete(msg)
       when "exit"
         log(:info, "Closing this connection...")
         @closing = true

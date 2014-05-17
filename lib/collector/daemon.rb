@@ -16,7 +16,12 @@ module Collector
           control.listen(MessagePack::RPC::UNIXServerTransport.new(sock_path), Collector::ControlServer.new)
           EM.defer { control.run }
 
-          nodes = EM.start_server("0.0.0.0", Settings.collector.server_port, Collector::NodeConnection)
+          event_queue = Collector::EventQueue.new
+          EM.add_periodic_timer(1) do
+            event_queue.flush
+          end
+
+          nodes = EM.start_server("0.0.0.0", Settings.collector.server_port, Collector::NodeConnection, event_queue)
 
           stop = -> _ do
             control.stop

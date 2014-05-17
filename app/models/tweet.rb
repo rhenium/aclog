@@ -38,50 +38,48 @@ class Tweet < ActiveRecord::Base
   }
 
   class << self
-    def create_from_json(json)
-      tweet = transaction do
-        self.find_by(id: json[:id]) ||
-          self.create!(id: json[:id],
+    def initialize_from_json(json, ignore_relation: false)
+      tweet = self.new(id: json[:id],
                        text: extract_entities(json),
                        source: json[:source],
-                       tweeted_at: json[:created_at],
+                       tweeted_at: Time.parse(json[:created_at]),
                        in_reply_to_id: json[:in_reply_to_status_id],
-                       user: User.create_from_json(json[:user]))
-      end
-    rescue ActiveRecord::RecordNotUnique => e
-      logger.debug("Duplicate tweet: #{tweet}: #{e.class}") # collector may be threaded
-      self.find(json[:id])
-    end
-
-    def create_from_twitter_object(obj)
-      t = self.create_from_json(obj.attrs)
-      t.update_reactions_count(json: obj.attrs)
-      t
-    end
-
-    def destroy_from_json(json)
-      deleted_count = self.delete(json[:delete][:status][:id])
-
-      if deleted_count > 0
-        Favorite.where(tweet_id: json[:delete][:status][:id]).delete_all
-        Retweet.where(tweet_id: json[:delete][:status][:id]).delete_all
-        true
+                       favorites_count: json[:favorite_count],
+                       retweets_count: json[:retweet_count],
+                       reactions_count: json[:favorite_count] + json[:retweet_count])
+      if ignore_relation
+        tweet.user_id = json[:user][:id]
       else
-        false
+        tweet.user = User.initialize_from_json(json[:user])
       end
+
+      tweet
     end
 
-    def import(id, client = nil)
+    def create_bulk_from_json(array)
+      objects = array.map {|json| self.initialize_from_json(json, ignore_relation: true) }
+      self.import(objects, on_duplicate_key_update: [:favorites_count, :retweets_count, :reactions_count])
+    end
+
+    def destroy_bulk_from_json(array)
+      ids = array.map {|json| json[:delete][:status][:id] }
+      self.where(id: ids).delete_all
+      Favorite.where(tweet_id: ids).delete_all
+      Retweet.where(tweet_id: ids).delete_all
+    end
+
+    def import_from_twitter(id, client = nil)
       client ||= Account.random.client
 
       st = client.status(id)
-      tweet = self.create_from_twitter_object(st)
+      self.create_bulk_from_json([st.attrs])
+      tweet = self.find(st.id)
       tweet.update(text: extract_entities(st.attrs),
                    source: st.attrs[:source],
                    in_reply_to_id: (tweet.in_reply_to_id || st.attrs[:in_reply_to_status_id]))
 
       nt = tweet
-      nt = self.create_from_twitter_object(client.status(nt.in_reply_to_id)) while !nt.in_reply_to && nt.in_reply_to_id
+      nt = self.create_bulk_from_json([client.status(nt.in_reply_to_id)]) while !nt.in_reply_to && nt.in_reply_to_id
 
       tweet.reload
     end
@@ -174,14 +172,5 @@ class Tweet < ActiveRecord::Base
       level += 1
     end
     nodes.sort_by {|t| t.id }
-  end
-
-  def update_reactions_count(favorites_count: 0, retweets_count: 0, json: {})
-    fav_op = favorites_count >= 0 ? "+" : "-"
-    rts_op = retweets_count >= 0 ? "+" : "-"
-    Tweet.where(id: self.id)
-      .update_all("favorites_count = GREATEST(favorites_count #{fav_op} #{favorites_count.abs}, #{(json[:favorite_count] || 0).to_i}), " +
-                  "retweets_count = GREATEST(retweets_count #{rts_op} #{retweets_count.abs}, #{(json[:retweet_count] || 0).to_i}), " +
-                  "reactions_count = favorites_count + retweets_count")
   end
 end

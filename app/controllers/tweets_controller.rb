@@ -11,9 +11,9 @@ class TweetsController < ApplicationController
 
   def import
     if logged_in?
-      tweet = Tweet.import(params[:id], current_user.account.client)
+      tweet = Tweet.import_from_twitter(params[:id], current_user.account.client)
     else
-      tweet = Tweet.import(params[:id])
+      tweet = Tweet.import_from_twitter(params[:id])
     end
     redirect_to tweet
   end

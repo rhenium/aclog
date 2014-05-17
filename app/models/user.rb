@@ -16,23 +16,16 @@ class User < ActiveRecord::Base
       key && where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
     end
 
-    def create_from_json(json)
-      user = where(id: json[:id]).first_or_initialize
-      orig = user.attributes.dup
-
-      user.screen_name = json[:screen_name]
-      user.name = json[:name]
-      user.profile_image_url = json[:profile_image_url]
-      user.protected = json[:protected]
-
-      if user.attributes == orig
-        logger.debug("User was not updated: #{user.id}")
-      else
-        user.save!
-        logger.debug("Successfully saved an user: #{user.id}")
+    def create_or_update_bulk_from_json(array)
+      objects = array.map do |json|
+        self.new(id: json[:id],
+                 screen_name: json[:screen_name],
+                 name: json[:name],
+                 profile_image_url: json[:profile_image_url],
+                 protected: json[:protected])
       end
 
-      user
+      self.import(objects, on_duplicate_key_update: [:screen_name, :name, :profile_image_url, :protected])
     end
   end
 

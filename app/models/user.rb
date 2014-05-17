@@ -78,9 +78,7 @@ class User < ActiveRecord::Base
   end
 
   def stats
-    @_stats ||= begin
-      raise(Aclog::Exceptions::UserNotRegistered, self) unless registered? && account.active?
-
+    Rails.cache.fetch("users/#{self.id}/stats", expires_in: Settings.cache.stats) do
       plucked = self.tweets.select("COUNT(*) AS count, SUM(reactions_count) AS sum").first.attributes
 
       ret = OpenStruct.new

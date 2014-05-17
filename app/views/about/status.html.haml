@@ -14,8 +14,8 @@
           - if node
             %tr
               %td= i
-              %td Working
-              %td= "#{(Time.now - node[:start_time]).to_i / 60} minutes"
+              %td Running
+              %td= "#{(Time.now - node[:activated_time]).to_i / 60} minutes"
           - else
             %tr.danger
               %td= i

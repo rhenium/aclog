@@ -45,6 +45,7 @@ module Collector
           con = self.inactive_connections.shift
           if con
             self.active_connections[first_inactive_id] = con
+            con.activated_time = Time.now
             Rails.logger.warn("[NodeManager] Registered node ##{con.connection_id} as group ##{first_inactive_id}")
             Account.for_node(first_inactive_id).each do |a|
               con.register_account(a)

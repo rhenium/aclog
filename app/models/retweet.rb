@@ -10,7 +10,7 @@ class Retweet < ActiveRecord::Base
                tweet_id: json[:retweeted_status][:id])
     end
 
-    self.import objects
+    self.import(objects, ignore: true)
   end
 
   # This doesn't update Tweet#reactions_count.

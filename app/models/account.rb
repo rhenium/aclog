@@ -41,8 +41,9 @@ class Account < ActiveRecord::Base
   end
 
   def friends
+    @_friends ||=
     Rails.cache.fetch("accounts/#{self.id}/friends", expires_in: Settings.cache.friends) do
-      self.client.friend_ids.to_a
+      Set.new self.client.friend_ids
     end
   end
 end

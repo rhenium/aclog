@@ -10,27 +10,25 @@ module Collector
     end
 
     def flush
-      ActiveRecord::Base.transaction do
-        queue_user = @queue_user; @queue_user = {}
-        User.create_or_update_bulk_from_json(queue_user.values)
+      queue_user = @queue_user; @queue_user = {}
+      User.create_or_update_bulk_from_json(queue_user.values)
 
-        queue_tweet = @queue_tweet; @queue_tweet = {}
-        Tweet.create_bulk_from_json(queue_tweet.values)
+      queue_tweet = @queue_tweet; @queue_tweet = {}
+      Tweet.create_bulk_from_json(queue_tweet.values)
 
-        queue_favorite = @queue_favorite; @queue_favorite = []
-        Favorite.create_bulk_from_json(queue_favorite)
+      queue_favorite = @queue_favorite; @queue_favorite = []
+      Favorite.create_bulk_from_json(queue_favorite)
 
-        queue_retweet = @queue_retweet; @queue_retweet = []
-        Retweet.create_bulk_from_json(queue_retweet)
+      queue_retweet = @queue_retweet; @queue_retweet = []
+      Retweet.create_bulk_from_json(queue_retweet)
 
-        queue_unfavorite = @queue_unfavorite; @queue_unfavorite = []
-        Favorite.delete_bulk_from_json(queue_unfavorite)
+      queue_unfavorite = @queue_unfavorite; @queue_unfavorite = []
+      Favorite.delete_bulk_from_json(queue_unfavorite)
 
-        queue_delete = @queue_delete; @queue_delete = []
-        if queue_delete.size > 0
-          Tweet.destroy_bulk_from_json(queue_delete)
-          Retweet.delete_bulk_from_json(queue_delete)
-        end
+      queue_delete = @queue_delete; @queue_delete = []
+      if queue_delete.size > 0
+        Tweet.destroy_bulk_from_json(queue_delete)
+        Retweet.delete_bulk_from_json(queue_delete)
       end
     end
 

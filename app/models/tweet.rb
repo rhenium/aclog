@@ -17,25 +17,14 @@ class Tweet < ActiveRecord::Base
   scope :not_protected, -> { joins(:user).references(:user).where(users: { protected: false }) }
   scope :registered, -> { joins(user: :account).references(:account).merge(Account.active) }
 
-  scope :max_id, -> id { where("tweets.id <= ?", id.to_i) if id }
-  scope :since_id, -> id { where("tweets.id > ?", id.to_i) if id }
+  scope :max_id, ->(id) { where("tweets.id <= ?", id.to_i) if id }
+  scope :since_id, ->(id) { where("tweets.id > ?", id.to_i) if id }
   scope :page, ->(page, page_per) { limit(page_per).offset((page - 1) * page_per) }
 
   scope :order_by_id, -> { order(id: :desc) }
   scope :order_by_reactions, -> { order(reactions_count: :desc) }
 
   scope :favorited_by, ->(user) { joins(:favorites).where(favorites: { user: user }) }
-  scope :retweeted_by, ->(user) { joins(:retweets).where(retweets: { user: user }) }
-  scope :discovered_by, ->(user) {
-    load_count = all.limit_value.to_i + all.offset_value.to_i
-    load_count = nil if load_count == 0
-
-    un = [:favorites, :retweets].map {|m|
-      user.__send__(m).select(:tweet_id).order(tweet_id: :desc).limit(load_count)
-    }.map {|m| "(#{m.to_sql})" }.join(" UNION ")
-
-    joins("INNER JOIN ((#{un})) reactions ON reactions.tweet_id = tweets.id")
-  }
 
   class << self
     def initialize_from_json(json, ignore_relation: false)

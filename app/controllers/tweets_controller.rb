@@ -51,18 +51,18 @@ class TweetsController < ApplicationController
     @tweets = paginate(@user.tweets.reacted(params[:reactions]).order_by_id).eager_load_for_html
   end
 
-  def user_discoveries
+  def user_favorites
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate_with_page_number(Tweet).reacted(params[:reactions]).discovered_by(@user).order_by_id.eager_load_for_html
+    @tweets = paginate(Tweet.reacted(params[:reactions]).favorited_by(@user).order_by_id).eager_load_for_html
   end
 
-  def user_discovered_by
+  def user_favorited_by
     @user = require_user
     authorize_to_show_user! @user
     @source_user = User.find(id: params[:source_user_id], screen_name: params[:source_screen_name])
     authorize_to_show_user! @source_user
-    @tweets = paginate_with_page_number(@user.tweets).reacted(params[:reactions]).discovered_by(@source_user).order_by_id.eager_load_for_html
+    @tweets = paginate(@user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id).eager_load_for_html
   end
 
   def all_best

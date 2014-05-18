@@ -48,7 +48,7 @@
               %ul.dropdown-menu
                 %li= link_to "Best", user_path(current_user.screen_name)
                 %li= link_to "Timeline", user_timeline_path(current_user.screen_name)
-                %li= link_to "Discoveries", user_discoveries_path(current_user.screen_name)
+                %li= link_to "Favorites", user_favorites_path(current_user.screen_name)
                 %li= link_to "Discovered by", user_discovered_by_path(current_user.screen_name)
                 %li= link_to "Discovered users", user_discovered_users_path(current_user.screen_name)
                 %li.divider

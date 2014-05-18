@@ -10,6 +10,6 @@
       - @result.each do |user_id, *counts|
         - user = @cached_users[user_id]
         %li
-          %a{href: user_discovered_by_user_path(screen_name: @user.screen_name, source_screen_name: user.screen_name), title: "#{user.name} (@#{user.screen_name})"}
+          %a{href: user_favorited_by_user_path(screen_name: @user.screen_name, source_screen_name: user.screen_name), title: "#{user.name} (@#{user.screen_name})"}
             = profile_image_tag user
             %span= counts.sum

@@ -54,7 +54,7 @@ class TweetsController < ApplicationController
   def user_favorites
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate(Tweet.reacted(params[:reactions]).favorited_by(@user).order_by_id).eager_load_for_html
+    @tweets = paginate_with_page_number(Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC")).eager_load_for_html
   end
 
   def user_favorited_by

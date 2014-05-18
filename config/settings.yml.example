@@ -37,6 +37,7 @@ default: &default
 
   cache:
     stats:            900 # sec
+    friends:          3600
 
 development:
   <<: *default

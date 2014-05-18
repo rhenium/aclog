@@ -37,20 +37,12 @@ class Account < ActiveRecord::Base
   end
 
   def following?(target_id)
-    api_friendship?(self.user_id, target_id)
+    friends.member? target_id
   end
 
-  def followed_by?(source_id)
-    api_friendship?(source_id, self.user_id)
-  end
-
-  private
-  def api_friendship?(source_id, target_id)
-    return nil unless source_id.is_a?(Integer)
-    return nil unless target_id.is_a?(Integer)
-
-    Rails.cache.fetch("friendship/#{source_id}-#{target_id}", expires_in: 3.days) do
-      client.friendship?(source_id, target_id) rescue nil
+  def friends
+    Rails.cache.fetch("accounts/#{self.id}/friends", expires_in: Settings.cache.friends) do
+      self.client.friend_ids.to_a
     end
   end
 end

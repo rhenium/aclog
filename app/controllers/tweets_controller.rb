@@ -78,7 +78,7 @@ class TweetsController < ApplicationController
   end
 
   def filter
-    @tweets = paginate(Tweet.reacted.recent(7.days).filter_by_query(params[:q].to_s).order_by_id).eager_load_for_html
+    @tweets = paginate(Tweet.recent(7.days).filter_by_query(params[:q].to_s).order_by_id).eager_load_for_html
     if params[:registered]
       @tweets = @tweets.to_a.select {|t| t.user.registered? }
     end

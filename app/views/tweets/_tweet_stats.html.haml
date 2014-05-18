@@ -11,7 +11,7 @@
             %ul
               - users.limit(favorites_truncate_count).each do |m|
                 %li<
-                  - if authorized_to_show_user?(m)
+                  - if tweet.user == current_user || authorized_to_show_user?(m)
                     %a{href: user_path(m.screen_name), title: "#{m.name} (@#{m.screen_name})"}<
                       = profile_image_tag m
                   - else

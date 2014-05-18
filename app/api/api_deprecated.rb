@@ -14,6 +14,13 @@ class ApiDeprecated < Grape::API
       end
     end
 
+    params_source_user = -> do
+      params do
+        optional :source_user_id, type: Integer, desc: "The numerical ID of the user for whom to return results for."
+        optional :source_screen_name, type: String, desc: "The username of the user for whom to return results for."
+      end
+    end
+
     params_pagination = -> do
       params do
         optional :count, type: Integer
@@ -26,6 +33,12 @@ class ApiDeprecated < Grape::API
       params do
         optional :since_id, type: Integer
         optional :max_id, type: Integer
+      end
+    end
+
+    params_threshold = -> do
+      params do
+        optional :reactions, type: Integer, desc: "Returns Tweets which has received reactions more than (or equal to) the specified number of times."
       end
     end
 
@@ -75,6 +88,23 @@ class ApiDeprecated < Grape::API
     params_pagination_with_ids[]
     get "discovered_by", rabl: "tweets" do
       @tweets = paginate_with_ids(user.tweets).discovered_by(user_b).order_by_id
+    end
+
+    desc "Returns the Tweets which a user specified by username or user ID discovered.", deprecated: true
+    params_user[]
+    params_pagination[]
+    params_threshold[]
+    get "user_discoveries", rabl: "tweets" do
+      @tweets = paginate_with_ids(Tweet).reacted(params[:reactions]).discovered_by(user).order_by_id
+    end
+
+    desc "Returns the specified user's Tweets which another specified user discovered.", deprecated: true
+    params_user[]
+    params_source_user[]
+    params_pagination[]
+    params_threshold[]
+    get "user_discovered_by", rabl: "tweets" do
+      @tweets = paginate_with_ids(user.tweets).reacted(params[:reactions]).discovered_by(source_user).order_by_id
     end
   end
 end

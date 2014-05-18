@@ -26,6 +26,18 @@ class Tweet < ActiveRecord::Base
 
   scope :favorited_by, ->(user) { joins(:favorites).where(favorites: { user: user }) }
 
+  # deprecated
+  scope :discovered_by, ->(user) {
+    load_count = all.limit_value.to_i + all.offset_value.to_i
+    load_count = nil if load_count == 0
+
+    un = [:favorites, :retweets].map {|m|
+      user.__send__(m).select(:tweet_id).order(tweet_id: :desc).limit(load_count)
+    }.map {|m| "(#{m.to_sql})" }.join(" UNION ")
+
+    joins("INNER JOIN ((#{un})) reactions ON reactions.tweet_id = tweets.id")
+  }
+
   class << self
     def initialize_from_json(json, ignore_relation: false)
       tweet = self.new(id: json[:id],

@@ -93,21 +93,21 @@ class ApiTweets < Grape::API
       @tweets = paginate_with_ids user.tweets.reacted(params[:reactions]).order_by_id
     end
 
-    desc "Returns the Tweets which a user specified by username or user ID discovered.", example_params: { user_id: 120726371, count: 2 }
+    desc "Returns the Tweets which a user specified by username or user ID favorited.", example_params: { user_id: 120726371, count: 2 }
     params_user[]
     params_pagination[]
     params_threshold[]
-    get "user_discoveries", rabl: "tweets" do
-      @tweets = paginate_with_ids(Tweet).reacted(params[:reactions]).discovered_by(user).order_by_id
+    get "user_favorites", rabl: "tweets" do
+      @tweets = paginate Tweet.reacted(params[:reactions]).favorited_by(user).order("`favorites`.`id` DESC")
     end
 
-    desc "Returns the specified user's Tweets which another specified user discovered.", example_params: { user_id: 120726371, count: 2, source_screen_name: "cn" }
+    desc "Returns the specified user's Tweets which another specified user favorited.", example_params: { user_id: 120726371, count: 2, source_screen_name: "haru067" }
     params_user[]
     params_source_user[]
-    params_pagination[]
+    params_pagination_with_ids[]
     params_threshold[]
-    get "user_discovered_by", rabl: "tweets" do
-      @tweets = paginate_with_ids(user.tweets).reacted(params[:reactions]).discovered_by(source_user).order_by_id
+    get "user_favorited_by", rabl: "tweets" do
+      @tweets = paginate_with_ids user.tweets.reacted(params[:reactions]).favorited_by(source_user).order_by_id
     end
   end
 end

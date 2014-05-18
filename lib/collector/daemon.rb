@@ -18,7 +18,7 @@ module Collector
 
           event_queue = Collector::EventQueue.new
           EM.add_periodic_timer(Settings.collector.flush_interval) do
-            EM.defer { event_queue.flush }
+            event_queue.flush
           end
 
           nodes = EM.start_server("0.0.0.0", Settings.collector.server_port, Collector::NodeConnection, event_queue)

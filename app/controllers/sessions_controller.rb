@@ -10,11 +10,12 @@ class SessionsController < ApplicationController
     rescue Aclog::Exceptions::WorkerConnectionError
     end
 
-    User.create_from_json(id: account.user_id,
-                          screen_name: auth["extra"]["raw_info"]["screen_name"],
-                          name: auth["extra"]["raw_info"]["name"],
-                          profile_image_url: auth["extra"]["raw_info"]["profile_image_url_https"],
-                          protected: auth["extra"]["raw_info"]["protected"])
+    User.create_or_update_bulk_from_json([
+      { id: account.user_id,
+        screen_name: auth["extra"]["raw_info"]["screen_name"],
+        name: auth["extra"]["raw_info"]["name"],
+        profile_image_url: auth["extra"]["raw_info"]["profile_image_url_https"],
+        protected: auth["extra"]["raw_info"]["protected"] }])
 
     session[:user_id] = account.user_id
 

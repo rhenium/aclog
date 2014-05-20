@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
         self.new(id: json[:id],
                  screen_name: json[:screen_name],
                  name: json[:name],
-                 profile_image_url: json[:profile_image_url],
+                 profile_image_url: json[:profile_image_url_https],
                  protected: json[:protected])
       end
 

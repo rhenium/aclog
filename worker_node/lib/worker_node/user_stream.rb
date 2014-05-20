@@ -147,7 +147,7 @@ module WorkerNode
         id: user[:id],
         screen_name: user[:screen_name],
         name: user[:name],
-        profile_image_url: user[:profile_image_url_https],
+        profile_image_url_https: user[:profile_image_url_https],
         protected: user[:protected] 
       }
     end

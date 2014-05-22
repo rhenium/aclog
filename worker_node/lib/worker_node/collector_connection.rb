@@ -105,5 +105,3 @@ module WorkerNode
     end
   end
 end
-
-

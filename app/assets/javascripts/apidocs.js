@@ -11,4 +11,3 @@ Application.apidocs = {
         }
     }
 };
-

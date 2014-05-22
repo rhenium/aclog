@@ -25,4 +25,3 @@ module TwitterOauthEchoAuthentication
     end
   end
 end
-

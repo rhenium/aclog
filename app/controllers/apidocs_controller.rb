@@ -44,5 +44,3 @@ class ApidocsController < ApplicationController
     end
   end
 end
-
-

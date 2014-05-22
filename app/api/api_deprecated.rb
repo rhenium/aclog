@@ -108,4 +108,3 @@ class ApiDeprecated < Grape::API
     end
   end
 end
-

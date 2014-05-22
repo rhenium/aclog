@@ -1,3 +1,3 @@
 collection @tweets
-extends "tweet"
 
+extends "tweet"

@@ -6,14 +6,14 @@ class UsersController < ApplicationController
   def discovered_by
     @user = require_user
     authorize_to_show_user_best! @user
-    @result = @user.count_discovered_by.take(Settings.users.count)
+    @result = @user.count_discovered_by.sort_by {|user_id, count| -count }.take(Settings.users.count)
     @cached_users = Hash[User.find(@result.map {|user_id, count| user_id }).map {|user| [user.id, user] }]
   end
 
   def discovered_users
     @user = require_user
     authorize_to_show_user_best! @user
-    @result = @user.count_discovered_users.take(Settings.users.count)
+    @result = @user.count_discovered_users.sort_by {|user_id, count| -count }.take(Settings.users.count)
     @cached_users = Hash[User.find(@result.map {|user_id, count| user_id }).map {|user| [user.id, user] }]
   end
 

@@ -1,9 +1,9 @@
 require "ostruct"
 
 class User < ActiveRecord::Base
-  has_many :tweets, dependent: :delete_all
-  has_many :favorites, dependent: :delete_all
-  has_many :retweets, dependent: :delete_all
+  has_many :tweets
+  has_many :favorites
+  has_many :retweets
   has_one :account
 
   class << self
@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
         self.new(id: json[:id],
                  screen_name: json[:screen_name],
                  name: json[:name],
-                 profile_image_url: json[:profile_image_url_https],
+                 profile_image_url: json[:profile_image_url_https] || json[:profile_image_url],
                  protected: json[:protected])
       end
 
@@ -85,37 +85,20 @@ class User < ActiveRecord::Base
   end
 
   def count_discovered_by
-    tws = Tweet.arel_table
-    f = -> model do
-      klas = model.arel_table
-      m = tws.project(tws[:id]).where(tws[:user_id].eq(self.id)).order(tws[:id].desc).take(100).as("m")
-      query = klas.project(klas[:user_id], klas[:user_id].count).join(m).on(klas[:tweet_id].eq(m[:id])).group(klas[:user_id])
-      ActiveRecord::Base.connection.exec_query(query.to_sql).rows
-    end
-    merge_count_user(f.call(Favorite), f.call(Retweet))
+    [Favorite, Retweet].map { |klass|
+      klass
+        .joins("INNER JOIN (#{self.tweets.reacted.order_by_id.limit(100).to_sql}) tweets ON tweets.id = #{klass.table_name}.tweet_id")
+        .group("`#{klass.table_name}`.`user_id`")
+        .count("`#{klass.table_name}`.`user_id`")
+    }.inject { |m, s| m.merge(s) { |key, first, second| first.to_i + second.to_i } }
   end
 
   def count_discovered_users
-    tws = Tweet.arel_table
-    f = -> model do
-      klas = model.arel_table
-      m = klas.project(klas[:tweet_id]).where(klas[:user_id].eq(self.id)).order(klas[:id].desc).take(500).as("m")
-      query = tws.project(tws[:user_id], tws[:user_id].count).join(m).on(tws[:id].eq(m[:tweet_id])).group(tws[:user_id])
-      ActiveRecord::Base.connection.exec_query(query.to_sql).rows
-    end
-    merge_count_user(f.call(Favorite), f.call(Retweet))
-  end
-
-  private
-  def merge_count_user(*args)
-    ret = {}
-    args.each_with_index do |o, i|
-      o.each do |user_id, count|
-        ret[user_id] ||= Array.new(args.size, 0)
-        ret[user_id][i] = count
-      end
-    end
-    ret.map(&:flatten).sort_by {|user_id, *counts| -counts.sum }
+    [Favorite, Retweet].map { |klass|
+      Tweet
+        .joins("INNER JOIN (#{self.__send__(klass.table_name.to_sym).order(id: :desc).limit(500).to_sql}) m ON m.tweet_id = tweets.id")
+        .group("tweets.user_id")
+        .count("tweets.user_id")
+    }.inject { |m, s| m.merge(s) { |key, first, second| first.to_i + second.to_i } }
   end
 end
-

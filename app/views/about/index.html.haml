@@ -3,7 +3,10 @@
   .container
     %p<
       %img{alt: "aclog", src: image_path("logo.png"), height: 200, width: 200}
-    %h1 aclog
+    %h1
+      aclog
+      - if Rails.env.development?
+        (dev)
     %p<
       %a.twitter-share-button{href: "https://twitter.com/share", data: { count: "none", lang: "en" }} ツイート
 .front-feature

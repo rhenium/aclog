@@ -61,7 +61,7 @@ module Collector
           authenticate_node(msg)
         else
           log(:error, "Unauthenticated client: #{msg}")
-          send_message(:fatal, text: "You aren't authenticate.")
+          send_message(:fatal, text: "You aren't authenticated.")
           close_connection_after_writing
         end
         return

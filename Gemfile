@@ -35,8 +35,8 @@ end
 
 group :test do
   gem "webmock"
-  gem "rspec", "~> 3.0.0.rc1"
-  gem "rspec-rails", "~> 3.0.0.rc1"
+  gem "rspec", "~> 3.0.0"
+  gem "rspec-rails", "~> 3.0.0"
   gem "spring-commands-rspec"
   gem "guard-rspec", "~> 4.2.9"
   gem "factory_girl_rails"

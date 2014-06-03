@@ -43,6 +43,12 @@ module Collector
         push_tweet(event[:target_object])
         push_user(event[:source])
         @queue_favorite << event
+
+        EM.defer do
+          Notification.try_notify_favorites(id: event[:target_object][:id],
+                                            user_id: event[:target_object][:user][:id],
+                                            favorites_count: event[:target_object][:favorite_count])
+        end
       end
     end
 

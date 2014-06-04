@@ -20,7 +20,7 @@ Collects favs and retweets in real time by UserStreams.
 * Import tweets from Favstar / Favotter / tweets.zip / ..
 
 ## Requirements
-* Ruby 2.0.0+
+* Ruby 2.1.1 / 2.1.2
 * MySQL/MariaDB 5.5.14+ (needs utf8mb4 support)
 
 ## Installation

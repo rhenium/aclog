@@ -8,9 +8,9 @@ class Notification
     count = hash_or_tweet[:favorites_count]
 
     if Settings.notification.enabled && Settings.notification.favorites.include?(count)
-      account = Account.includes(:user).where(users: { id: user_id }).first
-      if account && account.active? && account.notification?
-        Rails.cache.fetch("notification/tweets/#{ id }/favorites/#{ count }") do
+      Rails.cache.fetch("notification/tweets/#{ id }/favorites/#{ count }") do
+        account = Account.includes(:user).where(users: { id: user_id }).first
+        if account && account.active? && account.notification?
           notify(account.user, "#{ count }favs!", id)
           true
         end
@@ -27,16 +27,12 @@ class Notification
   def self.tweet(text, reply_to = 0)
     defer do
       begin
-        cur = 0
-        while cur < Settings.notification.accounts.size
+        Settings.notification.accounts.each do |hash|
           begin
-            client(cur).update(text, in_reply_to_status_id: reply_to)
+            client(hash).update(text, in_reply_to_status_id: reply_to)
+            break
           rescue Twitter::Error::Forbidden => e
-            if e.message = "User is over daily status update limit."
-              cur += 1
-            else
-              raise e
-            end
+            raise e unless e.message = "User is over daily status update limit."
           end
         end
       rescue => e
@@ -45,12 +41,13 @@ class Notification
     end
   end
 
-  def self.client(index)
-    s = Settings.notification.accounts[index]
-    Twitter::REST::Client.new(consumer_key: Settings.notification.consumer.key,
-                              consumer_secret: Settings.notification.consumer.secret,
-                              access_token: s.token,
-                              access_token_secret: s.secret)
+  def self.client(acc)
+    @_client ||= {}
+    @_client[acc] ||= 
+      Twitter::REST::Client.new(consumer_key: Settings.notification.consumer.key,
+                                consumer_secret: Settings.notification.consumer.secret,
+                                access_token: acc.token,
+                                access_token_secret: acc.secret)
   end
 
   def self.defer(&blk)

@@ -27,6 +27,12 @@ module Collector
         Tweet.destroy_bulk_from_json(queue_delete)
         Retweet.delete_bulk_from_json(queue_delete)
       end
+
+      queue_favorite.each do |event|
+        Notification.try_notify_favorites(id: event[:target_object][:id],
+                                          user_id: event[:target_object][:user][:id],
+                                          favorites_count: event[:target_object][:favorite_count])
+      end
     end
 
     def push_user(user)
@@ -43,12 +49,6 @@ module Collector
         push_tweet(event[:target_object])
         push_user(event[:source])
         @queue_favorite << event
-
-        EM.defer do
-          Notification.try_notify_favorites(id: event[:target_object][:id],
-                                            user_id: event[:target_object][:user][:id],
-                                            favorites_count: event[:target_object][:favorite_count])
-        end
       end
     end
 

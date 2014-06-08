@@ -78,9 +78,13 @@ class User < ActiveRecord::Base
 
       ret = OpenStruct.new
       ret.updated_at = Time.now
-      ret.since_join = (DateTime.now.utc - self.account.created_at.to_datetime).to_i
       ret.tweets_count = plucked["count"]
       ret.reactions_count = plucked["sum"]
+      ret.registered = self.registered?
+
+      if self.registered?
+        ret.since_join = (DateTime.now.utc - self.account.created_at.to_datetime).to_i
+      end
       
       ret
     end

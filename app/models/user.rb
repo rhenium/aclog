@@ -96,7 +96,9 @@ class User < ActiveRecord::Base
         .joins("INNER JOIN (#{self.tweets.reacted.order_by_id.limit(100).to_sql}) tweets ON tweets.id = #{klass.table_name}.tweet_id")
         .group("`#{klass.table_name}`.`user_id`")
         .count("`#{klass.table_name}`.`user_id`")
-    }.inject { |m, s| m.merge(s) { |key, first, second| first.to_i + second.to_i } }
+    }.inject { |m, s|
+      m.merge(s) { |key, first, second| first.to_i + second.to_i }
+    }.sort_by { |user_id, count| -count }
   end
 
   def count_discovered_users
@@ -105,6 +107,8 @@ class User < ActiveRecord::Base
         .joins("INNER JOIN (#{self.__send__(klass.table_name.to_sym).order(id: :desc).limit(500).to_sql}) m ON m.tweet_id = tweets.id")
         .group("tweets.user_id")
         .count("tweets.user_id")
-    }.inject { |m, s| m.merge(s) { |key, first, second| first.to_i + second.to_i } }
+    }.inject { |m, s|
+      m.merge(s) { |key, first, second| first.to_i + second.to_i }
+    }.sort_by { |user_id, count| -count }
   end
 end

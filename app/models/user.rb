@@ -35,8 +35,14 @@ class User < ActiveRecord::Base
     "https://twitter.com/#{self.screen_name}"
   end
 
-  def profile_image_url(size = :normal)
-    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_#{size}\\1")
+  def profile_image_url(size = nil)
+    if size == :original
+      suffix = ""
+    else
+      suffix = "_#{size || :normal}"
+    end
+
+    attributes["profile_image_url"].sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "#{suffix}\\1")
   end
 
   def protected?

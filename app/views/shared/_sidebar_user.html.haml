@@ -20,29 +20,17 @@
   - else
     .alert.alert-aclog @#{user.screen_name} は aclog に登録していません
 
-  - if defined?(thresholds)
-    .sidebar-list.row
-      .list-group.col-xs-6.col-sm-12
-        - if authorized_to_show_user_best?(user)
-          = link_to_with_active "Best", user_path(user.screen_name), class: "list-group-item"
-          = link_to_with_active "Timeline", user_timeline_path(user.screen_name), class: "list-group-item"
-        - else
-          = link_to_with_active "Timeline", user_path(user.screen_name), class: "list-group-item"
+  .sidebar-list{class: defined?(thresholds) ? "row" : nil}
+    .list-group{class: defined?(thresholds) ? "col-xs-6 col-sm-12" : nil}
+      - if authorized_to_show_user_best?(user)
+        = link_to_with_active "Best", user_path(user.screen_name), class: "list-group-item"
+        = link_to_with_active "Timeline", user_timeline_path(user.screen_name), class: "list-group-item"
         = link_to_with_active "Favorites", user_favorites_path(user.screen_name), class: "list-group-item"
-        - if authorized_to_show_user_best?(user)
-          = link_to_with_active "Discovered by", user_discovered_by_path(user.screen_name), class: "list-group-item"
-          = link_to_with_active "Discovered users", user_discovered_users_path(user.screen_name), class: "list-group-item"
+        = link_to_with_active "Discovered by", user_discovered_by_path(user.screen_name), class: "list-group-item"
+        = link_to_with_active "Discovered users", user_discovered_users_path(user.screen_name), class: "list-group-item"
+      - else
+        = link_to_with_active "Timeline", user_path(user.screen_name), class: "list-group-item"
+        = link_to_with_active "Favorites", user_favorites_path(user.screen_name), class: "list-group-item"
+    - if defined?(thresholds)
       .list-group.col-xs-6.col-sm-12
         = render "shared/_sidebar_thresholds", counts: thresholds
-  - else
-    .sidebar-list
-      .list-group
-        - if authorized_to_show_user_best?(user)
-          = link_to_with_active "Best", user_path(user.screen_name), class: "list-group-item"
-          = link_to_with_active "Timeline", user_timeline_path(user.screen_name), class: "list-group-item"
-        - else
-          = link_to_with_active "Timeline", user_path(user.screen_name), class: "list-group-item"
-        = link_to_with_active "Favorites", user_favorites_path(user.screen_name), class: "list-group-item"
-        - if authorized_to_show_user_best?(user)
-          = link_to_with_active "Discovered by", user_discovered_by_path(user.screen_name), class: "list-group-item"
-          = link_to_with_active "Discovered users", user_discovered_users_path(user.screen_name), class: "list-group-item"

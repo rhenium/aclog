@@ -15,16 +15,10 @@ module ApplicationHelper
     link_to name, options, html_options, &block
   end
 
-  def profile_image_tag(user, size = nil, options = {})
-    if size
-      url = user.__send__(:"profile_image_url_#{size}")
-    else
-      url = user.profile_image_url
-    end
-
+  def profile_image_tag(user, size = :normal, options = {})
     capture_haml do
       haml_tag("img.twitter-icon",
-               { src: url,
+               { src: user.profile_image_url(size),
                  alt: "@" + user.screen_name,
                  onerror: "this.src = '#{image_path("profile_image_missing.png")}'"
                }.merge(options))

@@ -35,20 +35,8 @@ class User < ActiveRecord::Base
     "https://twitter.com/#{self.screen_name}"
   end
 
-  def profile_image_url_original
-    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "\\1")
-  end
-
-  def profile_image_url_reasonably_small
-    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_reasonably_small\\1")
-  end
-
-  def profile_image_url_bigger
-    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_bigger\\1")
-  end
-
-  def profile_image_url_mini
-    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_mini\\1")
+  def profile_image_url(size = :normal)
+    profile_image_url.sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "_#{size}\\1")
   end
 
   def protected?

@@ -30,20 +30,21 @@ class Account < ActiveRecord::Base
   end
 
   def client
-    @client ||= Twitter::REST::Client.new(consumer_key: Settings.consumer.key,
-                                          consumer_secret: Settings.consumer.secret,
-                                          access_token: oauth_token,
-                                          access_token_secret: oauth_token_secret)
+    @_client ||= Twitter::REST::Client.new(consumer_key: Settings.consumer.key,
+                                           consumer_secret: Settings.consumer.secret,
+                                           access_token: oauth_token,
+                                           access_token_secret: oauth_token_secret)
   end
 
   def following?(target_id)
+    target_id = target_id.id if target_id.is_a? User
     friends.member? target_id
   end
 
   def friends
     @_friends ||=
     Rails.cache.fetch("accounts/#{self.id}/friends", expires_in: Settings.cache.friends) do
-      Set.new self.client.friend_ids
+      Set.new client.friend_ids
     end
   end
 end

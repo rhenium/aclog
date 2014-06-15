@@ -57,13 +57,8 @@ class User < ActiveRecord::Base
     !registered? || registered? && account.private?
   end
 
-  def following?(user)
-    raise Aclog::Exceptions::UserNotRegistered unless registered?
-    account.following?(user.id)
-  end
-
   def permitted_to_see?(user)
-    !user.protected? || user.id == self.id || self.following?(user) || false
+    !user.protected? || user.id == self.id || (self.registered? && account.following?(user))
   end
 
   def stats

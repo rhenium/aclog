@@ -19,7 +19,7 @@ class WorkerManager
 
     private
     def client
-      @client ||= begin
+      @_client ||= begin
         transport = MessagePack::RPC::UNIXTransport.new
         MessagePack::RPC::Client.new(transport, Rails.root.join("tmp", "sockets", "collector.sock").to_s)
       rescue Errno::ECONNREFUSED, Errno::ENOENT

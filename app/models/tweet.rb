@@ -10,8 +10,6 @@ class Tweet < ActiveRecord::Base
   has_many :favoriters, ->  { order("favorites.id") }, through: :favorites, source: :user
   has_many :retweeters, -> { order("retweets.id") }, through: :retweets, source: :user
 
-  scope :eager_load_for_html, -> { eager_load(:user) }
-
   scope :recent, ->(period = 3.days) { where("tweets.id > ?", snowflake_min(Time.zone.now - period)) }
   scope :reacted, ->(count = nil) { where("reactions_count >= ?", (count || 1).to_i) }
   scope :not_protected, -> { joins(:user).references(:user).where(users: { protected: false }) }

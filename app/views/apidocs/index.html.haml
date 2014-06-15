@@ -15,7 +15,7 @@ OAuth Echo の詳細については
   %h3= namespace.titleize
   %table.table
     %tbody
-      - endpoints.select {|_, e| !e.route_nodoc }.each do |path, endpoint|
+      - endpoints.reject {|_, e| e.route_nodoc }.each do |path, endpoint|
         %tr
           %td= link_to format_endpoint_name(endpoint), about_api_endpoint_path(endpoint.route_method.downcase, namespace, path), class: (endpoint.route_deprecated ? "deprecated" : nil)
           %td= endpoint.route_description

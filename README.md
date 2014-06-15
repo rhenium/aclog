@@ -4,7 +4,19 @@ Collects favs and retweets in real time by UserStreams.
 ## Aclog is
 * powered by Ruby on Rails
 * completely free and open source ([The MIT License](https://github.com/rhenium/aclog/blob/master/LICENSE.txt))
-* designed by rot([@aayh](https://twitter.com/aayh))
+* Scalable structure
+
+        |------------|           |-----------| (MsgPack) |---------|   |---|
+        |            -------------           ------------- Worker  =====   |
+        | Web Server (MsgPack-RPC)           -------------    Node ===== T |
+        |            -------------           |           |---------|   | w |
+        |-----| |----|           |           ------------- Worker  ===== i |
+              | |                | Collector -------------    Node ===== t |
+        |-----| |----|           |           |           |---------|   | t |
+        |            -------------           ------------- Worker  ===== e |
+        | DB (MySQL)                         -------------    Node ===== r |
+        |            -------------           |    :      |---------|   |   |
+        |------------|           |-----------|    :           :        |---|
 
 ## Status
 * *unstable*
@@ -13,21 +25,18 @@ Collects favs and retweets in real time by UserStreams.
 ## Features
 * Collecting favorites and retweets from Twitter Streaming API
 * Protected account support
-* JSON API (OAuth Echo)
+* JSON API (with OAuth Echo)
 * Atom feed
 
-### Not yet / will be implemented
-* Import tweets from Favstar / Favotter / tweets.zip / ..
-
 ## Requirements
-* Ruby 2.1.1 / 2.1.2
+* Ruby 2.1
 * MySQL/MariaDB 5.5.14+ (needs utf8mb4 support)
 
 ## Installation
 ### Database
 * Create MySQL user
 
-### Aclog (Application Server)
+### Application Server
 * Clone the source
 
         $ # We'll install aclog into /var/webapps/aclog
@@ -35,7 +44,11 @@ Collects favs and retweets in real time by UserStreams.
         $ git clone https://github.com/rhenium/aclog.git
         $ cd /var/webapps/aclog
 
-* Configure it
+* Install Gems
+
+        $ bundle install
+
+* Configure
 
         $ # Copy the example aclog config
         $ cp config/settings.yml.example config/settings.yml
@@ -51,23 +64,25 @@ Collects favs and retweets in real time by UserStreams.
         $ sed -i s/replace_here/$(rake secret)/g config/secrets.yml
 
         $ # Setup database. This will create database and tables on MySQL server.
-        $ rake db:setup
-
-* Install Gems
-
-        $ bundle install
+        $ RAILS_ENV=production bundle exec rake db:setup
 
 * Start your aclog
 
         $ # Start Unicorn (Web server)
-        $ rake web:start
+        $ RAILS_ENV=production bundle exec rake web:start
         $ # Start Background worker
-        $ rake collector:start
+        $ RAILS_ENV=production bundle exec rake collector:start
 
-### Aclog (Collector worker nodes)
-* Chdir
+### Collector worker nodes
+* Copy the source
 
-        $ cd /var/webapps/worker_node
+        $ cd /var/webapps
+        $ git clone https://github.com/rhenium/aclog.git
+        $ cd /var/webapps/aclog/worker_node
+
+* Install Gems
+
+        $ bundle install
 
 * Configure it
 
@@ -76,14 +91,13 @@ Collects favs and retweets in real time by UserStreams.
         $ # Edit it
         $ vi settings.yml
 
-* Install Gems
-
-        $ bundle install
-
 * Start worker
 
-        $ rake worker_node:run
+        $ bundle exec rake worker_node:run
 
+## Special Thanks
+* KOBA789 ([@KOBA789](https://twitter.com/KOBA789) / [koba789.com](http://koba789.com)) - Hosting aclog.koba789.com
+* rot ([@aayh](https://twitter.com/aayh)) - Web UI design
 
 ## Contributing
 1. Fork it
@@ -91,4 +105,3 @@ Collects favs and retweets in real time by UserStreams.
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-

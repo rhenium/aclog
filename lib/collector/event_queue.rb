@@ -7,6 +7,7 @@ module Collector
       @queue_retweet = []
       @queue_unfavorite = []
       @queue_delete = []
+      @queue_unauthorized = []
     end
 
     def flush
@@ -16,6 +17,7 @@ module Collector
       queue_retweet = @queue_retweet; @queue_retweet = []
       queue_unfavorite = @queue_unfavorite; @queue_unfavorite = []
       queue_delete = @queue_delete; @queue_delete = []
+      queue_unauthorized = @queue_unauthorized; @queue_unauthorized = []
 
       User.create_or_update_bulk_from_json(queue_user.values)
       Tweet.create_bulk_from_json(queue_tweet.values)
@@ -32,6 +34,11 @@ module Collector
         Notification.try_notify_favorites(id: event[:target_object][:id],
                                           user_id: event[:target_object][:user][:id],
                                           favorites_count: event[:target_object][:favorite_count])
+      end
+
+      queue_unauthorized.each do |a|
+        account = Account.find(a[:id])
+        account.verify_token!
       end
     end
 
@@ -72,6 +79,10 @@ module Collector
       caching(:delete, delete[:delete][:status][:id]) do
         @queue_delete << delete
       end
+    end
+
+    def push_unauthorized(unauthorized)
+      @queue_unauthorized << unauthorized
     end
 
     private

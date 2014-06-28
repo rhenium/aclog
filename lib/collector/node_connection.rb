@@ -70,6 +70,7 @@ module Collector
       case msg[:title]
       when "unauthorized"
         log(:info, "Received unauthorized: ##{msg[:id]}/#{msg[:user_id]}")
+        @queue.push_unauthorized(msg)
       when "tweet"
         log(:debug, "Received tweet: #{msg[:id]}")
         @queue.push_tweet(msg)

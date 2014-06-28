@@ -28,6 +28,14 @@ class Account < ActiveRecord::Base
   rescue Aclog::Exceptions::WorkerConnectionError
   end
 
+  def verify_token!
+    begin
+      client.user
+    rescue
+      self.revoked!
+    end
+  end
+
   def client
     @_client ||= Twitter::REST::Client.new(consumer_key: Settings.consumer.key,
                                            consumer_secret: Settings.consumer.secret,

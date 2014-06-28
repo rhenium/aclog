@@ -3,10 +3,11 @@ class TweetsController < ApplicationController
 
   def show
     @tweet = Tweet.find(params[:id])
-    @user = @tweet.user
-    authorize_to_show_user! @user
   rescue
     import
+  else
+    @user = @tweet.user
+    authorize_to_show_user! @user
   end
 
   def import

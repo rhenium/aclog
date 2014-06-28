@@ -29,7 +29,7 @@ class TweetsController < ApplicationController
     @user = require_user
     authorize_to_show_user! @user
 
-    if authorized_to_show_user_best? @user
+    if @user.registered?
       user_best
       render :user_best
     else
@@ -41,14 +41,12 @@ class TweetsController < ApplicationController
   def user_best
     @user = require_user
     authorize_to_show_user! @user
-    authorize_to_show_user_best! @user
     @tweets = paginate_with_page_number @user.tweets.reacted.order_by_reactions
   end
 
   def user_recent
     @user = require_user
     authorize_to_show_user! @user
-    authorize_to_show_user_best! @user
     @tweets = paginate_with_page_number @user.tweets.reacted.recent.order_by_reactions
   end
 

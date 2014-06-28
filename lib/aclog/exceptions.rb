@@ -11,7 +11,6 @@ module Aclog
     class DocumentNotFound < NotFound; end
 
     class UserProtected < Forbidden; end
-    class AccountPrivate < Forbidden; end
 
     class OAuthEchoError < Unauthorized; end
 

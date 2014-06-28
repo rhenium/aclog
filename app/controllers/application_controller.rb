@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
 
   after_action :tidy_response_body
   helper_method :logged_in?, :current_user
-  helper_method :authorized_to_show_user?, :authorized_to_show_user_best?
+  helper_method :authorized_to_show_user?
 
   def routing_error
     raise ActionController::RoutingError, "No route matches #{params[:unmatched_route]}"
@@ -31,16 +31,8 @@ class ApplicationController < ActionController::Base
       (logged_in? && current_user.permitted_to_see?(user))
   end
 
-  def authorized_to_show_user_best?(user)
-    authorized_to_show_user?(user) && user.registered?
-  end
-
   def authorize_to_show_user!(user)
     authorized_to_show_user?(user) || raise(Aclog::Exceptions::UserProtected, user)
-  end
-
-  def authorize_to_show_user_best!(user)
-    authorized_to_show_user_best?(user) || raise(Aclog::Exceptions::AccountPrivate, user)
   end
 
   private

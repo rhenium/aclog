@@ -22,15 +22,16 @@
 
   .sidebar-list{class: defined?(thresholds) ? "row" : nil}
     .list-group{class: defined?(thresholds) ? "col-xs-6 col-sm-12" : nil}
-      - if authorized_to_show_user_best?(user)
+      - if user.registered?
         = link_to_with_active "Best", user_path(user.screen_name), class: "list-group-item"
         = link_to_with_active "Timeline", user_timeline_path(user.screen_name), class: "list-group-item"
-        = link_to_with_active "Favorites", user_favorites_path(user.screen_name), class: "list-group-item"
+      - else
+        = link_to_with_active "Best", user_best_path(user.screen_name), class: "list-group-item"
+        = link_to_with_active "Timeline", user_path(user.screen_name), class: "list-group-item"
+      = link_to_with_active "Favorites", user_favorites_path(user.screen_name), class: "list-group-item"
+      - if user.registered?
         = link_to_with_active "Discovered by", user_discovered_by_path(user.screen_name), class: "list-group-item"
         = link_to_with_active "Discovered users", user_discovered_users_path(user.screen_name), class: "list-group-item"
-      - else
-        = link_to_with_active "Timeline", user_path(user.screen_name), class: "list-group-item"
-        = link_to_with_active "Favorites", user_favorites_path(user.screen_name), class: "list-group-item"
     - if defined?(thresholds)
       .list-group.col-xs-6.col-sm-12
         = render "shared/_sidebar_thresholds", counts: thresholds

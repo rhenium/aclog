@@ -5,14 +5,14 @@ class UsersController < ApplicationController
 
   def discovered_by
     @user = require_user
-    authorize_to_show_user_best! @user
+    @user.require_registered!
     @result = @user.count_discovered_by.take(Settings.users.count)
     @cached_users = User.find(@result.map(&:first)).map {|user| [user.id, user] }.to_h
   end
 
   def discovered_users
     @user = require_user
-    authorize_to_show_user_best! @user
+    @user.require_registered!
     @result = @user.count_discovered_users.take(Settings.users.count)
     @cached_users = User.find(@result.map(&:first)).map {|user| [user.id, user] }.to_h
   end

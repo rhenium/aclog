@@ -31,6 +31,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def require_registered!
+    registered? || raise(Aclog::Exceptions::UserNotRegistered, self)
+  end
+
   def twitter_url
     "https://twitter.com/#{self.screen_name}"
   end

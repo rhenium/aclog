@@ -78,7 +78,7 @@ class User < ActiveRecord::Base
   def count_discovered_by
     [Favorite, Retweet].map { |klass|
       klass
-        .joins("INNER JOIN (#{self.tweets.reacted.order_by_id.limit(100).to_sql}) tweets ON tweets.id = #{klass.table_name}.tweet_id")
+        .joins("INNER JOIN (#{self.tweets.reacted.order_by_id.limit(500).to_sql}) tweets ON tweets.id = #{klass.table_name}.tweet_id")
         .group("`#{klass.table_name}`.`user_id`")
         .count("`#{klass.table_name}`.`user_id`")
     }.inject { |m, s|

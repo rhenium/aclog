@@ -3,11 +3,8 @@
 .col-sm-9.col-md-7.col-lg-6
   = form_tag "/i/settings/update", method: :post do
     .checkbox
-      = check_box_tag :notification, true, @account.notification
-      = label_tag :notification, t("views.settings.enable_notification")
-    .checkbox
-      = check_box_tag :private, true, @account.private
-      = label_tag :private, t("views.settings.hide_best")
+      = check_box_tag :notification_enabled, true, @account.notification_enabled
+      = label_tag :notification_enabled, t("views.settings.enable_notification")
     .form-group
       = submit_tag "Submit", class: "btn btn-default"
       = link_to t("views.settings.confirm_deactivation"), { controller: "settings", action: "confirm_deactivation" }, class: "btn btn-link"

@@ -53,10 +53,6 @@ class User < ActiveRecord::Base
     !!account && account.active?
   end
 
-  def private?
-    !registered? || registered? && account.private?
-  end
-
   def permitted_to_see?(user)
     !user.protected? || user.id == self.id || (self.registered? && account.following?(user))
   end

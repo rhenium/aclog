@@ -10,7 +10,7 @@ class Notification
     if Settings.notification.enabled && Settings.notification.favorites.include?(count)
       Rails.cache.fetch("notification/tweets/#{ id }/favorites/#{ count }") do
         account = Account.includes(:user).where(users: { id: user_id }).first
-        if account && account.active? && account.notification?
+        if account && account.active? && account.notification_enabled?
           notify(account.user, "#{ count }favs!", id)
           true
         end

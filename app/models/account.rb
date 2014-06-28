@@ -1,13 +1,12 @@
 require "msgpack/rpc/transport/unix"
 
 class Account < ActiveRecord::Base
-  enum status: { active: 0, inactive: 1 }
+  enum status: { active: 0, inactive: 1, revoked: 2 }
 
   belongs_to :user
   scope :for_node, ->(block_number) { active.where("id % ? = ?", Settings.collector.nodes_count, block_number) }
 
-  def notification?; notification end
-  def private?; private end
+  def notification_enabled?; notification_enabled end
 
   def self.create_or_update(hash)
     account = where(user_id: hash[:user_id]).first_or_initialize

@@ -32,9 +32,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authorized_to_show_user_best?(user)
-    user.registered? &&
-      (!user.private? || current_user == user) &&
-        authorized_to_show_user?(user)
+    authorized_to_show_user?(user) && user.registered?
   end
 
   def authorize_to_show_user!(user)

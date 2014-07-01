@@ -9,6 +9,11 @@ namespace :web do
     Process.kill(0, pid) rescue false
   end
 
+  desc "Start aclog collector (master) in the foreground"
+  task :run do
+    system "unicorn -E #{Rails.env} -c #{Rails.root}/config/unicorn.rb"
+  end
+
   desc "Start web server (Unicorn)"
   task :start do
     pid = web_read_pid
@@ -16,7 +21,7 @@ namespace :web do
       STDERR.puts "Unicorn is already started (PID: #{pid})"
       next
     end
-    puts `unicorn -D -E #{Rails.env} -c #{Rails.root}/config/unicorn.rb`
+    system "unicorn -D -E #{Rails.env} -c #{Rails.root}/config/unicorn.rb"
   end
 
   desc "Stop web server (Unicorn)"

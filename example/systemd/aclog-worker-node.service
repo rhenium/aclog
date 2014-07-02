@@ -1,0 +1,12 @@
+[Unit]
+Description=aclog collector worker daemon
+After=network.target
+
+[Service]
+User=aclog
+Group=aclog
+WorkingDirectory=/var/webapps/aclog/worker_node
+ExecStart=/usr/bin/bundle exec rake worker_node:run
+
+[Install]
+WantedBy=multi-user.target

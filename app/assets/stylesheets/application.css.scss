@@ -179,6 +179,7 @@ pre {
     border-color: #777;
     margin-top: 5px;
     margin-bottom: 5px;
+//    margin-right: 0;
 }
 
 .navbar-toggle:hover,
@@ -245,7 +246,7 @@ pre {
 }
 
 .navbar-nav .signup {
-    margin: 4px 15px 0;
+    margin: 4px 0 0 0;
     height: auto;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
@@ -369,6 +370,36 @@ a.list-group-item.active:focus {
     font-size: 24px;
 }
 
+@media (max-width: 768px) {
+    .navbar-nav {
+        margin: 0 -15px;
+    }
+
+    .navbar-left {
+        float: left;
+    }
+
+    .navbar-right {
+        float: right;
+    }
+
+    .navbar-nav.navbar-right:last-child {
+        margin-right: 0;
+    }
+
+    .navbar-nav > li {
+        float: left;
+    }
+
+    .navbar-nav .dropdown-menu {
+        left: auto;
+        right: 0
+    }
+
+    .navbar-nav .open .dropdown-menu {
+        position: absolute;
+    }
+}
 @media (min-width: 768px) {
     h1 {
         margin-top: 0;
@@ -385,11 +416,6 @@ a.list-group-item.active:focus {
     }
 
     .navbar-nav.navbar-right:last-child {
-        margin-right: 0;
-    }
-
-    .navbar-nav .signup {
-        margin-left: 0;
         margin-right: 0;
     }
 

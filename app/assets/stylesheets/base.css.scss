@@ -1,0 +1,182 @@
+/* ================ Base ================ */
+
+body {
+    font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+    background-color: #e7e3df;
+}
+
+a, .btn.btn-link {
+    color: #d09827;
+}
+
+a:hover,
+a:focus,
+.btn.btn-link:hover,
+.btn.btn-link:focus {
+    color: #9d7015;
+}
+
+h1 {
+    margin: 15px 0;
+    font-size: 42px;
+    font-family: Raleway, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+
+    @media (min-width: 768px) {
+        margin-top: 0;
+
+        &.setting {
+            margin: 0;
+            text-align: 0;
+        }
+    }
+}
+
+h2 {
+    font-size: 24px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+code, pre {
+    background: #eeebe8;
+}
+
+pre {
+    border-color: #cecac7;
+}
+
+.btn:focus {
+    outline-color: #edc63c;
+}
+
+.btn {
+    padding-left: 30px;
+    padding-right: 30px;
+    color: #fff;
+    background-color: #edc63c;
+    border-color: #f0ad4e;
+
+    &:hover, &:focus, &:active {
+        color: #fff;
+        background-color: #f0ad4e;
+        border-color: #eea236;
+    }
+}
+
+.btn.btn-link {
+    padding-left: 12px;
+    padding-right: 12px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+
+::selection {
+    color: #fff;
+    background-color: #edc63c;
+}
+
+::-moz-selection {
+    color: #fff;
+    background-color: #eea236;
+}
+
+.alert-aclog {
+    color: #8b773e;
+    background-color: #eee182;
+    border-color: #edc63c;
+}
+
+.list-group-item {
+    color: #777;
+    background-color: transparent;
+    border-color: #cecac7;
+    border-width: 0 0 1px 0;
+
+    &:first-child,
+    &:last-child {
+        border-radius: 0;
+    }
+}
+
+a.list-group-item {
+    &:hover,
+    &:focus {
+        color: #333;
+        background-color: #cecac7;
+    }
+
+    &.active,
+    &.active:hover,
+    &.active:focus {
+        color: #fff;
+        background-color: #edc63c;
+        border-bottom-color: #f0ad4e;
+        border-width: 0 0 1px 0;
+    }
+}
+
+.list-group-col {
+    float: left;
+    width: 50%;
+
+    &:first-child {
+        .list-group-item {
+            border-right: 1px solid #cecac7;
+
+            &.active {
+                border-right: none;
+            }
+        }
+    }
+}
+
+.list-group {
+    &.list-group-scroll {
+        max-height: 300px;
+        overflow: scroll;
+        overflow-x: hidden;
+        overflow-y: scroll;
+
+        @media (min-width: 768px) {
+            max-height: none;
+            overflow: visible;
+        }
+    }
+
+    .list-group-head {
+        display: block;
+        padding: 10px 15px 5px;
+        color: #aaa;
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-bottom: 2px solid #cecac7;
+    }
+}
+
+.table>thead>tr>th,
+.table>tbody>tr>th,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>tbody>tr>td,
+.table>tfoot>tr>td {
+    border-bottom: solid 1px;
+    border-color: #cecac7;
+}
+
+.loading {
+    margin: 30px 0;
+    text-align: center;
+    display: none;
+}
+
+.refresh {
+    margin: 30px 0;
+    text-align: center;
+}
+

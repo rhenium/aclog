@@ -1,0 +1,23 @@
+/* ================ ApiDocs ================ */
+
+.api-params {
+    th {
+        font-weight: bold;
+
+        small {
+            display: block;
+            color: #777;
+            font-weight: normal;
+        }
+    }
+
+    b {
+        font-weight: bold
+    }
+}
+
+.deprecated,
+.deprecated:hover,
+.deprecated:focus  {
+    text-decoration: line-through !important;
+}

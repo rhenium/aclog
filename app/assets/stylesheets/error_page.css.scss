@@ -1,0 +1,17 @@
+.error-page {
+    text-align: center;
+
+    h1 {
+        font-size: 100px;
+
+        @media (min-width: 768px) {
+            font-size: 150px;
+        }
+    }
+
+    p {
+        color: #777;
+        font-size: 24px;
+    }
+}
+

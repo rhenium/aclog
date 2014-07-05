@@ -1,0 +1,36 @@
+/* ================ User list ================ */
+
+ul.user-list {
+    padding: 15px 0;
+    padding-left: 0;
+    list-style: none;
+
+    li {
+        display: inline-block;
+    }
+
+    li a {
+        display: block;
+        padding: 10px 20px;
+        color: #333;
+        font-size: 18px;
+        text-decoration: none;
+        text-align: right;
+    }
+
+    li a:hover {
+        background-color: #cecac7;
+    }
+
+    li a img {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 5px;
+    }
+
+    li a span {
+        display: block;
+        margin-bottom: 0;
+        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+    }
+}

@@ -139,14 +139,16 @@
 }
 
 .status-responses {
-    clear: both;
+    @include clearfix;
+
     padding: 10px 15px 15px 15px;
     border-top: 1px solid #ddd;
 
     dl {
+        @include clearfix;
+
         position: relative;
         margin: 10px 0 0 0;
-        clear: both;
         min-height: 44px;
 
         @media (min-width: 768px) {

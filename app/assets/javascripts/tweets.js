@@ -26,5 +26,13 @@ Application.tweets = {
                 });
             }
         }
+
+        $(".statuses").on("click", ".expand-responses-button", function() {
+            var id = $(this).attr("data-id");
+            var type = $(this).attr("data-type");
+            $.getJSON("/i/" + id + "/" + type + ".json", function(json) {
+                $(".status[data-id=\"" + id + "\"] .status-responses-" + type).html(json.html);
+            });
+        });
     }
 };

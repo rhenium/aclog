@@ -1,0 +1,7 @@
+- users.limit(count).each do |m|
+  %li<
+    - if tweet.user == current_user || authorized_to_show_user?(m)
+      %a{href: user_path(m.screen_name), title: "#{m.name} (@#{m.screen_name})"}<
+        = profile_image_tag m
+    - else
+      %img.twitter-icon{title: "Protected User", src: image_path("profile_image_protected.png")}

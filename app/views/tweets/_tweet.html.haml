@@ -1,3 +1,4 @@
-.status
+.status{data: { id: tweet.id }}
   = render partial: "tweet_content", locals: { tweet: tweet }
-  = render partial: "tweet_stats", locals: { tweet: tweet }
+  - if authorized_to_show_user?(tweet.user)
+    = render partial: "tweet_stats", locals: { tweet: tweet }

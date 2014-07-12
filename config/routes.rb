@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
   post "/i/:id/import" =>                       "tweets#import",                    as: "import", constraints: { id: /\d+/ }
+  get "/i/:id/:type" =>                         "tweets#tweet_responses",           as: "tweet_responses", constraints: { id: /\d+/ }
 
   get "/i/settings" =>                          "settings#index",                   as: "settings"
   post "/i/settings/update" =>                  "settings#update"

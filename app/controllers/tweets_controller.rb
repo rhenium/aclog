@@ -89,6 +89,13 @@ class TweetsController < ApplicationController
     end
   end
 
+  # /i/:id/{favorites,retweets}.json
+  def tweet_responses
+    show
+    users = params[:type] == "favorites" ? @tweet.favoriters : @tweet.retweeters
+    render json: { html: render_to_string("_tweet_stats_users", locals: { tweet: @tweet, users: users, count: nil }, formats: :html, layout: nil) }
+  end
+
   private
   def require_user
     User.find(id: params[:user_id], screen_name: params[:screen_name])

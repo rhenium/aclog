@@ -1,24 +1,19 @@
 .status-responses
-  - [["Favs", tweet.favorites_count, tweet.favoriters], ["RTs", tweet.retweets_count, tweet.retweeters]].each do |title, count, users|
-    - if count > 0
-      - if authorized_to_show_user?(tweet.user)
-        %dl
-          %dt
-            %a{href: tweet_path(tweet.id, full: true), title: "すべて見る"}<
-              %span>= count
-              = title
-          %dd{class: params[:action] != "show" ? "timeline" : ""}
-            %ul
-              - users.limit(favorites_truncate_count).each do |m|
-                %li<
-                  - if tweet.user == current_user || authorized_to_show_user?(m)
-                    %a{href: user_path(m.screen_name), title: "#{m.name} (@#{m.screen_name})"}<
-                      = profile_image_tag m
-                  - else
-                    %img.twitter-icon{title: "Protected User", src: image_path("profile_image_protected.png")}
-      - else
-        %dl
-          %dt
-            %span>= count
-            = title
-          %dd{class: params[:action] != "show" ? "timeline" : ""}
+  - if tweet.favorites_count > 0
+    %dl
+      %dt
+        %a.expand-responses-button{href: "javascript:void(0)", title: "すべて見る", data: { type: "favorites", id: tweet.id }}<
+          %span>= tweet.favorites_count
+          Favs
+      %dd
+        %ul{class: "status-responses-favorites"}
+          = render partial: "tweet_stats_users", locals: { tweet: tweet, users: tweet.favoriters, count: favorites_truncate_count }
+  - if tweet.retweets_count > 0
+    %dl
+      %dt
+        %a.expand-responses-button{href: "javascript:void(0)", title: "すべて見る", data: { type: "retweets", id: tweet.id }}<
+          %span>= tweet.retweets_count
+          RTs
+      %dd
+        %ul{class: "status-responses-retweets"}
+          = render partial: "tweet_stats_users", locals: { tweet: tweet, users: tweet.retweeters, count: favorites_truncate_count }

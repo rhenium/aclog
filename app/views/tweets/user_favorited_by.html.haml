@@ -10,4 +10,4 @@
       %a{href: user_path(@source_user.screen_name), title: "#{@source_user.name} (@#{@source_user.screen_name})"}
         = @source_user.screen_name
   .statuses= render @tweets
-  %p.loading= image_tag "loading.gif", width: 16, height: 16, alt: "Loading..."
+  = loading_tag

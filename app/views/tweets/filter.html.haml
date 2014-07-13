@@ -8,4 +8,4 @@
         = text_field_tag :q, params[:q]
         = submit_tag "filter", class: "btn", name: nil
   .statuses= render @tweets
-  %p.loading= image_tag "loading.gif", width: 16, height: 16, alt: "Loading..."
+  = loading_tag

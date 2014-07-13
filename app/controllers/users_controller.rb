@@ -1,8 +1,4 @@
 class UsersController < ApplicationController
-  def stats
-    @user = require_user
-  end
-
   def discovered_by
     @user = require_user
     @user.require_registered!

@@ -31,15 +31,15 @@
               %li= link_to "Best", best_path
               %li= link_to "Recent", recent_path
               %li= link_to "Timeline", timeline_path
-          %li.dropdown.omittable
-            %a.dropdown-toggle#jump_to_dropdown_toggle{href: "#", data: { toggle: "dropdown" }}<
+          %li.dropdown.omittable#user-jump-dropdown
+            %a.dropdown-toggle{href: "#", data: { toggle: "dropdown" }}<
               User
               %span.caret/
-            %ul.dropdown-menu#jump_to_user
+            %ul.dropdown-menu
               %li
-                %form#jump_to_form{autocomplete: "off"}
+                %form{autocomplete: "off"}
                   .input-group
-                    %input.form-control#jump_to_textbox{type: "text", placeholder: "Username"}
+                    %input.form-control{type: "text", placeholder: "Username"}
                     %span.input-group-btn
                       %button.btn{type: "submit"} Go
           - if logged_in?

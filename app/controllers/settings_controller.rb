@@ -14,6 +14,12 @@ class SettingsController < ApplicationController
 
   def deactivate
     @account.deactivate!
+
+    begin
+      WorkerManager.update_account(self)
+    rescue Aclog::Exceptions::WorkerConnectionError
+    end
+
     reset_session
   end
 

@@ -21,7 +21,7 @@ class TweetsController < ApplicationController
       account = nil
     end
 
-    tweet = Tweet.import_from_twitter(params[:id], account.client)
+    tweet = Tweet.import_from_twitter(params[:id], account ? account.client : nil)
     redirect_to tweet
   end
 

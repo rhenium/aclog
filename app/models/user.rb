@@ -18,16 +18,21 @@ class User < ActiveRecord::Base
       key && where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
     end
 
-    def create_or_update_bulk_from_json(array)
-      objects = array.map do |json|
-        self.new(id: json[:id],
-                 screen_name: json[:screen_name],
-                 name: json[:name],
-                 profile_image_url: json[:profile_image_url_https] || json[:profile_image_url],
-                 protected: json[:protected])
-      end
+    def build_from_json(json)
+      self.new(id: json[:id],
+               screen_name: json[:screen_name],
+               name: json[:name],
+               profile_image_url: json[:profile_image_url_https] || json[:profile_image_url],
+               protected: json[:protected])
+    end
 
-      self.import(objects, on_duplicate_key_update: [:screen_name, :name, :profile_image_url, :protected])
+    def create_or_update_from_json(json)
+      import([build_from_json(json)], on_duplicate_key_update: [:screen_name, :name, :profile_image_url, :protected])
+    end
+
+    def create_or_update_bulk_from_json(array)
+      objects = array.map {|json| build_from_json(json) }
+      import(objects, on_duplicate_key_update: [:screen_name, :name, :profile_image_url, :protected])
     end
   end
 

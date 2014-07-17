@@ -37,26 +37,20 @@ class Tweet < ActiveRecord::Base
   }
 
   class << self
-    def initialize_from_json(json, ignore_relation: false)
-      tweet = self.new(id: json[:id],
-                       text: extract_entities(json),
-                       source: json[:source],
-                       tweeted_at: Time.parse(json[:created_at]),
-                       in_reply_to_id: json[:in_reply_to_status_id],
-                       favorites_count: json[:favorite_count],
-                       retweets_count: json[:retweet_count],
-                       reactions_count: json[:favorite_count] + json[:retweet_count])
-      if ignore_relation
-        tweet.user_id = json[:user][:id]
-      else
-        tweet.user = User.initialize_from_json(json[:user])
-      end
-
-      tweet
+    def build_from_json(json)
+      self.new(id: json[:id],
+               text: extract_entities(json),
+               source: json[:source],
+               tweeted_at: Time.parse(json[:created_at]),
+               user_id: json[:user][:id],
+               in_reply_to_id: json[:in_reply_to_status_id],
+               favorites_count: json[:favorite_count],
+               retweets_count: json[:retweet_count],
+               reactions_count: json[:favorite_count] + json[:retweet_count])
     end
 
     def create_bulk_from_json(array)
-      objects = array.map {|json| self.initialize_from_json(json, ignore_relation: true) }
+      objects = array.map {|json| build_from_json(json) }
       self.import(objects, on_duplicate_key_update: [:favorites_count, :retweets_count, :reactions_count])
     end
 
@@ -72,13 +66,15 @@ class Tweet < ActiveRecord::Base
 
       st = client.status(id)
       self.create_bulk_from_json([st.attrs])
+      User.create_or_update_from_json(st.attrs[:user])
+
       tweet = self.find(st.id)
       tweet.update(text: extract_entities(st.attrs),
                    source: st.attrs[:source],
                    in_reply_to_id: (tweet.in_reply_to_id || st.attrs[:in_reply_to_status_id]))
 
       nt = tweet
-      nt = self.create_bulk_from_json([client.status(nt.in_reply_to_id)]) while !nt.in_reply_to && nt.in_reply_to_id
+      nt = self.build_from_json(client.status(nt.in_reply_to_id).attrs).save! while nt.in_reply_to_id && !nt.in_reply_to
 
       tweet.reload
     end
@@ -89,9 +85,8 @@ class Tweet < ActiveRecord::Base
 
       escape_text = -> str do
         str.gsub(/#(\d+)/) { strings[$1.to_i] }
-           .gsub("%", "\\%")
+           .gsub(/(_|%)/) {|x| "\\" + x }
            .gsub("*", "%")
-           .gsub("_", "\\_")
            .gsub("?", "_")
       end
 
@@ -146,7 +141,7 @@ class Tweet < ActiveRecord::Base
   end
 
   def twitter_url
-    "https://twitter.com/#{self.user.screen_name}/status/#{self.id}"
+    "https://twitter.com/#{user.screen_name}/status/#{self.id}"
   end
 
   def reply_ancestors(max_level = Float::INFINITY)
@@ -154,11 +149,11 @@ class Tweet < ActiveRecord::Base
     node = self
     level = 0
 
-    while node.in_reply_to && level < max_level
+    while level < max_level && node.in_reply_to
       nodes << (node = node.in_reply_to)
       level += 1
     end
-    nodes
+    nodes.reverse
   end
 
   def reply_descendants(max_level = Float::INFINITY)
@@ -166,10 +161,10 @@ class Tweet < ActiveRecord::Base
     c_nodes = [self]
     level = 0
 
-    while c_nodes.size > 0 && level < max_level
+    while level < max_level && c_nodes.size > 0
       nodes.concat(c_nodes.map! {|node| node.replies }.flatten!)
       level += 1
     end
-    nodes.sort_by {|t| t.id }
+    nodes.sort_by(&:id)
   end
 end

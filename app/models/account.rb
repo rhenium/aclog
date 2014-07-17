@@ -7,33 +7,26 @@ class Account < ActiveRecord::Base
   scope :for_node, ->(block_number) { active.where("id % ? = ?", Settings.collector.nodes_count, block_number) }
 
   def notification_enabled?; notification_enabled end
+  def deactivate!; self.inactive! end
 
-  def self.create_or_update(hash)
-    account = where(user_id: hash[:user_id]).first_or_initialize
-    account.oauth_token = hash[:oauth_token]
-    account.oauth_token_secret = hash[:oauth_token_secret]
-    account.status = :active
-    account.save if account.changed?
-    account
-  end
+  class << self
+    def register(hash)
+      account = where(user_id: hash[:user_id]).first_or_initialize
+      account.oauth_token = hash[:oauth_token]
+      account.oauth_token_secret = hash[:oauth_token_secret]
+      account.status = :active
+      account.save! if account.changed?
+    end
 
-  def self.random
-    self.active.order("RAND()").first
-  end
-
-  def deactivate!
-    self.inactive!
-
-    WorkerManager.update_account(self)
-  rescue Aclog::Exceptions::WorkerConnectionError
+    def random
+      active.order("RAND()").first
+    end
   end
 
   def verify_token!
-    begin
-      client.user
-    rescue
-      self.revoked!
-    end
+    client.user
+  rescue
+    self.revoked!
   end
 
   def client
@@ -44,7 +37,7 @@ class Account < ActiveRecord::Base
   end
 
   def following?(target_id)
-    target_id = target_id.id if target_id.is_a? User
+    target_id = target_id.id if target_id.is_a?(User)
     friends.member? target_id
   end
 

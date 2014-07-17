@@ -37,6 +37,10 @@ class Tweet < ActiveRecord::Base
   }
 
   class << self
+    # Builds a new instance of Tweet and initialize with JSON data from Twitter API.
+    # @note This method just builds an instance, doesn't save it.
+    # @param [Hash] json Data from Twitter API
+    # @return [Tweet] The new instance.
     def build_from_json(json)
       self.new(id: json[:id],
                text: extract_entities(json),
@@ -49,11 +53,15 @@ class Tweet < ActiveRecord::Base
                reactions_count: json[:favorite_count] + json[:retweet_count])
     end
 
+    # Builds instances of Tweet and save them. This method is supposed to be used from collector daemon.
+    # @param [Array<Hash>] array Data from collector.
     def create_bulk_from_json(array)
       objects = array.map {|json| build_from_json(json) }
       self.import(objects, on_duplicate_key_update: [:favorites_count, :retweets_count, :reactions_count])
     end
 
+    # Destroys Tweets from database. This method is supposed to be used from collector daemon.
+    # @param [Array<Hash>] array An array of Streaming API delete events.
     def destroy_bulk_from_json(array)
       ids = array.map {|json| json[:delete][:status][:id] }
       self.where(id: ids).delete_all
@@ -61,6 +69,11 @@ class Tweet < ActiveRecord::Base
       Retweet.where(tweet_id: ids).delete_all
     end
 
+    # Imports a Tweet from Twitter REST API.
+    # If the client is not specified, An random account will be selected from database.
+    # @param [Integer] id Target status ID.
+    # @param [Twitter::REST::Client] client The Twitter::REST::Client to be used.
+    # @return [Tweet] The Tweet instance imported.
     def import_from_twitter(id, client = nil)
       client ||= Account.random.client
 
@@ -79,6 +92,9 @@ class Tweet < ActiveRecord::Base
       tweet.reload
     end
 
+    # Filters tweets with original query string.
+    # @param [String] query
+    # @return [ActiveRecord::Relation]
     def filter_by_query(query)
       strings = []
       query = query.gsub(/"((?:\\"|[^"])*?)"/) {|m| strings << $1; "##{strings.size - 1}" }
@@ -140,10 +156,15 @@ class Tweet < ActiveRecord::Base
     end
   end
 
+  # Returns the URI of the tweet on twitter.com.
+  # @return [String] The URI.
   def twitter_url
     "https://twitter.com/#{user.screen_name}/status/#{self.id}"
   end
 
+  # Searches the ancestors of this Tweet recursively up to specified level.
+  # @param [Integer] max_level
+  # @return [Array<Tweet>] The search result.
   def reply_ancestors(max_level = Float::INFINITY)
     nodes = []
     node = self
@@ -156,6 +177,9 @@ class Tweet < ActiveRecord::Base
     nodes.reverse
   end
 
+  # Searches the descendants of this Tweet recursively up to specified level.
+  # @param [Integer] max_level
+  # @return [Array<Tweet>] The search result.
   def reply_descendants(max_level = Float::INFINITY)
     nodes = []
     c_nodes = [self]

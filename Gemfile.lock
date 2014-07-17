@@ -297,6 +297,7 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
     yajl-ruby (1.2.1)
+    yard (0.8.7.4)
 
 PLATFORMS
   ruby
@@ -337,3 +338,4 @@ DEPENDENCIES
   unicorn-worker-killer
   webmock
   yajl-ruby
+  yard

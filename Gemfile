@@ -43,3 +43,7 @@ group :test do
   gem "coveralls", require: false
   gem "simplecov", require: false
 end
+
+group :doc do
+  gem "yard"
+end

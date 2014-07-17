@@ -38,7 +38,6 @@ class Api < Grape::API
 
   mount ApiTweets
   mount ApiUsers
-  mount ApiDeprecated
 
   route :any, "*path", ignore: true do
     raise Aclog::Exceptions::NotFound

@@ -1,4 +1,8 @@
 class Notification
+  # Notifies the count of favovorites for the tweet with tweeting a reply from notification account.
+  # Notification will be send only when the count reached the specified number in settings.yml.
+  #
+  # @param [Hash, Tweet] hash_or_tweet the target tweet.
   def self.try_notify_favorites(hash_or_tweet)
     if hash_or_tweet.is_a?(Tweet)
       hash_or_tweet = hash_or_tweet.attributes

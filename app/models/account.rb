@@ -22,6 +22,7 @@ class Account < ActiveRecord::Base
       account.oauth_token_secret = hash[:oauth_token_secret]
       account.status = :active
       account.save! if account.changed?
+      account
     end
 
     # Returns a random active account.

@@ -20,7 +20,7 @@ class SessionsController < ApplicationController
     session[:user_id] = account.user_id
 
     to = request.env["omniauth.params"]["redirect_after_login"].to_s
-    if to.include? "//" || to[0] != "/"
+    if to.include?("//") || to[0] != "/"
       to = root_path
     end
     redirect_to to

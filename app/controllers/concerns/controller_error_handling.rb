@@ -9,7 +9,7 @@ module ControllerErrorHandling
       logger.fatal("#{message}\n\n")
 
       @message = "#{t("error.internal_error")}: #{request.uuid}"
-      render "shared/common_error", status: 500, formats: :html
+      render "errors/common_error", status: 500, formats: :html
     end
 
     rescue_from \
@@ -19,7 +19,7 @@ module ControllerErrorHandling
       Aclog::Exceptions::NotFound,
       Twitter::Error::NotFound do |exception|
       @message = t("error.not_found")
-      render "shared/common_error", status: 404, formats: :html
+      render "errors/common_error", status: 404, formats: :html
     end
 
     rescue_from \
@@ -27,12 +27,12 @@ module ControllerErrorHandling
       Twitter::Error::Unauthorized,
       Twitter::Error::Forbidden do |exception|
       @message = t("error.forbidden")
-      render "shared/common_error", status: 403, formats: :html
+      render "errors/common_error", status: 403, formats: :html
     end
 
     rescue_from Aclog::Exceptions::UserProtected do |exception|
       @message = t("error.forbidden")
-      render "shared/user_forbidden_error", status: 403, formats: :html
+      render "errors/user_forbidden_error", status: 403, formats: :html
     end
   end
 end

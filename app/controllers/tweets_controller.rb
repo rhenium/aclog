@@ -41,13 +41,8 @@ class TweetsController < ApplicationController
   def user_best
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate_with_page_number @user.tweets.reacted.order_by_reactions
-  end
 
-  def user_recent
-    @user = require_user
-    authorize_to_show_user! @user
-    @tweets = paginate_with_page_number @user.tweets.reacted.recent.order_by_reactions
+    @tweets = paginate_with_page_number @user.tweets.reacted.parse_recent(params[:recent]).order_by_reactions
   end
 
   def user_timeline
@@ -71,11 +66,7 @@ class TweetsController < ApplicationController
   end
 
   def all_best
-    @tweets = paginate_with_page_number Tweet.reacted.order_by_reactions
-  end
-
-  def all_recent
-    @tweets = paginate_with_page_number Tweet.recent.reacted.order_by_reactions
+    @tweets = paginate_with_page_number Tweet.reacted.parse_recent(params[:recent]).order_by_reactions
   end
 
   def all_timeline

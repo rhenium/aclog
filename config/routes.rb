@@ -21,7 +21,6 @@ Rails.application.routes.draw do
   post "/i/settings/deactivate" =>              "settings#deactivate"
 
   get "/i/best" =>                              "tweets#all_best",                  as: "best"
-  get "/i/recent" =>                            "tweets#all_recent",                as: "recent"
   get "/i/timeline" =>                          "tweets#all_timeline",              as: "timeline"
   get "/i/filter" =>                            "tweets#filter",                    as: "filter"
 
@@ -32,7 +31,6 @@ Rails.application.routes.draw do
   scope "/:screen_name" do
     get "/" =>                                  "tweets#user_index",                as: "user"
     get "/best" =>                              "tweets#user_best",                 as: "user_best"
-    get "/recent" =>                            "tweets#user_recent",               as: "user_recent"
     get "/timeline" =>                          "tweets#user_timeline",             as: "user_timeline"
     get "/favorites" =>                         "tweets#user_favorites",            as: "user_favorites"
     get "/favorited_by/:source_screen_name" =>  "tweets#user_favorited_by",         as: "user_favorited_by_user"
@@ -41,9 +39,6 @@ Rails.application.routes.draw do
     get "/discovered_users" =>                  "users#discovered_users",           as: "user_discovered_users"
   end
 
-  # Twitter redirect
-  get "/:screen_name/status(es)/:id" =>         redirect("/i/%{id}")
-
-  get "*unmatched_route" =>                       "application#routing_error"
+  get "*unmatched_route" =>                     "application#routing_error"
 end
 

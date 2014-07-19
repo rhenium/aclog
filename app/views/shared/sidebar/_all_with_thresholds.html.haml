@@ -1,0 +1,8 @@
+.sidebar
+  %h1 All
+  .sidebar-list.row
+    .list-group.col-xs-6.col-sm-12
+      = render partial: "shared/sidebar/parts/all_menu_items"
+    .list-group.col-xs-6.col-sm-12
+      = render partial: "shared/sidebar/parts/thresholds", locals: thresholds
+

@@ -80,6 +80,25 @@ class Tweet < ActiveRecord::Base
       tweet.reload
     end
 
+    # Parses /\d+[dwmy]/ style query and returns recent tweets (Relation) in specified period.
+    # @note When nil or unparsable string are specified, this method does nothing.
+    # @param [String] param
+    # @return [ActiveRecord::Relation]
+    def parse_recent(param)
+      match = param.to_s.match(/^(\d+)([a-z])$/)
+      if match
+        n = match[1].to_i
+        case match[2]
+        when "d" then recent(n.days)
+        when "w" then recent(n.weeks)
+        when "m" then recent(n.months)
+        when "y" then recent(n.years)
+        end
+      else
+        self
+      end
+    end
+
     # Filters tweets with original query string.
     # @param [String] query
     # @return [ActiveRecord::Relation]

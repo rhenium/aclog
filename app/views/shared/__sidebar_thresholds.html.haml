@@ -1,7 +1,0 @@
-- counts.each_slice(2).to_a.transpose.each do |ns|
-  .list-group-col
-    - ns.each do |n|
-      - if n == (params[:reactions] || 1).to_i
-        = link_to "#{n}~", params, class: "list-group-item active"
-      - else
-        = link_to "#{n}~", params.merge(reactions: (n == 1 ? nil : n)), class: "list-group-item"

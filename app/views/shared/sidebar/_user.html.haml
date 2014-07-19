@@ -1,0 +1,5 @@
+.sidebar
+  = render partial: "shared/sidebar/parts/user_stats", locals: { user: user }
+  .sidebar-list
+    .list-group
+      = render partial: "shared/sidebar/parts/user_menu_items", locals: { user: user }

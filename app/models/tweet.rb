@@ -95,7 +95,7 @@ class Tweet < ActiveRecord::Base
         when "y" then recent(n.years)
         end
       else
-        self
+        all
       end
     end
 

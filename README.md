@@ -68,10 +68,16 @@ Collects favs and retweets in real time by UserStreams.
 
 * Start your aclog
 
-        $ # Start Unicorn (Web server)
-        $ RAILS_ENV=production bundle exec rake web:start
-        $ # Start Background worker
-        $ RAILS_ENV=production bundle exec rake collector:start
+    * Rake
+
+            $ RAILS_ENV=production bundle exec rake web:start
+            $ RAILS_ENV=production bundle exec rake collector:start
+
+    * systemd
+
+            $ cp example/systemd/aclog-{webserver,collector}.service /usr/lib/systemd/system/
+            $ systemctl start aclog-webserver.service
+            $ systemctl start aclog-collector.service
 
 ### Collector worker nodes
 * Copy the source
@@ -93,7 +99,14 @@ Collects favs and retweets in real time by UserStreams.
 
 * Start worker
 
-        $ bundle exec rake worker_node:run
+    * Rake
+
+            $ bundle exec rake worker_node:run
+
+    * systemd
+
+            $ cp example/systemd/aclog-worker-node.service /usr/lib/systemd/system/
+            $ systemctl start aclog-worker-node.service
 
 ## Special Thanks
 * KOBA789 ([@KOBA789](https://twitter.com/KOBA789) / [koba789.com](http://koba789.com)) - Hosting aclog.koba789.com

@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
 
   private
   def tidy_response_body
-    if [:html, :xml, :rss, :atom].any? {|s| request.format == s }
+    if [:html, :xml, :atom].any? {|s| request.format == s }
       response.body = ActiveSupport::Multibyte::Unicode.tidy_bytes(response.body)
     end
   end

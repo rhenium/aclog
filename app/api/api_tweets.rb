@@ -29,9 +29,15 @@ class ApiTweets < Grape::API
       end
     end
 
-    params_threshold = -> do
+    params_reactions_threshold = -> do
       params do
         optional :reactions, type: Integer, desc: "Returns Tweets which has received reactions more than (or equal to) the specified number of times."
+      end
+    end
+
+    params_recent_threshold = -> do
+      params do
+        optional :recent, type: String, desc: "When specified, returns only recent tweets in the term. Format is: /^\\d+[dwmy]$/"
       end
     end
 
@@ -69,7 +75,7 @@ class ApiTweets < Grape::API
       raise Aclog::Exceptions::UserProtected unless permitted_to_see?(@tweet)
     end
 
-    desc "Returns Tweets, specified by comma-separated IDs.", example_params: { ids: "43341783446466560,50220624609685505" }
+    desc "Returns Tweets, specified by comma-separated IDs.", example_params: { ids: "43341783446466560,340640143058825216" }
     params do
       requires :ids, type: String, regexp: /^\d+(,\d+)*$/, desc: "A comma-separated list of Tweet IDs, up to #{Settings.tweets.count.max} are allowed in a single request."
     end
@@ -78,17 +84,18 @@ class ApiTweets < Grape::API
       @tweets = @tweets.select {|tweet| permitted_to_see?(tweet) }
     end
 
-    desc "Returns the best Tweets of a user, specified by username or user ID.", example_params: { user_id: 280414022, count: 2, page: 3 }
+    desc "Returns the best Tweets of a user, specified by username or user ID.", example_params: { user_id: 15926668, count: 2, page: 3, recent: "1m" }
     params_user[]
     params_pagination[]
+    params_recent_threshold[]
     get "user_best", rabl: "tweets" do
-      @tweets = paginate user.tweets.reacted.order_by_reactions
+      @tweets = paginate user.tweets.reacted.parse_recent(params[:recent]).order_by_reactions
     end
 
     desc "Returns the newest Tweets of a user, specified by username or user ID.", example_params: { screen_name: "toshi_a", count: 3, max_id: 432112694871605249 }
     params_user[]
     params_pagination_with_ids[]
-    params_threshold[]
+    params_reactions_threshold[]
     get "user_timeline", rabl: "tweets" do
       @tweets = paginate_with_ids user.tweets.reacted(params[:reactions]).order_by_id
     end
@@ -96,7 +103,7 @@ class ApiTweets < Grape::API
     desc "Returns the Tweets which a user specified by username or user ID favorited.", example_params: { user_id: 120726371, count: 2 }
     params_user[]
     params_pagination[]
-    params_threshold[]
+    params_reactions_threshold[]
     get "user_favorites", rabl: "tweets" do
       @tweets = paginate Tweet.reacted(params[:reactions]).favorited_by(user).order("`favorites`.`id` DESC")
     end
@@ -105,7 +112,7 @@ class ApiTweets < Grape::API
     params_user[]
     params_source_user[]
     params_pagination_with_ids[]
-    params_threshold[]
+    params_reactions_threshold[]
     get "user_favorited_by", rabl: "tweets" do
       @tweets = paginate_with_ids user.tweets.reacted(params[:reactions]).favorited_by(source_user).order_by_id
     end

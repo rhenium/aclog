@@ -13,7 +13,7 @@
         - @worker_status[:active_node_statuses].each do |node|
           - if node
             %tr
-              %td ##{node.connection_id}
+              %td ##{node[:connection_id]}
               %td Running
               %td= "#{(Time.now - node[:activated_time]).to_i / 60} minutes"
           - else
@@ -22,7 +22,7 @@
               %td Down
               %td -
     - if logged_in?
-      %p Worker ##{@worker_status[:active_node_statuses][current_user.account.worker_number].connection_id} is assigned to your account.
+      %p Worker ##{@worker_status[:active_node_statuses][current_user.account.worker_number][:connection_id]} is assigned to your account.
   - else
     .alert.alert-danger
       %strong Couldn't communicate with the collector service.

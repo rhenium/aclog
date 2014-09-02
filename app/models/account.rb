@@ -65,4 +65,10 @@ class Account < ActiveRecord::Base
       Set.new client.friend_ids
     end
   end
+
+  # Returns the worker id collecting tweets for this account.
+  # @return [Integer]
+  def worker_number
+    id % Settings.collector.nodes_count
+  end
 end

@@ -12,7 +12,8 @@ module Collector
       active_node_statuses = Settings.collector.nodes_count.times.map do |number|
         node = NodeManager.active_connections[number]
         if node
-          { activated_time: node.activated_time }
+          { activated_time: node.activated_time,
+            connection_id: node.connection_id }
         else
           nil
         end

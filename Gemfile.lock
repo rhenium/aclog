@@ -51,7 +51,6 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.7.1)
-    connection_pool (2.0.0)
     cool.io (1.1.1)
       iobuffer (>= 1.0.0)
     coveralls (0.7.1)
@@ -305,7 +304,6 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import
   bootstrap-sass
-  connection_pool
   coveralls
   dalli
   em-work_queue

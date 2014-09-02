@@ -55,7 +55,7 @@ Rails.application.configure do
   config.action_view.logger = nil
 
   # Use a different cache store in production.
-  config.cache_store = :dalli_store, { pool_size: 5 }
+  config.cache_store = :dalli_store
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.action_controller.asset_host = "http://assets.example.com"

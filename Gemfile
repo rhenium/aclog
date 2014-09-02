@@ -18,7 +18,6 @@ gem "turbolinks"
 gem "unicorn"
 gem "unicorn-worker-killer"
 gem "dalli"
-gem "connection_pool"
 
 gem "omniauth-twitter"
 gem "twitter"

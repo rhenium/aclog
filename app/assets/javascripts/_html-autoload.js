@@ -13,7 +13,7 @@
         opts = $.extend({}, defaults, _opts);
 
         $(window).scroll(function() {
-            if ((opts.content.offset().top + opts.content.height()) < ($(document).scrollTop() + $(window).height())) {
+            if ((opts.content.offset().top + opts.content.height()) - ($(document).scrollTop() + $(window).height()) < 100) {
                 if (loading || !opts.link || !opts.link.attr("href")) return;
 
                 opts.onStart();

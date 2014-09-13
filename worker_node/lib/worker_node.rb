@@ -1,5 +1,5 @@
 require "yaml"
-require "worker_node/event_queue"
+require "worker_node/unique_channel"
 require "worker_node/worker"
 require "worker_node/collector_connection"
 require "worker_node/user_stream"

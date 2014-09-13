@@ -3,10 +3,10 @@ require "yajl"
 
 module WorkerNode
   class UserStream
-    def initialize(msg, queue)
+    def initialize(msg, channel)
       @user_id = msg[:user_id]
       @account_id = msg[:id]
-      @queue = queue
+      @channel = channel
       prepare_client(msg)
     end
 
@@ -49,7 +49,7 @@ module WorkerNode
 
       client.on_unauthorized do
         log(:warn, "Unauthorized")
-        @queue.push(:unauthorized, id: @account_id, user_id: @user_id)
+        @channel.push(:unauthorized, id: @account_id, user_id: @user_id)
         self.stop
       end
 
@@ -90,14 +90,14 @@ module WorkerNode
 
     def on_tweet(json)
       log(:debug, "Tweet: #{json[:user][:id]} => #{json[:id]}")
-      @queue.push(:tweet,
+      @channel.push(:tweet,
                   reduce_tweet(json).merge(
                   unique_id: json[:id]))
     end
 
     def on_retweet(json)
       log(:debug, "Retweet: #{json[:user][:id]} => #{json[:retweeted_status][:id]}")
-      @queue.push(:retweet,
+      @channel.push(:retweet,
                   id: json[:id],
                   user: reduce_user(json[:user]),
                   retweeted_status: reduce_tweet(json[:retweeted_status]),
@@ -106,7 +106,7 @@ module WorkerNode
 
     def on_favorite(json)
       log(:debug, "Favorite: #{json[:source][:id]} => #{json[:target_object][:id]}")
-      @queue.push(:favorite,
+      @channel.push(:favorite,
                   source: reduce_user(json[:source]),
                   target_object: reduce_tweet(json[:target_object]),
                   unique_id: "fav-#{json[:created_at]}-#{json[:source][:id]}-#{json[:target_object][:id]}")
@@ -114,7 +114,7 @@ module WorkerNode
 
     def on_unfavorite(json)
       log(:debug, "Unfavorite: #{json[:source][:id]} => #{json[:target_object][:id]}")
-      @queue.push(:unfavorite,
+      @channel.push(:unfavorite,
                   source: reduce_user(json[:source]),
                   target_object: reduce_tweet(json[:target_object]),
                   unique_id: "unfav-#{json[:created_at]}-#{json[:source][:id]}-#{json[:target_object][:id]}")
@@ -122,7 +122,7 @@ module WorkerNode
 
     def on_delete(json)
       log(:debug, "Delete: #{json[:delete][:status]}")
-      @queue.push(:delete,
+      @channel.push(:delete,
                   json.merge(
                   unique_id: "delete-#{json[:delete][:status][:id]}"))
     end

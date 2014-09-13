@@ -6,14 +6,12 @@ module WorkerNode
     def initialize
       @streams = {}
       @unpacker = MessagePack::Unpacker.new(symbolize_keys: true)
-      @event_queue = EventQueue.new
+      @event_channel = UniqueChannel.new {|item| item[:unique_id] }
       @exiting = false
 
-      blk = ->(event) do
+      @event_channel.subscribe do |event|
         send_message(event[0], event[1])
-        @event_queue.pop &blk
       end
-      @event_queue.pop &blk
     end
 
     def post_init
@@ -74,7 +72,7 @@ module WorkerNode
         @streams[account_id].update(msg)
         log(:info, "Updated account: #{account_id}")
       else
-        stream = UserStream.new(msg, @event_queue)
+        stream = UserStream.new(msg, @event_channel)
         stream.start
         @streams[account_id] = stream
         log(:info, "Registered account: #{account_id}")

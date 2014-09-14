@@ -1,13 +1,13 @@
 require File.expand_path('../boot', __FILE__)
 
 # Pick the frameworks you want:
-require "active_model/railtie"
 require "active_record/railtie"
 require "action_controller/railtie"
-require "action_mailer/railtie"
 require "action_view/railtie"
-require "sprockets/railtie"
+require "action_mailer/railtie"
+# require "active_job/railtie"
 # require "rails/test_unit/railtie"
+require "sprockets/railtie"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -34,9 +34,6 @@ module Aclog
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     config.i18n.default_locale = :ja
     config.i18n.fallbacks = true
-
-    config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif *.eot *.woff *.ttf *.svg)
-    config.assets.precompile += [Proc.new { |path, fn| fn =~ /app\/assets/ && %w(.js).include?(File.extname(path)) }]
 
     config.generators do |g|
       g.test_framework :rspec

@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "rails", "~> 4.1.5"
+gem "rails", "~> 4.2.0.beta1"
 gem "activerecord-import"
 gem "tzinfo-data"
 gem "mysql2"
@@ -9,7 +9,7 @@ gem "yajl-ruby", require: "yajl"
 gem "grape"
 gem "grape-rabl"
 gem "haml-rails"
-gem "sass-rails", "~> 4.0.3"
+gem "sass-rails", "~> 5.0.0.beta1"
 gem "uglifier"
 gem "jquery-rails"
 gem "bootstrap-sass"
@@ -28,16 +28,18 @@ gem "em-work_queue"
 gem "pry-rails"
 
 group :development, :test do
-  gem "quiet_assets"
+  gem "byebug"
+  gem "web-console", "~> 2.0.0.beta2"
   gem "spring"
+  gem "quiet_assets"
 end
 
 group :test do
   gem "webmock"
-  gem "rspec", "~> 3.0.0"
-  gem "rspec-rails", "~> 3.0.0"
+  gem "rspec"
+  gem "rspec-rails"
   gem "spring-commands-rspec"
-  gem "guard-rspec", "~> 4.2.9"
+  gem "guard-rspec"
   gem "factory_girl_rails"
   gem "coveralls", require: false
   gem "simplecov", require: false

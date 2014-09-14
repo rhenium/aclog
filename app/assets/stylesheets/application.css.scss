@@ -1,5 +1,6 @@
-//= require bootstrap
-//= require base
-//= require_tree .
+@import "bootstrap-sprockets";
+@import "bootstrap";
+@import "base";
+@import "*";
 
 @import url(http://fonts.googleapis.com/css?family=Raleway:400,800);

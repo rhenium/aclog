@@ -24,7 +24,7 @@ class ApidocsController < ApplicationController
     end
 
     if @endpoint.route_example_params
-      @example_request_uri = api_url + @endpoint.route_path.sub(/\(\.:format\)$/, ".json")
+      @example_request_uri = root_url + "api" + @endpoint.route_path.sub(/\(\.:format\)$/, ".json")
       @example_request_uri += "?" + @endpoint.route_example_params.to_param
     end
   end

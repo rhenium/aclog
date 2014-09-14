@@ -2,7 +2,7 @@
 %h1= format_endpoint_name(@endpoint)
 %p= @endpoint.route_description
 %h2 Resource URL
-%p= api_url + @endpoint.route_path
+%p= root_url + "api" + @endpoint.route_path # TODO
 %h2 Parameters
 %table.table.api-params
   %tbody

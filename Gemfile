@@ -22,9 +22,9 @@ gem "dalli"
 gem "omniauth-twitter"
 gem "twitter"
 gem "twitter-text"
+gem "eventmachine"
 gem "msgpack"
 gem "msgpack-rpc"
-gem "em-work_queue"
 gem "pry-rails"
 
 group :development, :test do

@@ -12,7 +12,6 @@ module WorkerNode
 
     def start
       @client.connect
-      log(:info, "Connected")
     end
 
     def update(hash)
@@ -67,7 +66,9 @@ module WorkerNode
           next
         end
 
-        if json[:delete] && json[:delete][:status]
+        if json[:friends]
+          log(:info, "Connection established (friends: #{json[:friends].size})")
+        elsif json[:delete] && json[:delete][:status]
           on_delete(json)
         elsif json[:event] == "favorite"
           on_favorite(json)
@@ -77,8 +78,6 @@ module WorkerNode
           on_retweet(json)
         elsif json[:user]
           on_tweet(json)
-        elsif json[:friends]
-          log(:debug, "friends: #{json[:friends].size}")
         elsif json[:warning]
           log(:warn, "warning: #{json[:warning]}")
         else

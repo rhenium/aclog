@@ -5,6 +5,9 @@ Application.tweets = {
                 $(this).text(new Date($(this).attr("datetime"))
                                 .toLocaleString());
             });
+            $("img.twitter-icon", d).each(function() {
+                $(this).on("error", function() { this.src = '<%= image_path("profile_image_missing.png") %>'; });
+            });
         };
         formatTweet($(".statuses"));
 

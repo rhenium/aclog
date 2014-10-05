@@ -11,12 +11,15 @@ $(function() {
 
             if (previousText.length > 0) {
                 $.getJSON("/i/user_jump_suggest.json", { head: previousText }, function(json) {
+                    var menu = $("#user-jump-dropdown .dropdown-menu");
                     json.forEach(function(s) {
-                        $("#user-jump-dropdown .dropdown-menu")
-                            .append($("<li />").addClass("user-jump-suggestion")
-                                .append($("<a />").attr("href", "/" + s.screen_name).attr("title", s.name + " (@" + s.screen_name + ")")
-                                    .append($("<img />").addClass("twitter-icon").attr("src", s.profile_image_url).attr("alt", "@" + s.screen_name).attr("onerror", "this.src = '<%= image_path("profile_image_missing.png") %>'"))
-                                    .append($("<span />").text("@" + s.screen_name))));
+                        var img = $("<img />").addClass("twitter-icon").attr("src", s.profile_image_url).attr("alt", "@" + s.screen_name);
+                        img.on("error", function() { this.src = '<%= image_path("profile_image_missing.png") %>'; });
+
+                        menu.append($("<li />").addClass("user-jump-suggestion")
+                            .append($("<a />").attr("href", "/" + s.screen_name).attr("title", s.name + " (@" + s.screen_name + ")")
+                                .append(img)
+                                .append($("<span />").text("@" + s.screen_name))));
                     });
                 });
             }
@@ -26,4 +29,6 @@ $(function() {
         window.location = "/" + $("input", this).val();
         return false;
     });
+
+    $("img.twitter-icon").on("error", function() { this.src = '<%= image_path("profile_image_missing.png") %>'; });
 });

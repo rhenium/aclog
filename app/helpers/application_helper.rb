@@ -19,8 +19,7 @@ module ApplicationHelper
     capture_haml do
       haml_tag("img.twitter-icon",
                { src: user.profile_image_url(size),
-                 alt: "@" + user.screen_name,
-                 onerror: "this.src = '#{image_path("profile_image_missing.png")}'"
+                 alt: "@" + user.screen_name
                }.merge(options))
     end
   end

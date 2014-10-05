@@ -2,7 +2,7 @@
   - if tweet.favorites_count > 0
     %dl
       %dt
-        %a.expand-responses-button{href: "javascript:void(0)", title: "すべて見る", data: { type: "favorites", id: tweet.id }}<
+        %a.expand-responses-button{href: "#", title: "すべて見る", data: { type: "favorites", id: tweet.id }}<
           %span>= tweet.favorites_count
           Favs
       %dd
@@ -11,7 +11,7 @@
   - if tweet.retweets_count > 0
     %dl
       %dt
-        %a.expand-responses-button{href: "javascript:void(0)", title: "すべて見る", data: { type: "retweets", id: tweet.id }}<
+        %a.expand-responses-button{href: "#", title: "すべて見る", data: { type: "retweets", id: tweet.id }}<
           %span>= tweet.retweets_count
           RTs
       %dd

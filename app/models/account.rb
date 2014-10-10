@@ -1,5 +1,3 @@
-require "msgpack/rpc/transport/unix"
-
 class Account < ActiveRecord::Base
   enum status: { active: 0, inactive: 1, revoked: 2 }
 

@@ -60,10 +60,10 @@ class Tweet < ActiveRecord::Base
     # Imports a Tweet from Twitter REST API.
     # If the client is not specified, An random account will be selected from database.
     # @param [Integer] id Target status ID.
-    # @param [Twitter::REST::Client] client The Twitter::REST::Client to be used.
+    # @param [Account] client The Twitter::REST::Client to be used.
     # @return [Tweet] The Tweet instance imported.
-    def import_from_twitter(id, client = nil)
-      client ||= Account.random.client
+    def import_from_twitter(id, account = nil)
+      client = (account || Account.random).client
 
       st = client.status(id)
       self.create_bulk_from_json([st.attrs])

@@ -1,4 +1,5 @@
 require "msgpack/rpc/transport/unix"
+
 class WorkerManager
   class << self
     def alive?

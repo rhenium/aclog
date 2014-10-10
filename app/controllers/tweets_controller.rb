@@ -1,13 +1,10 @@
 class TweetsController < ApplicationController
-  after_action :eager_load_user
-
   def show
     @tweet = Tweet.find(params[:id])
-  rescue
-    import
-  else
     @user = @tweet.user
     authorize_to_show_user! @user
+  rescue ActiveRecord::RecordNotFound
+    import
   end
 
   def import
@@ -21,7 +18,7 @@ class TweetsController < ApplicationController
       account = nil
     end
 
-    tweet = Tweet.import_from_twitter(params[:id], account ? account.client : nil)
+    tweet = Tweet.import_from_twitter(params[:id], account)
     redirect_to tweet
   end
 
@@ -74,10 +71,7 @@ class TweetsController < ApplicationController
   end
 
   def filter
-    @tweets = paginate Tweet.recent(7.days).filter_by_query(params[:q].to_s).order_by_id.eager_load(:user)
-    if params[:registered]
-      @tweets = @tweets.to_a.select {|t| t.user.registered? }
-    end
+    @tweets = paginate Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id
   end
 
   # /i/:id/{favorites,retweets}.json
@@ -109,13 +103,11 @@ class TweetsController < ApplicationController
     [(params[:count] || Settings.tweets.count.default).to_i, Settings.tweets.count.max].min
   end
 
-  def eager_load_user
+  def render(*args)
     if @tweets && @tweets.is_a?(ActiveRecord::Relation)
       @tweets = @tweets.eager_load(:user)
     end
-  end
 
-  def render(*args)
     if @tweets && @tweets.length > 0
       if @page
         @prev_url = @page == 1 ? nil : url_for(params.merge(page: @page - 1))

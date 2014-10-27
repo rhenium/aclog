@@ -10,13 +10,10 @@ module TwitterOauthEchoAuthentication
       raise Aclog::Exceptions::OAuthEchoError, "X-Auth-Service-Provider is invalid"
     end
 
-    json = open(twitter_provider, "Authorization" => credentials) {|res|
-      Yajl::Parser.parse(res.read)
-    }
-
-    json["id"]
-  rescue Aclog::Exceptions::OAuthEchoError
-    raise $!
+    open(twitter_provider, "Authorization" => credentials) do |res|
+      json = Yajl::Parser.parse(res.read)
+      json["id"]
+    end
   rescue OpenURI::HTTPError
     if $!.message.include?("401")
       raise Aclog::Exceptions::OAuthEchoUnauthorized, $!

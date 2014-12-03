@@ -1,4 +1,4 @@
-Application.apidocs = {
+Application.Views.apidocs = {
     endpoint: function() {
         var loading = $("#example_request_loading");
         if (loading) {

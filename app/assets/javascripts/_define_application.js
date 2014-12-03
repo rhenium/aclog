@@ -1,3 +1,7 @@
 if (this.Application === undefined) {
-    this.Application = {};
+    this.Application = {
+        Views: {},
+        Helpers: {},
+        Partials: {}
+    };
 }

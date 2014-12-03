@@ -1,0 +1,25 @@
+Application.Helpers = {
+  controller: function() { return $("body").data("controller"); },
+  action: function() { return $("body").data("action"); },
+  user_id: function() { return $("body").data("user-id"); },
+  tweet_id: function() { return $("body").data("tweet-id"); },
+  rescue_profile_image: function(range) {
+    $("img.twitter-icon", range).each(function() {
+        $(this).on("error", function() { this.src = '<%= image_path("profile_image_missing.png") %>'; });
+    });
+  },
+  localize_time: function(range) {
+    $("time", range).each(function() {
+        $(this).text(new Date($(this).attr("datetime")).toLocaleString());
+    });
+  },
+  call_api: function(endpoint, params, callback) {
+    $.getJSON("/api/internal/" + endpoint, params, function(json) {
+      if (json.error) {
+        throw "api unsuccessful: " + json.error.message;
+      } else {
+        callback(json);
+      }
+    });
+  },
+};

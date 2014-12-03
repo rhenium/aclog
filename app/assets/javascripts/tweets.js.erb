@@ -1,13 +1,8 @@
-Application.tweets = {
+Application.Views.tweets = {
     _: function() {
         var formatTweet = function(d) {
-            $("time", d).each(function() {
-                $(this).text(new Date($(this).attr("datetime"))
-                                .toLocaleString());
-            });
-            $("img.twitter-icon", d).each(function() {
-                $(this).on("error", function() { this.src = '<%= image_path("profile_image_missing.png") %>'; });
-            });
+            Application.Helpers.localize_time(d);
+            Application.Helpers.rescue_profile_image(d);
         };
         formatTweet($(".statuses"));
 
@@ -28,10 +23,10 @@ Application.tweets = {
         }
 
         $(".statuses").on("click", ".expand-responses-button", function() {
-            var id = $(this).attr("data-id");
-            var type = $(this).attr("data-type");
-            $.getJSON("/i/" + id + "/" + type + ".json", function(json) {
-                $(".status[data-id=\"" + id + "\"] .status-responses-" + type).html(json.html);
+            var id = $(this).data("id");
+            var type = $(this).data("type");
+            Application.Helpers.call_api("tweets/responses", { id: id, type: type }, function(json) {
+              $(".status[data-id=\"" + id + "\"] .status-responses-" + type).html(json.html);
             });
         });
     }

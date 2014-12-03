@@ -9,10 +9,16 @@
 $(function() {
     var controller = $("body").data("controller");
     var action = $("body").data("action");
+    var partials = ($("body").data("partial") || "").split(" ");
 
-    var ac = Application[controller];
+    var ac = Application.Views[controller];
     if (ac !== undefined) {
         if (ac["_"] !== undefined) { ac["_"](); }
         if (ac[action] !== undefined) { ac[action](); }
     }
+
+    partials.forEach(function(par) {
+      var pa = Application.Partials[par];
+      if (pa !== undefined) { pa(); }
+    });
 });

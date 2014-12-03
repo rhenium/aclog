@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "rails", "~> 4.2.0.beta1"
+gem "rails", "~> 4.2.0.rc1"
 gem "activerecord-import"
 gem "tzinfo-data"
 gem "mysql2"

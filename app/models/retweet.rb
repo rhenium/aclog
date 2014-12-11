@@ -7,13 +7,17 @@ class Retweet < ActiveRecord::Base
   #
   # @param [Array] array An array of Streaming API messages.
   def self.create_bulk_from_json(array)
+    return if array.empty?
+
     objects = array.map do |json|
-      self.new(id: json[:id],
-               user_id: json[:user][:id],
-               tweet_id: json[:retweeted_status][:id])
+      {
+        id: json[:id],
+        user_id: json[:user][:id],
+        tweet_id: json[:retweeted_status][:id]
+      }
     end
 
-    self.import(objects, ignore: true)
+    self.import(objects.first.keys, objects.map(&:values), ignore: true)
   end
 
   # Unregisters retweet events in bulk from array of Streaming API's delete events.

@@ -30,22 +30,33 @@ class Tweet < ActiveRecord::Base
     # @param [Hash] json Data from Twitter API
     # @return [Tweet] The new instance.
     def build_from_json(json)
-      self.new(id: json[:id],
-               text: extract_entities(json),
-               source: json[:source],
-               tweeted_at: Time.parse(json[:created_at]),
-               user_id: json[:user][:id],
-               in_reply_to_id: json[:in_reply_to_status_id],
-               favorites_count: json[:favorite_count],
-               retweets_count: json[:retweet_count],
-               reactions_count: json[:favorite_count] + json[:retweet_count])
+      self.new(transform_from_json_into_hash(json))
+    end
+
+    def transform_from_json_into_hash(json)
+      {
+        id: json[:id],
+        text: extract_entities(json),
+        source: json[:source],
+        tweeted_at: Time.parse(json[:created_at]),
+        user_id: json[:user][:id],
+        in_reply_to_id: json[:in_reply_to_status_id],
+        favorites_count: json[:favorite_count],
+        retweets_count: json[:retweet_count],
+        reactions_count: json[:favorite_count] + json[:retweet_count]
+      }
     end
 
     # Builds instances of Tweet and save them. This method is supposed to be used from collector daemon.
     # @param [Array<Hash>] array Data from collector.
     def create_bulk_from_json(array)
-      objects = array.map {|json| build_from_json(json) }
-      self.import(objects, on_duplicate_key_update: [:favorites_count, :retweets_count, :reactions_count])
+      return if array.empty?
+
+      objects = array.map {|json| transform_from_json_into_hash(json) }
+      keys = objects.first.keys
+      self.import(keys, objects.map(&:values),
+                  on_duplicate_key_update: [:favorites_count, :retweets_count, :reactions_count],
+                  validate: false)
     end
 
     # Destroys Tweets from database. This method is supposed to be used from collector daemon.

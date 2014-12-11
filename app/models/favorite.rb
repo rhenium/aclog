@@ -7,12 +7,16 @@ class Favorite < ActiveRecord::Base
   #
   # @param [Array] array An array of Streaming API events.
   def self.create_bulk_from_json(array)
+    return if array.empty?
+
     objects = array.map do |json|
-      self.new(user_id: json[:source][:id],
-               tweet_id: json[:target_object][:id])
+      {
+        user_id: json[:source][:id],
+        tweet_id: json[:target_object][:id]
+      }
     end
 
-    self.import(objects, ignore: true)
+    self.import(objects.first.keys, objects.map(&:values), ignore: true)
   end
 
   # Unregisters favorite event in bulk from an array of Streaming API 'unfavorite' events.

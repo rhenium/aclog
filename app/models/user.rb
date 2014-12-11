@@ -18,12 +18,18 @@ class User < ActiveRecord::Base
       key && where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
     end
 
+    def transform_from_json_into_hash(json)
+      {
+        id: json[:id],
+        screen_name: json[:screen_name],
+        name: json[:name],
+        profile_image_url: json[:profile_image_url_https] || json[:profile_image_url],
+        protected: json[:protected]
+      }
+    end
+
     def build_from_json(json)
-      self.new(id: json[:id],
-               screen_name: json[:screen_name],
-               name: json[:name],
-               profile_image_url: json[:profile_image_url_https] || json[:profile_image_url],
-               protected: json[:protected])
+      self.new(transform_from_json_into_hash(json))
     end
 
     def create_or_update_from_json(json)
@@ -31,8 +37,13 @@ class User < ActiveRecord::Base
     end
 
     def create_or_update_bulk_from_json(array)
-      objects = array.map {|json| build_from_json(json) }
-      import(objects, on_duplicate_key_update: [:screen_name, :name, :profile_image_url, :protected])
+      return if array.empty?
+
+      objects = array.map {|json| transform_from_json_into_hash(json) }
+      keys = objects.first.keys
+      self.import(keys, objects.map(&:values),
+                  on_duplicate_key_update: [:screen_name, :name, :profile_image_url, :protected],
+                  validate: false)
     end
   end
 

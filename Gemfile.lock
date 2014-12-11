@@ -1,3 +1,10 @@
+GIT
+  remote: git://github.com/zdennis/activerecord-import.git
+  revision: d8961049e79d42143034ac3c87d3a59b92316632
+  specs:
+    activerecord-import (0.6.0)
+      activerecord (>= 3.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -30,8 +37,6 @@ GEM
       activemodel (= 4.2.0.rc1)
       activesupport (= 4.2.0.rc1)
       arel (~> 6.0)
-    activerecord-import (0.6.0)
-      activerecord (>= 3.0)
     activesupport (4.2.0.rc1)
       i18n (>= 0.7.0.beta1, < 0.8)
       json (~> 1.7, >= 1.7.7)
@@ -337,7 +342,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord-import
+  activerecord-import!
   bootstrap-sass
   byebug
   coveralls

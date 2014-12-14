@@ -21,6 +21,6 @@ class UsersController < ApplicationController
 
   private
   def require_user
-    User.find(id: (params[:id] || params[:user_id]), screen_name: params[:screen_name])
+    User.find(screen_name: params[:screen_name])
   end
 end

@@ -25,7 +25,6 @@ class SettingsController < ApplicationController
 
   private
   def set_account
-    @account = logged_in? && current_user.account
-    redirect_to "/i/login" unless @account
+    redirect_to "/i/login" unless logged_in?
   end
 end

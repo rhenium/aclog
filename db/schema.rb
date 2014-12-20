@@ -11,14 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140628072228) do
+ActiveRecord::Schema.define(version: 20141220025331) do
 
   create_table "accounts", force: true do |t|
-    t.integer  "user_id",              limit: 8,                null: false
-    t.string   "oauth_token",                                   null: false
-    t.string   "oauth_token_secret",                            null: false
-    t.boolean  "notification_enabled",           default: true, null: false
-    t.integer  "status",               limit: 2, default: 0,    null: false
+    t.integer  "user_id",              limit: 8,                  null: false
+    t.string   "oauth_token",          limit: 255,                null: false
+    t.string   "oauth_token_secret",   limit: 255,                null: false
+    t.boolean  "notification_enabled", limit: 1,   default: true, null: false
+    t.integer  "status",               limit: 2,   default: 0,    null: false
     t.datetime "updated_at"
     t.datetime "created_at"
   end
@@ -31,8 +31,8 @@ ActiveRecord::Schema.define(version: 20140628072228) do
     t.integer "user_id",  limit: 8, null: false
   end
 
-  add_index "favorites", ["tweet_id", "user_id"], name: "index_favorites_on_tweet_id_and_user_id", unique: true, using: :btree
-  add_index "favorites", ["user_id"], name: "index_favorites_on_user_id", using: :btree
+  add_index "favorites", ["tweet_id"], name: "index_favorites_on_tweet_id", using: :btree
+  add_index "favorites", ["user_id", "tweet_id"], name: "index_favorites_on_user_id_and_tweet_id", unique: true, using: :btree
 
   create_table "retweets", force: true do |t|
     t.integer "tweet_id", limit: 8, null: false
@@ -43,13 +43,13 @@ ActiveRecord::Schema.define(version: 20140628072228) do
   add_index "retweets", ["user_id"], name: "index_retweets_on_user_id", using: :btree
 
   create_table "tweets", force: true do |t|
-    t.text     "text",                                  null: false
-    t.text     "source",                                null: false
-    t.integer  "user_id",         limit: 8,             null: false
-    t.datetime "tweeted_at",                            null: false
-    t.integer  "favorites_count",           default: 0, null: false
-    t.integer  "retweets_count",            default: 0, null: false
-    t.integer  "reactions_count",           default: 0, null: false
+    t.text     "text",            limit: 65535,             null: false
+    t.text     "source",          limit: 65535,             null: false
+    t.integer  "user_id",         limit: 8,                 null: false
+    t.datetime "tweeted_at",                                null: false
+    t.integer  "favorites_count", limit: 4,     default: 0, null: false
+    t.integer  "retweets_count",  limit: 4,     default: 0, null: false
+    t.integer  "reactions_count", limit: 4,     default: 0, null: false
     t.integer  "in_reply_to_id",  limit: 8
   end
 
@@ -58,11 +58,11 @@ ActiveRecord::Schema.define(version: 20140628072228) do
   add_index "tweets", ["user_id", "reactions_count"], name: "index_tweets_on_user_id_and_reactions_count", using: :btree
 
   create_table "users", force: true do |t|
-    t.string   "screen_name",       limit: 20, null: false
-    t.string   "name",              limit: 64, null: false
-    t.string   "profile_image_url",            null: false
-    t.boolean  "protected",                    null: false
-    t.datetime "updated_at",                   null: false
+    t.string   "screen_name",       limit: 20,  null: false
+    t.string   "name",              limit: 64,  null: false
+    t.string   "profile_image_url", limit: 255, null: false
+    t.boolean  "protected",         limit: 1,   null: false
+    t.datetime "updated_at",                    null: false
   end
 
   add_index "users", ["screen_name"], name: "index_users_on_screen_name", using: :btree

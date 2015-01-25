@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "rails", "~> 4.2.0.rc1"
+gem "rails", "~> 4.2.0"
 gem "activerecord-import", github: "zdennis/activerecord-import"
 gem "tzinfo-data"
 gem "mysql2"
@@ -9,7 +9,7 @@ gem "yajl-ruby", require: "yajl"
 gem "grape"
 gem "grape-rabl"
 gem "haml-rails"
-gem "sass-rails", "~> 5.0.0.beta1"
+gem "sass-rails", "~> 5.0.0"
 gem "uglifier"
 gem "jquery-rails"
 gem "bootstrap-sass"
@@ -29,7 +29,7 @@ gem "pry-rails"
 
 group :development, :test do
   gem "byebug"
-  gem "web-console", "~> 2.0.0.beta2"
+  gem "web-console", "~> 2.0.0"
   gem "spring"
   gem "quiet_assets"
 end

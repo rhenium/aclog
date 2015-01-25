@@ -7,11 +7,11 @@ GEM
       eventmachine (~> 1.0)
       http_parser.rb (~> 0.6)
       simple_oauth (~> 0.2)
-    eventmachine (1.0.3)
+    eventmachine (1.0.4)
     http_parser.rb (0.6.0)
-    msgpack (0.5.9)
+    msgpack (0.5.10)
     rake (10.4.2)
-    simple_oauth (0.3.0)
+    simple_oauth (0.3.1)
     yajl-ruby (1.2.1)
 
 PLATFORMS

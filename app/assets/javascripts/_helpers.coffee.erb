@@ -1,0 +1,18 @@
+Application.Helpers =
+  controller: () -> $("body").data("controller")
+  action: () -> $("body").data("action")
+  user_id: () -> $("body").data("user-id")
+  tweet_id: () -> $("body").data("tweet-id")
+  rescue_profile_image: (range) ->
+    $("img.twitter-icon", range).each () ->
+        $(this).on "error", () ->
+          this.src = '<%= image_path("profile_image_missing.png") %>'
+  localize_time: (range) ->
+    $("time", range).each () ->
+        $(this).text(new Date($(this).attr("datetime")).toLocaleString())
+  call_api: (endpoint, params, callback) ->
+    $.getJSON "/i/api/" + endpoint, params, (json) ->
+      if json.error
+        throw "api unsuccessful: " + json.error.message
+      else
+        callback(json)

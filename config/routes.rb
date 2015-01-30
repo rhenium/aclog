@@ -9,11 +9,8 @@ Rails.application.routes.draw do
   get "/i/callback" =>                          "sessions#create"
   get "/i/logout" =>                            "sessions#destroy",                 as: "logout"
 
-  get "/i/user_jump_suggest" =>                 "users#user_jump_suggest",          as: "user_jump_suggest"
-
   get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
   post "/i/:id/import" =>                       "tweets#import",                    as: "import", constraints: { id: /\d+/ }
-  get "/i/:id/:type" =>                         "tweets#tweet_responses",           as: "tweet_responses", constraints: { id: /\d+/ }
 
   get "/i/settings" =>                          "settings#index",                   as: "settings"
   post "/i/settings/update" =>                  "settings#update"
@@ -23,6 +20,9 @@ Rails.application.routes.draw do
   get "/i/best" =>                              "tweets#all_best",                  as: "best"
   get "/i/timeline" =>                          "tweets#all_timeline",              as: "timeline"
   get "/i/filter" =>                            "tweets#filter",                    as: "filter"
+
+  get "/i/api/users/suggest_screen_name" =>     "users#i_suggest_screen_name"
+  get "/i/api/tweets/responses" =>              "tweets#i_responses",               as: "tweet_responses"
 
   get "/about/api" =>                           "apidocs#index",                    as: "about_api"
   get "/about/api/:method/:namespace/:path" =>  "apidocs#endpoint",                 as: "about_api_endpoint", constraints: { namespace: /[\w\/]+/ }

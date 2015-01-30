@@ -13,7 +13,7 @@ class UsersController < ApplicationController
     @cached_users = User.find(@result.map(&:first)).map {|user| [user.id, user] }.to_h
   end
 
-  def user_jump_suggest
+  def i_suggest_screen_name
     users = User.suggest_screen_name(params[:head].to_s).limit(10)
     filtered = users.map {|user| { name: user.name, screen_name: user.screen_name, profile_image_url: user.profile_image_url(:mini) } }
     render json: filtered

@@ -74,8 +74,7 @@ class TweetsController < ApplicationController
     @tweets = paginate Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id
   end
 
-  # /i/:id/{favorites,retweets}.json
-  def tweet_responses
+  def i_responses
     show
     users = params[:type] == "favorites" ? @tweet.favoriters : @tweet.retweeters
     render json: { html: render_to_string("_tweet_stats_users", locals: { tweet: @tweet, users: users, count: nil }, formats: :html, layout: nil) }

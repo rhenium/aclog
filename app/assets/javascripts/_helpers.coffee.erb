@@ -2,6 +2,7 @@ Application.Helpers =
   controller: () -> $("body").data("controller")
   action: () -> $("body").data("action")
   user_id: () -> $("body").data("user-id")
+  user_screen_name: () -> $("body").data("user-screen-name")
   tweet_id: () -> $("body").data("tweet-id")
   rescue_profile_image: (range) ->
     $("img.twitter-icon", range).each () ->

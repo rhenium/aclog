@@ -9,13 +9,13 @@
 $ ->
   controller = $("body").data("controller")
   action = $("body").data("action")
-  partials = ($("body").data("partial") || "").split(" ")
+  parts = ($("body").data("parts") || "").split(" ")
 
   ac = Application.Views[controller]
   if ac
     ac["_"]?()
     ac["action"]?()
 
-  partials.forEach (par) ->
-    pa = Application.Partials[par]
+  parts.forEach (par) ->
+    pa = Application.Parts[par]
     pa?()

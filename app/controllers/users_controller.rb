@@ -19,6 +19,11 @@ class UsersController < ApplicationController
     render json: filtered
   end
 
+  def i_stats
+    user = User.find(params[:id])
+    render json: user.stats.to_h
+  end
+
   private
   def require_user
     User.find(screen_name: params[:screen_name])

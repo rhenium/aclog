@@ -22,7 +22,8 @@ Rails.application.routes.draw do
   get "/i/filter" =>                            "tweets#filter",                    as: "filter"
 
   get "/i/api/users/suggest_screen_name" =>     "users#i_suggest_screen_name"
-  get "/i/api/tweets/responses" =>              "tweets#i_responses",               as: "tweet_responses"
+  get "/i/api/users/stats" =>                   "users#i_stats"
+  get "/i/api/tweets/responses" =>              "tweets#i_responses"
 
   get "/about/api" =>                           "apidocs#index",                    as: "about_api"
   get "/about/api/:method/:namespace/:path" =>  "apidocs#endpoint",                 as: "about_api_endpoint", constraints: { namespace: /[\w\/]+/ }

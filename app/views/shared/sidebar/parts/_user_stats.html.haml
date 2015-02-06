@@ -1,20 +1,8 @@
+- register_view_part :sidebar_user_stats
 %p<
   = profile_image_tag user, :original, class: "img-rounded", width: 64, height: 64
 %p= "@" + user.screen_name
 %p<
   %a.aclogicon.aclogicon-twitter{href: user.twitter_url}
-- if user.registered?
-  %ul.records
-    %li<
-      %span> Received
-      %span.data>= user.stats.reactions_count
-    %li<
-      %span> Average
-      %span.data>= "%.2f" % (user.stats.reactions_count.to_f / user.stats.tweets_count)
-    %li<
-      %span> Joined
-      %span.data>
-        = user.stats.since_join
-        %span> d ago
-- else
-  .alert.alert-aclog @#{user.screen_name} は aclog に登録していません
+.user-stats
+  = loading_tag

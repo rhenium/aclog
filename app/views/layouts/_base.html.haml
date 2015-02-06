@@ -15,7 +15,7 @@
       %link{rel: "next", href: @next_url}
     - if @prev_url
       %link{rel: "prev", href: @prev_url}
-  %body{data: { controller: controller.controller_path, action: controller.action_name }}
+  %body{data: meta_info}
     %nav.navbar.navbar-static-top
       .container
         .nav.navbar-nav.navbar-left

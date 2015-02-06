@@ -21,4 +21,3 @@ Application.Parts.sidebar_user_stats = ->
         $("<div />").addClass("alert").addClass("alert-aclog")
           .text("@" + Application.Helpers.user_screen_name() + " は aclog に登録していません"))
     loading.hide()
-    console.log json

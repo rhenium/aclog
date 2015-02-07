@@ -14,7 +14,7 @@ $ ->
   ac = Application.Views[controller]
   if ac
     ac["_"]?()
-    ac["action"]?()
+    ac[action]?()
 
   parts.forEach (par) ->
     pa = Application.Parts[par]

@@ -108,7 +108,7 @@ GEM
     get_process_mem (0.2.0)
     globalid (0.3.0)
       activesupport (>= 4.1.0)
-    grape (0.10.1)
+    grape (0.9.0)
       activesupport
       builder
       hashie (>= 2.1.0)
@@ -145,7 +145,7 @@ GEM
       haml (>= 3.1, < 5.0)
       html2haml (>= 1.0.1)
       railties (>= 4.0.1)
-    hashie (3.3.2)
+    hashie (3.4.0)
     hike (1.2.3)
     hitimes (1.2.2)
     html2haml (2.0.0)
@@ -373,7 +373,7 @@ DEPENDENCIES
   dalli
   eventmachine
   factory_girl_rails
-  grape
+  grape (~> 0.9.0)
   grape-rabl
   guard-rspec
   haml-rails

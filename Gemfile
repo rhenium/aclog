@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 gem "rails", "~> 4.2.0"
-gem "activerecord-import", github: "zdennis/activerecord-import"
+gem "activerecord-import"
 gem "tzinfo-data"
 gem "mysql2"
 gem "settingslogic"

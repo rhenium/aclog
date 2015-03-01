@@ -20,10 +20,17 @@ class Api < Grape::API
   helpers TwitterOauthEchoAuthentication
 
   helpers do
+    def session
+      env[Rack::Session::Abstract::ENV_SESSION_KEY]
+    end
+
     def current_user
       @_current_user ||= begin
-        if headers["X-Verify-Credentials-Authorization"]
+        if session.key?(:api_user_id)
+          User.find(session[:api_user_id])
+        elsif headers["X-Verify-Credentials-Authorization"]
           user_id = authenticate_with_twitter_oauth_echo
+          session[:api_user_id] = user_id
           User.find(user_id)
         end
       end

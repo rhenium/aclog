@@ -166,7 +166,7 @@ module WorkerNode
     end
 
     def log(level, message)
-      WorkerNode.logger.__send__(level, "[UserStream:##{@account_id}:#{@user_id}] #{message}")
+      WorkerNode.logger.__send__(level, "UserStream(##{@account_id}/#{@user_id})") { message }
     end
   end
 end

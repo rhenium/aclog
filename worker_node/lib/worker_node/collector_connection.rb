@@ -99,7 +99,7 @@ module WorkerNode
     end
 
     def log(level, message)
-      WorkerNode.logger.__send__(level, "[CollectorConnection] #{message}")
+      WorkerNode.logger.__send__(level, "CollectorConnection") { message }
     end
   end
 end

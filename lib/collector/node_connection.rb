@@ -115,7 +115,7 @@ module Collector
     end
 
     def log(level, message)
-      Rails.logger.__send__(level, "[Node:#{@connection_id}] #{message}")
+      Rails.logger.__send__(level, "Node(#{@connection_id})") { message }
     end
   end
 end

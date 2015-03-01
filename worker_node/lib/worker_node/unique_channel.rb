@@ -9,7 +9,7 @@ module WorkerNode
     def push(type, event)
       u = @block.call(event)
       if @cache.key?(u)
-        WorkerNode.logger.debug("[UniqueChannel] Duplicate event: #{u}")
+        WorkerNode.logger.debug("UniqueChannel") { "Duplicate event: #{u}" }
       else
         @channel.push [type, event]
         if u

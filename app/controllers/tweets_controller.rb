@@ -51,7 +51,7 @@ class TweetsController < ApplicationController
   def user_favorites
     @user = require_user
     authorize_to_show_user! @user
-    @tweets = paginate_with_page_number Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC")
+    @tweets = paginate_with_page_number Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC").eager_load(:user)
   end
 
   def user_favorited_by
@@ -59,19 +59,19 @@ class TweetsController < ApplicationController
     authorize_to_show_user! @user
     @source_user = User.find(id: params[:source_user_id], screen_name: params[:source_screen_name])
     authorize_to_show_user! @source_user
-    @tweets = paginate @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id
+    @tweets = paginate @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id.eager_load(:user)
   end
 
   def all_best
-    @tweets = paginate_with_page_number Tweet.reacted.parse_recent(params[:recent]).order_by_reactions
+    @tweets = paginate_with_page_number Tweet.reacted.parse_recent(params[:recent]).order_by_reactions.eager_load(:user)
   end
 
   def all_timeline
-    @tweets = paginate Tweet.reacted(params[:reactions]).order_by_id
+    @tweets = paginate Tweet.reacted(params[:reactions]).order_by_id.eager_load(:user)
   end
 
   def filter
-    @tweets = paginate Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id
+    @tweets = paginate Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.eager_load(:user)
   end
 
   def i_responses
@@ -103,10 +103,6 @@ class TweetsController < ApplicationController
   end
 
   def render(*args)
-    if @tweets && @tweets.is_a?(ActiveRecord::Relation)
-      @tweets = @tweets.eager_load(:user)
-    end
-
     if @tweets && @tweets.length > 0
       if @page
         @prev_url = @page == 1 ? nil : url_for(params.merge(page: @page - 1))

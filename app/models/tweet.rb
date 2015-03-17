@@ -77,6 +77,7 @@ class Tweet < ActiveRecord::Base
       client = (account || Account.random).client
 
       st = client.status(id)
+      st = st.retweeted_status if st.retweet?
       self.create_bulk_from_json([st.attrs])
       User.create_or_update_from_json(st.attrs[:user])
 

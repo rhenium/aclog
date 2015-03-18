@@ -5,7 +5,7 @@ Application.Views.tweets =
       Application.Helpers.rescue_profile_image(d)
     formatTweet $(".statuses")
 
-    if $("link[rel=next]") isnt null
+    if $("link[rel=next]").length
       $.autopager
         content: $(".statuses")
         link: $("link[rel=next]")

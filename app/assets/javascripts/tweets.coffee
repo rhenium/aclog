@@ -13,10 +13,10 @@ Application.Views.tweets =
         onReceived: (obj) -> formatTweet(obj)
         onComplete: -> $(".loading").hide()
 
-      $(".statuses").on "click", ".expand-responses-button", ->
-        id = $(this).data("id")
-        type = $(this).data("type")
-        Application.Helpers.call_api "tweets/responses", { id: id, type: type }, (json) ->
-          obj = $(".status[data-id=\"" + id + "\"] .status-responses-" + type).html(json.html)
-          Application.Helpers.rescue_profile_image obj
-        return false
+    $(".statuses").on "click", ".expand-responses-button", ->
+      id = $(this).data("id")
+      type = $(this).data("type")
+      Application.Helpers.call_api "tweets/responses", { id: id, type: type }, (json) ->
+        obj = $(".status[data-id=\"" + id + "\"] .status-responses-" + type).html(json.html)
+        Application.Helpers.rescue_profile_image obj
+      return false

@@ -15,8 +15,8 @@ gem "jquery-rails"
 gem "bootstrap-sass"
 gem "turbolinks"
 
-gem "unicorn"
-gem "unicorn-worker-killer"
+gem "puma"
+gem "puma_worker_killer"
 gem "dalli"
 
 gem "omniauth-twitter"
@@ -32,6 +32,7 @@ group :development, :test do
   gem "web-console", "~> 2.0.0"
   gem "spring"
   gem "quiet_assets"
+  gem "oink"
 end
 
 group :test do

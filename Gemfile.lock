@@ -140,6 +140,7 @@ GEM
     hashie (3.4.0)
     hike (1.2.3)
     hitimes (1.2.2)
+    hodel_3000_compliant_logger (0.1.1)
     html2haml (2.0.0)
       erubis (~> 2.7.0)
       haml (~> 4.0.0)
@@ -155,7 +156,6 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (1.8.2)
-    kgio (2.9.3)
     listen (2.9.0)
       celluloid (>= 0.15.2)
       rb-fsevent (>= 0.9.3)
@@ -188,6 +188,9 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     oauth (0.4.7)
+    oink (0.10.1)
+      activerecord
+      hodel_3000_compliant_logger
     omniauth (1.2.2)
       hashie (>= 1.2, < 4)
       rack (~> 1.0)
@@ -203,6 +206,11 @@ GEM
       slop (~> 3.4)
     pry-rails (0.3.3)
       pry (>= 0.9.10)
+    puma (2.11.1)
+      rack (>= 1.1, < 2.0)
+    puma_worker_killer (0.0.3)
+      get_process_mem (~> 0.1)
+      puma (~> 2.7)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rabl (0.11.6)
@@ -238,7 +246,6 @@ GEM
       activesupport (= 4.2.0)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    raindrops (0.13.0)
     rake (10.4.2)
     rb-fsevent (0.9.4)
     rb-inotify (0.9.5)
@@ -332,13 +339,6 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.6)
-    unicorn (4.8.3)
-      kgio (~> 2.6)
-      rack
-      raindrops (~> 0.7)
-    unicorn-worker-killer (0.4.3)
-      get_process_mem (~> 0)
-      unicorn (~> 4)
     virtus (1.0.4)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
@@ -374,8 +374,11 @@ DEPENDENCIES
   msgpack
   msgpack-rpc
   mysql2
+  oink
   omniauth-twitter
   pry-rails
+  puma
+  puma_worker_killer
   quiet_assets
   rails (~> 4.2.0)
   rspec
@@ -390,8 +393,6 @@ DEPENDENCIES
   twitter-text
   tzinfo-data
   uglifier
-  unicorn
-  unicorn-worker-killer
   web-console (~> 2.0.0)
   webmock
   yajl-ruby

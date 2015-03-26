@@ -8,8 +8,8 @@
     %meta{name: "msapplication-TileImage", content: image_path("tile-image.png")}
     %meta{name: "msapplication-TileColor", content: "#f0eadb"}
     %meta{name: "twitter:widgets:csp", content: "on"}
-    = stylesheet_link_tag "application", media: nil, "data-turbolinks-track" => true
-    = javascript_include_tag "application", "data-turbolinks-track" => true
+    = stylesheet_link_tag "application", media: nil
+    = javascript_include_tag "application"
     = csrf_meta_tags
     - if @next_url
       %link{rel: "next", href: @next_url}
@@ -32,16 +32,23 @@
               %li= link_to "Best", best_path
               %li= link_to "Timeline", timeline_path
           %li.dropdown.omittable#user-jump-dropdown
-            %a.dropdown-toggle{href: "#", data: { toggle: "dropdown" }}<
+            %a.dropdown-toggle{href: "#", data: { toggle: "dropdown", "v-on" => "click: focus" }}<
               User
               %span.caret/
             %ul.dropdown-menu
               %li
-                %form{autocomplete: "off"}
+                %form{autocomplete: "off", data: {"v-on" => "submit: submit"}}
                   .input-group
-                    %input.form-control{type: "text", placeholder: "Username"}
+                    %input.form-control{type: "text", placeholder: "Username", data: {"v-model" => "enteredUserName"}}
                     %span.input-group-btn
                       %button.btn{type: "submit"} Go
+              %template{data: {"v-repeat" => "users"}}
+                %li.user-jump-suggestion
+                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name}} (@{{screen_name}})"}<
+                    %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
+                    %span @{{screen_name}}
+              %li{data: {"v-if" => "loading"}}
+                %img.loading-image{src: image_path("loading.gif")}
           - if logged_in?
             %li.dropdown
               %a.dropdown-toggle{href: "#", data: { toggle: "dropdown" }}<

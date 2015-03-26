@@ -5,5 +5,4 @@
   %h1
     %small #{@user.screen_name}'s
     Timeline
-  .statuses= render @tweets
-  = loading_tag
+  .statuses= render "tweets_template"

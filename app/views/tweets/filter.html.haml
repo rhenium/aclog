@@ -7,5 +7,4 @@
       = field_set_tag do
         = text_field_tag :q, params[:q]
         = submit_tag "filter", class: "btn", name: nil
-  .statuses= render @tweets
-  = loading_tag
+  .statuses= render "tweets_template"

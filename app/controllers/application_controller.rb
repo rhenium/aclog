@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  include SecurityHeaders
+  #include SecurityHeaders
   include ControllerErrorHandling if Rails.env.production?
 
   protect_from_forgery with: :exception

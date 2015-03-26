@@ -150,6 +150,9 @@ GEM
     http_parser.rb (0.6.0)
     i18n (0.7.0)
     ice_nine (0.11.1)
+    jbuilder (2.2.12)
+      activesupport (>= 3.0.0, < 5)
+      multi_json (~> 1.2)
     jquery-rails (4.0.3)
       rails-dom-testing (~> 1.0)
       railties (>= 4.2.0)
@@ -370,6 +373,7 @@ DEPENDENCIES
   grape-rabl
   guard-rspec
   haml-rails
+  jbuilder
   jquery-rails
   msgpack
   msgpack-rpc

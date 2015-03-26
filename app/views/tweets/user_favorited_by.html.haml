@@ -9,5 +9,4 @@
       Favorited By
       %a{href: user_path(@source_user.screen_name), title: "#{@source_user.name} (@#{@source_user.screen_name})"}
         = @source_user.screen_name
-  .statuses= render @tweets
-  = loading_tag
+  .statuses= render "tweets_template"

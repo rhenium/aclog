@@ -39,14 +39,6 @@ module ApplicationHelper
     end
   end
 
-  def loading_tag
-    capture_haml do
-      haml_tag(".loading") do
-        haml_concat image_tag "loading.gif", width: 16, height: 16, alt: "Loading..."
-      end
-    end
-  end
-
   # utf8, form
   def utf8_enforcer_tag; raw "" end
 end

@@ -1,21 +1,21 @@
+### TODO
 #= require jquery
 #= require jquery_ujs
-#= require turbolinks
-#= require bootstrap-sprockets
+#= require bootstrap/dropdown
 #= require _widgets
-#= require _define_application
+###
+#= require twitter-text-1.11.0
+#= require superagent-1.1.0
+#= require vue-0.11.5
+#= require _init
+#= require _helpers
 #= require_tree .
 
 $ ->
-  controller = $("body").data("controller")
-  action = $("body").data("action")
-  parts = ($("body").data("parts") || "").split(" ")
-
-  ac = Application.Views[controller]
+  ac = Views[Helpers.controller()]
   if ac
     ac["_"]?()
-    ac[action]?()
+    ac[Helpers.action()]?()
 
-  parts.forEach (par) ->
-    pa = Application.Parts[par]
-    pa?()
+  Helpers.parts().forEach (par) ->
+    (Parts[par])?()

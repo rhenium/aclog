@@ -1,19 +1,7 @@
-Application.Helpers =
-  controller: () -> $("body").data("controller")
-  action: () -> $("body").data("action")
-  user_id: () -> $("body").data("user-id")
-  user_screen_name: () -> $("body").data("user-screen-name")
-  tweet_id: () -> $("body").data("tweet-id")
-  rescue_profile_image: (range) ->
-    $("img.twitter-icon", range).each () ->
-        $(this).on "error", () ->
-          this.src = '<%= image_path("profile_image_missing.png") %>'
-  localize_time: (range) ->
-    $("time", range).each () ->
-        $(this).text(new Date($(this).attr("datetime")).toLocaleString())
-  call_api: (endpoint, params, callback) ->
-    $.getJSON "/i/api/" + endpoint, params, (json) ->
-      if json.error
-        throw "api unsuccessful: " + json.error.message
-      else
-        callback(json)
+window.Helpers =
+  controller: -> document.body.getAttribute("data-controller")
+  action: -> document.body.getAttribute("data-action")
+  parts: -> (document.body.getAttribute("data-parts") || "").split(" ")
+  user_id: -> document.body.getAttribute("data-user-id")
+  user_screen_name: -> document.body.getAttribute("data-user-screen-name")
+  tweet_id: -> document.body.getAttribute("data-tweet-id")

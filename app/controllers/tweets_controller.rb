@@ -7,6 +7,10 @@ class TweetsController < ApplicationController
     import
   end
 
+  def responses
+    show
+  end
+
   def import
     tweet = Tweet.find_by(id: params[:id])
 
@@ -74,12 +78,6 @@ class TweetsController < ApplicationController
     @tweets = paginate Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.eager_load(:user)
   end
 
-  def i_responses
-    show
-    users = params[:type] == "favorites" ? @tweet.favoriters : @tweet.retweeters
-    render json: { html: render_to_string("_tweet_stats_users", locals: { tweet: @tweet, users: users, count: nil }, formats: :html, layout: nil) }
-  end
-
   private
   def require_user
     User.find(id: params[:user_id], screen_name: params[:screen_name])
@@ -113,12 +111,14 @@ class TweetsController < ApplicationController
       end
     end
 
-    if @tweets && request.xhr?
-      super(json: { html: render_to_string(partial: "tweet", collection: @tweets, as: :tweet, formats: :html),
-                    next_url: @next_url,
-                    prev_url: @prev_url })
-    else
-      super(*args)
+    if request.format == :json
+      if !template_exists?(params[:action], params[:controller], true)
+        if @tweets
+          return super("tweets")
+        end
+      end
     end
+
+    super
   end
 end

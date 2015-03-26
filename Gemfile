@@ -28,6 +28,7 @@ gem "msgpack-rpc"
 gem "pry-rails"
 
 group :development, :test do
+  gem "thin"
   gem "byebug"
   gem "web-console", "~> 2.0.0"
   gem "spring"

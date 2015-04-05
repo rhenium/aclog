@@ -1,0 +1,7 @@
+Views.about =
+  _: -> {}
+  index: ->
+    Array.prototype.forEach.call document.querySelectorAll(".tweet-button a"), (node) ->
+      node.onclick = (e) ->
+        e.preventDefault()
+        Helpers.openTwitterIntent(node.getAttribute("href"))

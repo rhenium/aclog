@@ -19,11 +19,11 @@
           %span.source {{{source | formatSource}}}
           %ul
             %li<
-              %a.aclogicon.aclogicon-fav{href: "https://twitter.com/intent/favorite?tweet_id={{id_str}}", title: "お気に入り登録"}
+              %a.aclogicon.aclogicon-fav{href: "https://twitter.com/intent/favorite?tweet_id={{id_str}}", title: "お気に入り登録", data: {"v-on" => "click: openIntent"}}
             %li<
-              %a.aclogicon.aclogicon-retweet{href: "https://twitter.com/intent/retweet?tweet_id={{id_str}}", title: "リツイート"}
+              %a.aclogicon.aclogicon-retweet{href: "https://twitter.com/intent/retweet?tweet_id={{id_str}}", title: "リツイート", data: {"v-on" => "click: openIntent"}}
             %li<
-              %a.aclogicon.aclogicon-reply{href: "https://twitter.com/intent/tweet?in_reply_to={{id_str}}", title: "返信"}
+              %a.aclogicon.aclogicon-reply{href: "https://twitter.com/intent/tweet?in_reply_to={{id_str}}", title: "返信", data: {"v-on" => "click: openIntent"}}
     .status-responses
       %template{data: {"v-if" => "favorites_count > 0"}}
         %dl

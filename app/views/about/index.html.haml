@@ -8,7 +8,10 @@
       - if Rails.env.development?
         (dev)
     %p<
-      %a.twitter-share-button{href: "https://twitter.com/share", data: { count: "none", lang: "ja" }} ツイート
+      .tweet-button
+        %a{href: "https://twitter.com/intent/tweet?text=#{CGI.escape(title)}&url=#{CGI.escape(url_for(only_path: false))}", target: "_blank"}
+          %i/
+          %span ツイート
 .front-feature
   .container
     .row

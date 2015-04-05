@@ -24,12 +24,14 @@ class Tweet < ActiveRecord::Base
 
   scope :favorited_by, ->(user) { joins(:favorites).where(favorites: { user: user }) }
 
+  # should be called in last
   scope :paginate, ->(params) {
-    page_per = [(params[:count] || Settings.tweets.count.default).to_i, Settings.tweets.count.max].min
-    if params[:page]
-      page([params[:page].to_i, 1].max, page_per)
-    else
+    page_per = params[:count] ? [params[:count].to_i, Settings.tweets.count.max].min : Settings.tweets.count.default
+
+    if !params[:page] && self.all.order_values.all? {|o| !o.is_a?(String) && o.expr.name == :id }
       limit(page_per).max_id(params[:max_id]).since_id(params[:since_id])
+    else
+      page([params[:page].to_i, 1].max, page_per)
     end
   }
 

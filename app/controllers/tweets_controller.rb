@@ -31,7 +31,7 @@ class TweetsController < ApplicationController
 
   def user_best
     authorize! @user ||= User.find(screen_name: params[:screen_name])
-    @tweets = @user.tweets.reacted.parse_recent(params[:recent]).order_by_reactions.paginate(page: params[:page])
+    @tweets = @user.tweets.reacted.parse_recent(params[:recent]).order_by_reactions.paginate(params)
 
     @sidebars = [:user, :recent_thresholds]
     @title = "@#{@user.screen_name}'s Best Tweets"
@@ -39,7 +39,7 @@ class TweetsController < ApplicationController
 
   def user_timeline
     authorize! @user ||= User.find(screen_name: params[:screen_name])
-    @tweets = @user.tweets.reacted(params[:reactions]).order_by_id.paginate(params.permit(:page, :since_id, :max_id))
+    @tweets = @user.tweets.reacted(params[:reactions]).order_by_id.paginate(params)
 
     @sidebars = [:user, :reactions_thresholds]
     @title = "@#{@user.screen_name}'s Timeline"
@@ -47,7 +47,7 @@ class TweetsController < ApplicationController
 
   def user_favorites
     authorize! @user = User.find(screen_name: params[:screen_name])
-    @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC").eager_load(:user).paginate(page: params[:page])
+    @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC").eager_load(:user).paginate(params)
 
     @sidebars = [:user, :reactions_thresholds]
     @title = "@#{@user.screen_name}'s Favorites"
@@ -56,28 +56,28 @@ class TweetsController < ApplicationController
   def user_favorited_by
     authorize! @user = User.find(screen_name: params[:screen_name])
     authorize! @source_user = User.find(screen_name: params[:source_screen_name])
-    @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id.eager_load(:user).paginate(params.permit(:page, :since_id, :max_id))
+    @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id.eager_load(:user).paginate(params)
 
     @sidebars = [:user, :reactions_thresholds]
     @title = "@#{@user.screen_name}'s Tweets favorited by @#{@source_user.screen_name}"
   end
 
   def all_best
-    @tweets = Tweet.reacted.parse_recent(params[:recent]).order_by_reactions.eager_load(:user).paginate(page: params[:page])
+    @tweets = Tweet.reacted.parse_recent(params[:recent]).order_by_reactions.eager_load(:user).paginate(params)
 
     @sidebars = [:all, :recent_thresholds]
     @title = "Top Tweets"
   end
 
   def all_timeline
-    @tweets = Tweet.reacted(params[:reactions]).order_by_id.eager_load(:user).paginate(params.permit(:page, :since_id, :max_id))
+    @tweets = Tweet.reacted(params[:reactions]).order_by_id.eager_load(:user).paginate(params)
 
     @sidebars = [:all, :reactions_thresholds]
     @title = "Public Timeline"
   end
 
   def filter
-    @tweets = Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.eager_load(:user).paginate(params.permit(:page, :since_id, :max_id))
+    @tweets = Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.eager_load(:user).paginate(params)
 
     @sidebars = [:all]
     @title = "Filter"

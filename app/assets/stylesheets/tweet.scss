@@ -188,11 +188,18 @@
 
     dd {
         margin-left: 68px;
+        transition: all .1s ease;
     }
 
     dd.collapsed {
-        max-height: 88px;
         overflow: hidden;
+        max-height: 88px;
+        @media (min-width: 768px) {
+            max-height: 84px;
+        }
+        @media (min-width: 1200px) {
+            max-height: 88px;
+        }
     }
 
     dd li {

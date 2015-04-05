@@ -28,10 +28,10 @@
       %template{data: {"v-if" => "favorites_count > 0"}}
         %dl
           %dt
-            %a.expand-responses-button{href: "#", title: "すべて見る"}<
+            %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandFavorites(this, $event)"}}<
               %span> {{favorites_count}}
               Favs
-          %dd
+          %dd{data: {"v-class" => "collapsed: !expandFavorites"}}
             %ul{class: "status-responses-favorites"}
               %li{data: {"v-if" => "loading"}}
                 %img.loading-image{src: image_path("loading.gif")}
@@ -44,10 +44,10 @@
       %template{data: {"v-if" => "retweets_count > 0"}}
         %dl
           %dt
-            %a.expand-responses-button{href: "#", title: "すべて見る"}<
+            %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandRetweets(this, $event)"}}<
               %span> {{retweets_count}}
               RTs
-          %dd
+          %dd{data: {"v-class" => "collapsed: !expandRetweets"}}
             %ul{class: "status-responses-retweets"}
               %li{data: {"v-if" => "loading"}}
                 %img.loading-image{src: image_path("loading.gif")}

@@ -9,7 +9,14 @@ Views.tweets =
         prev: null
       methods:
         failProfileImage: (e) ->
+          e.preventDefault()
           e.target.src = '<%= image_path("profile_image_missing.png") %>'
+        toggleExpandFavorites: (status, e) ->
+          e.preventDefault()
+          status.expandFavorites = !status.expandFavorites
+        toggleExpandRetweets: (status, e) ->
+          e.preventDefault()
+          status.expandRetweets = !status.expandRetweets
       filters:
         formatSource: (str) ->
           if /^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)
@@ -28,6 +35,7 @@ Views.tweets =
         .end (err, res) ->
           json = res.body
           json.statuses.forEach (status) ->
+            status.expandFavorites = status.expandRetweets = false
             if status.allowed && status.reactions_count > 0
               status.loading = true
               superagent

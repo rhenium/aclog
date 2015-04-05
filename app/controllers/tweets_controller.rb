@@ -87,7 +87,6 @@ class TweetsController < ApplicationController
   def render(*args)
     return super(*args) if args.size > 0
 
-    #raise StandardError, request.formats
     if template_exists?(params[:action], params[:controller], true, [], formats: request.formats)
       super
     else

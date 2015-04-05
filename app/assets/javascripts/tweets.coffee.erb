@@ -54,7 +54,8 @@ Views.tweets =
           vm.next = json.next
           vm.prev = json.prev
 
-    loadJSON(window.location.toString())
+    l = window.location
+    loadJSON(l.protocol + "//" + l.host + l.pathname.replace(/(\.\w+)?$/, ".json") + l.search)
     
     content = $(".statuses")
     $(window).scroll ->

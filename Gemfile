@@ -16,7 +16,6 @@ gem "bootstrap-sass"
 gem "turbolinks"
 
 gem "puma"
-gem "puma_worker_killer"
 gem "dalli"
 
 gem "omniauth-twitter"

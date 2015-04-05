@@ -97,7 +97,6 @@ GEM
       multipart-post (>= 1.2, < 3)
     ffi (1.9.8)
     formatador (0.2.5)
-    get_process_mem (0.2.0)
     globalid (0.3.3)
       activesupport (>= 4.1.0)
     grape (0.9.0)
@@ -208,9 +207,6 @@ GEM
       pry (>= 0.9.10)
     puma (2.11.1)
       rack (>= 1.1, < 2.0)
-    puma_worker_killer (0.0.3)
-      get_process_mem (~> 0.1)
-      puma (~> 2.7)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rabl (0.11.6)
@@ -378,7 +374,6 @@ DEPENDENCIES
   omniauth-twitter
   pry-rails
   puma
-  puma_worker_killer
   quiet_assets
   rails (~> 4.2.0)
   rspec

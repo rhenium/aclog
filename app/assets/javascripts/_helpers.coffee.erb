@@ -5,3 +5,12 @@ window.Helpers =
   user_id: -> document.body.getAttribute("data-user-id")
   user_screen_name: -> document.body.getAttribute("data-user-screen-name")
   tweet_id: -> document.body.getAttribute("data-tweet-id")
+  openTwitterIntent: (url) ->
+    w = 550
+    h = 420
+    sh = window.screen.height
+    sw = window.screen.width
+    left = Math.round(sw / 2 - w / 2)
+    top = sh > h && Math.round(sh / 2 - h / 2) || 0
+    options = "scrollbars=yes, resizable=yes, toolbar=no, location=yes, width=" + w + ", height=" + h + ", left=" + left + ", top=" + top
+    window.open url, null, options

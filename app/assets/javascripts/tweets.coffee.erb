@@ -17,6 +17,9 @@ Views.tweets =
         toggleExpandRetweets: (status, e) ->
           e.preventDefault()
           status.expandRetweets = !status.expandRetweets
+        openIntent: (e) ->
+          e.preventDefault()
+          Helpers.openTwitterIntent(e.target.getAttribute("href"))
       filters:
         formatSource: (str) ->
           if /^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)

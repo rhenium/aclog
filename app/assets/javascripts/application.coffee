@@ -2,7 +2,6 @@
 #= require jquery
 #= require jquery_ujs
 #= require bootstrap/dropdown
-#= require _widgets
 ###
 #= require twitter-text-1.11.0
 #= require superagent-1.1.0

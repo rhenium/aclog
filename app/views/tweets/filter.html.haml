@@ -1,11 +1,12 @@
-- title "Filter"
-.col-sm-3.col-md-offset-1
-  = render "shared/sidebar/all"
-.col-sm-9.col-md-7.col-lg-6
-  .search
-    = form_tag({}, method: "get", class: "form-inline") do
-      = field_set_tag do
-        = text_field_tag :q, params[:q]
-        = submit_tag "filter", class: "btn", name: nil
-  .statuses= render @tweets
-  = loading_tag
+.container
+  .row
+    .col-sm-3.col-md-offset-1
+      .sidebar
+        = render_sidebars
+    .col-sm-9.col-md-7.col-lg-6
+      .search
+        = form_tag({}, method: "get", class: "form-inline") do
+          = field_set_tag do
+            = text_field_tag :q, params[:q]
+            = submit_tag "filter", class: "btn", name: nil
+      .statuses= render "tweets_template"

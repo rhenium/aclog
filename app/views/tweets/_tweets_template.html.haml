@@ -1,0 +1,72 @@
+.status{data: {"v-repeat" => "statuses"}, class: "{{aside?'status-reply':''}}"}
+  %template{data: {"v-if" => "allowed"}}
+    .status-tweet
+      .status-user
+        %a{href: user_path("dummy").sub("dummy", "{{user.screen_name}}"), title: "{{user.name}} (@{{user.screen_name}})"}<
+          %img.twitter-icon{src: "{{user.profile_image_url}}", alt: "@{{user.screen_name}}", data: {"v-on" => "error: failProfileImage"}}
+      .status-content
+        .status-head
+          %span.user<
+            %a{href: user_path("dummy").sub("dummy", "{{user.screen_name}}")}<
+              %span {{user.name}}
+              %span @{{user.screen_name}}
+          %span.time<
+            %a{href: tweet_path("0").sub("0", "{{id_str}}"), title: "このツイートの詳細を見る"}<
+              %time{datetime: "{{tweeted_at}}"} {{tweeted_at | toLocaleString}}
+            %a.source.aclogicon.aclogicon-twitter{href: "https://twitter.com/{{user.screen_name}}/status/{{id_str}}", title: "Twitter で見る"}
+        .status-text {{{text | formatText}}}
+        .status-foot
+          %span.source {{{source | formatSource}}}
+          %ul
+            %li<
+              %a.aclogicon.aclogicon-fav{href: "https://twitter.com/intent/favorite?tweet_id={{id_str}}", title: "お気に入り登録"}
+            %li<
+              %a.aclogicon.aclogicon-retweet{href: "https://twitter.com/intent/retweet?tweet_id={{id_str}}", title: "リツイート"}
+            %li<
+              %a.aclogicon.aclogicon-reply{href: "https://twitter.com/intent/tweet?in_reply_to={{id_str}}", title: "返信"}
+    .status-responses
+      %template{data: {"v-if" => "favorites_count > 0"}}
+        %dl
+          %dt
+            %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandFavorites(this, $event)"}}<
+              %span> {{favorites_count}}
+              Favs
+          %dd{data: {"v-class" => "collapsed: !expandFavorites"}}
+            %ul{class: "status-responses-favorites"}
+              %li{data: {"v-if" => "loading"}}
+                %img.loading-image{src: image_path("loading.gif")}
+              %li{data: {"v-repeat" => "favorites"}}<
+                %template{data: {"v-if": "allowed"}}
+                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name}} (@{{screen_name}})"}<
+                    %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
+                %template{data: {"v-if": "!allowed"}}
+                  %img{src: image_path("profile_image_protected.png"), alt: "protected user"}
+      %template{data: {"v-if" => "retweets_count > 0"}}
+        %dl
+          %dt
+            %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandRetweets(this, $event)"}}<
+              %span> {{retweets_count}}
+              RTs
+          %dd{data: {"v-class" => "collapsed: !expandRetweets"}}
+            %ul{class: "status-responses-retweets"}
+              %li{data: {"v-if" => "loading"}}
+                %img.loading-image{src: image_path("loading.gif")}
+              %li{data: {"v-repeat" => "retweets"}}<
+                %template{data: {"v-if": "allowed"}}
+                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name}} (@{{screen_name}})"}<
+                    %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
+                %template{data: {"v-if": "!allowed"}}
+                  %img{src: image_path("profile_image_protected.png"), alt: "protected user"}
+  %template{data: {"v-if" => "!allowed"}}
+    .status-tweet
+      .status-user
+        %img{src: image_path("profile_image_protected.png"), alt: "protected user"}
+      .status-content
+        .status-head
+          %span.time
+            %time{datetime: "{{tweeted_at}}"} {{tweeted_at | toLocaleString}}
+            .source.aclogicon.aclogicon-twitter
+        .status-text.protected ユーザーはツイートを非公開にしています
+        .status-foot
+.loading-box{data: {"v-if" => "loading"}}
+  %img.loading-image{src: image_path("loading.gif")}

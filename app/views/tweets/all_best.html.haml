@@ -1,8 +1,0 @@
-- title "Top Tweets"
-.col-sm-3.col-md-offset-1
-  = render "shared/sidebar/all_with_thresholds", thresholds: { param: :recent, default: "All Time", counts: ["All Time", "1d", "1w", "1m", "6m", "1y"] }
-.col-sm-9.col-md-7.col-lg-6
-  %h1
-    Top Tweets
-  .statuses= render @tweets
-  = loading_tag

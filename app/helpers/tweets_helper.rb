@@ -1,23 +1,9 @@
 module TweetsHelper
-  def favorites_truncate_count
-    params[:full] == "true" ? Settings.tweets.favorites.max : Settings.tweets.favorites.default
-  end
-
-  def favorites_truncated?(tweet)
-    (favorites_truncate_count || Float::INFINITY) < [tweet.favorites_count, tweet.retweets_count].max
-  end
-
-  def format_tweet_text(text)
-    text = sanitize(text)
-    text = auto_link(text, suppress_lists: true, username_include_symbol: true, username_url_base: "/")
-    text.gsub(/\r\n|\r|\n/, "<br />").html_safe
-  end
-
-  def link_to_source_text(source, *args)
-    if /^<a href="(.+?)" rel="nofollow">(.+?)<\/a>/ =~ source
-      link_to $2, $1, *args
-    else
-      source
-    end
+  def header
+    orig = @header || @title
+    orig
+      .sub(/@\w{1,20}'s/) {|t| "<small>#{t.delete("@")}</small>" }
+      .sub(/\w+ by @\w{1,20}/) {|t| "<small>#{t.delete("@")}</small>" }
+      .html_safe
   end
 end

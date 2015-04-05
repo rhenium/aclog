@@ -1,5 +1,36 @@
-.sidebar
-  = render partial: "shared/sidebar/parts/user_stats", locals: { user: user }
-  .sidebar-list
-    .list-group
-      = render partial: "shared/sidebar/parts/user_menu_items", locals: { user: user }
+- register_view_part :sidebar_user_stats
+%p<
+  = profile_image_tag @user, :original, class: "img-rounded", width: 64, height: 64
+%p= "@" + @user.screen_name
+%p<
+  %a.aclogicon.aclogicon-twitter{href: @user.twitter_url}
+.user-stats
+  %template{data: {"v-if" => "stats"}}
+    %template{data: {"v-if" => "stats.registered"}}
+      %ul.records
+        %li<
+          %span> Received
+          %span.data {{stats.reactions_count}}
+        %li<
+          %span> Average
+          %span.data {{average}}
+        %li<
+          %span> Joined
+          %span.data>
+            {{stats.since_join}}
+            %span> d ago
+    %template{data: {"v-if" => "!stats.registered"}}
+      .alert.alert-aclog @{{screen_name}} は aclog に登録していません
+  .loading-box{data: {"v-if" => "loading"}}
+    %img.loading-image{src: image_path("loading.gif")}
+.list-group
+  - if @user.registered?
+    = link_to_with_active "Best", user_path(@user.screen_name), class: "list-group-item"
+    = link_to_with_active "Timeline", user_timeline_path(@user.screen_name), class: "list-group-item"
+  - else
+    = link_to_with_active "Best", user_best_path(@user.screen_name), class: "list-group-item"
+    = link_to_with_active "Timeline", user_path(@user.screen_name), class: "list-group-item"
+  = link_to_with_active "Favorites", user_favorites_path(@user.screen_name), class: "list-group-item"
+  - if @user.registered?
+    = link_to_with_active "Discovered by", user_discovered_by_path(@user.screen_name), class: "list-group-item"
+    = link_to_with_active "Discovered users", user_discovered_users_path(@user.screen_name), class: "list-group-item"

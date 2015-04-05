@@ -1,21 +1,32 @@
 - title "aclog API"
-%h2 OAuth
-%p ツイートを非公開にしているアカウントの情報にアクセスするには本人であるか、対象のアカウントをフォローしている必要があります。Aclog API では、その認証に OAuth Echo を使用します。
-%p OAuth Echo を使用するには以下のリクエストヘッダを使用します。
-%pre
-  %code
-    :preserve
-      X-Auth-Service-Provider: https://api.twitter.com/1.1/account/verify_credentials.json
-      X-Verify-Credentials-Authorization: OAuth rea...
-OAuth Echo の詳細については
-%a{href: "#"} Twitter のドキュメント
-を参照してください。
-%h2 Endpoints
-- @routes.values.inject(:merge).each do |namespace, endpoints|
-  %h3= namespace.titleize
-  %table.table
-    %tbody
-      - endpoints.reject {|_, e| e.route_nodoc }.each do |path, endpoint|
-        %tr
-          %td= link_to format_endpoint_name(endpoint), about_api_endpoint_path(endpoint.route_method.downcase, namespace, path), class: (endpoint.route_deprecated ? "deprecated" : nil)
-          %td= endpoint.route_description
+.container
+  .row
+    .col-sm-3.sidebar
+      %h1 aclog API
+      .sidebar-list
+        .list-group.list-group-scroll
+          - @routes.values.inject(:merge).each do |namespace, endpoints|
+            %span.list-group-head= namespace.titleize
+            - endpoints.reject {|_, e| e.route_nodoc || e.route_deprecated }.each do |path, endpoint|
+              = link_to_with_active format_endpoint_name(endpoint), about_api_endpoint_path(endpoint.route_method.downcase, namespace, path), class: "list-group-item"
+    .col-sm-9
+      %h2 OAuth
+      %p ツイートを非公開にしているアカウントの情報にアクセスするには本人であるか、対象のアカウントをフォローしている必要があります。Aclog API では、その認証に OAuth Echo を使用します。
+      %p OAuth Echo を使用するには以下のリクエストヘッダを使用します。
+      %pre
+        %code
+          :preserve
+            X-Auth-Service-Provider: https://api.twitter.com/1.1/account/verify_credentials.json
+            X-Verify-Credentials-Authorization: OAuth rea...
+      OAuth Echo の詳細については
+      %a{href: "#"} Twitter のドキュメント
+      を参照してください。
+      %h2 Endpoints
+      - @routes.values.inject(:merge).each do |namespace, endpoints|
+        %h3= namespace.titleize
+        %table.table
+          %tbody
+            - endpoints.reject {|_, e| e.route_nodoc }.each do |path, endpoint|
+              %tr
+                %td= link_to format_endpoint_name(endpoint), about_api_endpoint_path(endpoint.route_method.downcase, namespace, path), class: (endpoint.route_deprecated ? "deprecated" : nil)
+                %td= endpoint.route_description

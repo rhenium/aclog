@@ -188,23 +188,24 @@
 
     dd {
         margin-left: 68px;
+        transition: all .1s ease;
     }
 
-    dd.timeline {
-        max-height: 88px;
+    dd.collapsed {
         overflow: hidden;
-
+        max-height: 88px;
         @media (min-width: 768px) {
-            max-height: none;
+            max-height: 84px;
+        }
+        @media (min-width: 1200px) {
+            max-height: 88px;
         }
     }
 
     dd li {
         float: left;
         display: block;
-    }
-
-    dd img {
+        position: relative;
         width: 44px;
         height: 44px;
 
@@ -217,6 +218,14 @@
             width: 44px;
             height: 44px;
         }
+    }
+
+    dd img {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0; right: 0; bottom: 0; left: 0;
+        margin: auto;
     }
 }
 

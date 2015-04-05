@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
-  include SecurityHeaders
-  include ControllerErrorHandling if Rails.env.production?
+  #include SecurityHeaders
+  include ControllerErrorHandling
 
   protect_from_forgery with: :exception
 
@@ -32,8 +32,15 @@ class ApplicationController < ActionController::Base
       (logged_in? && current_user.permitted_to_see?(user))
   end
 
-  def authorize_to_show_user!(user)
-    authorized_to_show_user?(user) || raise(Aclog::Exceptions::UserProtected, user)
+  def authorize!(object)
+    if object.is_a? User
+      authorized_to_show_user?(object) || raise(Aclog::Exceptions::UserProtected, object)
+    elsif object.is_a? Tweet
+      authorize! object.user
+    else
+      raise ArgumentError, "parameter `object` must be a User or a Tweet"
+    end
+    object
   end
 
   private

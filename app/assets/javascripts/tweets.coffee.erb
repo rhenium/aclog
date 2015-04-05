@@ -1,0 +1,61 @@
+Views.tweets =
+  _: ->
+    vm = new Vue
+      el: ".statuses"
+      data:
+        statuses: []
+        loading: false
+        next: null
+        prev: null
+      methods:
+        failProfileImage: (e) ->
+          e.preventDefault()
+          e.target.src = '<%= image_path("profile_image_missing.png") %>'
+        toggleExpandFavorites: (status, e) ->
+          e.preventDefault()
+          status.expandFavorites = !status.expandFavorites
+        toggleExpandRetweets: (status, e) ->
+          e.preventDefault()
+          status.expandRetweets = !status.expandRetweets
+      filters:
+        formatSource: (str) ->
+          if /^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)
+            str
+          else
+            str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        formatText: (str) ->
+          autolinked = twttr.txt.autoLink(str, { suppressLists: true, usernameIncludeSymbol: true, usernameUrlBase: "/" })
+          autolinked.replace(/\r?\n/g, "<br />\n")
+
+    loadJSON = (url) ->
+      vm.loading = true
+      superagent
+        .get url
+        .accept "json"
+        .end (err, res) ->
+          json = res.body
+          json.statuses.forEach (status) ->
+            status.expandFavorites = status.expandRetweets = false
+            if status.allowed && status.reactions_count > 0
+              status.loading = true
+              superagent
+                .get "/i/" + status.id_str + "/responses"
+                .accept "json"
+                .end (rerr, rres) ->
+                  rjson = rres.body
+                  status.favorites = rjson.favorites
+                  status.retweets = rjson.retweets
+                  status.loading = false
+          vm.statuses = vm.statuses.concat(json.statuses)
+          vm.loading = false
+          vm.next = json.next
+          vm.prev = json.prev
+
+    loadJSON(window.location.toString())
+    
+    content = $(".statuses")
+    $(window).scroll ->
+      if vm.loading || !vm.next
+        return
+      if (content.offset().top + content.height()) - ($(document).scrollTop() + $(window).height()) < 100
+        loadJSON vm.next

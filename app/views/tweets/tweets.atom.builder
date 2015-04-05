@@ -1,11 +1,11 @@
 atom_feed do |feed|
-  feed.title yield :title
-  feed.subtitle yield :title
+  feed.title title
+  feed.subtitle title
   feed.updated DateTime.now
 
   @tweets.each do |tweet|
     feed.entry(tweet) do |entry|
-      entry.title "#{tweet.favorites_count}/#{tweet.retweets_count}: #{CGI.unescapeHTML(strip_tags(format_tweet_text(tweet.text)))}"
+      entry.title "#{tweet.favorites_count}/#{tweet.retweets_count}: #{CGI.unescapeHTML(tweet.text)}"
       entry.updated Time.now.iso8601
       entry.summary "Has been favorited by #{tweet.favorites_count} #{tweet.favorites_count != 1 ? "people" : "person"}, " +
         "retweeted by #{tweet.retweets_count} #{tweet.retweets_count != 1 ? "people" : "person"}."

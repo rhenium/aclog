@@ -1,8 +1,0 @@
-- register_view_part :sidebar_user_stats
-%p<
-  = profile_image_tag user, :original, class: "img-rounded", width: 64, height: 64
-%p= "@" + user.screen_name
-%p<
-  %a.aclogicon.aclogicon-twitter{href: user.twitter_url}
-.user-stats
-  = loading_tag

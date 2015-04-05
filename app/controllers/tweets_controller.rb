@@ -1,124 +1,101 @@
 class TweetsController < ApplicationController
   def show
     @tweet = Tweet.find(params[:id])
-    @user = @tweet.user
-    authorize_to_show_user! @user
+    authorize! @user = @tweet.user
+
+    @sidebars = [:user]
+    @title = "\"#{view_context.truncate(CGI.unescapeHTML(@tweet.text))}\" from #{@user.name} (@#{@user.screen_name})"
+    @header = "@#{@user.screen_name}'s Tweet"
   rescue ActiveRecord::RecordNotFound
     import
   end
 
   def import
-    tweet = Tweet.find_by(id: params[:id])
-
-    if tweet && tweet.user.registered?
-      account = tweet.user.account
-    elsif logged_in?
-      account = current_user.account
-    else
-      account = nil
-    end
-
-    tweet = Tweet.import_from_twitter(params[:id], account)
+    tweet = Tweet.import_from_twitter(params[:id], current_user)
     redirect_to tweet
   end
 
+  def responses
+    authorize! @tweet = Tweet.find(params[:id])
+  end
+
   def user_index
-    @user = require_user
-    authorize_to_show_user! @user
+    authorize! @user = User.find(screen_name: params[:screen_name])
 
     if @user.registered?
       user_best
-      render :user_best
     else
       user_timeline
-      render :user_timeline
     end
   end
 
   def user_best
-    @user = require_user
-    authorize_to_show_user! @user
+    authorize! @user ||= User.find(screen_name: params[:screen_name])
+    @tweets = @user.tweets.reacted.parse_recent(params[:recent]).order_by_reactions.paginate(page: params[:page])
 
-    @tweets = paginate_with_page_number @user.tweets.reacted.parse_recent(params[:recent]).order_by_reactions
+    @sidebars = [:user, :recent_thresholds]
+    @title = "@#{@user.screen_name}'s Best Tweets"
   end
 
   def user_timeline
-    @user = require_user
-    authorize_to_show_user! @user
-    @tweets = paginate @user.tweets.reacted(params[:reactions]).order_by_id
+    authorize! @user ||= User.find(screen_name: params[:screen_name])
+    @tweets = @user.tweets.reacted(params[:reactions]).order_by_id.paginate(params.permit(:page, :since_id, :max_id))
+
+    @sidebars = [:user, :reactions_thresholds]
+    @title = "@#{@user.screen_name}'s Timeline"
   end
 
   def user_favorites
-    @user = require_user
-    authorize_to_show_user! @user
-    @tweets = paginate_with_page_number Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC").eager_load(:user)
+    authorize! @user = User.find(screen_name: params[:screen_name])
+    @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC").eager_load(:user).paginate(page: params[:page])
+
+    @sidebars = [:user, :reactions_thresholds]
+    @title = "@#{@user.screen_name}'s Favorites"
   end
 
   def user_favorited_by
-    @user = require_user
-    authorize_to_show_user! @user
-    @source_user = User.find(id: params[:source_user_id], screen_name: params[:source_screen_name])
-    authorize_to_show_user! @source_user
-    @tweets = paginate @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id.eager_load(:user)
+    authorize! @user = User.find(screen_name: params[:screen_name])
+    authorize! @source_user = User.find(screen_name: params[:source_screen_name])
+    @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id.eager_load(:user).paginate(params.permit(:page, :since_id, :max_id))
+
+    @sidebars = [:user, :reactions_thresholds]
+    @title = "@#{@user.screen_name}'s Tweets favorited by @#{@source_user.screen_name}"
   end
 
   def all_best
-    @tweets = paginate_with_page_number Tweet.reacted.parse_recent(params[:recent]).order_by_reactions.eager_load(:user)
+    @tweets = Tweet.reacted.parse_recent(params[:recent]).order_by_reactions.eager_load(:user).paginate(page: params[:page])
+
+    @sidebars = [:all, :recent_thresholds]
+    @title = "Top Tweets"
   end
 
   def all_timeline
-    @tweets = paginate Tweet.reacted(params[:reactions]).order_by_id.eager_load(:user)
+    @tweets = Tweet.reacted(params[:reactions]).order_by_id.eager_load(:user).paginate(params.permit(:page, :since_id, :max_id))
+
+    @sidebars = [:all, :reactions_thresholds]
+    @title = "Public Timeline"
   end
 
   def filter
-    @tweets = paginate Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.eager_load(:user)
-  end
+    @tweets = Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.eager_load(:user).paginate(params.permit(:page, :since_id, :max_id))
 
-  def i_responses
-    show
-    users = params[:type] == "favorites" ? @tweet.favoriters : @tweet.retweeters
-    render json: { html: render_to_string("_tweet_stats_users", locals: { tweet: @tweet, users: users, count: nil }, formats: :html, layout: nil) }
+    @sidebars = [:all]
+    @title = "Filter"
   end
 
   private
-  def require_user
-    User.find(id: params[:user_id], screen_name: params[:screen_name])
-  end
-
-  def paginate(tweets)
-    if params[:page]
-      paginate_with_page_number tweets
-    else
-      tweets.limit(params_count).max_id(params[:max_id]).since_id(params[:since_id])
-    end
-  end
-
-  def paginate_with_page_number(tweets)
-    @page = (params[:page] || 1).to_i
-    tweets.page(@page, params_count)
-  end
-
-  def params_count
-    [(params[:count] || Settings.tweets.count.default).to_i, Settings.tweets.count.max].min
-  end
-
   def render(*args)
-    if @tweets && @tweets.length > 0
-      if @page
-        @prev_url = @page == 1 ? nil : url_for(params.merge(page: @page - 1))
-        @next_url = url_for(params.merge(page: @page + 1))
-      else
-        @prev_url = url_for(params.tap {|h| h.delete(:max_id) }.merge(since_id: @tweets.first.id))
-        @next_url = url_for(params.tap {|h| h.delete(:since_id) }.merge(max_id: @tweets.last.id - 1))
-      end
-    end
+    return super(*args) if args.size > 0
 
-    if @tweets && request.xhr?
-      super(json: { html: render_to_string(partial: "tweet", collection: @tweets, as: :tweet, formats: :html),
-                    next_url: @next_url,
-                    prev_url: @prev_url })
+    #raise StandardError, request.formats
+    if template_exists?(params[:action], params[:controller], true, [], formats: request.formats)
+      super
     else
-      super(*args)
+      if @tweets
+        super("tweets")
+      else
+        super # bug
+      end
     end
   end
 end

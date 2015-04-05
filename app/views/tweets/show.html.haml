@@ -1,14 +1,12 @@
-- title "\"#{CGI.unescapeHTML(strip_tags(format_tweet_text(@tweet.text)))}\" from #{@user.name} (@#{@user.screen_name})"
-.col-sm-3.col-md-offset-1
-  = render "shared/sidebar/user", user: @user
-.col-sm-9.col-md-7.col-lg-6
-  %h1
-    %small #{@user.screen_name}'s
-    Tweet
-  .statuses
-    = render partial: "tweet_reply", collection: @tweet.reply_ancestors(2), as: :tweet
-    = render @tweet
-    = render partial: "tweet_reply", collection: @tweet.reply_descendants(2), as: :tweet
-  %p.refresh<
-    = link_to import_path(@tweet.id), method: :post, title: "Refresh tweet" do
-      %span.glyphicon.glyphicon-refresh/
+.container
+  .row
+    .col-sm-3.col-md-offset-1
+      .sidebar
+        = render_sidebars
+    .col-sm-9.col-md-7.col-lg-6
+      %h1= header
+      .statuses
+        = render "tweets_template"
+        .refresh-box<
+          = link_to import_path(@tweet.id), method: :post, title: "Refresh tweet" do
+            %span.glyphicon.glyphicon-refresh/

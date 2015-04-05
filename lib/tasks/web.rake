@@ -1,5 +1,5 @@
 namespace :web do
-  @web_pid_file = Rails.root.join("tmp", "pids", "unicorn.pid").to_s
+  @web_pid_file = Rails.root.join("tmp", "pids", "puma.pid").to_s
   
   def web_read_pid
     Integer(File.read(@web_pid_file)) rescue nil
@@ -9,53 +9,53 @@ namespace :web do
     Process.kill(0, pid) rescue false
   end
 
-  desc "Start aclog collector (master) in the foreground"
+  desc "Start web server in the foreground"
   task :run do
-    system "unicorn -E #{Rails.env} -c #{Rails.root}/config/unicorn.rb"
+    system "puma -e #{Rails.env} -C #{Rails.root}/config/puma.rb"
   end
 
-  desc "Start web server (Unicorn)"
+  desc "Start web server"
   task :start do
     pid = web_read_pid
     if pid && process_alive?(pid)
-      STDERR.puts "Unicorn is already started (PID: #{pid})"
+      STDERR.puts "Web server is already started (PID: #{pid})"
       next
     end
-    system "unicorn -D -E #{Rails.env} -c #{Rails.root}/config/unicorn.rb"
+    system "puma -d -e #{Rails.env} -C #{Rails.root}/config/puma.rb"
   end
 
-  desc "Stop web server (Unicorn)"
+  desc "Stop web server"
   task :stop do
     pid = web_read_pid
     unless process_alive?(pid)
-      STDERR.puts "Unicorn is not running."
+      STDERR.puts "Puma is not running."
       next
     end
 
-    Process.kill(:QUIT, pid)
+    Process.kill(:TERM, pid)
     while process_alive?(pid)
-      sleep 0.1
+      sleep 0.05
     end
   end
 
-  desc "Retart web server (Unicorn)"
+  desc "Retart web server"
   task :restart do
     pid = web_read_pid
     unless process_alive?(pid)
-      STDERR.puts "Unicorn is not running."
+      STDERR.puts "Puma is not running."
       Rake::Task["web:start"].invoke
     end
 
     Process.kill("USR2", pid)
   end
 
-  desc "Show status of web server (Unicorn)"
+  desc "Show status of web server"
   task :status do
     pid = web_read_pid
     if pid && process_alive?(pid)
-      STDOUT.puts "Unicorn is running."
+      STDOUT.puts "Puma is running."
     else
-      STDOUT.puts "Unicorn is not running."
+      STDOUT.puts "Puma is not running."
     end
   end
 end

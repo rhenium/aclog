@@ -24,6 +24,15 @@ class Tweet < ActiveRecord::Base
 
   scope :favorited_by, ->(user) { joins(:favorites).where(favorites: { user: user }) }
 
+  scope :paginate, ->(params) {
+    page_per = [(params[:count] || Settings.tweets.count.default).to_i, Settings.tweets.count.max].min
+    if params[:page]
+      page([params[:page].to_i, 1].max, page_per)
+    else
+      limit(page_per).max_id(params[:max_id]).since_id(params[:since_id])
+    end
+  }
+
   class << self
     # Builds a new instance of Tweet and initialize with JSON data from Twitter API.
     # @note This method just builds an instance, doesn't save it.
@@ -73,8 +82,8 @@ class Tweet < ActiveRecord::Base
     # @param [Integer] id Target status ID.
     # @param [Account] client The Twitter::REST::Client to be used.
     # @return [Tweet] The Tweet instance imported.
-    def import_from_twitter(id, account = nil)
-      client = (account || Account.random).client
+    def import_from_twitter(id, current_user = nil)
+      client = (current_user ? current_user.account : Account.random).client
 
       st = client.status(id)
       st = st.retweeted_status if st.retweet?

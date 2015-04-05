@@ -1,0 +1,8 @@
+.list-group
+  - [0, 1, 3, 10, 50, 100].each_slice(2).to_a.transpose.each do |ns|
+    .list-group-col
+      - ns.each do |n|
+        - if n.to_s == (params[:reactions] || 1).to_s
+          = link_to n, params, class: "list-group-item active"
+        - else
+          = link_to n, params.merge(reactions: (n == 1 ? nil : n)), class: "list-group-item"

@@ -1,7 +1,0 @@
-- title "Public Timeline"
-.col-sm-3.col-md-offset-1
-  = render "shared/sidebar/all_with_thresholds", thresholds: { param: :reactions, default: 1, counts: [1, 10, 50, 100, 500, 1000] }
-.col-sm-9.col-md-7.col-lg-6
-  %h1
-    Public Timeline
-  .statuses= render "tweets_template"

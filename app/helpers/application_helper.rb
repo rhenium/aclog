@@ -1,12 +1,6 @@
 module ApplicationHelper
   include Twitter::Autolink
 
-  def title(*args)
-    content_for :title do
-      (args.compact).join(" - ")
-    end
-  end
-
   def register_view_part(name)
     (@view_parts ||= []) << name
   end
@@ -20,6 +14,15 @@ module ApplicationHelper
       user_screen_name: @user.try(:screen_name),
       tweet_id: @tweet.try(:id)
     }
+  end
+
+  def title(name = nil, suffix = false)
+    if name
+      @title = name
+      title
+    else
+      ["aclog", @title].compact.join(" - ")
+    end
   end
 
   def link_to_with_active(name, options = {}, html_options = {}, &block)
@@ -37,6 +40,29 @@ module ApplicationHelper
                  alt: "@" + user.screen_name
                }.merge(options))
     end
+  end
+
+  def render_sidebars
+    str = ""
+    if @sidebars
+      @sidebars.each do |sidebar|
+        case sidebar
+        when :user
+          str << render("shared/sidebar/user")
+        when :all
+          str << render("shared/sidebar/all")
+        when :reactions_thresholds
+          str << render("shared/sidebar/reactions_thresholds")
+        when :recent_thresholds
+          str << render("shared/sidebar/recent_thresholds")
+        end
+      end
+    end
+    str.html_safe
+  end
+
+  def sidebar?
+    @sidebars && @sidebars.size > 0
   end
 
   # utf8, form

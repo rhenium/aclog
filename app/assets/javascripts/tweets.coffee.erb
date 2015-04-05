@@ -5,6 +5,8 @@ Views.tweets =
       data:
         statuses: []
         loading: false
+        next: null
+        prev: null
       methods:
         failProfileImage: (e) ->
           e.target.src = '<%= image_path("profile_image_missing.png") %>'
@@ -18,7 +20,7 @@ Views.tweets =
           autolinked = twttr.txt.autoLink(str, { suppressLists: true, usernameIncludeSymbol: true, usernameUrlBase: "/" })
           autolinked.replace(/\r?\n/g, "<br />\n")
 
-    loadJSON = (url, callback) ->
+    loadJSON = (url) ->
       vm.loading = true
       superagent
         .get url
@@ -38,16 +40,14 @@ Views.tweets =
                   status.loading = false
           vm.statuses = vm.statuses.concat(json.statuses)
           vm.loading = false
-          if callback
-            callback()
+          vm.next = json.next
+          vm.prev = json.prev
 
     loadJSON(window.location.toString())
     
-    if (link = $("link[rel=next]")).length
-      content = $(".statuses")
-      $(window).scroll ->
-        if vm.loading || !link.attr("href")
-          return
-        if (content.offset().top + content.height()) - ($(document).scrollTop() + $(window).height()) < 100
-          loadJSON link.attr("href"), ->
-            link.attr("href", json.next)
+    content = $(".statuses")
+    $(window).scroll ->
+      if vm.loading || !vm.next
+        return
+      if (content.offset().top + content.height()) - ($(document).scrollTop() + $(window).height()) < 100
+        loadJSON vm.next

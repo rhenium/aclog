@@ -1,30 +1,41 @@
 - title "aclog API: #{format_endpoint_name(@endpoint)}"
-%h1= format_endpoint_name(@endpoint)
-%p= @endpoint.route_description
-%h2 Resource URL
-%p= root_url + "api" + @endpoint.route_path # TODO
-%h2 Parameters
-%table.table.api-params
-  %tbody
-    - @endpoint.route_params.each do |name, options|
-      %tr
-        %th
-          = name
-          - if options[:required]
-            %small required
-          - else
-            %small optional
-        %td
-          %p= options[:desc]
-          %p
-            %b> Type
-            \:
-            = options[:type]
-- if @example_request_uri
-  %h2 Example Request
-  %p
-    %span= @endpoint.route_method
-    %code#example_request_uri= @example_request_uri
-  %pre
-    %code
-      #example_request_loading= image_tag "loading.gif", alt: "loading..."
+.container
+  .row
+    .col-sm-3.sidebar
+      %h1 aclog API
+      .sidebar-list
+        .list-group.list-group-scroll
+          - @routes.values.inject(:merge).each do |namespace, endpoints|
+            %span.list-group-head= namespace.titleize
+            - endpoints.reject {|_, e| e.route_nodoc || e.route_deprecated }.each do |path, endpoint|
+              = link_to_with_active format_endpoint_name(endpoint), about_api_endpoint_path(endpoint.route_method.downcase, namespace, path), class: "list-group-item"
+    .col-sm-9
+      %h1= format_endpoint_name(@endpoint)
+      %p= @endpoint.route_description
+      %h2 Resource URL
+      %p= root_url + "api" + @endpoint.route_path # TODO
+      %h2 Parameters
+      %table.table.api-params
+        %tbody
+          - @endpoint.route_params.each do |name, options|
+            %tr
+              %th
+                = name
+                - if options[:required]
+                  %small required
+                - else
+                  %small optional
+              %td
+                %p= options[:desc]
+                %p
+                  %b> Type
+                  \:
+                  = options[:type]
+      - if @example_request_uri
+        %h2 Example Request
+        %p
+          %span= @endpoint.route_method
+          %code#example_request_uri= @example_request_uri
+        %pre
+          %code
+            #example_request_loading= image_tag "loading.gif", alt: "loading..."

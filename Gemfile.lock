@@ -69,6 +69,7 @@ GEM
       execjs
     coffee-script-source (1.9.1)
     columnize (0.9.0)
+    connection_pool (2.1.3)
     cool.io (1.2.4)
     coveralls (0.8.0)
       multi_json (~> 1.10)
@@ -371,6 +372,7 @@ DEPENDENCIES
   activerecord-import
   bootstrap-sass
   byebug
+  connection_pool
   coveralls
   dalli
   eventmachine

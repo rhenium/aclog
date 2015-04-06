@@ -18,6 +18,7 @@ gem "turbolinks"
 
 gem "puma"
 gem "dalli"
+gem "connection_pool"
 
 gem "omniauth-twitter"
 gem "twitter"

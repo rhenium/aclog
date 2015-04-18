@@ -58,15 +58,17 @@
         }
     }
 
-    .sidebar-flex {
-        display: flex;
+    @media (max-width: 768px) {
+        .sidebar-flex {
+            display: flex;
 
-        .list-group {
-            flex: auto;
-            width: 100%;
-            margin-right: 15px;
-            &:last-child {
-                margin-right: 0;
+            .list-group {
+                flex: auto;
+                width: 100%;
+                margin-right: 15px;
+                &:last-child {
+                    margin-right: 0;
+                }
             }
         }
     }

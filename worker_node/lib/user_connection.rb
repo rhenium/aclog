@@ -101,7 +101,8 @@ class UserConnection
                       identifier: "retweet-#{json[:id]}",
                       data: { id: json[:id],
                               user: { id: json[:user][:id] },
-                              retweeted_status: { id: json[:retweeted_status][:id] } } }
+                              retweeted_status: { id: json[:retweeted_status][:id],
+                                                  user: { id: json[:retweeted_status][:user][:id] } } } }
     on_user(json[:user])
     on_tweet(json[:retweeted_status])
   end

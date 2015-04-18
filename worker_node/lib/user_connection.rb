@@ -2,7 +2,7 @@ class UserConnection
   def initialize(msg)
     @user_id = msg[:user_id]
     @account_id = msg[:id]
-    @client = UserStream::Client.new(msg)
+    @client = UserStream::Client.new(msg.merge(params: { include_followings_activity: true }))
     setup_client
   end
 

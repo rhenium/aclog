@@ -27,8 +27,13 @@ class UserConnection
 
   private
   def setup_client
-    @client.on_error do |message|
-      log(:error, "Unknown error: #{message}")
+    @client.on_error do |error|
+      if error.is_a? Errno::ETIMEDOUT
+        log(:warn, "Stalled")
+        reconnect
+      else
+        log(:error, "Unknown error: #{error}")
+      end
     end
     @client.on_service_unavailable do |message|
       # TODO: occurs when the Twitter account is deleted?

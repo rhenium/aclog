@@ -34,7 +34,7 @@ module UserStream
                 consumer_secret: @options[:consumer_secret],
                 access_token: @options[:oauth_token],
                 access_token_secret: @options[:oauth_token_secret] }
-      req = EM::HttpRequest.new("https://userstream.twitter.com/1.1/user.json")
+      req = EM::HttpRequest.new("https://userstream.twitter.com/1.1/user.json", inactivity_timeout: 100) # at least one line per 90 seconds will come
       req.use(EM::Middleware::OAuth, oauth)
       http = req.get(opts)
 

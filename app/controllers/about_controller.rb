@@ -4,6 +4,6 @@ class AboutController < ApplicationController
 
   def status
     @worker_status = WorkerManager.status
-  rescue
+  rescue Aclog::Exceptions::WorkerConnectionError
   end
 end

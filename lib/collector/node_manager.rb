@@ -15,8 +15,7 @@ module Collector
 
       def unregister(node_connection)
         self.node_connections.delete(node_connection)
-        i = self.active_connections.find_index(node_connection)
-        if i
+        if i = self.active_connections.find_index(node_connection)
           self.active_connections[i] = nil
         else
           self.inactive_connections.delete(node_connection)
@@ -25,25 +24,21 @@ module Collector
       end
 
       def register_account(account)
-        n = account.id % Settings.collector.nodes_count
-        if self.active_connections[n]
-          self.active_connections[n].register_account(account)
+        if con = self.active_connections[account.worker_number]
+          con.register_account(account)
         end
       end
 
       def unregister_account(account)
-        n = account.id % Settings.collector.nodes_count
-        if self.active_connections[n]
-          self.active_connections[n].unregister_account(account)
+        if con = self.active_connections[account.worker_number]
+          con.unregister_account(account)
         end
       end
 
       private
       def bind
-        first_inactive_id = self.active_connections.find_index(nil)
-        if first_inactive_id
-          con = self.inactive_connections.shift
-          if con
+        if first_inactive_id = self.active_connections.find_index(nil)
+          if con = self.inactive_connections.shift
             self.active_connections[first_inactive_id] = con
             con.activated_time = Time.now
             Rails.logger.warn("NodeManager") { "Registered node ##{con.connection_id} as group ##{first_inactive_id}" }

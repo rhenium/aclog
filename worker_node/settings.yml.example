@@ -1,5 +1,8 @@
-secret_key: secret key
+secret_key: secret_key
 collector_host: localhost
 collector_port: 42106
-log_level: debug
+log_level: info
 memcached: "127.0.0.1:11211"
+user_stream_compression: true
+user_stream_params:
+  replies: "all"

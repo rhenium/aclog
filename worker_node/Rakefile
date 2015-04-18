@@ -7,7 +7,6 @@ $stderr.sync = true
 namespace :worker_node do
   desc "Run an aclog worker node."
   task :run do
-    worker = WorkerNode::Worker.new
-    worker.run
+    WorkerNode.run
   end
 end

@@ -37,10 +37,11 @@ module Collector
         Retweet.delete_bulk_from_json(deletes)
       end
 
-      favorites.each do |event|
-        Notification.try_notify_favorites(id: event[:target_object][:id],
-                                          user_id: event[:target_object][:user][:id],
-                                          favorites_count: event[:target_object][:favorite_count])
+      tweet_ids = favorites.map {|f| f[:target_object][:id] }
+      if tweet_ids.size > 0
+        Tweet.where(id: tweet_ids).each do |tweet|
+          Notification.try_notify_favorites(tweet)
+        end
       end
 
       unauthorizeds.each do |a|
@@ -49,45 +50,39 @@ module Collector
       end
     end
 
-    def push_user(user)
-      cache(user.merge!(identifier: user[:id])) do
-        @queue_user << user
+    def push_user(msg)
+      cache(msg) do
+        @queue_user << msg[:data]
       end
     end
 
-    def push_tweet(tweet)
-      cache(tweet.merge!(identifier: "tweet-#{tweet[:id]}-#{tweet[:favorite_count]}-#{tweet[:retweet_count]}")) do
-        @queue_tweet << tweet
+    def push_tweet(msg)
+      cache(msg) do
+        @queue_tweet << msg[:data]
       end
     end
 
-    def push_favorite(event)
-      cache(event.merge!(identifier: "favorite-#{event[:timestamp_ms]}-#{event[:source][:id]}-#{event[:target_object][:id]}")) do
-        push_tweet(event[:target_object])
-        push_user(event[:source])
-        @queue_favorite << event
+    def push_retweet(msg)
+      cache(msg) do
+        @queue_retweet << msg[:data]
       end
     end
 
-    def push_retweet(status)
-      cache(status.merge!(identifier: "retweet-#{status[:id]}")) do
-        push_user(status[:user])
-        push_tweet(status[:retweeted_status])
-        @queue_retweet << status
+    def push_favorite(msg)
+      cache(msg) do
+        @queue_favorite << msg[:data]
       end
     end
 
-    def push_unfavorite(event)
-      cache(event.merge!(identifier: "unfavorite-#{event[:timestamp_ms]}-#{event[:source][:id]}-#{event[:target_object][:id]}")) do
-        push_tweet(event[:target_object])
-        push_user(event[:source])
-        @queue_unfavorite << event
+    def push_unfavorite(msg)
+      cache(msg) do
+        @queue_unfavorite << msg[:data]
       end
     end
 
-    def push_delete(delete)
-      cache(delete.merge(identifier: "delete-#{delete[:delete][:status][:id]}")) do
-        @queue_delete << delete
+    def push_delete(msg)
+      cache(msg) do
+        @queue_delete << msg[:data]
       end
     end
 

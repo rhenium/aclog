@@ -2,4 +2,4 @@ secret_key: secret key
 collector_host: localhost
 collector_port: 42106
 log_level: debug
-cache_size: 10000
+memcached: "127.0.0.1:11211"

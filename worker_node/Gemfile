@@ -1,6 +1,8 @@
 source "https://rubygems.org"
 
 gem "rake"
-gem "em-twitter"
+gem "em-http-request", require: "em-http"
+gem "simple_oauth"
 gem "msgpack"
 gem "yajl-ruby", require: "yajl"
+gem "dalli"

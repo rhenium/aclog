@@ -4,36 +4,29 @@ class Notification
   # THIS METHOD IS NOT THREAD SAFE
   #
   # @param [Hash, Tweet] hash_or_tweet the target tweet.
-  def self.try_notify_favorites(hash_or_tweet)
+  def self.try_notify_favorites(tweet)
     return unless Settings.notification.enabled
 
-    if hash_or_tweet.is_a?(Tweet)
-      hash_or_tweet = hash_or_tweet.attributes
-    end
-    id = hash_or_tweet[:id]
-    user_id = hash_or_tweet[:user_id]
-    count = hash_or_tweet[:favorites_count]
-
     notify_favs = -> c do
-      account = Account.includes(:user).where(users: { id: user_id }).first
+      account = Account.includes(:user).where(users: { id: tweet.user_id }).first
       if account && account.active? && account.notification_enabled?
-        notify(account.user, "#{ c }favs!", id)
+        notify(account.user, "#{ c }favs!", tweet.id)
       end
     end
 
-    last_count = Rails.cache.read("notification/tweets/#{ id }/favorites_count")
+    last_count = Rails.cache.read("notification/tweets/#{ tweet.id }/favorites_count")
     if last_count
-      t_count = Settings.notification.favorites.select {|m| last_count < m && m <= count }.last
+      t_count = Settings.notification.favorites.select {|m| last_count < m && m <= tweet.favorites_count }.last
       if t_count
         notify_favs.(t_count)
       end
     else
-      if Settings.notification.favorites.include?(count)
-        notify_favs.(count)
+      if Settings.notification.favorites.include?(tweet.favorites_count)
+        notify_favs.(tweet.favorites_count)
       end
     end
 
-    Rails.cache.write("notification/tweets/#{ id }/favorites_count", [last_count || 0, count].max)
+    Rails.cache.write("notification/tweets/#{ tweet.id }/favorites_count", [last_count || 0, tweet.favorites_count].max)
   end
 
   private

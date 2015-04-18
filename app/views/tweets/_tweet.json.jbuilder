@@ -11,6 +11,6 @@ if authorized_to_show_user?(tweet.user)
   json.retweets []
   json.allowed true
 else
-  json.tweeted_at
+  json.tweeted_at tweet.tweeted_at
   json.allowed false
 end

@@ -87,7 +87,7 @@ module Collector
     end
 
     def push_unauthorized(unauthorized)
-      @queue_unauthorized << unauthorized
+      @queue_unauthorized << unauthorized[:data]
     end
 
     private

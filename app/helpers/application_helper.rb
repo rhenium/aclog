@@ -42,23 +42,26 @@ module ApplicationHelper
     end
   end
 
-  def render_sidebars
-    str = ""
-    if @sidebars
-      @sidebars.each do |sidebar|
-        case sidebar
-        when :user
-          str << render("shared/sidebar/user")
-        when :all
-          str << render("shared/sidebar/all")
-        when :reactions_thresholds
-          str << render("shared/sidebar/reactions_thresholds")
-        when :recent_thresholds
-          str << render("shared/sidebar/recent_thresholds")
+  def render_sidebar_content
+    if user = @sidebars.delete(:user)
+      parts = [:nav_user] + @sidebars
+    elsif all = @sidebars.delete(:all)
+      parts = [:nav_all] + @sidebars
+    end
+
+    capture_haml do
+      if user
+        haml_concat render("shared/sidebar/user")
+      elsif all
+        haml_concat render("shared/sidebar/all")
+      end
+
+      haml_tag(".sidebar-flex") do
+        (parts || []).each do |part|
+          haml_concat render("shared/sidebar/parts/#{part}")
         end
       end
     end
-    str.html_safe
   end
 
   def sidebar?

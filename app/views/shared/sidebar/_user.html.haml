@@ -23,14 +23,3 @@
       .alert.alert-aclog @{{screen_name}} は aclog に登録していません
   .loading-box{data: {"v-if" => "loading"}}
     %img.loading-image{src: image_path("loading.gif")}
-.list-group
-  - if @user.registered?
-    = link_to_with_active "Best", user_path(@user.screen_name), class: "list-group-item"
-    = link_to_with_active "Timeline", user_timeline_path(@user.screen_name), class: "list-group-item"
-  - else
-    = link_to_with_active "Best", user_best_path(@user.screen_name), class: "list-group-item"
-    = link_to_with_active "Timeline", user_path(@user.screen_name), class: "list-group-item"
-  = link_to_with_active "Favorites", user_favorites_path(@user.screen_name), class: "list-group-item"
-  - if @user.registered?
-    = link_to_with_active "Discovered by", user_discovered_by_path(@user.screen_name), class: "list-group-item"
-    = link_to_with_active "Discovered users", user_discovered_users_path(@user.screen_name), class: "list-group-item"

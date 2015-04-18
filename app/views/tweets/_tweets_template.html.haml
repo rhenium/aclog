@@ -2,21 +2,21 @@
   %template{data: {"v-if" => "allowed"}}
     .status-tweet
       .status-user
-        %a{href: user_path("dummy").sub("dummy", "{{user.screen_name}}"), title: "{{user.name}} (@{{user.screen_name}})"}<
+        %a{href: user_path("dummy").sub("dummy", "{{user.screen_name}}"), title: "{{user.name | removeInvalidCharacters}} (@{{user.screen_name}})"}<
           %img.twitter-icon{src: "{{user.profile_image_url}}", alt: "@{{user.screen_name}}", data: {"v-on" => "error: failProfileImage"}}
       .status-content
         .status-head
           %span.user<
             %a{href: user_path("dummy").sub("dummy", "{{user.screen_name}}")}<
-              %span {{user.name}}
+              %span {{user.name | removeInvalidCharacters}}
               %span @{{user.screen_name}}
           %span.time<
             %a{href: tweet_path("0").sub("0", "{{id_str}}"), title: "このツイートの詳細を見る"}<
               %time{datetime: "{{tweeted_at}}"} {{tweeted_at | toLocaleString}}
             %a.source.aclogicon.aclogicon-twitter{href: "https://twitter.com/{{user.screen_name}}/status/{{id_str}}", title: "Twitter で見る"}
-        .status-text {{{text | formatText}}}
+        .status-text {{{text | removeInvalidCharacters | formatText}}}
         .status-foot
-          %span.source {{{source | formatSource}}}
+          %span.source {{{source | removeInvalidCharacters | formatSource}}}
           %ul
             %li<
               %a.aclogicon.aclogicon-fav{href: "https://twitter.com/intent/favorite?tweet_id={{id_str}}", title: "お気に入り登録", data: {"v-on" => "click: openIntent"}}
@@ -37,7 +37,7 @@
                 %img.loading-image{src: image_path("loading.gif")}
               %li{data: {"v-repeat" => "favorites"}}<
                 %template{data: {"v-if": "allowed"}}
-                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name}} (@{{screen_name}})"}<
+                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name | removeInvalidCharacters}} (@{{screen_name}})"}<
                     %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
                 %template{data: {"v-if": "!allowed"}}
                   %img{src: image_path("profile_image_protected.png"), alt: "protected user"}
@@ -53,7 +53,7 @@
                 %img.loading-image{src: image_path("loading.gif")}
               %li{data: {"v-repeat" => "retweets"}}<
                 %template{data: {"v-if": "allowed"}}
-                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name}} (@{{screen_name}})"}<
+                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name | removeInvalidCharacters}} (@{{screen_name}})"}<
                     %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
                 %template{data: {"v-if": "!allowed"}}
                   %img{src: image_path("profile_image_protected.png"), alt: "protected user"}

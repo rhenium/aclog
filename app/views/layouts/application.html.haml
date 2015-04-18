@@ -40,7 +40,7 @@
                       %button.btn{type: "submit"} Go
               %template{data: {"v-repeat" => "users"}}
                 %li.user-jump-suggestion
-                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name}} (@{{screen_name}})"}<
+                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name | removeInvalidCharacters}} (@{{screen_name}})"}<
                     %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
                     %span @{{screen_name}}
               %li.loading-box{data: {"v-if" => "loading"}}

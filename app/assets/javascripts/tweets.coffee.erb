@@ -23,7 +23,7 @@ Views.tweets =
       filters:
         formatSource: (str) ->
           if /^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)
-            str
+            str.replace(/&/g, "&amp;")
           else
             str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
         formatText: (str) ->

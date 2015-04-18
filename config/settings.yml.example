@@ -8,7 +8,6 @@ default: &default
     server_port:      42106
     secret_key:       "secret key to authorize workers"
     nodes_count:      1 # workers count
-    cache_size:       10000
     flush_interval:   3
 
   notification:

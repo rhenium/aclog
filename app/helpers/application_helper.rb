@@ -21,7 +21,7 @@ module ApplicationHelper
       @title = name
       title
     else
-      ["aclog", @title].compact.join(" - ")
+      [@title, "aclog"].compact.join(" - ")
     end
   end
 

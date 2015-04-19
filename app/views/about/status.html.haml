@@ -22,7 +22,10 @@
               %td Down
               %td -
     - if logged_in?
-      %p Worker ##{@worker_status["active_node_statuses"][current_user.account.worker_number]["connection_id"]} is assigned to your account.
+      - if your_node = @worker_status["active_node_statuses"][current_user.account.worker_number]
+        %p Worker ##{your_node["connection_id"]} is assigned to your account.
+      - else
+        %p Worker for group #{current_user.account.worker_number} is currently down.
   - else
     .alert.alert-danger
       %strong Couldn't communicate with the collector service.

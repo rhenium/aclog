@@ -341,10 +341,10 @@ GEM
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
       equalizer (~> 0.0, >= 0.0.9)
-    web-console (2.0.0)
-      activemodel (~> 4.0)
+    web-console (2.1.2)
+      activemodel (>= 4.0)
       binding_of_caller (>= 0.7.2)
-      railties (~> 4.0)
+      railties (>= 4.0)
       sprockets-rails (>= 2.0, < 4.0)
     webmock (1.21.0)
       addressable (>= 2.3.6)
@@ -381,7 +381,7 @@ DEPENDENCIES
   rails (~> 4.2.1)
   rspec
   rspec-rails
-  sass-rails (~> 5.0)
+  sass-rails
   settingslogic
   simplecov
   spring

@@ -47,6 +47,8 @@ module ApplicationHelper
       parts = [:nav_user] + @sidebars
     elsif all = @sidebars.delete(:all)
       parts = [:nav_all] + @sidebars
+    elsif apidocs = @sidebars.delete(:apidocs)
+      parts = @sidebars
     end
 
     capture_haml do
@@ -54,6 +56,8 @@ module ApplicationHelper
         haml_concat render("shared/sidebar/user")
       elsif all
         haml_concat render("shared/sidebar/all")
+      elsif apidocs
+        haml_concat render("shared/sidebar/apidocs")
       end
 
       haml_tag(".sidebar-flex") do

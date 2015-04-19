@@ -1,47 +1,31 @@
 class ApidocsController < ApplicationController
-  before_action :reload_docs
+  before_action :set_apidocs, :set_sidebar
 
   def index
-    @routes = @@routes
   end
 
   def endpoint
-    @routes = @@routes
-
-    method = @@routes[params[:method]]
-    unless method
-      raise Aclog::Exceptions::DocumentNotFound
-    end
-
-    @resource = method[params[:namespace]]
-    unless @resource
-      raise Aclog::Exceptions::DocumentNotFound
-    end
-
-    @endpoint = @resource[params[:path]]
-    unless @endpoint
-      raise Aclog::Exceptions::DocumentNotFound
-    end
-
-    if @endpoint.route_example_params
-      @example_request_uri = root_url + "api" + @endpoint.route_path.sub(/\(\.:format\)$/, ".json")
-      @example_request_uri += "?" + @endpoint.route_example_params.to_param
-    end
+    method = @apidocs[params[:method].to_s.upcase] || raise(Aclog::Exceptions::DocumentNotFound)
+    @resource = method[params[:namespace]] || raise(Aclog::Exceptions::DocumentNotFound)
+    @endpoint = @resource[params[:path]] || raise(Aclog::Exceptions::DocumentNotFound)
   end
 
   private
-  def reload_docs
-    @@routes ||= begin
+  def set_apidocs
+    @apidocs = Rails.cache.fetch("apidocs", expired_in: 1.days) do
       h = {}
       Api.routes.reject {|r| r.route_ignore }.each {|route|
         next if route.route_method == "HEAD"
-        # /tweets/show(.:format) -> tweets, show
-        method = route.route_method.downcase
-        namespace = route.route_namespace[1..-1]
-        path = route.route_path.sub(route.route_namespace, "")[1..-11] # 10: "(.:format)".size
+        method = route.route_method
+        namespace = route.route_namespace.sub(/^\//, "")
+        path = route.route_path.split("/", 3).last.sub(/\(\.:format\)$/, "")
         ((h[method] ||= {})[namespace] ||= {})[path] = route
       }
       h
     end
+  end
+
+  def set_sidebar
+    @sidebars = [:apidocs]
   end
 end

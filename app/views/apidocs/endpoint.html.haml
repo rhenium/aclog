@@ -2,13 +2,7 @@
 .container
   .row
     .col-sm-3.sidebar
-      %h1 aclog API
-      .sidebar-list
-        .list-group.list-group-scroll
-          - @routes.values.inject(:merge).each do |namespace, endpoints|
-            %span.list-group-head= namespace.titleize
-            - endpoints.reject {|_, e| e.route_nodoc || e.route_deprecated }.each do |path, endpoint|
-              = link_to_with_active format_endpoint_name(endpoint), about_api_endpoint_path(endpoint.route_method.downcase, namespace, path), class: "list-group-item"
+      = render_sidebar_content
     .col-sm-9
       %h1= format_endpoint_name(@endpoint)
       %p= @endpoint.route_description
@@ -29,13 +23,12 @@
                 %p= options[:desc]
                 %p
                   %b> Type
-                  \:
-                  = options[:type]
-      - if @example_request_uri
+                  \: #{options[:type]}
+      - if @endpoint.route_example_params
         %h2 Example Request
         %p
           %span= @endpoint.route_method
-          %code#example_request_uri= @example_request_uri
+          %code#example_request_uri= root_url + "api" + @endpoint.route_path.sub(/\(\.:format\)$/, ".json") + "?" + @endpoint.route_example_params.to_param
         %pre
           %code
             #example_request_loading= image_tag "loading.gif", alt: "loading..."

@@ -28,11 +28,14 @@ class UserConnection
   private
   def setup_client
     @client.on_error do |error|
-      if error.is_a? Errno::ETIMEDOUT
+      if error == Errno::ETIMEDOUT
         log(:warn, "Stalled")
-        reconnect
+        EM.add_timer(5) { @client.reconnect }
+      elsif error = Errno::ECONNRESET
+        log(:warn, "Connection reset")
+        EM.add_timer(5) { @client.reconnect }
       else
-        log(:error, "Unknown error: #{error}")
+        log(:error, "Unknown error: #{error.inspect}")
       end
     end
     @client.on_service_unavailable do |message|

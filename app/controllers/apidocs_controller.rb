@@ -34,6 +34,7 @@ class ApidocsController < ApplicationController
     @@routes ||= begin
       h = {}
       Api.routes.reject {|r| r.route_ignore }.each {|route|
+        next if route.route_method == "HEAD"
         # /tweets/show(.:format) -> tweets, show
         method = route.route_method.downcase
         namespace = route.route_namespace[1..-1]

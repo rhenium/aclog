@@ -87,13 +87,13 @@ class TweetsController < ApplicationController
   def render(*args)
     return super(*args) if args.size > 0
 
-    if template_exists?(params[:action], params[:controller], true, [], formats: request.formats)
+    if template_exists?(params[:action], _prefixes)
       super
     else
       if @tweets
         super("tweets")
       else
-        super # bug
+        # bug
       end
     end
   end

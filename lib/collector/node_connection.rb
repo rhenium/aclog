@@ -6,6 +6,9 @@ module Collector
     @@_id = 0
 
     def initialize(queue)
+      # comm_inactivity_timeout exceed -> heatbeat -> (when alive) -> continue
+      #                                            -> (when not) -> unbind
+      self.comm_inactivity_timeout = 10
       @unpacker = MessagePack::Unpacker.new(symbolize_keys: true)
       @connection_id = (@@_id += 1)
       @authenticated = false

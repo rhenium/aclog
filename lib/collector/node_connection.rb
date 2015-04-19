@@ -127,6 +127,7 @@ module Collector
     def heartbeat
       if @heartbeats.size > 2 # 30 sec
         log(:warn, "Node is dead.")
+        NodeManager.unregister(self)
         @heartbeat_timer.cancel
         @closing = true
         close_connection_after_writing

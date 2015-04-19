@@ -43,5 +43,11 @@ module Aclog
     config.middleware.use(Rack::Config) do |env|
       env["api.tilt.root"] = "#{config.root}/app/api/templates"
     end
+
+    console do
+      require "console/helper"
+      Rails::ConsoleMethods.include Console::Helper
+      TOPLEVEL_BINDING.eval("self").extend Rails::ConsoleMethods
+    end
   end
 end

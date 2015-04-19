@@ -1,3 +1,5 @@
+require "set"
+
 module Collector
   class NodeConnection < EM::Connection
     attr_reader :connection_id
@@ -6,15 +8,13 @@ module Collector
     @@_id = 0
 
     def initialize(queue)
-      # comm_inactivity_timeout exceed -> heatbeat -> (when alive) -> continue
-      #                                            -> (when not) -> unbind
-      self.comm_inactivity_timeout = 10
       @unpacker = MessagePack::Unpacker.new(symbolize_keys: true)
       @connection_id = (@@_id += 1)
       @authenticated = false
       @closing = false
       @activated_time = nil
       @queue = queue
+      @heartbeats = Set.new
     end
 
     def unbind
@@ -96,6 +96,9 @@ module Collector
         log(:info, "Closing this connection...")
         @closing = true
         NodeManager.unregister(self)
+      when "heartbeat"
+        log(:debug, "Heartbeat reply: #{msg[:data]}")
+        @heartbeats.delete(msg[:data])
       else
         log(:warn, "Unknown message: #{msg.inspect}")
         send_message(event: :error, data: "Unknown message.")
@@ -108,6 +111,7 @@ module Collector
         log(:info, "Connection authenticated.")
         send_message(event: :auth, data: nil)
         NodeManager.register(self)
+        @heartbeat_timer = EM.add_periodic_timer(10, &method(:heartbeat))
       else
         log(:warn, "Invalid secret_key: #{secret_key.inspect}")
         send_message(event: :error, data: "Invalid secret_key.")
@@ -118,6 +122,20 @@ module Collector
 
     def send_message(data)
       send_data(data.to_msgpack)
+    end
+
+    def heartbeat
+      if @heartbeats.size > 2 # 30 sec
+        log(:warn, "Node is dead.")
+        @heartbeat_timer.cancel
+        @closing = true
+        close_connection_after_writing
+        return
+      end
+
+      id = Time.now.to_i
+      @heartbeats << id
+      send_message(event: :heartbeat, data: id)
     end
 
     def log(level, message)

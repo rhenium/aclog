@@ -52,6 +52,9 @@ class CollectorConnection < EM::Connection
       register_account(msg[:data])
     when "unregister"
       unregister_account(msg[:data])
+    when "heartbeat"
+      log(:debug, "Heartbeat: #{msg[:data]}")
+      send_message(msg)
     else
       log(:warn, "Unknown message: #{msg.inspect}")
     end

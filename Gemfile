@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "rails", "~> 4.2.0"
+gem "rails", "~> 4.2.1"
 gem "activerecord-import"
 gem "tzinfo-data"
 gem "mysql2"
@@ -9,12 +9,12 @@ gem "yajl-ruby", require: "yajl"
 gem "grape", "~> 0.9.0"
 gem "grape-rabl"
 gem "haml-rails"
-gem "sass-rails", "~> 5.0.0"
+gem "sass-rails", "~> 5.0"
+gem "coffee-rails"
 gem "jbuilder"
 gem "uglifier"
 gem "jquery-rails"
 gem "bootstrap-sass"
-gem "turbolinks"
 
 gem "puma"
 gem "dalli"
@@ -31,7 +31,7 @@ gem "pry-rails"
 group :development, :test do
   gem "thin"
   gem "byebug"
-  gem "web-console", "~> 2.0.0"
+  gem "web-console", "~> 2.0"
   gem "spring"
   gem "quiet_assets"
   gem "oink"
@@ -46,8 +46,4 @@ group :test do
   gem "factory_girl_rails"
   gem "coveralls", require: false
   gem "simplecov", require: false
-end
-
-group :doc do
-  gem "yard"
 end

@@ -313,8 +313,6 @@ GEM
     timers (4.0.1)
       hitimes
     tins (0.13.2)
-    turbolinks (2.5.3)
-      coffee-rails
     twitter (5.14.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
@@ -352,7 +350,6 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
     yajl-ruby (1.2.1)
-    yard (0.8.7.6)
 
 PLATFORMS
   ruby
@@ -361,6 +358,7 @@ DEPENDENCIES
   activerecord-import
   bootstrap-sass
   byebug
+  coffee-rails
   connection_pool
   coveralls
   dalli
@@ -380,21 +378,19 @@ DEPENDENCIES
   pry-rails
   puma
   quiet_assets
-  rails (~> 4.2.0)
+  rails (~> 4.2.1)
   rspec
   rspec-rails
-  sass-rails (~> 5.0.0)
+  sass-rails (~> 5.0)
   settingslogic
   simplecov
   spring
   spring-commands-rspec
   thin
-  turbolinks
   twitter
   twitter-text
   tzinfo-data
   uglifier
-  web-console (~> 2.0.0)
+  web-console (~> 2.0)
   webmock
   yajl-ruby
-  yard

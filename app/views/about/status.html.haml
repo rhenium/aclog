@@ -6,18 +6,21 @@
     %table.table
       %thead
         %tr
+          %th Group
           %th Worker ID
           %th Status
           %th Uptime
       %tbody
-        - @worker_status["active_node_statuses"].each do |node|
+        - @worker_status["active_node_statuses"].each_with_index do |node, i|
           - if node
             %tr
+              %td= i
               %td ##{node["connection_id"]}
               %td Running
-              %td= "#{(Time.now.to_i - node["activated_time"]) / 60} minutes"
+              %td #{(Time.now.to_i - node["activated_time"]) / 60} minutes
           - else
             %tr.danger
+              %td= i
               %td -
               %td Down
               %td -

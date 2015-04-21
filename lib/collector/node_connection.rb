@@ -18,6 +18,7 @@ module Collector
     end
 
     def unbind
+      @heartbeat_timer.cancel if @heartbeat_timer
       if @closing
         log(:info, "Connection was closed.")
       else
@@ -129,6 +130,7 @@ module Collector
         log(:warn, "Node is dead.")
         NodeManager.unregister(self)
         @heartbeat_timer.cancel
+        @heartbeat_timer = nil
         @closing = true
         close_connection_after_writing
         return

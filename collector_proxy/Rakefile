@@ -1,0 +1,12 @@
+$:.unshift File.expand_path("../lib/", __FILE__)
+require "collector_proxy"
+
+$stdout.sync = true
+$stderr.sync = true
+
+namespace :collector_proxy do
+  desc "Run collector proxy."
+  task :run do
+    CollectorProxy.run
+  end
+end

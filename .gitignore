@@ -12,6 +12,7 @@
 /config/database.yml
 
 /worker_node/settings.yml
+/collector_proxy/settings.yml
 
 .*
 *~

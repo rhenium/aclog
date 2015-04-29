@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    dalli (2.7.4)
+    eventmachine (1.0.7)
+    msgpack (0.5.11)
+    rake (10.4.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  dalli
+  eventmachine
+  msgpack
+  rake

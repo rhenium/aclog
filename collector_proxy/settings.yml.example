@@ -1,0 +1,6 @@
+secret_key: secret_key
+collector_port: 42107
+worker_node_port: 42106
+nodes_count: 1
+log_level: debug
+memcached: "127.0.0.1:11211"

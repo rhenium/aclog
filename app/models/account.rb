@@ -2,7 +2,6 @@ class Account < ActiveRecord::Base
   enum status: { active: 0, inactive: 1, revoked: 2 }
 
   belongs_to :user
-  scope :for_node, ->(block_number) { active.where("id % ? = ?", Settings.collector.nodes_count, block_number) }
 
   # Returns whether tweet notification is enabled for this user.
   def notification_enabled?; notification_enabled end
@@ -62,11 +61,5 @@ class Account < ActiveRecord::Base
     Rails.cache.fetch("accounts/#{self.id}/friends", expires_in: Settings.cache.friends) do
       Set.new client.friend_ids
     end
-  end
-
-  # Returns the worker id collecting tweets for this account.
-  # @return [Integer]
-  def worker_number
-    id % Settings.collector.nodes_count
   end
 end

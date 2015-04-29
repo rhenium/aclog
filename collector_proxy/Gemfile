@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+
+gem "rake"
+gem "msgpack"
+gem "eventmachine"
+gem "dalli"

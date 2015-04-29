@@ -21,11 +21,12 @@ module Collector
             event_queue.flush
           end
 
-          nodes = EM.start_server("0.0.0.0", Settings.collector.server_port, Collector::NodeConnection, event_queue)
+          proxy_connection = EM.connect(Settings.collector.proxy_host, Settings.collector.proxy_port, Collector::CollectorProxyConnection, event_queue)
 
-          stop = -> _ do
+          stop = proc do
             control.stop
-            EM.stop_server(nodes)
+            proxy_connection.exit
+            
             EM.stop
           end
 

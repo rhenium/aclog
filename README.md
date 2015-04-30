@@ -31,6 +31,7 @@ Collects favs and retweets in real time by UserStreams.
 ## Requirements
 * Ruby 2.1+
 * MySQL/MariaDB 5.5.14+ (needs utf8mb4 support)
+* memcached
 * JavaScript runtime (see https://github.com/rails/execjs)
 
 ## Installation

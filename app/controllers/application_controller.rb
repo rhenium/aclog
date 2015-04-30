@@ -4,7 +4,6 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :exception
 
-  after_action :tidy_response_body
   helper_method :logged_in?, :current_user
   helper_method :authorized_to_show_user?
 
@@ -21,8 +20,6 @@ class ApplicationController < ActionController::Base
     @_current_user ||= begin
       if logged_in?
         User.find(session[:user_id])
-      else
-        nil
       end
     end
   end
@@ -41,12 +38,5 @@ class ApplicationController < ActionController::Base
       raise ArgumentError, "parameter `object` must be a User or a Tweet"
     end
     object
-  end
-
-  private
-  def tidy_response_body
-    if [:html, :xml, :atom].any? {|s| request.format == s }
-      response.body = ActiveSupport::Multibyte::Unicode.tidy_bytes(response.body)
-    end
   end
 end

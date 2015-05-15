@@ -93,8 +93,10 @@ module Collector
     private
     def cache(object)
       if id = object[:identifier]
-        unless @dalli.get(id)
-          @dalli.set(id, true)
+        key, val = id.split("#", 2)
+        cur = @dalli.get(id)
+        if !cur || (val && (cur <=> val) == -1) # not found or new
+          @dalli.set(key, true || value)
           yield
         end
       else

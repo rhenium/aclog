@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   post "/i/:id/import" =>                       "tweets#import",                    as: "import", constraints: { id: /\d+/ }
 
   get "/i/settings" =>                          "settings#index",                   as: "settings"
-  post "/i/settings/update" =>                  "settings#update"
+  post "/i/settings/update" =>                  "settings#update",                  as: "settings_update"
   get "/i/settings/confirm_deactivation" =>     "settings#confirm_deactivation"
   post "/i/settings/deactivate" =>              "settings#deactivate"
 

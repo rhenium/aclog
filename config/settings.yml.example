@@ -35,6 +35,7 @@ default: &default
     count:            50
 
   cache:
+    expires_in:       900
     stats:            900 # sec
     friends:          3600
     memcached:        "127.0.0.1:11211"

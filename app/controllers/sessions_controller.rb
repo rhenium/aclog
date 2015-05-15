@@ -20,10 +20,11 @@ class SessionsController < ApplicationController
     session[:user_id] = account.user_id
 
     to = request.env["omniauth.params"]["redirect_after_login"].to_s
-    if to.include?("//") || to[0] != "/"
-      to = root_path
+    if to == "/" || to[0] != "/" || to.include?("//")
+      redirect_to user_path(auth.extra.raw_info.screen_name)
+    else
+      redirect_to to
     end
-    redirect_to to
   end
 
   def destroy

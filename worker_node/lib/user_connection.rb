@@ -21,7 +21,7 @@ class UserConnection
   end
 
   def stop
-    @client.close
+    @client.stop
     log(:info, "Stopped: #{@account_id}")
   end
 
@@ -35,7 +35,7 @@ class UserConnection
         log(:warn, "Connection reset")
         EM.add_timer(5) { @client.reconnect }
       else
-        log(:error, "Unknown error: #{error.inspect}")
+        log(:error, "Unknown error: #{error}")
       end
     end
     @client.on_service_unavailable do |message|
@@ -54,7 +54,8 @@ class UserConnection
       log(:warn, "420: #{message}")
     end
     @client.on_disconnected do
-      @client.reconnect
+      log(:warn, "Disconnected")
+      EM.add_timer(5) { @client.reconnect }
     end
 
     @client.on_item do |item|
@@ -94,7 +95,7 @@ class UserConnection
     log(:debug, "Tweet: #{json[:user][:id]} => #{json[:id]}")
     on_user(json[:user])
     EventChannel << { event: :tweet,
-                      identifier: "tweet-#{json[:id]}-#{json[:favorite_count]}-#{json[:retweet_count]}",
+                      identifier: "tweet-#{json[:id]}##{json[:timestamp_ms]}-#{json[:favorite_count]}-#{json[:retweet_count]}",
                       data: compact_tweet(json) }
   end
 
@@ -116,7 +117,7 @@ class UserConnection
     on_user(json[:target])
     on_tweet(json[:target_object])
     EventChannel << { event: json[:event].to_sym,
-                      identifier: "#{json[:event]}-#{json[:timestamp_ms]}-#{json[:source][:id]}-#{json[:target][:id]}-#{json[:target_object][:id]}",
+                      identifier: "#{json[:event]}-#{json[:timestamp_ms]}-#{json[:source][:id]}-#{json[:target_object][:id]}",
                       data: {  timestamp_ms: json[:timestamp_ms],
                                source: { id: json[:source][:id] },
                                target: { id: json[:target][:id] },

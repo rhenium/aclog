@@ -21,7 +21,7 @@ class UserConnection
   end
 
   def stop
-    @client.close
+    @client.stop
     log(:info, "Stopped: #{@account_id}")
   end
 
@@ -35,7 +35,7 @@ class UserConnection
         log(:warn, "Connection reset")
         EM.add_timer(5) { @client.reconnect }
       else
-        log(:error, "Unknown error: #{error.inspect}")
+        log(:error, "Unknown error: #{error}")
       end
     end
     @client.on_service_unavailable do |message|
@@ -54,7 +54,8 @@ class UserConnection
       log(:warn, "420: #{message}")
     end
     @client.on_disconnected do
-      @client.reconnect
+      log(:warn, "Disconnected")
+      EM.add_timer(5) { @client.reconnect }
     end
 
     @client.on_item do |item|

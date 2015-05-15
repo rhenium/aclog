@@ -7,7 +7,7 @@ module UserStream
     def initialize(options = {})
       @options = { compression: true }.merge(options).freeze
       @callbacks = {}
-      @closing = false
+      @exiting = false
     end
 
     def update(options = {})
@@ -20,8 +20,12 @@ module UserStream
       connect
     end
 
+    def stop
+      @exiting = true
+      close
+    end
+
     def close
-      @closing = true
       @http.close
     end
 
@@ -64,7 +68,7 @@ module UserStream
       end
 
       http.errback do
-        callback(:error, http.error) unless @closing
+        callback(:error, http.error) unless @exiting
       end
 
       @http = http

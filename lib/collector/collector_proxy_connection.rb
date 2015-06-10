@@ -46,7 +46,11 @@ module Collector
           next
         end
 
-        parse_message(msg)
+        begin
+          parse_message(msg)
+        rescue
+          log(:error, "Failed to parse message: #{msg}")
+        end
       end
     end
 

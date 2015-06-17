@@ -54,6 +54,8 @@ module Collector
           log(:error, "Failed to parse message: #{msg}")
         end
       end
+    rescue
+      log(:fatal, "Failed to parse data: #{data}")
     end
 
     def exit

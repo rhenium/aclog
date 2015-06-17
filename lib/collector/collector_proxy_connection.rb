@@ -25,9 +25,11 @@ module Collector
     def unbind
       if @closing
         log(:info, "Connection was closed.")
+        @connected = false
       else
         if @connected
           log(:info, "Connection was closed unexpectedly.")
+          @connected = false
         end
 
         EM.add_timer(10) { try_reconnect }

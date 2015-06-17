@@ -4,7 +4,7 @@ class WorkerManager
   class << self
     def alive?
       !!client
-    rescue Aclog
+    rescue Aclog::Exceptions::WorkerConnectionError
       false
     end
 

@@ -84,25 +84,28 @@ class UserConnection
     end
   end
 
-  def on_user(json)
+  def on_user(json, timestamp = nil)
+    timestamp ||= json[:timestamp_ms]
     log(:debug, "User: @#{json[:screen_name]} (#{json[:id]})")
     EventChannel << { event: :user,
                       identifier: "user-#{json[:id]}-#{json[:profile_image_url_https]}",
                       data: compact_user(json) }
   end
 
-  def on_tweet(json)
+  def on_tweet(json, timestamp = nil)
+    timestamp ||= json[:timestamp_ms]
     log(:debug, "Tweet: #{json[:user][:id]} => #{json[:id]}")
-    on_user(json[:user])
+    on_user(json[:user], timestamp)
     EventChannel << { event: :tweet,
-                      identifier: "tweet-#{json[:id]}##{json[:timestamp_ms]}-#{json[:favorite_count]}-#{json[:retweet_count]}",
+                      identifier: "tweet-#{json[:id]}##{timestamp}-#{json[:favorite_count]}-#{json[:retweet_count]}",
                       data: compact_tweet(json) }
   end
 
-  def on_retweet(json)
+  def on_retweet(json, timestamp = nil)
+    timestamp ||= json[:timestamp_ms]
     log(:debug, "Retweet: #{json[:user][:id]} => #{json[:retweeted_status][:id]}")
-    on_user(json[:user])
-    on_tweet(json[:retweeted_status])
+    on_user(json[:user], timestamp)
+    on_tweet(json[:retweeted_status], timestamp)
     EventChannel << { event: :retweet,
                       identifier: "retweet-#{json[:id]}",
                       data: { id: json[:id],
@@ -111,20 +114,22 @@ class UserConnection
                                                   user: { id: json[:retweeted_status][:user][:id] } } } }
   end
 
-  def on_event_tweet(json)
+  def on_event_tweet(json, timestamp = nil)
+    timestamp ||= json[:timestamp_ms] || (Time.parse(json[:created_at]).to_i * 1000).to_s rescue nil
     log(:debug, "Event: #{json[:event]}: #{json[:source][:screen_name]} => #{json[:target][:screen_name]}/#{json[:target_object][:id]}")
-    on_user(json[:source])
-    on_user(json[:target])
-    on_tweet(json[:target_object])
+    on_user(json[:source], timestamp)
+    on_user(json[:target], timestamp)
+    on_tweet(json[:target_object], timestamp)
     EventChannel << { event: json[:event].to_sym,
-                      identifier: "#{json[:event]}-#{json[:timestamp_ms]}-#{json[:source][:id]}-#{json[:target_object][:id]}",
-                      data: {  timestamp_ms: json[:timestamp_ms],
+                      identifier: "#{json[:event]}-#{timestamp}-#{json[:source][:id]}-#{json[:target_object][:id]}",
+                      data: {  timestamp_ms: timestamp,
                                source: { id: json[:source][:id] },
                                target: { id: json[:target][:id] },
                                target_object: { id: json[:target_object][:id] } } }
   end
 
-  def on_delete(json)
+  def on_delete(json, timestamp = nil)
+    timestamp ||= json[:timestamp_ms]
     log(:debug, "Delete: #{json[:delete][:status]}")
     EventChannel << { event: :delete,
                       identifier: "delete-#{json[:delete][:status][:id]}",

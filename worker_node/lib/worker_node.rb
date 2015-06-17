@@ -13,6 +13,8 @@ class WorkerNode
     def run
       EventChannel.setup
 
+      EM.epoll if Settings.epoll
+      EM.set_descriptor_table_size(Settings.descriptor_table_size || 1024)
       EM.run do
         connection = EM.connect(Settings.collector_host, Settings.collector_port, CollectorConnection)
 

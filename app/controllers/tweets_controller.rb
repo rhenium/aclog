@@ -15,7 +15,7 @@ class TweetsController < ApplicationController
     redirect_to tweet
   end
 
-  def responses
+  def i_responses
     authorize! @tweet = Tweet.find(params[:id])
   end
 

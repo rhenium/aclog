@@ -42,7 +42,7 @@ Views.tweets =
             if status.allowed && status.reactions_count > 0
               status.loading = true
               superagent
-                .get "/i/" + status.id_str + "/responses"
+                .get "/i/api/tweets/responses?id=" + status.id_str
                 .accept "json"
                 .end (rerr, rres) ->
                   rjson = rres.body

@@ -12,17 +12,7 @@ class ApidocsController < ApplicationController
 
   private
   def set_apidocs
-    @apidocs = Rails.cache.fetch("apidocs", expired_in: 1.days) do
-      h = {}
-      Api.routes.reject {|r| r.route_ignore }.each {|route|
-        next if route.route_method == "HEAD"
-        method = route.route_method
-        namespace = route.route_namespace.sub(/^\//, "")
-        path = route.route_path.split("/", 3).last.sub(/\(\.:format\)$/, "")
-        ((h[method] ||= {})[namespace] ||= {})[path] = route
-      }
-      h
-    end
+    @apidocs = Api.docs
   end
 
   def set_sidebar

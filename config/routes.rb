@@ -38,7 +38,6 @@ Rails.application.routes.draw do
 
     get "/discovered_by" =>                     "users#discovered_by",              as: "user_discovered_by"
     get "/discovered_users" =>                  "users#discovered_users",           as: "user_discovered_users"
-    get "/stats" =>                             "users#stats",                      as: "user_stats"
   end
 
   get "*unmatched_route" =>                     "application#routing_error"

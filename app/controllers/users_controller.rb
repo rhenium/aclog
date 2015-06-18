@@ -17,7 +17,7 @@ class UsersController < ApplicationController
     @sidebars = [:user]
   end
 
-  def stats
+  def i_stats
     user = User.find(screen_name: params[:screen_name])
     render json: user.stats.to_h
   end

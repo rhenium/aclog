@@ -17,11 +17,10 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    @_current_user ||= begin
+    @_current_user ||=
       if logged_in?
         User.find(session[:user_id])
       end
-    end
   end
 
   def authorized_to_show_user?(user)
@@ -38,5 +37,9 @@ class ApplicationController < ActionController::Base
       raise ArgumentError, "parameter `object` must be a User or a Tweet"
     end
     object
+  end
+
+  def safe_redirect?(to)
+    to[0] == "/" && !to.include?("//")
   end
 end

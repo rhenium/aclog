@@ -29,6 +29,7 @@ Collects favs and retweets in real time by UserStreams.
 * Atom feed
 
 ## Requirements
+* Linux (WorkerNode optionally needs epoll)
 * Ruby 2.2+
 * MySQL/MariaDB 5.5.14+ (needs utf8mb4 support)
 * memcached

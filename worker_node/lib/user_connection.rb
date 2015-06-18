@@ -12,11 +12,10 @@ class UserConnection
   end
 
   def update(hash)
-    if hash[:oauth_token] == @client.options[:oauth_token]
-      log(:debug, "Token is not changed")
-    else
-      @client.update(hash)
+    if @client.update_if_necessary(hash)
       log(:info, "Updated connection")
+    else
+      log(:debug, "Token is not changed")
     end
   end
 
@@ -129,7 +128,6 @@ class UserConnection
   end
 
   def on_delete(json, timestamp = nil)
-    timestamp ||= json[:timestamp_ms]
     log(:debug, "Delete: #{json[:delete][:status]}")
     EventChannel << { event: :delete,
                       identifier: "delete-#{json[:delete][:status][:id]}",

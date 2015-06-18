@@ -10,7 +10,6 @@ Rails.application.routes.draw do
   get "/i/logout" =>                            "sessions#destroy",                 as: "logout"
 
   get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
-  get "/i/:id/responses" =>                     "tweets#responses",                 as: "responses", constraints: { id: /\d+/ }
   post "/i/:id/import" =>                       "tweets#import",                    as: "import", constraints: { id: /\d+/ }
 
   get "/i/settings" =>                          "settings#index",                   as: "settings"
@@ -22,6 +21,7 @@ Rails.application.routes.draw do
   get "/i/timeline" =>                          "tweets#all_timeline",              as: "timeline"
   get "/i/filter" =>                            "tweets#filter",                    as: "filter"
 
+  get "/i/api/tweets/responses" =>              "tweets#i_responses",               as: "responses"
   get "/i/api/users/suggest_screen_name" =>     "users#i_suggest_screen_name"
   get "/i/api/users/stats" =>                   "users#i_stats"
 
@@ -38,7 +38,6 @@ Rails.application.routes.draw do
 
     get "/discovered_by" =>                     "users#discovered_by",              as: "user_discovered_by"
     get "/discovered_users" =>                  "users#discovered_users",           as: "user_discovered_users"
-    get "/stats" =>                             "users#stats",                      as: "user_stats"
   end
 
   get "*unmatched_route" =>                     "application#routing_error"

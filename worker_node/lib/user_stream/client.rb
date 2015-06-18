@@ -85,7 +85,7 @@ module UserStream
 
     def setup_connection
       opts = { query: {}, head: {} }
-      opts[:query].merge(@options[:params]) if @options[:params].is_a? Hash
+      opts[:query].merge!(@options[:params]) if @options[:params].is_a? Hash
       opts[:head]["accept-encoding"] = "gzip" if @options[:compression]
 
       oauth = { consumer_key: @options[:consumer_key],

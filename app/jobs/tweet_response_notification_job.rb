@@ -1,10 +1,12 @@
-class Notification
+class TweetResponseNotificationJob < ActiveJob::Base
+  queue_as :default
+
   # Notifies the count of favovorites for the tweet with tweeting a reply from notification account.
   # Notification will be send only when the count reached the specified number in settings.yml.
   # THIS METHOD IS NOT THREAD SAFE
   #
   # @param [Hash, Tweet] hash_or_tweet the target tweet.
-  def self.try_notify_favorites(tweet)
+  def perform(tweet)
     return unless Settings.notification.enabled
 
     notify_favs = -> c do
@@ -30,12 +32,12 @@ class Notification
   end
 
   private
-  def self.notify(user, text, id)
+  def notify(user, text, id)
     url = Rails.application.routes.url_helpers.tweet_url(host: Settings.base_url, id: id)
     tweet("@#{ user.screen_name } #{ text } #{ url }", id)
   end
 
-  def self.tweet(text, reply_to = 0)
+  def tweet(text, reply_to = 0)
     defer do
       begin
         Settings.notification.accounts.each do |hash|
@@ -52,7 +54,7 @@ class Notification
     end
   end
 
-  def self.client(acc)
+  def client(acc)
     @_client ||= {}
     @_client[acc] ||= 
       Twitter::REST::Client.new(consumer_key: Settings.notification.consumer.key,
@@ -61,7 +63,7 @@ class Notification
                                 access_token_secret: acc.secret)
   end
 
-  def self.defer(&blk)
+  def defer(&blk)
     if EM.reactor_running?
       EM.defer &blk
     else

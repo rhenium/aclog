@@ -40,7 +40,7 @@ module Collector
       tweet_ids = favorites.map {|f| f[:target_object][:id] }
       if tweet_ids.size > 0
         Tweet.where(id: tweet_ids).each do |tweet|
-          Notification.try_notify_favorites(tweet)
+          TweetResponseNotificationJob.perform_later(tweet)
         end
       end
 

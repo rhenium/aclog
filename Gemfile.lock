@@ -82,6 +82,11 @@ GEM
     daemons (1.2.2)
     dalli (2.7.4)
     debug_inspector (0.0.2)
+    delayed_job (4.0.6)
+      activesupport (>= 3.0, < 5.0)
+    delayed_job_active_record (4.0.3)
+      activerecord (>= 3.0, < 5.0)
+      delayed_job (>= 3.0, < 4.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.2.5)
@@ -369,6 +374,7 @@ DEPENDENCIES
   connection_pool
   coveralls
   dalli
+  delayed_job_active_record
   eventmachine
   factory_girl_rails
   grape

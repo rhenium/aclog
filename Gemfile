@@ -19,6 +19,7 @@ gem "bootstrap-sass"
 gem "puma"
 gem "dalli"
 gem "connection_pool"
+gem "delayed_job_active_record"
 
 gem "omniauth-twitter"
 gem "twitter"

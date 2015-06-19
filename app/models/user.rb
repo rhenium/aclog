@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
 
       key, value = hash.delete_if {|k, v| v.nil? }.first
 
-      key && where(key => value).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
+      key && where(args).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
     end
 
     def transform_from_json_into_hash(json)
@@ -41,9 +41,9 @@ class User < ActiveRecord::Base
 
       objects = array.map {|json| transform_from_json_into_hash(json) }
       keys = objects.first.keys
-      self.import(keys, objects.map(&:values),
-                  on_duplicate_key_update: [:screen_name, :name, :profile_image_url, :protected],
-                  validate: false)
+      import(keys, objects.map(&:values),
+             on_duplicate_key_update: [:screen_name, :name, :profile_image_url, :protected],
+             validate: false)
     end
   end
 

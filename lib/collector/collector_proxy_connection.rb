@@ -25,9 +25,11 @@ module Collector
     def unbind
       if @closing
         log(:info, "Connection was closed.")
+        @connected = false
       else
         if @connected
           log(:info, "Connection was closed unexpectedly.")
+          @connected = false
         end
 
         EM.add_timer(10) { try_reconnect }
@@ -46,8 +48,14 @@ module Collector
           next
         end
 
-        parse_message(msg)
+        begin
+          parse_message(msg)
+        rescue
+          log(:error, "Failed to parse message: #{msg}")
+        end
       end
+    rescue
+      log(:fatal, "Failed to parse data: #{data}")
     end
 
     def exit

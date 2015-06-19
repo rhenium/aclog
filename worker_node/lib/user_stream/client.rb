@@ -11,7 +11,7 @@ module UserStream
     end
 
     def update(options)
-      initialize(options)
+      @options = options
       reconnect
     end
 

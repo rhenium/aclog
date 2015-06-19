@@ -13,7 +13,8 @@ class SettingsController < ApplicationController
   end
 
   def deactivate
-    @account.deactivate!
+    @account.status = Account::INACTIVE
+    @account.save!
 
     begin
       WorkerManager.update_account(@account)

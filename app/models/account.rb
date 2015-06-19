@@ -1,14 +1,18 @@
 class Account < ActiveRecord::Base
-  enum status: { active: 0, inactive: 1, revoked: 2 }
+  ACTIVE = 0
+  INACTIVE = 1
+  REVOKED = 2
 
   belongs_to :user
+  scope :active, -> { where(status: ACTIVE) }
   scope :for_node, ->(block_number) { active.where("id % ? = ?", Settings.collector.nodes_count, block_number) }
 
   # Returns whether tweet notification is enabled for this user.
   def notification_enabled?; notification_enabled end
 
-  # Changes the `status` value to :inactive.
-  def deactivate!; self.inactive! end
+  def active?
+    status == ACTIVE
+  end
 
   class << self
     # Registers a new account or updates an existing account.
@@ -18,7 +22,7 @@ class Account < ActiveRecord::Base
       account = where(user_id: hash[:user_id]).first_or_initialize
       account.oauth_token = hash[:oauth_token]
       account.oauth_token_secret = hash[:oauth_token_secret]
-      account.status = :active
+      account.status = ACTIVE
       account.save! if account.changed?
       account
     end
@@ -35,7 +39,7 @@ class Account < ActiveRecord::Base
   def verify_token!
     client.user
   rescue
-    self.revoked!
+    update_attribute(status, REVOKED)
   end
 
   # Returns Twitter Gem's Client instance.

@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
 
       key, value = hash.delete_if {|k, v| v.nil? }.first
 
-      key && where(args).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{key}=#{value}")
+      key && where(hash).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{hash.map {|k, v| "#{k}=#{v}" }.join(", ")}")
     end
 
     def transform_from_json_into_hash(json)

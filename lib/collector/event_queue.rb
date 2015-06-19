@@ -37,7 +37,7 @@ module Collector
         Retweet.delete_bulk_from_json(deletes)
       end
 
-      if Settings.notification.enabled?
+      if Settings.notification.enabled
         tweet_ids = favorites.map {|f| f[:target_object][:id] }
         if tweet_ids.size > 0
           Tweet.where(id: tweet_ids).each do |tweet|

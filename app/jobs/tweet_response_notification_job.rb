@@ -15,7 +15,7 @@ class TweetResponseNotificationJob < ActiveJob::Base
     if last_count
       t_count = Settings.notification.favorites.select {|m| last_count < m && m <= tweet.favorites_count }.last
     else
-      t_count = Settings.notification.favorites.include?(tweet.favorites_count) || tweet.favorites_count
+      t_count = Settings.notification.favorites.include?(tweet.favorites_count) && tweet.favorites_count
     end
 
     if t_count

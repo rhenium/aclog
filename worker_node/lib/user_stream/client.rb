@@ -16,7 +16,7 @@ module UserStream
     end
 
     def update_if_necessary(options)
-      if options[:oauth][:oauth_token] == @options[:oauth][:oauth_token]
+      if options[:oauth][:access_token] == @options[:oauth][:access_token]
         update(options)
         true
       else

@@ -16,7 +16,7 @@ module UserStream
     end
 
     def update_if_necessary(options)
-      if options[:oauth_token] == @options[:oauth_token]
+      if options[:oauth][:oauth_token] == @options[:oauth][:oauth_token]
         update(options)
         true
       else
@@ -88,13 +88,8 @@ module UserStream
       opts[:query].merge!(@options[:params]) if @options[:params].is_a? Hash
       opts[:head]["accept-encoding"] = "gzip" if @options[:compression]
 
-      oauth = { consumer_key: @options[:consumer_key],
-                consumer_secret: @options[:consumer_secret],
-                access_token: @options[:oauth_token],
-                access_token_secret: @options[:oauth_token_secret] }
-
       req = EM::HttpRequest.new("https://userstream.twitter.com/1.1/user.json", inactivity_timeout: 100) # at least one line per 90 seconds will come
-      req.use(EM::Middleware::OAuth, oauth)
+      req.use(EM::Middleware::OAuth, @options[:oauth])
 
       req.get(opts)
     end

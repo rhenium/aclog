@@ -2,8 +2,7 @@ class UserConnection
   def initialize(msg)
     @user_id = msg[:user_id]
     @account_id = msg[:id]
-    @client = UserStream::Client.new(msg.merge(params: Settings.user_stream_params, compression: Settings.user_stream_compression))
-    setup_client
+    @client = setup_client(msg)
   end
 
   def start
@@ -25,39 +24,50 @@ class UserConnection
   end
 
   private
-  def setup_client
-    @client.on_error do |error|
+  def setup_client(msg)
+    client = UserStream::Client.new(
+      oauth: {
+        consumer_key: msg[:consumer_key],
+        consumer_secret: msg[:consumer_secret],
+        access_token: msg[:oauth_token],
+        access_token_secret: msg[:oauth_token_secret]
+      },
+      params: Settings.user_stream_params,
+      compression: Settings.user_stream_compression
+    )
+
+    client.on_error do |error|
       if error == Errno::ETIMEDOUT
         log(:warn, "Stalled")
-        EM.add_timer(5) { @client.reconnect }
+        EM.add_timer(5) { client.reconnect }
       elsif error = Errno::ECONNRESET
         log(:warn, "Connection reset")
-        EM.add_timer(5) { @client.reconnect }
+        EM.add_timer(5) { client.reconnect }
       else
         log(:error, "Unknown error: #{error}")
       end
     end
-    @client.on_service_unavailable do |message|
+    client.on_service_unavailable do |message|
       # TODO: occurs when the Twitter account is deleted?
       log(:info, "Service unavailable")
       self.stop
     end
-    @client.on_unauthorized do |message|
+    client.on_unauthorized do |message|
       log(:warn, "Unauthorized")
       EventChannel << { event: :unauthorized,
                         identifier: nil,
-                        data: { id: @account_id, user_id: @user_id } }
+                        data: { id: msg[:id], user_id: msg[:user_id] } }
       self.stop
     end
-    @client.on_enhance_your_calm do |message|
+    client.on_enhance_your_calm do |message|
       log(:warn, "420: #{message}")
     end
-    @client.on_disconnected do
+    client.on_disconnected do
       log(:warn, "Disconnected")
-      EM.add_timer(5) { @client.reconnect }
+      EM.add_timer(5) { client.reconnect }
     end
 
-    @client.on_item do |item|
+    client.on_item do |item|
       begin
         json = Yajl::Parser.parse(item, symbolize_keys: true)
       rescue Yajl::ParseError
@@ -81,6 +91,8 @@ class UserConnection
         # scrub_geo, limit, unknown message
       end
     end
+
+    client
   end
 
   def on_user(json, timestamp = nil)

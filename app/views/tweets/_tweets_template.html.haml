@@ -25,38 +25,32 @@
             %li<
               %a.aclogicon.aclogicon-reply{href: "https://twitter.com/intent/tweet?in_reply_to={{id_str}}", title: "返信", data: {"v-on" => "click: openIntent"}}
     .status-responses
-      %template{data: {"v-if" => "favorites_count > 0"}}
-        %dl
-          %dt
-            %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandFavorites(this, $event)"}}<
-              %span> {{favorites_count}}
-              Favs
-          %dd{data: {"v-class" => "collapsed: !expandFavorites"}}
-            %ul{class: "status-responses-favorites"}
-              %li{data: {"v-if" => "loading"}}
-                %img.loading-image{src: image_path("loading.gif")}
-              %li{data: {"v-repeat" => "favorites"}}<
-                %template{data: {"v-if" => "allowed"}}
-                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name | removeInvalidCharacters}} (@{{screen_name}})"}<
-                    %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
-                %template{data: {"v-if" => "!allowed"}}
-                  %img{src: image_path("profile_image_protected.png"), alt: "protected user"}
-      %template{data: {"v-if" => "retweets_count > 0"}}
-        %dl
-          %dt
-            %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandRetweets(this, $event)"}}<
-              %span> {{retweets_count}}
-              RTs
-          %dd{data: {"v-class" => "collapsed: !expandRetweets"}}
-            %ul{class: "status-responses-retweets"}
-              %li{data: {"v-if" => "loading"}}
-                %img.loading-image{src: image_path("loading.gif")}
-              %li{data: {"v-repeat" => "retweets"}}<
-                %template{data: {"v-if" => "allowed"}}
-                  %a{href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name | removeInvalidCharacters}} (@{{screen_name}})"}<
-                    %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
-                %template{data: {"v-if" => "!allowed"}}
-                  %img{src: image_path("profile_image_protected.png"), alt: "protected user"}
+      %dl{data: {"v-if" => "favorites_count > 0"}}
+        %dt
+          %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandFavorites(this, $event)"}}<
+            %span> {{favorites_count}}
+            Favs
+        %dd{data: {"v-class" => "collapsed: !expandFavorites"}}
+          %ul{class: "status-responses-favorites"}
+            %li{data: {"v-if" => "loading"}}
+              %img.loading-image{src: image_path("loading.gif")}
+            %li{data: {"v-repeat" => "favorites"}}<
+              %a{data: {"v-if" => "allowed"}, href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name | removeInvalidCharacters}} (@{{screen_name}})"}<
+                %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
+              %img{data: {"v-if" => "!allowed"}, src: image_path("profile_image_protected.png"), alt: "protected user"}
+      %dl{data: {"v-if" => "retweets_count > 0"}}
+        %dt
+          %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandRetweets(this, $event)"}}<
+            %span> {{retweets_count}}
+            RTs
+        %dd{data: {"v-class" => "collapsed: !expandRetweets"}}
+          %ul{class: "status-responses-retweets"}
+            %li{data: {"v-if" => "loading"}}
+              %img.loading-image{src: image_path("loading.gif")}
+            %li{data: {"v-repeat" => "retweets"}}<
+              %a{data: {"v-if" => "allowed"}, href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name | removeInvalidCharacters}} (@{{screen_name}})"}<
+                %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
+              %img{data: {"v-if" => "!allowed"}, src: image_path("profile_image_protected.png"), alt: "protected user"}
   %template{data: {"v-if" => "!allowed"}}
     .status-tweet
       .status-user

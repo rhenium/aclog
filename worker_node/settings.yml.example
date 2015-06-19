@@ -3,6 +3,8 @@ collector_host: localhost
 collector_port: 42106
 log_level: info
 memcached: "127.0.0.1:11211"
+epoll: false
+descriptor_table_size: 4096
 user_stream_compression: true
 user_stream_params:
   replies: "all"

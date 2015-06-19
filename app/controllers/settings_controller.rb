@@ -5,7 +5,7 @@ class SettingsController < ApplicationController
   end
 
   def update
-    @account.update(notification_enabled: params[:notification_enabled] == "true")
+    @account.update(notification_enabled: !!params[:notification_enabled])
     redirect_to action: "index"
   end
 
@@ -25,7 +25,8 @@ class SettingsController < ApplicationController
 
   private
   def set_account
-    return redirect_to "/i/login" unless logged_in?
+    return redirect_to "/i/login?redirect_after_login=" + CGI.escape(url_for(only_path: true)) unless logged_in?
+
     @account = current_user.account
   end
 end

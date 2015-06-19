@@ -4,7 +4,6 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :exception
 
-  after_action :tidy_response_body
   helper_method :logged_in?, :current_user
   helper_method :authorized_to_show_user?
 
@@ -18,13 +17,10 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    @_current_user ||= begin
+    @_current_user ||=
       if logged_in?
         User.find(session[:user_id])
-      else
-        nil
       end
-    end
   end
 
   def authorized_to_show_user?(user)
@@ -43,10 +39,7 @@ class ApplicationController < ActionController::Base
     object
   end
 
-  private
-  def tidy_response_body
-    if [:html, :xml, :atom].any? {|s| request.format == s }
-      response.body = ActiveSupport::Multibyte::Unicode.tidy_bytes(response.body)
-    end
+  def safe_redirect?(to)
+    to[0] == "/" && !to.include?("//")
   end
 end

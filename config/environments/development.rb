@@ -38,4 +38,6 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  config.cache_store = :dalli_store, Settings.cache.memcached, { namespace: "aclog-web", pool_size: 5, expires_in: Settings.cache.expires_in }
 end

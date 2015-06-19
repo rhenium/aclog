@@ -37,10 +37,12 @@ module Collector
         Retweet.delete_bulk_from_json(deletes)
       end
 
-      tweet_ids = favorites.map {|f| f[:target_object][:id] }
-      if tweet_ids.size > 0
-        Tweet.where(id: tweet_ids).each do |tweet|
-          Notification.try_notify_favorites(tweet)
+      if Settings.notification.enabled?
+        tweet_ids = favorites.map {|f| f[:target_object][:id] }
+        if tweet_ids.size > 0
+          Tweet.where(id: tweet_ids).each do |tweet|
+            TweetResponseNotificationJob.perform_later(tweet)
+          end
         end
       end
 
@@ -93,8 +95,10 @@ module Collector
     private
     def cache(object)
       if id = object[:identifier]
-        unless @dalli.get(id)
-          @dalli.set(id, true)
+        key, val = id.split("#", 2)
+        cur = @dalli.get(id)
+        if !cur || (val && (cur <=> val) == -1) # not found or new
+          @dalli.set(key, true || value)
           yield
         end
       else

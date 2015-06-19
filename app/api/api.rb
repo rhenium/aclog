@@ -50,4 +50,21 @@ class Api < Grape::API
   route :any, "*path", ignore: true do
     raise Aclog::Exceptions::NotFound
   end
+
+  class << self
+    def docs
+      Rails.cache.fetch("apidocs") do
+        {}.tap do |h|
+          Api.routes.each {|route|
+            next if route.route_ignore
+            next if route.route_method == "HEAD"
+            method = route.route_method
+            namespace = route.route_namespace.sub(/^\//, "")
+            path = route.route_path.split("/", 3).last.sub(/\(\.:format\)$/, "")
+            ((h[method] ||= {})[namespace] ||= {})[path] = route
+          }
+        end
+      end
+    end
+  end
 end

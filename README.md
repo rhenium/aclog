@@ -2,7 +2,7 @@
 Collects favs and retweets in real time by UserStreams.
 
 ## Aclog is
-* powered by Ruby on Rails
+* powered by Ruby on Rails and EventMachine
 * completely free and open source ([The MIT License](https://github.com/rhenium/aclog/blob/master/LICENSE.txt))
 * Scalable structure
 
@@ -19,7 +19,6 @@ Collects favs and retweets in real time by UserStreams.
         |------------|           |-----------|    :           :        |---|
 
 ## Status
-* *unstable*
 * Working on [aclog.koba789.com](http://aclog.koba789.com)
 
 ## Features
@@ -75,12 +74,14 @@ Collects favs and retweets in real time by UserStreams.
 
             $ RAILS_ENV=production bundle exec rake web:start
             $ RAILS_ENV=production bundle exec rake collector:start
+            $ RAILS_ENV=production bundle exec bin/delayed_job start
 
     * systemd
 
             $ cp example/systemd/aclog-{webserver,collector}.service /usr/lib/systemd/system/
             $ systemctl start aclog-webserver.service
             $ systemctl start aclog-collector.service
+            $ systemctl start aclog-delayed_job.service
 
 ### Collector worker nodes
 * Copy the source

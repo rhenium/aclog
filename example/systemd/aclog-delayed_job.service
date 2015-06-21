@@ -1,5 +1,5 @@
 [Unit]
-Description=aclog collector daemon
+Description=aclog delayed_job daemon
 After=network.target
 
 [Service]
@@ -7,7 +7,7 @@ User=aclog
 Group=aclog
 Environment="RAILS_ENV=production"
 WorkingDirectory=/var/webapps/aclog/
-ExecStart=/usr/bin/bundle exec rake collector:run
+ExecStart=/usr/bin/bundle exec bin/delayed_job run
 
 [Install]
 WantedBy=multi-user.target

@@ -11,7 +11,7 @@ class UserConnection
   end
 
   def update(hash)
-    if @client.update_if_necessary(hash)
+    if @client.update_if_necessary(setup_options(hash))
       log(:info, "Updated connection")
     else
       log(:debug, "Token is not changed")
@@ -25,16 +25,7 @@ class UserConnection
 
   private
   def setup_client(msg)
-    client = UserStream::Client.new(
-      oauth: {
-        consumer_key: msg[:consumer_key],
-        consumer_secret: msg[:consumer_secret],
-        access_token: msg[:oauth_token],
-        access_token_secret: msg[:oauth_token_secret]
-      },
-      params: Settings.user_stream_params,
-      compression: Settings.user_stream_compression
-    )
+    client = UserStream::Client.new(setup_options(msg))
 
     client.on_error do |error|
       if error == Errno::ETIMEDOUT
@@ -93,6 +84,19 @@ class UserConnection
     end
 
     client
+  end
+
+  def setup_options(msg)
+    {
+      oauth: {
+        consumer_key: msg[:consumer_key],
+        consumer_secret: msg[:consumer_secret],
+        access_token: msg[:oauth_token],
+        access_token_secret: msg[:oauth_token_secret]
+      },
+      params: Settings.user_stream_params,
+      compression: Settings.user_stream_compression
+    }
   end
 
   def on_user(json, timestamp = nil)

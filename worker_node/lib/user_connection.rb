@@ -59,14 +59,7 @@ class UserConnection
       EM.add_timer(5) { client.reconnect }
     end
 
-    client.on_item do |item|
-      begin
-        json = Yajl::Parser.parse(item, symbolize_keys: true)
-      rescue Yajl::ParseError
-        log(:warn, "JSON parse error: #{item}")
-        next
-      end
-
+    client.on_item do |json|
       if json[:friends]
         log(:info, "Connection established (friends: #{json[:friends].size})")
       elsif json[:delete] && json[:delete][:status]

@@ -52,6 +52,7 @@ class UserConnection
     end
     client.on_enhance_your_calm do |message|
       log(:warn, "420: #{message}")
+      EM.add_timer(60) { client.reconnect }
     end
     client.on_disconnected do
       log(:warn, "Disconnected")

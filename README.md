@@ -78,7 +78,7 @@ Collects favs and retweets in real time by UserStreams.
 
     * systemd
 
-            $ cp example/systemd/aclog-{webserver,collector}.service /usr/lib/systemd/system/
+            $ cp example/systemd/aclog-{webserver,collector,delayed_job}.service /usr/lib/systemd/system/
             $ systemctl start aclog-webserver.service
             $ systemctl start aclog-collector.service
             $ systemctl start aclog-delayed_job.service

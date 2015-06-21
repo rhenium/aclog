@@ -20,6 +20,7 @@ gem "puma"
 gem "dalli"
 gem "connection_pool"
 gem "delayed_job_active_record"
+gem "daemons"
 
 gem "omniauth-twitter"
 gem "twitter"

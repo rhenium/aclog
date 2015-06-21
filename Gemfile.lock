@@ -373,6 +373,7 @@ DEPENDENCIES
   coffee-rails
   connection_pool
   coveralls
+  daemons
   dalli
   delayed_job_active_record
   eventmachine

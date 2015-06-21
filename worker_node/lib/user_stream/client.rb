@@ -16,12 +16,9 @@ module UserStream
     end
 
     def update_if_necessary(options)
-      if options[:oauth][:access_token] == @options[:oauth][:access_token]
-        update(options)
-        true
-      else
-        false
-      end
+      needed = options[:oauth][:access_token] != @options[:oauth][:access_token]
+      update(options) if needed
+      needed
     end
 
     def reconnect

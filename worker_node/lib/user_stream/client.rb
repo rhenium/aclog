@@ -39,31 +39,47 @@ module UserStream
     end
 
     def connect
-      @buftok = BufferedTokenizer.new("\r\n")
+      buftok = BufferedTokenizer.new("\r\n")
+      error = nil
+      errorbuf = ""
       @http = setup_connection
 
       @http.headers do |headers|
+        case status = @http.response_header.status
+        when 200
+          # yay!
+        when 401
+          error = :unauthorized
+        when 420
+          error = :enhance_your_calm
+        when 503
+          error = :service_unavailable
+        else
+          error = "status_#{status}".to_sym
+        end
       end
 
       @http.stream do |chunk|
-        @buftok.extract(chunk).each do |line|
+        if error
+          errorbuf << chunk
+          next
+        end
+
+        buftok.extract(chunk).each do |line|
           next if line.empty?
           callback(:item, line)
         end
       end
 
       @http.callback do
-        case @http.response_header.status
-        when 401
-          callback(:unauthorized, @http.response)
-        when 420
-          callback(:enhance_your_calm, @http.response)
-        when 503
-          callback(:service_unavailable, @http.response)
-        when 200
-          callback(:disconnected)
+        if error
+          if @callbacks.key?(error)
+            callback(error, errorbuf)
+          else
+            callback(:error, "#{error}: #{errorbuf}")
+          end
         else
-          callback(:error, "#{@http.response}: #{@http.response}")
+          callback(:disconnected)
         end
       end
 

@@ -105,10 +105,16 @@ module UserStream
       opts[:query].merge!(@options[:params]) if @options[:params].is_a? Hash
       opts[:head]["accept-encoding"] = "gzip" if @options[:compression]
 
+      log(:debug, "Connecting with options: #{opts}")
+
       req = EM::HttpRequest.new("https://userstream.twitter.com/1.1/user.json", inactivity_timeout: 100) # at least one line per 90 seconds will come
       req.use(EM::Middleware::OAuth, @options[:oauth])
 
       req.get(opts)
+    end
+
+    def log(level, message)
+      WorkerNode.logger.__send__(level, "UserStream(#{@options[:identifier]})") { message }
     end
   end
 end

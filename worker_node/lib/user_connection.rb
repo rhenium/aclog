@@ -7,7 +7,7 @@ class UserConnection
 
   def start
     @client.connect
-    log(:info, "Connected")
+    log(:debug, "Connect")
   end
 
   def update(hash)
@@ -20,7 +20,7 @@ class UserConnection
 
   def stop
     @client.stop
-    log(:info, "Stopped: #{@account_id}")
+    log(:info, "Stop: #{@account_id}")
   end
 
   private
@@ -39,9 +39,8 @@ class UserConnection
       end
     end
     client.on_service_unavailable do |message|
-      # TODO: occurs when the Twitter account is deleted?
-      log(:info, "Service unavailable")
-      self.stop
+      log(:warn, "Service unavailable")
+      EM.add_timer(60) { client.reconnect }
     end
     client.on_unauthorized do |message|
       log(:warn, "Unauthorized")
@@ -89,7 +88,8 @@ class UserConnection
         access_token_secret: msg[:oauth_token_secret]
       },
       params: Settings.user_stream_params,
-      compression: Settings.user_stream_compression
+      compression: Settings.user_stream_compression,
+      identifier: "##{msg[:id]}/#{msg[:user_id]}"
     }
   end
 

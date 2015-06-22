@@ -16,7 +16,7 @@ module UserStream
     end
 
     def update_if_necessary(options)
-      needed = options[:oauth][:access_token] != @options[:oauth][:access_token]
+      needed = options != @options
       update(options) if needed
       needed
     end
@@ -102,7 +102,7 @@ module UserStream
 
     def setup_connection
       opts = { query: {}, head: {} }
-      opts[:query].merge!(@options[:params]) if @options[:params].is_a? Hash
+      opts[:query].merge!(@options[:params]) if @options[:params]
       opts[:head]["accept-encoding"] = "gzip" if @options[:compression]
 
       log(:debug, "Connecting with options: #{opts}")

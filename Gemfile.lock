@@ -408,3 +408,6 @@ DEPENDENCIES
   web-console (~> 2.0)
   webmock
   yajl-ruby
+
+BUNDLED WITH
+   1.10.4

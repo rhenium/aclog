@@ -5,10 +5,17 @@ class TweetResponseNotificationJob < ActiveJob::Base
   # Notification will be send only when the count reached the specified number in settings.yml.
   # THIS METHOD IS NOT THREAD SAFE
   #
-  # @param [Hash, Tweet] hash_or_tweet the target tweet.
-  def perform(tweet)
+  # @param [Array] An array of tweets ids
+  def perform(tweet_ids)
     return unless Settings.notification.enabled
 
+    Tweet.where(id: tweet_ids).includes(user: :account).each do |tweet|
+      perform_tweet(tweet)
+    end
+  end
+
+  private
+  def perform_tweet(tweet)
     last_count = Rails.cache.read("notification/tweets/#{ tweet.id }/favorites_count")
     Rails.cache.write("notification/tweets/#{ tweet.id }/favorites_count", [last_count || 0, tweet.favorites_count].max)
 
@@ -23,7 +30,6 @@ class TweetResponseNotificationJob < ActiveJob::Base
     end
   end
 
-  private
   def notify(tweet, text)
     user = tweet.user
     account = user.account

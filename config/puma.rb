@@ -11,7 +11,6 @@ threads 4, 16
 workers 2
 
 bind "unix://" + File.join(_rails_root, "tmp", "sockets", "web.sock")
-port 3000
 
 on_worker_boot do
   ActiveSupport.on_load(:active_record) do

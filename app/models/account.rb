@@ -39,7 +39,7 @@ class Account < ActiveRecord::Base
   def verify_token!
     client.user
   rescue
-    update_attribute(status, REVOKED)
+    update_attribute(:status, REVOKED)
   end
 
   # Returns Twitter Gem's Client instance.

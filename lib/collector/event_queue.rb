@@ -44,9 +44,8 @@ module Collector
         end
       end
 
-      unauthorizeds.each do |a|
-        account = Account.find(a[:id])
-        account.verify_token!
+      if unauthorizeds.size > 0
+        AccountTokenVerificationJob.perform_later(unauthorizeds.map {|u| u[:id] })
       end
     end
 

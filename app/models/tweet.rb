@@ -107,6 +107,7 @@ class Tweet < ActiveRecord::Base
           else
             # TORIAEZU protected
             current.user.update(protected: true)
+            raise Aclog::Exceptions::Forbidden, id
           end
         end
 

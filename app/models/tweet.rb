@@ -79,28 +79,39 @@ class Tweet < ActiveRecord::Base
       Retweet.where(tweet_id: ids).delete_all
     end
 
-    # Imports a Tweet from Twitter REST API.
-    # If the client is not specified, An random account will be selected from database.
+    # Update a Tweet from Twitter REST API.
+    # If the current_user is not specified, An random account will be selected from database.
     # @param [Integer] id Target status ID.
-    # @param [Account] client The Twitter::REST::Client to be used.
+    # @param [User] current_user The user to use its token.
     # @return [Tweet] The Tweet instance imported.
-    def import_from_twitter(id, current_user = nil)
+    def update_from_twitter(id, current_user = nil)
       client = (current_user ? current_user.account : Account.random).client
 
-      st = client.status(id)
-      st = st.retweeted_status if st.retweet?
-      self.create_bulk_from_json([st.attrs])
-      User.create_or_update_from_json(st.attrs[:user])
+      begin
+        st = client.status(id)
+        st = st.retweeted_status if st.retweet?
+        User.create_or_update_from_json(st.attrs[:user])
+        Tweet.create_bulk_from_json([st.attrs])
 
-      tweet = self.find(st.id)
-      tweet.update(text: extract_entities(st.attrs),
-                   source: st.attrs[:source],
-                   in_reply_to_id: (tweet.in_reply_to_id || st.attrs[:in_reply_to_status_id]))
+        tweet = Tweet.find(st.id)
+        tweet.update(text: extract_entities(st.attrs),
+                     source: st.attrs[:source],
+                     in_reply_to_id: (tweet.in_reply_to_id || st.attrs[:in_reply_to_status_id]))
 
-      nt = tweet
-      nt = self.build_from_json(client.status(nt.in_reply_to_id).attrs).save! while nt.in_reply_to_id && !nt.in_reply_to
+        tweet.reload
+      rescue Twitter::Error::NotFound
+        # Original tweet is deleted, or user is currently deleted
+        if current = Tweet.find_by(id: id)
+          if client.user?(current.user_id)
+            current.destroy
+          else
+            # TORIAEZU protected
+            current.user.update(protected: true)
+          end
+        end
 
-      tweet.reload
+        raise Aclog::Exceptions::NotFound, id
+      end
     end
 
     # Parses /\d+[dwmy]/ style query and returns recent tweets (Relation) in specified period.

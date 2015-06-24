@@ -1,17 +1,20 @@
 class TweetsController < ApplicationController
   def show
-    @tweet = Tweet.find(params[:id])
+    begin
+      @tweet = Tweet.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      @tweet = Tweet.update_from_twitter(params[:id], current_user)
+    end
+
     authorize! @user = @tweet.user
 
     @sidebars = [:user]
     @title = "\"#{view_context.truncate(CGI.unescapeHTML(@tweet.text))}\" from #{@user.name} (@#{@user.screen_name})"
     @header = "@#{@user.screen_name}'s Tweet"
-  rescue ActiveRecord::RecordNotFound
-    import
   end
 
-  def import
-    tweet = Tweet.import_from_twitter(params[:id], current_user)
+  def update
+    tweet = Tweet.update_from_twitter(params[:id], current_user)
     redirect_to tweet
   end
 

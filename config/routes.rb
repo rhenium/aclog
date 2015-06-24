@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   get "/i/logout" =>                            "sessions#destroy",                 as: "logout"
 
   get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
-  post "/i/:id/import" =>                       "tweets#import",                    as: "import", constraints: { id: /\d+/ }
+  post "/i/:id/update" =>                       "tweets#update",                    as: "update", constraints: { id: /\d+/ }
 
   get "/i/settings" =>                          "settings#index",                   as: "settings"
   post "/i/settings/update" =>                  "settings#update",                  as: "settings_update"

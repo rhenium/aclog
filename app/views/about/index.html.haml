@@ -52,15 +52,28 @@
           %a{href: about_api_path}>< API ドキュメント
           をご覧下さい。
       .col-sm-3
-        %h1 Free Software
+        %h1 Open Source
         %p Aclog のソースコードは MIT License でライセンスされています。完全なソースコードは
-        %a{href: "https://github.com/rhenium/aclog"} GitHub
-        から入手することができます。
+        %a{href: "https://github.com/rhenium/aclog"} GitHub のリポジトリ
+        で公開されています。
 .front-footer
   %p
-    %a.aclogicon.aclogicon-twitter{href: "https://twitter.com/aclog_service"}
-    %a.aclogicon.aclogicon-github{href: "https://github.com/rhenium/aclog"}
+    %a.aclogicon.aclogicon-twitter{href: "https://twitter.com/aclog_service", target: "_blank"}
+    %a.aclogicon.aclogicon-github{href: "https://github.com/rhenium/aclog", target: "_blank"}
+  %p.contributors
+    .contributor
+      %em Created by
+      %a{href: "https://twitter.com/rhe__", target: "_blank"}
+        %img{alt: "@rhe__", title: "@rhe__", src: User.find_by(screen_name: "rhe__").profile_image_url}
+    .contributor
+      %em Designed by
+      %a{href: "https://twitter.com/aayh", target: "_blank"}
+        %img{alt: "@aayh", title: "@aayh", src: User.find_by(screen_name: "aayh").profile_image_url}
+    .contributor
+      %em Hosted by
+      %a{href: "https://twitter.com/KOBA789", target: "_blank"}
+        %img{alt: "@KOBA789", title: "@KOBA789", src: User.find_by(screen_name: "KOBA789").profile_image_url}
   %p
     = link_to "Home", root_path
-    = link_to "Status", status_path
     = link_to "API", about_api_path
+    = link_to "Status", status_path

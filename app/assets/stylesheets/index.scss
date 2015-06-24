@@ -151,4 +151,29 @@
             border-color: #edc63c;
         }
     }
+
+    .contributors {
+        display: flex;
+        justify-content: center;
+
+        .contributor {
+            width: 100px;
+
+            em {
+                display: block;
+                margin-bottom: 10px;
+            }
+
+            img {
+                width: 36px;
+                height: 36px;
+                border: 2px solid #777;
+                border-radius: 50%;
+
+                &:hover {
+                    border-color: #edc63c;
+                }
+            }
+        }
+    }
 }

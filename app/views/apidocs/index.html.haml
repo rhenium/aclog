@@ -1,21 +1,61 @@
-- title "aclog API"
+- title "API"
 .container
   .row
     .col-sm-3.sidebar
       = render_sidebar_content
     .col-sm-9
-      %h2 OAuth
-      %p ツイートを非公開にしているアカウントの情報にアクセスするには本人であるか、対象のアカウントをフォローしている必要があります。Aclog API では、その認証に OAuth Echo を使用します。
-      %p OAuth Echo を使用するには以下のリクエストヘッダを使用します。
+      %h1 API Documentation
+      %p Aclog の全機能が使える API を提供しています。
+      %p Aclog API で取得できるデータにはツイート本文やユーザーの名前等は含まれませんが、これは Twitter API 規約の制約によるものですのでご了承ください。
+
+      %h2 基本的な使い方
+      %p 現在の Aclog API のエンドポイントは全て HTTP / GET を使用します。
+      %p curl を使用する場合、以下のように呼び出すことができます。
+      %pre
+        %code
+          :preserve
+            curl -v \
+                 --get http://aclog.koba789.com/api/tweets/user_timeline.json \
+                 --data screen_name=rhe__ \
+                 --data count=2
+
+      %h2 認証
+      %p ツイートを非公開にしているアカウントの情報にアクセスするには本人であるか、対象のアカウントをフォローしている必要があります。
+      %p Aclog API では OAuth Echo を使用します。OAuth Echo を使用するには、API リクエスト時のヘッダに以下の 2 つを追加します。
       %pre
         %code
           :preserve
             X-Auth-Service-Provider: https://api.twitter.com/1.1/account/verify_credentials.json
-            X-Verify-Credentials-Authorization: OAuth rea...
+            X-Verify-Credentials-Authorization: [account/verify_credentials を呼び出しに使う Authorization ヘッダの内容]
       OAuth Echo の詳細については
-      %a{href: "#"} Twitter のドキュメント
+      %a{href: "https://dev.twitter.com/oauth/echo"} Twitter のドキュメント
       を参照してください。
-      %h2 Endpoints
+      %h2 エラー
+      %p Aclog API の呼び出しでエラーが発生した場合、レスポンスのステータスコードは 400 番台もしくは 500 番台となり、以下のフォーマットのレスポンスボディが返されます。
+      %pre
+        %code
+          :preserve
+            {
+              "error": {
+                "message": "That page does not exists."
+              }
+            }
+      %p Aclog API で発生するエラーには以下の種類があります。
+      %table.table
+        %tbody
+          %tr
+            %td ステータスコード 404
+            %td 存在しない API を呼び出した場合。または、パラメータとして指定したユーザー・ツイートが Aclog のデータベース上に存在しない場合
+          %tr
+            %td ステータスコード 403
+            %td ツイートを非公開にしているユーザーに関して API を呼び出した場合で、自分が相手をフォローしていないか OAuth Echo を使用していない場合。
+          %tr
+            %td ステータスコード 401
+            %td OAuth Echo に失敗した場合。
+          %tr
+            %td ステータスコード 500
+            %td Aclog の内部エラー。Aclog の不具合です。
+      %h2 エンドポイント
       - @apidocs.values.inject(:merge).each do |namespace, endpoints|
         %h3= namespace.titleize
         %table.table

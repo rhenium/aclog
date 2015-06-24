@@ -1,9 +1,9 @@
 class TweetsController < ApplicationController
   def show
-    begin
-      @tweet = Tweet.find(params[:id])
+    @tweet ||= begin
+      Tweet.find(params[:id])
     rescue ActiveRecord::RecordNotFound
-      @tweet = Tweet.update_from_twitter(params[:id], current_user)
+      Tweet.update_from_twitter(params[:id], current_user)
     end
 
     authorize! @user = @tweet.user
@@ -14,8 +14,9 @@ class TweetsController < ApplicationController
   end
 
   def update
-    tweet = Tweet.update_from_twitter(params[:id], current_user)
-    redirect_to tweet
+    @tweet = Tweet.update_from_twitter(params[:id], current_user)
+    show
+    render :show
   end
 
   def i_responses

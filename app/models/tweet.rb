@@ -86,6 +86,7 @@ class Tweet < ActiveRecord::Base
     # @return [Tweet] The Tweet instance imported.
     def update_from_twitter(id, current_user = nil)
       client = (current_user ? current_user.account : Account.random).client
+      id = Integer(id) rescue (raise Aclog::Exceptions::NotFound, id)
 
       begin
         st = client.status(id)

@@ -2,6 +2,7 @@ class TweetsController < ApplicationController
   def show
     @tweet ||= begin
       Tweet.find(params[:id])
+      TweetUpdateJob.perform_later(params[:id].to_i)
     rescue ActiveRecord::RecordNotFound
       Tweet.update_from_twitter(params[:id], current_user)
     end

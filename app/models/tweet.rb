@@ -84,36 +84,57 @@ class Tweet < ActiveRecord::Base
     # @param [Integer] id Target status ID.
     # @param [User] current_user The user to use its token.
     # @return [Tweet] The Tweet instance imported.
-    def update_from_twitter(id, current_user = nil)
+    def update_from_twitter(ids, current_user = nil)
       client = (current_user ? current_user.account : Account.random).client
-      id = Integer(id) rescue (raise Aclog::Exceptions::NotFound, id)
+
+      if ids.is_a?(Array)
+        ids.map!(&:to_i)
+      else
+        ids = [ids.to_i]
+      end
+      ids.reject! {|id| id <= 0 }
+      
+      unless ids.size > 0
+        raise Aclog::Exceptions::TweetNotFound, "specify at least one valid status ID"
+      end
+
+      currents = Tweet.where(id: ids).eager_load(:user).to_a # query immediately
 
       begin
-        st = client.status(id)
-        st = st.retweeted_status if st.retweet?
-        User.create_or_update_from_json(st.attrs[:user])
-        Tweet.create_bulk_from_json([st.attrs])
+        if ids.size == 1
+          sts = [client.status(ids.first)]
+        else
+          sts = client.statuses(ids)
+        end
+      rescue Twitter::Error::NotFound
+        sts = []
+      end
 
-        tweet = Tweet.find(st.id)
+      sts.map! {|st| st.retweet? ? st.retweeted_status : st }
+
+      User.create_or_update_bulk_from_json(sts.map {|st| st.attrs[:user] })
+      Tweet.create_bulk_from_json(sts.map {|st| st.attrs })
+
+      tweets = Tweet.where(id: sts.map(&:id)).each do |tweet|
+        st = sts.find {|s| s.id == tweet.id }
         tweet.update(text: extract_entities(st.attrs),
                      source: st.attrs[:source],
                      in_reply_to_id: (tweet.in_reply_to_id || st.attrs[:in_reply_to_status_id]))
-
-        tweet.reload
-      rescue Twitter::Error::NotFound
-        # Original tweet is deleted, or user is currently deleted
-        if current = Tweet.find_by(id: id)
-          if client.user?(current.user_id)
-            current.destroy
-          else
-            # TORIAEZU protected
-            current.user.update(protected: true)
-            raise Aclog::Exceptions::Forbidden, id
-          end
-        end
-
-        raise Aclog::Exceptions::NotFound, id
       end
+
+      tobedelete = currents.reject {|tw| tw.user.protected? || sts.any? {|st| st.id == tw.id } }
+      tbdusers = client.users(tobedelete.map {|tw| tw.user_id }) rescue []
+
+      tobedelete.each do |tweet|
+        if tbdusers.any? {|u| u.id == tweet.user_id }
+          tweet.destroy
+        else
+          # TORIAEZU protected
+          tweet.user.update(protected: true)
+        end
+      end
+
+      tweets
     end
 
     # Parses /\d+[dwmy]/ style query and returns recent tweets (Relation) in specified period.

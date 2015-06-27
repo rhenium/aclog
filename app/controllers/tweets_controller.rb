@@ -1,10 +1,10 @@
 class TweetsController < ApplicationController
   def show
     @tweet ||= begin
+      TweetUpdateJob.perform_later(params[:id].to_i) if request.format == :html
       Tweet.find(params[:id])
-      TweetUpdateJob.perform_later(params[:id].to_i)
     rescue ActiveRecord::RecordNotFound
-      Tweet.update_from_twitter(params[:id], current_user)
+      Tweet.update_from_twitter(params[:id], current_user).first || (raise Aclog::Exceptions::TweetNotFound, params[:id])
     end
 
     authorize! @user = @tweet.user
@@ -15,7 +15,7 @@ class TweetsController < ApplicationController
   end
 
   def update
-    @tweet = Tweet.update_from_twitter(params[:id], current_user)
+    @tweet = Tweet.update_from_twitter(params[:id], current_user).first
     show
     render :show
   end

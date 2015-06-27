@@ -10,7 +10,7 @@ class TweetsController < ApplicationController
     authorize! @user = @tweet.user
 
     @sidebars = [:user]
-    @title = "\"#{view_context.truncate(CGI.unescapeHTML(@tweet.text))}\" from #{@user.name} (@#{@user.screen_name})"
+    @title = "\"#{CGI.unescapeHTML(@tweet.text).truncate(30)}\" from #{@user.name} (@#{@user.screen_name})"
     @header = "@#{@user.screen_name}'s Tweet"
   end
 

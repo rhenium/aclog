@@ -92,15 +92,20 @@ module Collector
     private
     def cache(object)
       if id = object[:identifier]
-        key, val = id.split("#", 2)
-        cur = @dalli.get(id)
-        if !cur || (val && (cur <=> val) == -1) # not found or new
-          @dalli.set(key, true || value)
-          yield
+        if version = object[:version]
+          cur = @dalli.get(id)
+          if cur && cur >= version
+            Rails.logger.debug("EventQueue") { "dup: #{id}/#{cur} <=> #{version}" }
+            return
+          else
+            @dalli.set(id, version)
+          end
         end
-      else
-        yield
       end
+
+      yield
+    rescue
+      puts $!
     end
   end
 end

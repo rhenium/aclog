@@ -26,6 +26,9 @@ module Collector
         unauthorizeds = @queue_unauthorized.size.times.map { @queue_unauthorized.deq }
       end
 
+      users.reverse!.uniq! {|i| i[:id] }
+      tweets.reverse!.uniq! {|i| i[:id] }
+
       User.create_or_update_bulk_from_json(users)
       Tweet.create_bulk_from_json(tweets)
       Favorite.create_bulk_from_json(favorites)
@@ -104,8 +107,6 @@ module Collector
       end
 
       yield
-    rescue
-      puts $!
     end
   end
 end

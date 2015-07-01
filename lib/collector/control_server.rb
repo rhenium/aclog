@@ -9,19 +9,15 @@ module Collector
     end
 
     def status
-      active_node_statuses = Settings.collector.nodes_count.times.map do |number|
-        node = NodeManager.active_connections[number]
-        if node
-          { activated_time: node.activated_time.to_i,
-            connection_id: node.connection_id }
-        else
-          nil
-        end
-      end
+      nodes = {}
+      NodeManager.node_connections.each {|node|
+        nodes[node.connection_id] = { activated_at: (a = node.activated_at) && a.to_i }
+      }
 
-      { start_time: Daemon.start_time.to_i,
-        active_node_statuses: active_node_statuses,
-        inactive_nodes_count: NodeManager.inactive_connections.size }
+      { started_at: Daemon.start_time.to_i,
+        nodes: nodes,
+        active_node_ids: NodeManager.active_connections.map {|n| n && n.connection_id },
+        inactive_node_ids: NodeManager.inactive_connections.map {|n| n.connection_id } }
     end
   end
 end

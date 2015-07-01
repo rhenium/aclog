@@ -7,44 +7,41 @@ module Collector
     class << self
       attr_reader :node_connections, :active_connections, :inactive_connections
 
-      def register(node_connection)
-        self.node_connections << node_connection
-        self.inactive_connections << node_connection
+      def register(con)
+        node_connections << con
+        inactive_connections << con
         bind
       end
 
-      def unregister(node_connection)
-        self.node_connections.delete(node_connection)
-        if i = self.active_connections.find_index(node_connection)
-          self.active_connections[i] = nil
+      def unregister(con)
+        node_connections.delete(con)
+        if i = active_connections.find_index(con)
+          active_connections[i] = nil
+          bind
         else
-          self.inactive_connections.delete(node_connection)
+          inactive_connections.delete(con)
         end
-        bind
       end
 
       def register_account(account)
-        if con = self.active_connections[account.worker_number]
+        if con = active_connections[account.worker_number]
           con.register_account(account)
         end
       end
 
       def unregister_account(account)
-        if con = self.active_connections[account.worker_number]
+        if con = active_connections[account.worker_number]
           con.unregister_account(account)
         end
       end
 
       private
       def bind
-        if first_inactive_id = self.active_connections.find_index(nil)
-          if con = self.inactive_connections.shift
-            self.active_connections[first_inactive_id] = con
-            con.activated_time = Time.now
+        if first_inactive_id = active_connections.find_index(nil)
+          if con = inactive_connections.shift
+            con.activate(first_inactive_id)
+            active_connections[first_inactive_id] = con
             Rails.logger.warn("NodeManager") { "Registered node ##{con.connection_id} as group ##{first_inactive_id}" }
-            Account.for_node(first_inactive_id).each do |a|
-              con.register_account(a)
-            end
           else
             Rails.logger.warn("NodeManager") { "Not enough nodes: (#{self.active_connections.count {|c| c }}/#{Settings.collector.nodes_count})" }
           end

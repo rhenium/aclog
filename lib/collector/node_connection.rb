@@ -2,8 +2,7 @@ require "set"
 
 module Collector
   class NodeConnection < EM::Connection
-    attr_reader :connection_id
-    attr_accessor :activated_time
+    attr_reader :connection_id, :activated_at
 
     @@_id = 0
 
@@ -12,7 +11,7 @@ module Collector
       @connection_id = (@@_id += 1)
       @authenticated = false
       @closing = false
-      @activated_time = nil
+      @activated_at = nil
       @queue = queue
       @heartbeats = Set.new
     end
@@ -56,6 +55,15 @@ module Collector
                    data: { id: account.id,
                            user_id: account.user_id })
       log(:info, "Unregistered account ##{account.id}/#{account.user_id}")
+    end
+
+    def activate(worker_number)
+      @activated_at = Time.now
+      send_message(event: :activate,
+                   data: { users: [] })
+      Account.for_node(worker_number).each do |a|
+        register_account(a)
+      end
     end
 
     private

@@ -11,22 +11,28 @@
           %th Status
           %th Uptime
       %tbody
-        - @worker_status["active_node_statuses"].each_with_index do |node, i|
-          - if node
+        - @worker_status["active_node_ids"].each.with_index(1) do |node_id, i|
+          - if node_id
             %tr
               %td= i
-              %td ##{node["connection_id"]}
+              %td ##{node_id}
               %td Running
-              %td #{(Time.now.to_i - node["activated_time"]) / 60} minutes
+              %td #{(Time.now.to_i - @worker_status["nodes"][node_id]["activated_at"]) / 60} minutes
           - else
             %tr.danger
               %td= i
               %td -
               %td Down
               %td -
+        - @worker_status["inactive_node_ids"].each.with_index(1) do |node_id, i|
+          %tr
+            %td -
+            %td ##{node_id}
+            %td Idle
+            %td -
     - if logged_in?
-      - if your_node = @worker_status["active_node_statuses"][current_user.account.worker_number]
-        %p Worker ##{your_node["connection_id"]} is assigned to your account.
+      - if your_node_id = @worker_status["active_node_ids"][current_user.account.worker_number]
+        %p Worker ##{your_node_id} is assigned to your account.
       - else
         %p Worker for group #{current_user.account.worker_number} is currently down.
   - else

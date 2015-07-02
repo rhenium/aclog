@@ -14,7 +14,7 @@ class UserConnection
     if @client.update_if_necessary(setup_options(hash))
       log(:info, "Updated connection")
     else
-      log(:debug, "Token is not changed")
+      log(:debug, "Token not changed")
     end
   end
 
@@ -46,7 +46,7 @@ class UserConnection
       log(:warn, "Unauthorized")
       EventChannel << { event: :unauthorized,
                         data: { id: msg[:id], user_id: msg[:user_id] } }
-      self.stop
+      stop
     end
     client.on_enhance_your_calm do |message|
       log(:warn, "420: #{message}")
@@ -97,7 +97,7 @@ class UserConnection
   end
 
   def on_user(json, timestamp = nil)
-    log(:debug, "User: @#{json[:screen_name]} (#{json[:id]})")
+    log(:debug, "user-#{json[:id]} (#{timestamp})")
     EventChannel << { event: :user,
                       identifier: "user-#{json[:id]}",
                       version: timestamp,
@@ -106,7 +106,7 @@ class UserConnection
 
   def on_tweet(json, timestamp = nil)
     timestamp ||= json[:timestamp_ms].to_i
-    log(:debug, "Tweet: #{json[:user][:id]} => #{json[:id]}")
+    log(:debug, "tweet-#{json[:id]} (#{timestamp})")
     on_user(json[:user], timestamp)
     EventChannel << { event: :tweet,
                       identifier: "tweet-#{json[:id]}",
@@ -116,7 +116,7 @@ class UserConnection
 
   def on_retweet(json, timestamp = nil)
     timestamp ||= json[:timestamp_ms].to_i
-    log(:debug, "Retweet: #{json[:user][:id]} => #{json[:retweeted_status][:id]}")
+    log(:debug, "retweet-#{json[:id]} (#{timestamp})")
     on_user(json[:user], timestamp)
     on_tweet(json[:retweeted_status], timestamp)
     EventChannel << { event: :retweet,
@@ -130,7 +130,7 @@ class UserConnection
 
   def on_event_tweet(json, timestamp = nil)
     timestamp ||= (json[:timestamp_ms] || (Time.parse(json[:created_at]).to_i * 1000)).to_i
-    log(:debug, "Event: #{json[:event]}: #{json[:source][:screen_name]} => #{json[:target][:screen_name]}/#{json[:target_object][:id]}")
+    log(:debug, "#{json[:event]}-#{json[:source][:id]}-#{json[:target_object][:id]} (#{timestamp})")
     on_user(json[:source], timestamp)
     on_user(json[:target], timestamp)
     on_tweet(json[:target_object], timestamp)
@@ -144,7 +144,7 @@ class UserConnection
 
   def on_delete(json, timestamp = nil)
     timestamp ||= json[:timestamp_ms].to_i
-    log(:debug, "Delete: #{json[:delete][:status][:id]}")
+    log(:debug, "delete-#{json[:delete][:status][:id]} (#{timestamp})")
     EventChannel << { event: :delete,
                       identifier: "delete-#{json[:delete][:status][:id]}",
                       version: timestamp,
@@ -172,6 +172,6 @@ class UserConnection
   end
 
   def log(level, message)
-    WorkerNode.logger.__send__(level, "UserConnection(##{@account_id}/#{@user_id})") { message }
+    WorkerNode.logger.__send__(level, "##{@account_id}/#{@user_id}") { message }
   end
 end

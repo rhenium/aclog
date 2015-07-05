@@ -2,7 +2,7 @@ class TweetsController < ApplicationController
   def show
     @tweet ||= begin
       tweet = Tweet.find(params[:id])
-      if request.format == :html
+      if request.format == :html && !bot_request?
         Tweet.delay.update_from_twitter(params[:id].to_i, current_user)
       end
       tweet

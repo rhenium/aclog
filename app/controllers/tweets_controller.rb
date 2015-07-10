@@ -2,8 +2,8 @@ class TweetsController < ApplicationController
   def show
     @tweet ||= begin
       tweet = Tweet.find(params[:id])
-      if request.format == :html && !bot_request?
-        Tweet.delay.update_from_twitter(params[:id].to_i, current_user)
+      if tweet && request.format == :html && !bot_request?
+        TweetUpdateJob.perform_later(params[:id].to_i)
       end
       tweet
     rescue ActiveRecord::RecordNotFound

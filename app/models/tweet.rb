@@ -52,9 +52,9 @@ class Tweet < ActiveRecord::Base
         tweeted_at: Time.parse(json[:created_at]),
         user_id: json[:user][:id],
         in_reply_to_id: json[:in_reply_to_status_id],
-        favorites_count: json[:favorite_count],
-        retweets_count: json[:retweet_count],
-        reactions_count: json[:favorite_count] + json[:retweet_count]
+        favorites_count: json[:favorite_count].to_i,
+        retweets_count: json[:retweet_count].to_i,
+        reactions_count: json[:favorite_count].to_i + json[:retweet_count].to_i
       }
     end
 

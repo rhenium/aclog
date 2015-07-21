@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   #include SecurityHeaders
   include ControllerErrorHandling
+  include Utils
 
   protect_from_forgery with: :exception
 

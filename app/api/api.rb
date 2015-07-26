@@ -1,7 +1,7 @@
 class Api < Grape::API
   content_type :json, "application/json"
   default_format :json
-  formatter :json, Grape::Formatter::Rabl
+  formatter :json, Grape::Rabl::Formatter
   error_formatter :json, ->(message, backtrace, options, env) do
     { error: { message: message } }.to_json
   end

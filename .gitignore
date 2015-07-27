@@ -1,4 +1,5 @@
 /vendor/bundle
+/vendor/assets/bower_components
 /log/*.log
 /tmp
 /spec/tmp
@@ -20,4 +21,3 @@
 !/.coveralls.yml
 !/.travis.yml
 !/.rspec
-

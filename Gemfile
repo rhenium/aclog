@@ -15,6 +15,7 @@ gem "jbuilder"
 gem "uglifier"
 gem "jquery-rails"
 gem "bootstrap-sass"
+gem "bower-rails"
 
 gem "puma"
 gem "dalli"

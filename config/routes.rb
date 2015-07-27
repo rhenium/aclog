@@ -36,8 +36,9 @@ Rails.application.routes.draw do
     get "/favorites" =>                         "tweets#user_favorites",            as: "user_favorites"
     get "/favorited_by/:source_screen_name" =>  "tweets#user_favorited_by",         as: "user_favorited_by_user"
 
-    get "/discovered_by" =>                     "users#discovered_by",              as: "user_discovered_by"
-    get "/discovered_users" =>                  "users#discovered_users",           as: "user_discovered_users"
+    get "/stats" =>                             "users#stats",                      as: "user_stats"
+    get "/discovered_by" => redirect("/%{screen_name}/stats")
+    get "/discovered_users" => redirect("/%{screen_name}/stats")
   end
 
   get "*unmatched_route" =>                     "application#routing_error"

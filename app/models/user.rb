@@ -103,7 +103,7 @@ class User < ActiveRecord::Base
         .count("`#{klass.table_name}`.`user_id`")
     }.inject { |m, s|
       m.merge(s) { |key, first, second| first.to_i + second.to_i }
-    }.sort_by { |user_id, count| -count }
+    }.sort_by { |user_id, count| -count }.to_h
   end
 
   def count_discovered_users
@@ -114,6 +114,6 @@ class User < ActiveRecord::Base
         .count("tweets.user_id")
     }.inject { |m, s|
       m.merge(s) { |key, first, second| first.to_i + second.to_i }
-    }.sort_by { |user_id, count| -count }
+    }.sort_by { |user_id, count| -count }.to_h
   end
 end

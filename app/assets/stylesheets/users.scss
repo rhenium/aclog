@@ -1,4 +1,23 @@
 /* ================ User list ================ */
+#discovered_by, #discovered_users {
+    width: 100%;
+}
+
+#discovered_by svg,
+#discovered_users svg {
+    width: 100%;
+
+    path.slice {
+        stroke-width:2px;
+    }
+    
+    polyline {
+        opacity: .3;
+        stroke: black;
+        stroke-width: 2px;
+        fill: none;
+    }
+}
 
 ul.user-list {
     padding: 15px 0;

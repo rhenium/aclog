@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 20150618164547) do
     t.integer  "user_id",              limit: 8,                  null: false
     t.string   "oauth_token",          limit: 255,                null: false
     t.string   "oauth_token_secret",   limit: 255,                null: false
-    t.boolean  "notification_enabled", limit: 1,   default: true, null: false
+    t.boolean  "notification_enabled",             default: true, null: false
     t.integer  "status",               limit: 2,   default: 0,    null: false
     t.datetime "updated_at"
     t.datetime "created_at"
@@ -77,7 +77,7 @@ ActiveRecord::Schema.define(version: 20150618164547) do
     t.string   "screen_name",       limit: 20,  null: false
     t.string   "name",              limit: 64,  null: false
     t.string   "profile_image_url", limit: 255, null: false
-    t.boolean  "protected",         limit: 1,   null: false
+    t.boolean  "protected",                     null: false
     t.datetime "updated_at",                    null: false
   end
 

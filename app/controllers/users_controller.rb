@@ -1,19 +1,10 @@
 class UsersController < ApplicationController
-  def discovered_by
+  def stats
     authorize! @user = User.find(screen_name: params[:screen_name])
     @user.require_registered!
-    @result = @user.count_discovered_by.take(Settings.users.count)
-    @cached_users = User.find(@result.map(&:first)).map {|user| [user.id, user] }.to_h
-
-    @sidebars = [:user]
-  end
-
-  def discovered_users
-    authorize! @user = User.find(screen_name: params[:screen_name])
-    @user.require_registered!
-    @result = @user.count_discovered_users.take(Settings.users.count)
-    @cached_users = User.find(@result.map(&:first)).map {|user| [user.id, user] }.to_h
-
+    @discovered_by = @user.count_discovered_by.take(Settings.users.count).to_h
+    @discovered_users = @user.count_discovered_users.take(Settings.users.count).to_h
+    @cached_users = User.find((@discovered_by.keys.take(Settings.users.count) + @discovered_users.keys.take(Settings.users.count)).uniq).map {|user| [user.id, user] }.to_h
     @sidebars = [:user]
   end
 

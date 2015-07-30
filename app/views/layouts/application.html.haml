@@ -38,7 +38,7 @@
               %li
                 %form{autocomplete: "off", data: {"v-on" => "submit: submit"}}
                   .input-group
-                    %input.form-control{type: "text", placeholder: "Username", data: {"v-model" => "enteredUserName"}}
+                    %input.form-control{type: "text", placeholder: "Username", data: {"v-model" => "enteredUserName", "v-el" => "input"}}
                     %span.input-group-btn
                       %button.btn{type: "submit"} Go
               %template{data: {"v-repeat" => "users"}}

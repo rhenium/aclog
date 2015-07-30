@@ -29,7 +29,8 @@ $ ->
       failProfileImage: (e) ->
         e.target.src = '<%= image_path("profile_image_missing.png") %>'
       focus: ->
-        setTimeout (-> $("#user-jump-dropdown input").focus()), 0
+        vm = this
+        setTimeout (-> vm.$$.input.focus()), 0
       submit: (e) ->
         e.preventDefault()
         window.location = "/" + this.enteredUserName
@@ -43,7 +44,8 @@ $ ->
       vm.loading = true
       currentReq =
         superagent
-          .get "/i/api/users/suggest_screen_name?head=" + encodeURIComponent(newVal)
+          .get "/i/api/users/suggest_screen_name.json"
+          .query { head: newVal }
           .accept "json"
           .end (err, res) ->
             vm.users = res.body

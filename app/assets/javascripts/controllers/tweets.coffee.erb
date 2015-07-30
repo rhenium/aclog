@@ -1,0 +1,35 @@
+Views.tweets =
+  _: ->
+    vm = new Vue
+      el: ".statuses"
+      data:
+        statuses: []
+        loading: false
+        next: null
+        prev: null
+      methods:
+        clear: ->
+          this.statuses = []
+        loadNext: (nextUrl = null, queryString = null) ->
+          vm = this
+          if vm.loading || (!nextUrl && !vm.next)
+            return
+          vm.loading = true
+          superagent
+            .get (nextUrl || vm.next)
+            .query(queryString || {})
+            .accept "json"
+            .end (err, res) ->
+              json = res.body
+              vm.statuses = vm.statuses.concat(json.statuses)
+              vm.next = json.next
+              vm.loading = false
+    url = window.location.pathname.replace(/(\.\w+)?$/, ".json") + window.location.search
+    vm.loadNext(url)
+
+    content = $(".statuses")
+    $(window).scroll ->
+      console.log $(window).height()
+      console.log $(document).height()
+      if (content.offset().top + content.height()) - ($(document).scrollTop() + $(window).height()) < 100
+        vm.loadNext()

@@ -1,0 +1,43 @@
+Views.users =
+  _: ->
+  stats: ->
+    drawgraph = (target, data_raw, jumpUrl) ->
+      data = data_raw.users
+      vm = new Vue
+        el: target
+        data:
+          users: data_raw.users
+          users_count: data_raw.users_count
+          reactions_count: data_raw.reactions_count
+          colors: ["#393b79", "#5254a3", "#6b6ecf", "#9c9ede", "#637939", "#8ca252", "#b5cf6b", "#cedb9c", "#8c6d31", "#bd9e39", "#e7ba52", "#e7cb94", "#843c39", "#ad494a", "#d6616b", "#e7969c", "#7b4173", "#a55194", "#ce6dbd", "#de9ed6"]
+          loading: false
+          showTweets: false
+          statuses: []
+          lastUser: null
+        computed:
+          jumpUrl: ->
+            jumpUrl(this.lastUser)
+        methods:
+          openTweets: (user, e) ->
+            if !this.showTweets || user == this.lastUser
+              this.showTweets = !this.showTweets
+            if this.showTweets
+              this.lastUser = user
+              vm = this
+              superagent
+                .get vm.jumpUrl
+                .query { count: 3 }
+                .accept "json"
+                .end (err, res) ->
+                  json = res.body
+                  vm.statuses = json.statuses
+    l = window.location
+    superagent
+      .get(l.protocol + "//" + l.host + l.pathname.replace(/(\.\w+)?$/, ".json") + l.search)
+      .accept "json"
+      .end (err, res) ->
+        json = res.body
+        drawgraph "#discovered_by", json.discovered_by, (user) ->
+          "/" + Helpers.user_screen_name() + "/favorited_by/" + user.screen_name
+        drawgraph "#discovered_users", json.discovered_users, (user) ->
+          "/" + user.screen_name + "/favorited_by/" + Helpers.user_screen_name()

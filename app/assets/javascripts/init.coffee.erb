@@ -1,11 +1,17 @@
 Vue.config.prefix = "data-v-"
+Vue.config.strict = true
 Vue.filter "toLocaleString", (string) ->
   new Date(string).toLocaleString()
 Vue.filter "removeInvalidCharacters", (str) ->
   # JavaScript is kuso: http://www.w3.org/TR/xml/#charsets
   str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/gm, "")
 
+<% if Rails.env.development? %>
+Vue.config.debug = true
+<% end %>
+
 if window.Views is undefined
   window.Views = {}
   window.Helpers = {}
-  window.Parts = {}
+  window.Shared = {}
+  window.Common = {}

@@ -1,0 +1,63 @@
+%template#tweet-template
+  .status{data: {"v-class" => "aside: status-reply"}}
+    .status-tweet{data: {"v-if" => "allowed"}}
+      .status-user
+        %a{href: user_path("dummy").sub("dummy", "{{user.screen_name}}"), title: "{{user.name | removeInvalidCharacters}} (@{{user.screen_name}})"}<
+          %img.twitter-icon{src: "{{user.profile_image_url}}", alt: "@{{user.screen_name}}", data: {"v-on" => "error: failProfileImage"}}
+      .status-content
+        .status-head
+          %span.user<
+            %a{href: user_path("dummy").sub("dummy", "{{user.screen_name}}")}<
+              %span {{user.name | removeInvalidCharacters}}
+              %span @{{user.screen_name}}
+          %span.time<
+            %a{href: tweet_path("0").sub("0", "{{id_str}}"), title: "このツイートの詳細を見る"}<
+              %time{datetime: "{{tweeted_at}}"} {{tweeted_at | toLocaleString}}
+            %a.source.aclogicon.aclogicon-twitter{href: "https://twitter.com/{{user.screen_name}}/status/{{id_str}}", title: "Twitter で見る"}
+        .status-text {{{text | removeInvalidCharacters | formatText}}}
+        .status-foot
+          %span.source {{{source | removeInvalidCharacters | formatSource}}}
+          %ul
+            %li<
+              %a.aclogicon.aclogicon-fav{href: "https://twitter.com/intent/favorite?tweet_id={{id_str}}", title: "お気に入り登録", data: {"v-on" => "click: openIntent"}}
+            %li<
+              %a.aclogicon.aclogicon-retweet{href: "https://twitter.com/intent/retweet?tweet_id={{id_str}}", title: "リツイート", data: {"v-on" => "click: openIntent"}}
+            %li<
+              %a.aclogicon.aclogicon-reply{href: "https://twitter.com/intent/tweet?in_reply_to={{id_str}}", title: "返信", data: {"v-on" => "click: openIntent"}}
+    .status-responses{data: {"v-if" => "allowed"}}
+      %dl{data: {"v-if" => "favorites_count > 0"}}
+        %dt
+          %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandFavorites(this, $event)"}}<
+            %span> {{favorites_count}}
+            Favs
+        %dd{data: {"v-class" => "collapsed: !expandFavorites"}}
+          %ul{class: "status-responses-favorites"}
+            %li{data: {"v-if" => "loading"}}
+              %img.loading-image{src: image_path("loading.gif")}
+            %li{data: {"v-repeat" => "favorites"}}<
+              %a{data: {"v-if" => "allowed"}, href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name | removeInvalidCharacters}} (@{{screen_name}})"}<
+                %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
+              %img{data: {"v-if" => "!allowed"}, src: image_path("profile_image_protected.png"), alt: "protected user"}
+      %dl{data: {"v-if" => "retweets_count > 0"}}
+        %dt
+          %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandRetweets(this, $event)"}}<
+            %span> {{retweets_count}}
+            RTs
+        %dd{data: {"v-class" => "collapsed: !expandRetweets"}}
+          %ul{class: "status-responses-retweets"}
+            %li{data: {"v-if" => "loading"}}
+              %img.loading-image{src: image_path("loading.gif")}
+            %li{data: {"v-repeat" => "retweets"}}<
+              %a{data: {"v-if" => "allowed"}, href: user_path("dummy").sub("dummy", "{{screen_name}}"), title: "{{name | removeInvalidCharacters}} (@{{screen_name}})"}<
+                %img.twitter-icon{src: "{{profile_image_url}}", alt: "@{{screen_name}}", data: {"v-on" => "error: failProfileImage"}}
+              %img{data: {"v-if" => "!allowed"}, src: image_path("profile_image_protected.png"), alt: "protected user"}
+    .status-tweet{data: {"v-if" => "!allowed"}}
+      .status-user
+        %img{src: image_path("profile_image_protected.png"), alt: "protected user"}
+      .status-content
+        .status-head
+          %span.time
+            %time{datetime: "{{tweeted_at}}"} {{tweeted_at | toLocaleString}}
+            .source.aclogicon.aclogicon-twitter
+        .status-text.protected ユーザーはツイートを非公開にしています
+        .status-foot

@@ -1,0 +1,43 @@
+Vue.component "tweet",
+  template: "#tweet-template"
+  data: ->
+    loading: false
+    expandFavorites: false
+    expandRetweets: false
+  filters:
+    formatSource: (str) ->
+      if /^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)
+        str.replace(/&/g, "&amp;")
+      else
+        str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    formatText: (str) ->
+      autolinked = twttr.txt.autoLink(str, { suppressLists: true, usernameIncludeSymbol: true, usernameUrlBase: "/" })
+      autolinked.replace(/\r?\n/g, "<br />\n")
+  methods:
+    failProfileImage: (e) ->
+      e.preventDefault()
+      e.target.src = '<%= image_path("profile_image_missing.png") %>'
+    toggleExpandFavorites: (e) ->
+      e.preventDefault()
+      this.expandFavorites = !this.expandFavorites
+    toggleExpandRetweets: (e) ->
+      e.preventDefault()
+      this.expandRetweets = !this.expandRetweets
+    openIntent: (e) ->
+      e.preventDefault()
+      Helpers.openTwitterIntent(e.target.getAttribute("href"))
+    updateReactions: ->
+      if this.allowed && this.reactions_count > 0
+        vm = this
+        vm.loading = true
+        superagent
+          .get "/i/api/tweets/responses.json"
+          .query { id: this.id_str }
+          .accept "json"
+          .end (rerr, rres) ->
+            rjson = rres.body
+            vm.favorites = rjson.favorites
+            vm.retweets = rjson.retweets
+            vm.loading = false
+  ready: ->
+    this.updateReactions()

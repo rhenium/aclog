@@ -1,4 +1,4 @@
-Parts.sidebar_user_stats = ->
+Shared.sidebar_user_stats = ->
   vm = new Vue
     el: ".user-stats"
     data:

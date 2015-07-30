@@ -1,3 +1,23 @@
+#= require jquery
+#= require jquery_ujs
+#= require bootstrap/dropdown
+#= require twitter-text-1.11.0
+#= require superagent-1.1.0
+#= require vue-0.12.8-master
+
+#= require init
+#= require_tree ./shared
+#= require_tree ./controllers
+
+$ ->
+  ac = Views[Helpers.controller()]
+  if ac
+    ac["_"]?()
+    ac[Helpers.action()]?()
+
+  Helpers.parts().forEach (par) ->
+    (Shared[par])?()
+
 $ ->
   vm = new Vue
     el: "#user-jump-dropdown"

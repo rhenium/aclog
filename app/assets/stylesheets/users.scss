@@ -1,24 +1,48 @@
-/* ================ User list ================ */
-#discovered_by, #discovered_users {
+.chart {
     width: 100%;
-}
+    display: flex;
 
-#discovered_by svg,
-#discovered_users svg {
-    width: 100%;
+    .chart-item {
+        margin-top: 100px;
+        height: 50px;
+        border: 1px solid #000000;
 
-    path.slice {
-        stroke-width:2px;
+        &:last-child {
+            flex-grow: 1;
+        }
+
+        > span {
+            display: block;
+            line-height: 50px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .popout {
+            display: inline-block;
+            white-space: nowrap;
+            position: relative;
+            top: -100px;
+            padding: 5px;
+            text-align: center;
+            background-color: #eeeeee;
+            border: 1px solid #999999;
+            border-radius: 3px;
+            z-index: 1;
+
+            .count span {
+                font-size: larger;
+                font-weight: bold;
+            }
+        }
+
+        &:hover {
+            .popout {
+                z-index: 2;
+            }
+        }
     }
-    
-    polyline {
-        opacity: .3;
-        stroke: black;
-        stroke-width: 2px;
-        fill: none;
-    }
 }
-
 ul.user-list {
     padding: 15px 0;
     padding-left: 0;

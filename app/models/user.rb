@@ -96,24 +96,18 @@ class User < ActiveRecord::Base
   end
 
   def count_discovered_by
-    [Favorite, Retweet].map { |klass|
-      klass
-        .joins("INNER JOIN (#{self.tweets.reacted.order_by_id.limit(500).to_sql}) tweets ON tweets.id = #{klass.table_name}.tweet_id")
-        .group("`#{klass.table_name}`.`user_id`")
-        .count("`#{klass.table_name}`.`user_id`")
-    }.inject { |m, s|
-      m.merge(s) { |key, first, second| first.to_i + second.to_i }
-    }.sort_by { |user_id, count| -count }.to_h
+    Favorite
+      .joins("INNER JOIN (#{self.tweets.reacted.order_by_id.limit(100).to_sql}) tweets ON tweets.id = favorites.tweet_id")
+      .group("`favorites`.`user_id`")
+      .count("`favorites`.`user_id`")
+      .sort_by { |user_id, count| -count }.to_h
   end
 
   def count_discovered_users
-    [Favorite, Retweet].map { |klass|
-      Tweet
-        .joins("INNER JOIN (#{self.__send__(klass.table_name.to_sym).order(id: :desc).limit(500).to_sql}) m ON m.tweet_id = tweets.id")
-        .group("tweets.user_id")
-        .count("tweets.user_id")
-    }.inject { |m, s|
-      m.merge(s) { |key, first, second| first.to_i + second.to_i }
-    }.sort_by { |user_id, count| -count }.to_h
+    Tweet
+      .joins("INNER JOIN (#{self.favorites.order(id: :desc).limit(1000).to_sql}) m ON m.tweet_id = tweets.id")
+      .group("tweets.user_id")
+      .count("tweets.user_id")
+      .sort_by { |user_id, count| -count }.to_h
   end
 end

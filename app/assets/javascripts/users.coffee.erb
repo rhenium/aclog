@@ -1,89 +1,20 @@
 Views.users =
   _: ->
   stats: ->
-    drawgraph = (target, data, jump) ->
-      radius = document.querySelector(target + " .chart").offsetWidth / 2
-      iconSize = 48
-      colors = d3.scale.category20b().range()
-
-      svg = d3.select(target + " .chart")
-              .attr("width", radius * 2).attr("height", radius * 2)
-
-      g = svg.append("g")
-            .attr("transform", "translate(" + radius + "," + radius + ")")
-      g.append("g").attr("class", "slices")
-      g.append("g").attr("class", "lines")
-      g.append("g").attr("class", "labels")
-      g.append("g").attr("class", "images")
-
-      pie = d3.layout.pie()
-        .value((d) -> d.count)
-
-      arc = d3.svg.arc()
-        .outerRadius(radius * 0.7)
-        .innerRadius(radius * 0.3)
-
-      innerArc = d3.svg.arc()
-        .innerRadius(radius * 0.45)
-        .outerRadius(radius * 0.45)
-
-      outerArc = d3.svg.arc()
-        .innerRadius(radius * 0.8)
-        .outerRadius(radius * 0.8)
-
-      slice = g.select(".slices").selectAll("path.slice").data(pie(data))
-      slice.enter()
-        .insert("path")
-        .style("fill", (d) -> colors[data.indexOf(d.data) % colors.length])
-        .attr("class", "slice")
-      slice.transition().attrTween "d", (d) ->
-        interpolate = d3.interpolate(d, d)
-        (t) ->
-          arc(interpolate(t))
-      slice.exit().remove()
-
-      polyline = g.select(".lines").selectAll("polyline").data(pie(data))
-      polyline.enter()
-        .append("polyline")
-      polyline.transition().attrTween "points", (d) ->
-        interpolate = d3.interpolate(d, d)
-        (t) ->
-          d2 = interpolate(t)
-          [arc.centroid(d2), outerArc.centroid(d2)]
-      polyline.exit().remove()
-
-      text = g.select(".labels").selectAll("text").data(pie(data))
-      text.enter()
-        .append("text")
-        .style("fill", "white")
-        .attr("color", "white")
-        .style("text-anchor", "middle")
-        .style("dominant-baseline", "middle")
-        .text((d) -> d.data.count)
-      text.transition().attrTween "transform", (d) ->
-        interpolate = d3.interpolate(d, d)
-        (t) ->
-          d2 = interpolate(t)
-          pos = innerArc.centroid(d2)
-          "translate(" + pos + ")"
-      text.exit().remove()
-
-      img = g.select(".images").selectAll("image").data(pie(data))
-      img.enter()
-        .append("image")
-        .attr("xlink:href", (d) -> d.data.profile_image_url)
-        .attr("width", iconSize).attr("height", iconSize)
-        .on "click", (d) ->
-          jump(d.data)
-      img.transition().attrTween "transform", (d) ->
-        interpolate = d3.interpolate(d, d)
-        (t) ->
-          d2 = interpolate(t)
-          pos = outerArc.centroid(d2)
-          pos[0] -= iconSize / 2
-          pos[1] -= iconSize / 2
-          "translate(" + pos + ")"
-      img.exit().remove()
+    drawgraph = (target, data_raw, jump) ->
+      data = data_raw.users
+      vm = new Vue
+        el: target
+        data:
+          users: data_raw.users
+          users_count: data_raw.users_count
+          reactions_count: data_raw.reactions_count
+          colors: ["#393b79", "#5254a3", "#6b6ecf", "#9c9ede", "#637939", "#8ca252", "#b5cf6b", "#cedb9c", "#8c6d31", "#bd9e39", "#e7ba52", "#e7cb94", "#843c39", "#ad494a", "#d6616b", "#e7969c", "#7b4173", "#a55194", "#ce6dbd", "#de9ed6"]
+          loading: false
+          showTweets: false
+        methods:
+          openTweets: (e) ->
+            a
     l = window.location
     superagent
       .get(l.protocol + "//" + l.host + l.pathname.replace(/(\.\w+)?$/, ".json") + l.search)
@@ -92,5 +23,6 @@ Views.users =
         json = res.body
         drawgraph "#discovered_by", json.discovered_by, (u) ->
           window.location = "/" + Helpers.user_screen_name() + "/favorited_by/" + u.screen_name
+
         drawgraph "#discovered_users", json.discovered_users, (u) ->
           window.location = "/" + u.screen_name + "/favorited_by/" + Helpers.user_screen_name()

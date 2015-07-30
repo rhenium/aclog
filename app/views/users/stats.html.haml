@@ -9,9 +9,19 @@
         %small #{@user.screen_name}'s
         Stats
       .favorite-graph
-        #discovered_by
-          %h2 Favorited by..
-          %svg.chart{xmlns: "http://www.w3.org/2000/svg"}
-        #discovered_users
-          %h2 Favoriting..
-          %svg.chart{xmlns: "http://www.w3.org/2000/svg"}
+        - [["discovered_by", "Favorited by.."], ["discovered_users", "Favoriting.."]].each do |graph_id, graph_title|
+          %div{id: graph_id}
+            %h2= graph_title
+            .chart{data: {"v-if" => "!loading"}}
+              .chart-item{data: {"v-repeat" => "users", "v-style" => "width: (100 * count / reactions_count) + '%', background-color: colors[$index % colors.length]", "v-on" => "click: openTweets"}}
+                .popout
+                  %img{data: {"v-attr" => "src: profile_image_url"}}
+                  .count
+                    %span {{ count }}
+                    favs
+              .chart-item{data: {"v-style" => "background-color: colors[users.length % colors.length]"}}
+                %span Other {{ users_count - users.length }} People
+            .loading-box{data: {"v-if" => "loading"}}
+              %img.loading-image{src: image_path("loading.gif")}
+            .statuses{data: {"v-if" => "showTweets"}}
+              = render "tweets/tweets_template"

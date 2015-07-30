@@ -1,16 +1,19 @@
 apply = ->(name, list) do
-  json.__send__(name, list.sort_by {|k, v| -v }) do |user_id, count|
-    u = @cached_users[user_id]
-    if authorized_to_show_user?(u)
-      json.user_id u.id
+  json.__send__(name) do
+    tops = list.take(Settings.users.count)
+    cached_users = User.find(tops.map {|k, v| k }).map {|user| [user.id, user] }.to_h
+
+    all_reactions = list.inject(0) {|sum, (k, v)| sum + v }
+    json.users_count list.size
+    json.reactions_count all_reactions
+    json.users(tops) do |user_id, count|
+      u = cached_users[user_id]
+      json.user_id user_id
+      json.count count
       json.name u.name
       json.screen_name u.screen_name
       json.profile_image_url u.profile_image_url
-      json.allowed true
-    else
-      json.allowed false
     end
-    json.count count
   end
 end
 

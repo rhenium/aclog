@@ -1,6 +1,0 @@
-{
-  "name": "dsl-generated dependencies",
-  "dependencies": {
-    "d3": "latest"
-  }
-}

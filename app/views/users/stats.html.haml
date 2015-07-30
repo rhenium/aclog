@@ -12,17 +12,18 @@
         - [["discovered_by", "Favorited by.."], ["discovered_users", "Favoriting.."]].each do |graph_id, graph_title|
           %div{id: graph_id}
             %h2= graph_title
-            .chart{data: {"v-if" => "!loading"}}
-              .chart-item{data: {"v-repeat" => "users", "v-style" => "width: (100 * count / reactions_count) + '%', background-color: colors[$index % colors.length]", "v-on" => "click: openTweets(this)"}}
-                .popout
-                  %img{data: {"v-attr" => "src: profile_image_url"}}
-                  .count
-                    %span {{ count }}
-                    favs
-              .chart-item{data: {"v-style" => "background-color: colors[users.length % colors.length]"}}
-                %span Other {{ users_count - users.length }} People
+            %template{data: {"v-if" => "!loading"}}
+              .chart
+                .chart-item{data: {"v-repeat" => "users", "v-style" => "width: (100 * count / reactions_count) + '%', background-color: colors[$index % colors.length]", "v-on" => "click: openTweets(this)"}}
+                  .popout
+                    %img{data: {"v-attr" => "src: profile_image_url"}}
+                    .count
+                      %span {{ count }}
+                      favs
+                .chart-item{data: {"v-style" => "background-color: colors[users.length % colors.length]"}}
+                  %span Other {{ users_count - users.length }} People
+              .statuses{data: {"v-if" => "showTweets"}}
+                = render "tweets/tweets_template"
+                %a{href: "{{ jumpUrl }}"} Read on..
             .loading-box{data: {"v-if" => "loading"}}
               %img.loading-image{src: image_path("loading.gif")}
-            .statuses{data: {"v-if" => "showTweets"}}
-              = render "tweets/tweets_template"
-              %a{href: "{{ jumpUrl }}"} Read on..

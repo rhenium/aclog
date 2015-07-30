@@ -4,9 +4,10 @@
     %p<
       %img{alt: "aclog", src: image_path("logo.png"), height: 200, width: 200}
     %h1
-      aclog
-      - if Rails.env.development?
-        (dev)
+      - if Rails.env.produciton?
+        aclog
+      - else
+        🚧
     %p<
       .tweet-button
         %a{href: "https://twitter.com/intent/tweet?text=#{CGI.escape(title)}&url=#{CGI.escape(url_for(only_path: false))}", target: "_blank"}

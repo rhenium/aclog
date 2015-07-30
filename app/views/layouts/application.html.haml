@@ -16,9 +16,10 @@
       .container
         .nav.navbar-nav.navbar-left
           = link_to root_path, class: "navbar-brand" do
-            aclog
-            - if Rails.env.development?
-              (dev)
+            - if Rails.env.produciton?
+              aclog
+            - else
+              🚧
         %ul.nav.navbar-nav.navbar-right
           %li.dropdown.omittable
             %a.dropdown-toggle{href: "#", data: { toggle: "dropdown" }}<

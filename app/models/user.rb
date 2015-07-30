@@ -105,7 +105,7 @@ class User < ActiveRecord::Base
 
   def count_discovered_users
     Tweet
-      .joins("INNER JOIN (#{self.favorites.order(id: :desc).limit(1000).to_sql}) m ON m.tweet_id = tweets.id")
+      .joins("INNER JOIN (#{self.favorites.order(id: :desc).limit(300).to_sql}) m ON m.tweet_id = tweets.id")
       .group("tweets.user_id")
       .count("tweets.user_id")
       .sort_by { |user_id, count| -count }.to_h

@@ -24,6 +24,7 @@
                   %span Other {{ users_count - users.length }} People
               .statuses{data: {"v-if" => "showTweets"}}
                 = render "tweets/tweets_template"
-                %a{href: "{{ jumpUrl }}"} Read on..
+                .refresh-box<
+                  %a{href: "{{ jumpUrl }}"} &#187;
             .loading-box{data: {"v-if" => "loading"}}
               %img.loading-image{src: image_path("loading.gif")}

@@ -1,10 +1,11 @@
-/vendor/bundle
-/vendor/assets/bower_components
 /log/*.log
 /tmp
 /spec/tmp
 /coverage
 /public/assets
+/vendor/bundle
+/vendor/assets/bower.json
+/vendor/assets/bower_components
 
 /config/settings.yml
 /config/settings/*.local.yml

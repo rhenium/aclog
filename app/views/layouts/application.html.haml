@@ -8,8 +8,8 @@
     %meta{name: "msapplication-TileImage", content: image_path("tile-image.png")}
     %meta{name: "msapplication-TileColor", content: "#f0eadb"}
     %meta{name: "twitter:widgets:csp", content: "on"}
-    %link{rel: "stylesheet", href: asset_path("application.css")}
-    %script{src: asset_path("application.js")}
+    = stylesheet_link_tag "application"
+    = javascript_include_tag "application"
     = csrf_meta_tags
   %body{data: meta_info}
     %nav.navbar.navbar-static-top

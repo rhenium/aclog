@@ -1,0 +1,22 @@
+Vue.config.prefix = "data-v-";
+Vue.config.strict = true;
+
+<% if Rails.env.development? %>
+Vue.config.debug = true;
+<% end %>
+
+Vue.filter("toLocaleString", function (string) {
+  return new Date(string).toLocaleString();
+});
+
+Vue.filter("removeInvalidCharacters", function (str) {
+  // JavaScript is kuso: http://www.w3.org/TR/xml/#charsets
+  return str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/gm, "");
+});
+
+if (window.Views === void 0) {
+  window.Views = {};
+  window.Helpers = {};
+  window.Shared = {};
+  window.Common = {};
+}

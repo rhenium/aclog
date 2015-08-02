@@ -47,8 +47,6 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    binding_of_caller (0.7.2)
-      debug_inspector (>= 0.0.1)
     bootstrap-sass (3.3.5.1)
       autoprefixer-rails (>= 5.0.0.1)
       sass (>= 3.3.0)
@@ -60,13 +58,6 @@ GEM
     coderay (1.1.0)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
-    coffee-rails (4.1.0)
-      coffee-script (>= 2.2.0)
-      railties (>= 4.0.0, < 5.0)
-    coffee-script (2.4.1)
-      coffee-script-source
-      execjs
-    coffee-script-source (1.9.1.1)
     columnize (0.9.0)
     connection_pool (2.2.0)
     cool.io (1.2.4)
@@ -80,7 +71,6 @@ GEM
       safe_yaml (~> 1.0.0)
     daemons (1.2.3)
     dalli (2.7.4)
-    debug_inspector (0.0.2)
     delayed_job (4.0.6)
       activesupport (>= 3.0, < 5.0)
     delayed_job_active_record (4.0.3)
@@ -347,11 +337,6 @@ GEM
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
       equalizer (~> 0.0, >= 0.0.9)
-    web-console (2.2.1)
-      activemodel (>= 4.0)
-      binding_of_caller (>= 0.7.2)
-      railties (>= 4.0)
-      sprockets-rails (>= 2.0, < 4.0)
     webmock (1.21.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -365,7 +350,6 @@ DEPENDENCIES
   bootstrap-sass
   bower-rails
   byebug
-  coffee-rails
   connection_pool
   coveralls
   daemons
@@ -400,7 +384,6 @@ DEPENDENCIES
   twitter-text
   tzinfo-data
   uglifier
-  web-console (~> 2.0)
   webmock
   yajl-ruby
 

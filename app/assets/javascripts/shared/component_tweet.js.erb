@@ -1,0 +1,63 @@
+Vue.component("tweet", {
+  template: "#tweet-template",
+  data: function() {
+    return {
+      loading: false,
+      expandFavorites: false,
+      expandRetweets: false,
+    };
+  },
+  filters: {
+    formatSource: function(str) {
+      if (/^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)) {
+        return str.replace(/&/g, "&amp;");
+      } else {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+    },
+    formatText: function(str) {
+      var autolinked = twttr.txt.autoLink(str, {
+        suppressLists: true,
+        usernameIncludeSymbol: true,
+        usernameUrlBase: "/"
+      });
+      return autolinked.replace(/\r?\n/g, "<br />\n");
+    }
+  },
+  methods: {
+    failProfileImage: function(e) {
+      e.preventDefault();
+      e.target.src = '<%= image_path("profile_image_missing.png") %>';
+    },
+    toggleExpandFavorites: function(e) {
+      e.preventDefault();
+      this.expandFavorites = !this.expandFavorites;
+    },
+    toggleExpandRetweets: function(e) {
+      e.preventDefault();
+      this.expandRetweets = !this.expandRetweets;
+    },
+    openIntent: function(e) {
+      e.preventDefault();
+      Helpers.openTwitterIntent(e.target.getAttribute("href"));
+    },
+    updateReactions: function() {
+      if (!this.allowed || this.reactions_count == 0) { return; }
+      var vm = this;
+      vm.loading = true;
+      superagent
+        .get("/i/api/tweets/responses.json")
+        .query({ id: this.id_str })
+        .accept("json")
+        .end(function(rerr, rres) {
+          var rjson = rres.body;
+          vm.favorites = rjson.favorites;
+          vm.retweets = rjson.retweets;
+          vm.loading = false;
+        });
+    },
+  },
+  ready: function() {
+    this.updateReactions();
+  },
+});

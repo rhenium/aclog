@@ -10,7 +10,8 @@ Shared.sidebar_user_stats = ->
         Math.round(this.stats.reactions_count / this.stats.tweets_count * 100) / 100
 
   superagent
-    .get "/i/api/users/stats?screen_name=" + Helpers.user_screen_name()
+    .get "/i/api/users/stats_compact.json"
+    .query { screen_name: Helpers.user_screen_name() }
     .accept "json"
     .end (err, res) ->
       vm.stats = res.body

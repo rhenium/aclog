@@ -8,5 +8,5 @@
       .statuses
         = render "tweets_template"
         .refresh-box<
-          = link_to update_path(@tweet.id), method: :post, title: "Refresh tweet" do
+          %a{href: "#", title: "Refresh", data: {"v-on" => "click: reload"}}
             %span.glyphicon.glyphicon-refresh/

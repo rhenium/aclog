@@ -9,7 +9,7 @@
         %small #{@user.screen_name}'s
         Stats
       .favorite-graph
-        - [["discovered_by", "Favorited by.."], ["discovered_users", "Favoriting.."]].each do |graph_id, graph_title|
+        - [["favorited_by", "Favorited by.."], ["favorited_users", "Favoriting.."]].each do |graph_id, graph_title|
           %div{id: graph_id}
             %h2= graph_title
             %template{data: {"v-if" => "!loading"}}
@@ -25,6 +25,6 @@
               .statuses{data: {"v-if" => "showTweets"}}
                 = render "tweets/tweets_template"
                 .refresh-box<
-                  %a{href: "{{ jumpUrl }}"} &#187;
+                  %a{href: "{{ tweetsUrl }}"} &#187;
             .loading-box{data: {"v-if" => "loading"}}
               %img.loading-image{src: image_path("loading.gif")}

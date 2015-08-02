@@ -61,7 +61,7 @@
                 %li= link_to "Stats", user_stats_path(current_user.screen_name)
                 %li.divider
                 %li= link_to "Settings", settings_path
-                %li= link_to "Sign out", logout_path
+                %li= link_to "Sign out", logout_path, method: :post
           - else
             %li= link_to "Sign in", "/i/login?redirect_after_login=" + CGI.escape(request.fullpath), method: :post, class: "signup"
     = yield

@@ -7,8 +7,8 @@ module ApplicationHelper
 
   def meta_info
     {
-      controller: controller.controller_path,
-      action: controller.action_name,
+      controller: params[:controller],
+      action: params[:action],
       parts: @view_parts.try(:join, " "),
       user_id: @user.try(:id),
       user_screen_name: @user.try(:screen_name),

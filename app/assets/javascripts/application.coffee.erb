@@ -12,8 +12,11 @@
 $ ->
   ac = Views[Helpers.controller()]
   if ac
-    ac["_"]?()
-    ac[Helpers.action()]?()
+    spe = ac[Helpers.action()]
+    if spe
+      spe()
+    else
+      ac._()
 
   Helpers.parts().forEach (par) ->
     (Shared[par])?()

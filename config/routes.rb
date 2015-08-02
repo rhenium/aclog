@@ -1,32 +1,37 @@
 Rails.application.routes.draw do
-  root "about#index"
+  get "/i/status" => redirect("/about/status")
+  get "/:screen_name/discovered_by" => redirect("/%{screen_name}/stats")
+  get "/:screen_name/discovered_users" => redirect("/%{screen_name}/stats")
 
   mount Api => "/api"
 
-  get "/i/status" =>                            "about#status",                     as: "status"
+  root "about#index"
 
-  # Internals / SessionsController
+  get "/about/api" =>                           "apidocs#index",                    as: "about_api"
+  get "/about/api/:method/:namespace/:path" =>  "apidocs#endpoint",                 as: "about_api_endpoint", constraints: { namespace: /[\w\/]+/ }
+  get "/about/status" =>                        "about#status",                     as: "status"
+
+  get "/settings" =>                            "settings#index",                   as: "settings"
+  post "/settings/update" =>                    "settings#update",                  as: "settings_update"
+  get "/settings/confirm_deactivation" =>       "settings#confirm_deactivation"
+  post "/settings/deactivate" =>                "settings#deactivate"
+
   get "/i/callback" =>                          "sessions#create"
-  get "/i/logout" =>                            "sessions#destroy",                 as: "logout"
+  post "/i/logout" =>                           "sessions#destroy",                 as: "logout"
 
   get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
   post "/i/:id" =>                              "tweets#update",                    as: "update", constraints: { id: /\d+/ }
-
-  get "/i/settings" =>                          "settings#index",                   as: "settings"
-  post "/i/settings/update" =>                  "settings#update",                  as: "settings_update"
-  get "/i/settings/confirm_deactivation" =>     "settings#confirm_deactivation"
-  post "/i/settings/deactivate" =>              "settings#deactivate"
 
   get "/i/best" =>                              "tweets#all_best",                  as: "best"
   get "/i/timeline" =>                          "tweets#all_timeline",              as: "timeline"
   get "/i/filter" =>                            "tweets#filter",                    as: "filter"
 
-  get "/i/api/tweets/responses" =>              "tweets#i_responses",               as: "responses"
-  get "/i/api/users/suggest_screen_name" =>     "users#i_suggest_screen_name"
-  get "/i/api/users/stats" =>                   "users#i_stats"
-
-  get "/about/api" =>                           "apidocs#index",                    as: "about_api"
-  get "/about/api/:method/:namespace/:path" =>  "apidocs#endpoint",                 as: "about_api_endpoint", constraints: { namespace: /[\w\/]+/ }
+  scope "/i/api" do
+    post "/tweets/update" => "internal/tweets#update"
+    get "/tweets/:action", controller: "internal/tweets"
+    get "/users/:action",  controller: "internal/users"
+    get "/about/:action",  controller: "internal/about"
+  end
 
   # User pages
   scope "/:screen_name" do
@@ -35,10 +40,7 @@ Rails.application.routes.draw do
     get "/timeline" =>                          "tweets#user_timeline",             as: "user_timeline"
     get "/favorites" =>                         "tweets#user_favorites",            as: "user_favorites"
     get "/favorited_by/:source_screen_name" =>  "tweets#user_favorited_by",         as: "user_favorited_by_user"
-
     get "/stats" =>                             "users#stats",                      as: "user_stats"
-    get "/discovered_by" => redirect("/%{screen_name}/stats")
-    get "/discovered_users" => redirect("/%{screen_name}/stats")
   end
 
   get "*unmatched_route" =>                     "application#routing_error"

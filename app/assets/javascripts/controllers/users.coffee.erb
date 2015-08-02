@@ -1,7 +1,6 @@
 Views.users =
-  _: ->
   stats: ->
-    drawgraph = (target, data_raw, jumpUrl) ->
+    drawgraph = (target, data_raw, det) ->
       data = data_raw.users
       vm = new Vue
         el: target
@@ -15,8 +14,12 @@ Views.users =
           statuses: []
           lastUser: null
         computed:
-          jumpUrl: ->
-            jumpUrl(this.lastUser)
+          tweetsUrl: ->
+            d = det(this.lastUser)
+            "/" + d[0] + "/favorited_by/" + d[1]
+          tweetsApi: ->
+            d = det(this.lastUser)
+            "/i/api/tweets/user_favorited_by.json?screen_name=" + d[0] + "&source_screen_name=" + d[1]
         methods:
           openTweets: (user, e) ->
             if !this.showTweets || user == this.lastUser
@@ -25,19 +28,25 @@ Views.users =
               this.lastUser = user
               vm = this
               superagent
-                .get vm.jumpUrl
+                .get vm.tweetsApi
                 .query { count: 3 }
                 .accept "json"
                 .end (err, res) ->
                   json = res.body
                   vm.statuses = json.statuses
-    l = window.location
     superagent
-      .get(l.protocol + "//" + l.host + l.pathname.replace(/(\.\w+)?$/, ".json") + l.search)
+      .get "/i/api/users/favorited_by.json"
+      .query { screen_name: Helpers.user_screen_name() }
       .accept "json"
       .end (err, res) ->
         json = res.body
-        drawgraph "#discovered_by", json.discovered_by, (user) ->
-          "/" + Helpers.user_screen_name() + "/favorited_by/" + user.screen_name
-        drawgraph "#discovered_users", json.discovered_users, (user) ->
-          "/" + user.screen_name + "/favorited_by/" + Helpers.user_screen_name()
+        drawgraph "#favorited_by", res.body, (user) ->
+          [Helpers.user_screen_name(), user.screen_name]
+    superagent
+      .get "/i/api/users/favorited_users.json"
+      .query { screen_name: Helpers.user_screen_name() }
+      .accept "json"
+      .end (err, res) ->
+        json = res.body
+        drawgraph "#favorited_users", res.body, (user) ->
+          [user.screen_name, Helpers.user_screen_name()]

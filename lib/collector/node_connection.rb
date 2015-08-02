@@ -8,7 +8,7 @@ module Collector
 
     def initialize(queue)
       @unpacker = MessagePack::Unpacker.new(symbolize_keys: true)
-      @connection_id = (@@_id += 1)
+      @connection_id = @@_id; @@_id += 1
       @authenticated = false
       @closing = false
       @activated_at = nil

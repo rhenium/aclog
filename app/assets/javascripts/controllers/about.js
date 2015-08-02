@@ -35,7 +35,7 @@ Views.about = {
           if (vm.loading) { return; }
           vm.loading = true;
           superagent
-            .get("/i/status.json")
+            .get("/i/api/about/status.json")
             .accept("json")
             .end(function (err, res) {
               var json = res.body;

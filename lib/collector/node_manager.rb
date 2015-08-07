@@ -24,13 +24,13 @@ module Collector
       end
 
       def register_account(account)
-        if con = active_connections[account.worker_number]
+        if con = active_connections[account.id % Settings.collector.nodes_count]
           con.register_account(account)
         end
       end
 
       def unregister_account(account)
-        if con = active_connections[account.worker_number]
+        if con = active_connections[account.id % Settings.collector.nodes_count]
           con.unregister_account(account)
         end
       end

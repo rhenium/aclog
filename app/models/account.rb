@@ -3,7 +3,6 @@ class Account < ActiveRecord::Base
 
   belongs_to :user
   scope :active, -> { where(status: :active) }
-  scope :for_node, ->(block_number) { active.where("id % ? = ?", Settings.collector.nodes_count, block_number) }
 
   class << self
     # Registers a new account or updates an existing account.
@@ -33,21 +32,21 @@ class Account < ActiveRecord::Base
     revoked!
   end
 
-  # Returns Twitter Gem's Client instance.
-  # @return [Twitter::REST::Client] An instance of Twitter::REST::Client.
-  def client
-    @_client ||= Twitter::REST::Client.new(consumer_key: Settings.consumer.key,
-                                           consumer_secret: Settings.consumer.secret,
-                                           access_token: oauth_token,
-                                           access_token_secret: oauth_token_secret)
-  end
-
   # Returns whether following the target user or not.
   # @param [User, Integer] target_id Target user.
   # @return [Boolean] whether following the target or not.
   def following?(target_id)
     target_id = target_id.id if target_id.is_a?(User)
     friends.member? target_id
+  end
+
+  # Returns Twitter Gem's Client instance.
+  # @return [Twitter::REST::Client] An instance of Twitter::REST::Client.
+  def client
+    Twitter::REST::Client.new(consumer_key: Settings.consumer.key,
+                              consumer_secret: Settings.consumer.secret,
+                              access_token: oauth_token,
+                              access_token_secret: oauth_token_secret)
   end
 
   # Returns the array of friends.
@@ -57,11 +56,5 @@ class Account < ActiveRecord::Base
     Rails.cache.fetch("accounts/#{self.id}/friends", expires_in: Settings.cache.friends) do
       Set.new client.friend_ids
     end
-  end
-
-  # Returns the worker id collecting tweets for this account.
-  # @return [Integer]
-  def worker_number
-    id % Settings.collector.nodes_count
   end
 end

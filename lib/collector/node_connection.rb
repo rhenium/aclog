@@ -57,11 +57,11 @@ module Collector
       log(:info, "Unregistered account ##{account.id}/#{account.user_id}")
     end
 
-    def activate(worker_number)
+    def activate(block_number)
       @activated_at = Time.now
       send_message(event: :activate,
                    data: { users: [] })
-      Account.for_node(worker_number).each do |a|
+      Account.active.where("id % ? = ?", Settings.collector.nodes_count, block_number).each do |a|
         register_account(a)
       end
     end

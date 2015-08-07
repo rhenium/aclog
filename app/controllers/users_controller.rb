@@ -8,6 +8,6 @@ class UsersController < ApplicationController
   private
   def load_user
     authorize! @user = User.find(screen_name: params[:screen_name])
-    @user.require_registered!
+    @user.registered? || raise(Aclog::Exceptions::UserNotRegistered, self)
   end
 end

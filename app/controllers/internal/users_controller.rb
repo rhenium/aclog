@@ -28,6 +28,6 @@ class Internal::UsersController < Internal::ApplicationController
   end
 
   def require_registered!
-    @user.require_registered!
+    @user.registered? || raise(Aclog::Exceptions::UserNotRegistered, self)
   end
 end

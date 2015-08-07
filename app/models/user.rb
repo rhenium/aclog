@@ -17,7 +17,6 @@ class User < ActiveRecord::Base
       return super(*args) unless hash.is_a?(Hash)
 
       key, value = hash.delete_if {|k, v| v.nil? }.first
-
       key && where(hash).order(updated_at: :desc).first || raise(ActiveRecord::RecordNotFound, "Couldn't find User with #{hash.map {|k, v| "#{k}=#{v}" }.join(", ")}")
     end
 
@@ -48,10 +47,6 @@ class User < ActiveRecord::Base
              on_duplicate_key_update: [:screen_name, :name, :profile_image_url, :protected],
              validate: false)
     end
-  end
-
-  def require_registered!
-    registered? || raise(Aclog::Exceptions::UserNotRegistered, self)
   end
 
   def twitter_url

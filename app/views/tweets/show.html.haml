@@ -8,5 +8,5 @@
       .statuses
         = render "tweets_template"
         .refresh-box<
-          %a{href: "#", title: "Refresh", data: {"v-on" => "click: reload"}}
+          %a{href: "#", title: "Refresh", data: {"v-if" => "!loading", "v-on" => "click: reload"}}
             %span.glyphicon.glyphicon-refresh/

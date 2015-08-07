@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  #include SecurityHeaders
+  include SecurityHeaders
   include ControllerErrorHandling
   include Utils
 

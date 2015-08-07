@@ -8,7 +8,7 @@ module SecurityHeaders
   def set_csp_header
     policy = {
       "default-src" => "'self'",
-      "img-src" => "'self' https://pbs.twimg.com https://abs.twimg.com",
+      "img-src" => "'self' https://pbs.twimg.com https://abs.twimg.com, data:",
       "style-src" => "'self' http://fonts.googleapis.com",
       "font-src" => "'self' http://fonts.gstatic.com"
     }

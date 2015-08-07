@@ -1,5 +1,5 @@
 class Internal::UsersController < Internal::ApplicationController
-  before_action :load_user, only: [:stats_compact, :favorited_by, :favorited_users]
+  before_action :load_user, only: [:favorited_by, :favorited_users]
   before_action :require_registered!, only: [:favorited_by, :favorited_users]
 
   def suggest_screen_name
@@ -9,6 +9,7 @@ class Internal::UsersController < Internal::ApplicationController
   end
 
   def stats_compact
+    @user = User.find(screen_name: params[:screen_name])
     render json: @user.stats.to_h
   end
 

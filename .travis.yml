@@ -1,17 +1,18 @@
 language: ruby
 rvm:
-  - 2.1.1
-  - 2.1.2
+  - 2.1.6
+  - 2.2.2
 services:
   - mysql
+env:
+  - RAILS_ENV=test
 before_script:
-  - "cp config/settings.yml.example config/settings.yml"
-  - "cp config/database.yml.example config/database.yml"
-  - "sed -i 's/username: root/username: /g' config/database.yml"
-  - "cp config/secrets.yml.example config/secrets.yml"
-  - "sed -i s/replace_here/$(rake secret)/g config/secrets.yml"
+  - cp config/settings.yml.example config/settings.yml
+  - cp config/database.yml.example config/database.yml
+  - sed -i 's/username: root/username: /g' config/database.yml
+  - cp config/secrets.yml.example config/secrets.yml
+  - sed -i s/replace_here/$(rake secret)/g config/secrets.yml
+  - bundle exec rake tmp:create
+  - bundle exec rake db:create db:migrate
 script:
-  - "RAILS_ENV=test bundle exec rake db:create db:migrate"
-  - "RAILS_ENV=test bundle exec rake tmp:create"
-  - "RAILS_ENV=test bundle exec rails runner bin/start.rb start"
-  - "RAILS_ENV=test bundle exec rspec"
+  - bundle exec rspec

@@ -31,7 +31,6 @@ gem "msgpack-rpc"
 group :development, :test do
   gem "pry-rails"
   gem "byebug"
-  gem "spring"
   gem "quiet_assets"
   gem "oink"
 end
@@ -40,9 +39,6 @@ group :test do
   gem "webmock"
   gem "rspec"
   gem "rspec-rails"
-  gem "spring-commands-rspec"
   gem "guard-rspec"
-  gem "factory_girl_rails"
-  gem "coveralls", require: false
   gem "simplecov", require: false
 end

@@ -29,7 +29,7 @@ class Account < ActiveRecord::Base
   # If the token was revoked, changes the `status` to :revoked.
   def verify_token!
     client.user
-  rescue
+  rescue Twitter::Error::Unauthorized
     revoked!
   end
 

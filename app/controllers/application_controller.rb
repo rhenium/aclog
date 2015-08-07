@@ -30,13 +30,19 @@ class ApplicationController < ActionController::Base
   end
 
   def authorize!(object)
-    if object.is_a? User
-      authorized_to_show_user?(object) || raise(Aclog::Exceptions::UserProtected, object)
-    elsif object.is_a? Tweet
+    case object
+    when User
+      unless authorized_to_show_user?(object)
+        raise(Aclog::Exceptions::UserProtected, object)
+      end
+    when Tweet
       authorize! object.user
+    when NilClass
+      raise Aclog::Exceptions::NotFound
     else
       raise ArgumentError, "parameter `object` must be a User or a Tweet"
     end
+
     object
   end
 

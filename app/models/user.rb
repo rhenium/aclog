@@ -6,7 +6,10 @@ class User < ActiveRecord::Base
   has_many :retweets
   has_one :account
 
-  scope :suggest_screen_name, ->(str) { where("screen_name LIKE ?", "#{str.gsub(/(_|%)/) {|x| "\\" + x }}%").order(screen_name: :asc) }
+  scope :suggest_screen_name, ->(str) {
+    escaped = str.gsub(/(_|%)/) {|x| "\\" + x }
+    where("screen_name LIKE ?", escaped + "%")
+  }
 
   class << self
     def find(*args)

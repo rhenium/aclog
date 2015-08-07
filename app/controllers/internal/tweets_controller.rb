@@ -1,12 +1,13 @@
 class Internal::TweetsController < Internal::ApplicationController
+  before_action :load_user, only: [:user_best, :user_timeline, :user_favorites, :user_favorited_by]
+
   def responses
-    authorize! @tweet = Tweet.find(params[:id])
+    @tweet = authorize! Tweet.find(params[:id])
   end
 
   def update
-    @tweet = Tweet.update_from_twitter(params[:id], current_user).first
-    raise Aclog::Exceptions::TweetNotFound, params[:id] unless @tweet
-    authorize! @user = @tweet.user
+    @tweet = authorize! Tweet.update_from_twitter(params[:id], current_user).first
+    @user = authorize! @tweet.user
     render :show
   end
 
@@ -17,27 +18,23 @@ class Internal::TweetsController < Internal::ApplicationController
   # action specific:
   def show
     @tweet = Tweet.find(params[:id])
-    authorize! @user = @tweet.user
+    @user = authorize! @tweet.user
   end
 
   def user_best
-    authorize! @user ||= User.find(screen_name: params[:screen_name])
     @tweets = @user.tweets.reacted.parse_recent(params[:recent]).order_by_reactions.paginate(params)
   end
 
   def user_timeline
-    authorize! @user ||= User.find(screen_name: params[:screen_name])
     @tweets = @user.tweets.reacted(params[:reactions]).order_by_id.paginate(params)
   end
 
   def user_favorites
-    authorize! @user = User.find(screen_name: params[:screen_name])
     @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC").eager_load(:user).paginate(params)
   end
 
   def user_favorited_by
-    authorize! @user = User.find(screen_name: params[:screen_name])
-    authorize! @source_user = User.find(screen_name: params[:source_screen_name])
+    @source_user = authorize! User.find(screen_name: params[:source_screen_name])
     @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id.eager_load(:user).paginate(params)
   end
 
@@ -66,5 +63,9 @@ class Internal::TweetsController < Internal::ApplicationController
         # bug
       end
     end
+  end
+
+  def load_user
+    @user = authorize! User.find(screen_name: params[:screen_name])
   end
 end

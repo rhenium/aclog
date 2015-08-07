@@ -45,14 +45,14 @@ class ApiTweets < Grape::API
       def user
         @_user ||= begin
           user = User.find(id: params[:user_id], screen_name: params[:screen_name])
-          raise Aclog::Exceptions::UserProtected unless permitted_to_see?(user)
+          raise Aclog::Exceptions::UserProtected unless authorized?(user)
           user
         end
       end
 
       def source_user
         user = User.find(id: params[:source_user_id], screen_name: params[:source_screen_name])
-        raise Aclog::Exceptions::UserProtected unless permitted_to_see?(user)
+        raise Aclog::Exceptions::UserProtected unless authorized?(user)
         user
       end
 
@@ -72,7 +72,7 @@ class ApiTweets < Grape::API
     end
     get "show", rabl: "tweet" do
       @tweet = Tweet.find(params[:id])
-      raise Aclog::Exceptions::UserProtected unless permitted_to_see?(@tweet)
+      raise Aclog::Exceptions::UserProtected unless authorized?(@tweet)
     end
 
     desc "Returns Tweets, specified by comma-separated IDs.", example_params: { ids: "43341783446466560,340640143058825216" }
@@ -81,7 +81,7 @@ class ApiTweets < Grape::API
     end
     get "lookup", rabl: "tweets" do
       @tweets = Tweet.where(id: params[:ids].split(",").map(&:to_i))
-      @tweets = @tweets.select {|tweet| permitted_to_see?(tweet) }
+      @tweets = @tweets.select {|tweet| authorized?(tweet) }
     end
 
     desc "Returns the best Tweets of a user, specified by username or user ID.", example_params: { user_id: 15926668, count: 2, page: 3, recent: "1m" }

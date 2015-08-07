@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   helper_method :logged_in?, :current_user
-  helper_method :authorized_to_show_user?
+  helper_method :authorized?
 
   def routing_error
     raise ActionController::RoutingError, "No route matches #{params[:unmatched_route]}"
@@ -24,24 +24,23 @@ class ApplicationController < ActionController::Base
       end
   end
 
-  def authorized_to_show_user?(user)
-    !user.protected? ||
-      (logged_in? && current_user.permitted_to_see?(user))
+  def authorized?(object)
+    case object
+    when User
+      !object.protected? ||
+        logged_in? &&
+          (object.id == current_user.id ||
+           current_user.account.following?(object))
+    when Tweet
+      authorized?(object.user)
+    else
+      raise ArgumentError, "object must be User or Tweet"
+    end
   end
 
   def authorize!(object)
-    case object
-    when User
-      unless authorized_to_show_user?(object)
-        raise(Aclog::Exceptions::UserProtected, object)
-      end
-    when Tweet
-      authorize! object.user
-    when NilClass
-      raise Aclog::Exceptions::NotFound
-    else
-      raise ArgumentError, "parameter `object` must be a User or a Tweet"
-    end
+    authorized?(object) ||
+      raise(Aclog::Exceptions::UserProtected, object)
 
     object
   end

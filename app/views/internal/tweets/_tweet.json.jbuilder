@@ -1,4 +1,4 @@
-if authorized_to_show_user?(tweet.user)
+if authorized?(tweet.user)
   json.id_str tweet.id.to_s
   
   json.user do

@@ -71,10 +71,6 @@ class User < ActiveRecord::Base
     !!account && account.active?
   end
 
-  def permitted_to_see?(user)
-    !user.protected? || user.id == self.id || (self.registered? && account.following?(user))
-  end
-
   def stats
     Rails.cache.fetch("users/#{self.id}/stats", expires_in: Settings.cache.stats) do
       plucked = self.tweets.select("COUNT(*) AS count, SUM(reactions_count) AS sum").first.attributes

@@ -39,10 +39,18 @@ class Api < Grape::API
       end
     end
 
-    def permitted_to_see?(user_or_tweet)
-      user_or_tweet.is_a?(User) ?
-        !user_or_tweet.protected? ||      current_user.try(:permitted_to_see?, user_or_tweet) :
-        !user_or_tweet.user.protected? || current_user.try(:permitted_to_see?, user_or_tweet.user)
+    def authorized?(object)
+      case object
+      when User
+        !object.protected? ||
+          logged_in? &&
+            (object.id == current_user.id ||
+             current_user.account.following?(object))
+      when Tweet
+        authorized?(object.user)
+      else
+        raise ArgumentError, "object must be User or Tweet"
+      end
     end
   end
 

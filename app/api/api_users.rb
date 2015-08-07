@@ -11,7 +11,7 @@ class ApiUsers < Grape::API
       def user
         @_user ||= begin
           user = User.find(id: params[:id] || params[:user_id], screen_name: params[:screen_name])
-          raise Aclog::Exceptions::UserProtected unless permitted_to_see?(user)
+          raise Aclog::Exceptions::UserProtected unless authorized?(user)
           user
         end
       end

@@ -32,6 +32,19 @@ class Account < ActiveRecord::Base
     revoked!
   end
 
+  def authorized?(object)
+    case object
+    when User
+      !object.protected? ||
+        object.id == self.user_id ||
+        following?(object)
+    when Tweet
+      authorized?(object.user)
+    else
+      raise ArgumentError, "object must be User or Tweet"
+    end
+  end
+
   # Returns whether following the target user or not.
   # @param [User, Integer] target_id Target user.
   # @return [Boolean] whether following the target or not.

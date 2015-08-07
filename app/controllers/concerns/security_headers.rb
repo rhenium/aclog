@@ -8,9 +8,9 @@ module SecurityHeaders
   def set_csp_header
     policy = {
       "default-src" => "'self'",
-      "img-src" => "'self' https://pbs.twimg.com https://abs.twimg.com, data:",
-      "style-src" => "'self' http://fonts.googleapis.com",
-      "font-src" => "'self' http://fonts.gstatic.com"
+      "img-src" => "'self' pbs.twimg.com abs.twimg.com data:",
+      "style-src" => "'self' fonts.googleapis.com",
+      "font-src" => "'self' fonts.gstatic.com"
     }
     policy_str = policy.map {|k, v| "#{k} #{v}" }.join("; ")
     response["Content-Security-Policy"] = policy_str

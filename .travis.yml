@@ -9,7 +9,7 @@ env:
 before_script:
   - cp config/settings.yml.example config/settings.yml
   - cp config/database.yml.example config/database.yml
-  - sed -i 's/username: root/username: /g' config/database.yml
+  - "sed -i 's/username: root/username: /g' config/database.yml"
   - cp config/secrets.yml.example config/secrets.yml
   - sed -i s/replace_here/$(rake secret)/g config/secrets.yml
   - bundle exec rake tmp:create

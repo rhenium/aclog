@@ -12,11 +12,13 @@ namespace :collector do
 
   desc "Start aclog collector (master) in the foreground"
   task run: :environment do
+    require Rails.root.join("collector/daemon")
     Collector::Daemon.start
   end
   
   desc "Start aclog collector (master)"
   task start: :environment do
+    require Rails.root.join("collector/daemon")
     pid = collector_read_pid
     if pid && process_alive?(pid)
       STDERR.puts "Collector daemon is already started (PID: #{pid})"

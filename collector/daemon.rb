@@ -1,4 +1,8 @@
 require "msgpack/rpc/transport/unix"
+require_relative "event_queue"
+require_relative "node_connection"
+require_relative "node_manager"
+require_relative "control_server"
 
 module Collector
   module Daemon

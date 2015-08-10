@@ -2,7 +2,7 @@ class Account < ActiveRecord::Base
   enum status: { active: 0, inactive: 1, revoked: 2 }
 
   belongs_to :user
-  scope :active, -> { where(status: :active) }
+  scope :active, -> { where(status: self.statuses[:active]) }
 
   class << self
     # Registers a new account or updates an existing account.
@@ -30,19 +30,6 @@ class Account < ActiveRecord::Base
     client.user
   rescue Twitter::Error::Unauthorized
     revoked!
-  end
-
-  def authorized?(object)
-    case object
-    when User
-      !object.protected? ||
-        object.id == self.user_id ||
-        following?(object)
-    when Tweet
-      authorized?(object.user)
-    else
-      raise ArgumentError, "object must be User or Tweet"
-    end
   end
 
   # Returns whether following the target user or not.

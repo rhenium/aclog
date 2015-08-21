@@ -166,8 +166,8 @@ class UserConnection
       source: status[:source],
       created_at: status[:created_at],
       in_reply_to_status_id: status[:in_reply_to_status_id],
-      favorite_count: status[:favorite_count],
-      retweet_count: status[:retweet_count],
+      favorite_count: (status[:favorite_count] || 0),
+      retweet_count: (status[:retweet_count] || 0),
       user: { id: status[:user][:id] } }
   end
 

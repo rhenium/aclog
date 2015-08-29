@@ -38,17 +38,13 @@ Views.tweets = {
     });
 
     if (!Views.tweets[Helpers.action()]) {
-      var query = Helpers.given_parameters();
-      if (Helpers.user_screen_name()) {
-        query.screen_name = Helpers.user_screen_name();
-      }
+      var query = Helpers.request_params();
       var url = "/i/api/" + Helpers.controller() + "/" + Helpers.action() + ".json";
       vm.loadNext(url, query);
     }
   },
   show: function() {
-    var _query = Helpers.given_parameters();
-    _query.id = Helpers.tweet_id();
+    var _query = Helpers.request_params();
     var vm = new Vue({
       el: ".statuses",
       data: {
@@ -82,6 +78,7 @@ Views.tweets = {
             .accept("json")
             .end(function(err, res) {
               var json = res.body;
+              console.log(json);
               vm.statuses = json.statuses;
               vm.loading = false;
             });

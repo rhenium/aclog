@@ -1,5 +1,5 @@
 %template#tweet-template
-  .status{data: {"v-class" => "aside: status-reply"}}
+  .status{data: {"v-class" => "status-reply: aside"}}
     .status-tweet{data: {"v-if" => "allowed"}}
       .status-user
         %a{href: user_path("dummy").sub("dummy", "{{user.screen_name}}"), title: "{{user.name | removeInvalidCharacters}} (@{{user.screen_name}})"}<

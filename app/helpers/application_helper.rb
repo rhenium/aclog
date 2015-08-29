@@ -12,7 +12,8 @@ module ApplicationHelper
       parts: @view_parts.try(:join, " "),
       user_id: @user.try(:id),
       user_screen_name: @user.try(:screen_name),
-      tweet_id: @tweet.try(:id)
+      tweet_id: @tweet.try(:id),
+      request_params: JSON.generate(params.to_hash.reject {|key, _| ["action", "controller", "oauth_token", "password"].include?(key) }),
     }
   end
 

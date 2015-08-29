@@ -37,6 +37,10 @@ class TweetsController < ApplicationController
 
     @sidebars = [:user, :reactions_thresholds]
     @title = "@#{@user.screen_name}'s Timeline"
+
+    if request.format == :atom
+      @tweets = @user.tweets.reacted(params[:reactions]).order_by_id.paginate(params)
+    end
   end
 
   def user_favorites

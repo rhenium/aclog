@@ -71,6 +71,10 @@ class User < ActiveRecord::Base
     !!account && account.active?
   end
 
+  def opted_out?
+    !!account && account.opted_out?
+  end
+
   def stats
     Rails.cache.fetch("users/#{self.id}/stats", expires_in: Settings.cache.stats) do
       plucked = self.tweets.select("COUNT(*) AS count, SUM(reactions_count) AS sum").first.attributes

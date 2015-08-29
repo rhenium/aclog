@@ -42,6 +42,9 @@ class ApplicationController < ActionController::Base
     authorized?(object) ||
       raise(Aclog::Exceptions::UserProtected, object)
 
+    object.is_a?(User) && object.opted_out? &&
+      raise(Aclog::Exceptions::UserOptedOut, object)
+
     object
   end
 

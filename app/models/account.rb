@@ -1,5 +1,5 @@
 class Account < ActiveRecord::Base
-  enum status: { active: 0, inactive: 1, revoked: 2 }
+  enum status: { active: 0, inactive: 1, revoked: 2, opted_out: 3 }
 
   belongs_to :user
   scope :active, -> { where(status: self.statuses[:active]) }
@@ -10,6 +10,9 @@ class Account < ActiveRecord::Base
     # @return [Account] The target account object.
     def register(hash)
       account = where(user_id: hash[:user_id]).first_or_initialize
+      if account.opted_out?
+        raise UserOptedOut, account
+      end
       account.oauth_token = hash[:oauth_token]
       account.oauth_token_secret = hash[:oauth_token_secret]
       account.status = :active

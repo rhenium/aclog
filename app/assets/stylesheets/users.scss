@@ -1,82 +1,53 @@
 .chart {
-    width: 100%;
-    margin: 30px 0;
-    display: flex;
-    flex-direction: row-reverse;
+    // margin: 30px 0;
+    // display: flex;
+    // flex-direction: row-reverse;
 
-    .chart-item {
-        margin-top: 100px;
-        height: 50px;
+    // .chart-item {
+    //     margin-top: 100px;
+    //     height: 50px;
 
-        &.other {
-            flex-grow: 1;
-        }
+    //     &.other {
+    //         flex-grow: 1;
+    //     }
 
-        > span {
-            display: block;
-            line-height: 50px;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            overflow: hidden;
-        }
+    //     > span {
+    //         display: block;
+    //         line-height: 50px;
+    //         width: 100%;
+    //         height: 100%;
+    //         text-align: center;
+    //         overflow: hidden;
+    //     }
 
-        .popout {
-            display: inline-block;
-            white-space: nowrap;
-            position: relative;
-            top: -100px;
-            padding: 5px;
-            text-align: center;
-            background-color: #eeeeee;
-            border: 1px solid #999999;
-            border-radius: 3px;
-            z-index: 1;
+    //     .popout {
+    //         display: inline-block;
+    //         white-space: nowrap;
+    //         position: relative;
+    //         top: -100px;
+    //         padding: 5px;
+    //         text-align: center;
+    //         background-color: #eeeeee;
+    //         border: 1px solid #999999;
+    //         border-radius: 3px;
+    //         z-index: 1;
 
-            .count span {
-                font-size: larger;
-                font-weight: bold;
-            }
-        }
+    //         .count span {
+    //             font-size: larger;
+    //             font-weight: bold;
+    //         }
+    //     }
 
-        &:hover {
-            .popout {
-                z-index: 2;
-            }
-        }
-    }
+    //     &:hover {
+    //         .popout {
+    //             z-index: 2;
+    //         }
+    //     }
+    // }
+    height: 300px;
 }
-ul.user-list {
-    padding: 15px 0;
-    padding-left: 0;
-    list-style: none;
 
-    li {
-        display: inline-block;
-    }
-
-    li a {
-        display: block;
-        padding: 10px 20px;
-        color: #333;
-        font-size: 18px;
-        text-decoration: none;
-        text-align: right;
-    }
-
-    li a:hover {
-        background-color: #cecac7;
-    }
-
-    li a img {
-        width: 48px;
-        height: 48px;
-        margin-bottom: 5px;
-    }
-
-    li a span {
-        display: block;
-        margin-bottom: 0;
-        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-    }
+.nvtooltip {
+    .icon {}
+    .meta {}
 }

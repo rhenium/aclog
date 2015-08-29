@@ -42,3 +42,9 @@ group :test do
   gem "guard-rspec"
   gem "simplecov", require: false
 end
+
+## rails-assets
+source "https://rails-assets.org" do
+  gem "rails-assets-nvd3"
+  gem "rails-assets-d3"
+end

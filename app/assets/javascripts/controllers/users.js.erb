@@ -39,11 +39,11 @@ Views.users = {
                   var json = res.body;
                   vm.statuses = json.statuses;
                 });
-            },
-            failProfileImage: function(e) {
-              e.preventDefault();
-              e.target.src = '<%= image_path("profile_image_missing.png") %>';
-            },
+            }
+          },
+          failProfileImage: function(e) {
+            e.preventDefault();
+            e.target.src = '<%= image_path("profile_image_missing.png") %>';
           },
         },
       });

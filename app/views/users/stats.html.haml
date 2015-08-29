@@ -12,6 +12,19 @@
         - [["favorited_by", "Favorited by.."], ["favorited_users", "Favoriting.."]].each do |graph_id, graph_title|
           %div{id: graph_id}
             %h2= graph_title
-            %svg.chart{xmlns: "http://www.w3.org/2000/svg"}
+            %template{data: {"v-if" => "!loading"}}
+              .chart
+                .chart-item.other{data: {"v-if" => "users_count > users.length", "v-style" => "background-color: colors[users.length % colors.length]"}}
+                  %span Other {{ users_count - users.length }} People
+                .chart-item{data: {"v-repeat" => "users | orderBy 'count'", "v-style" => "width: (100 * count / reactions_count) + '%', background-color: colors[(users.length - $index - 1) % colors.length]", "v-on" => "click: openTweets(this)"}}
+                  .popout
+                    %img{data: {"v-attr" => "src: profile_image_url"}}
+                    .count
+                      %span {{ count }}
+                      favs
+              .statuses{data: {"v-if" => "showTweets"}}
+                = render "tweets/tweets_template"
+                .refresh-box<
+                  %a{href: "{{ tweetsUrl }}"} &#187;
             .loading-box{data: {"v-if" => "loading"}}
               %img.loading-image{src: image_path("loading.gif")}

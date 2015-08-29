@@ -1,73 +1,49 @@
 Views.users = {
   stats: function() {
     var drawgraph = function(target, data_raw, det) {
-        nv.addGraph(function() {
-          var size = document.querySelector(target).offsetWidth * 0.6;
-          var iconSize = 48;
-          var chart = nv.models.pieChart()
-            .x(function(d) { return d.screen_name; })
-            .y(function(d) { return d.count; })
-            .showLabels(true)
-            .showLegend(false)
-            .donut(true)
-            .title("100 tweets / " + data_raw.reactions_count.toString() + " favs")
-            .labelsOutside(true);
-          var tooltip = chart.tooltip;
-          tooltip.contentGenerator(function(d) {
-            if (d.data.screen_name) {
-              var container, count, iconimg, leftcon, rightcon, screen_name;
-              iconimg = document.createElement("img");
-              iconimg.setAttribute("src", d.data.profile_image_url);
-              leftcon = document.createElement("div");
-              leftcon.className = "icon";
-              leftcon.appendChild(iconimg);
-              screen_name = document.createElement("span");
-              screen_name.appendChild(document.createTextNode("@" + d.data.screen_name));
-              count = document.createElement("span");
-              count.appendChild(document.createTextNode(d.data.count));
-              rightcon = document.createElement("div");
-              rightcon.className = "meta";
-              rightcon.appendChild(screen_name);
-              rightcon.appendChild(count);
-              container = document.createElement("div");
-              container.appendChild(leftcon);
-              container.appendChild(rightcon);
-              return container.outerHTML;
-            } else {
-              var container, count, iconimg, rightcon, screen_name;
-              screen_name = document.createElement("span");
-              screen_name.appendChild(document.createTextNode("Other " + (data_raw.users_count - data_raw.users.length).toString() + " users"));
-              count = document.createElement("span");
-              count.appendChild(document.createTextNode(d.data.count));
-              rightcon = document.createElement("div");
-              rightcon.className = "meta";
-              rightcon.appendChild(screen_name);
-              rightcon.appendChild(count);
-              container = document.createElement("div");
-              container.appendChild(rightcon);
-              return container.outerHTML;
+      var vm = new Vue({
+        el: target,
+        data: {
+          users: data_raw.users,
+          users_count: data_raw.users_count,
+          reactions_count: data_raw.reactions_count,
+          colors: ["#393b79", "#5254a3", "#6b6ecf", "#9c9ede", "#637939", "#8ca252", "#b5cf6b", "#cedb9c", "#8c6d31", "#bd9e39", "#e7ba52", "#e7cb94", "#843c39", "#ad494a", "#d6616b", "#e7969c", "#7b4173", "#a55194", "#ce6dbd", "#de9ed6"],
+          loading: false,
+          showTweets: false,
+          statuses: [],
+          lastUser: null
+        },
+        computed: {
+          tweetsUrl: function() {
+            var d = det(this.lastUser);
+            return "/" + d[0] + "/favorited_by/" + d[1];
+          },
+          tweetsApi: function() {
+            var d = det(this.lastUser);
+            return "/i/api/tweets/user_favorited_by.json?screen_name=" + d[0] + "&source_screen_name=" + d[1];
+          }
+        },
+        methods: {
+          openTweets: function(user, e) {
+            if (!this.showTweets || user === this.lastUser) {
+              this.showTweets = !this.showTweets;
             }
-          });
-          var svg = d3.select(target + " .chart")
-            .attr("height", size)
-            .datum(data_raw.users.concat([{ count: (data_raw.reactions_count - data_raw.users.reduce(function(sum, c) { return sum + c.count; }, 0)) }]))
-            .transition()
-            .call(chart);
-          svg.selectAll(".nv-label").each(function(d, i) {
-            var group, text;
-            group = d3.select(this);
-            text = group.select("text").remove();
-            return group.append("image").attr("xlink:href", function(d) {
-              return d.data.profile_image_url;
-            }).attr("width", iconSize).attr("height", iconSize).attr("transform", "translate(-" + iconSize / 2 + ", -" + iconSize / 2 + ")").on("click", function(d) {
-              var d = det(d.data);
-              return "/" + d[0] + "/favorited_by/" + d[1];
-            });
-          });
-          nv.utils.windowResize(chart.update);
-          return chart;
-        });
-      };
+            if (this.showTweets) {
+              this.lastUser = user;
+              vm = this;
+              superagent
+                .get(vm.tweetsApi)
+                .query({ count: 3 })
+                .accept("json")
+                .end(function(err, res) {
+                  var json = res.body;
+                  vm.statuses = json.statuses;
+                });
+            }
+          },
+        },
+      });
+    };
 
     superagent
       .get("/i/api/users/favorited_by.json")

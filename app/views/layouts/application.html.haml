@@ -16,7 +16,7 @@
       .container
         .nav.navbar-nav.navbar-left
           = link_to root_path, class: "navbar-brand" do
-            - if Rails.env.produciton?
+            - if Rails.env.production?
               aclog
             - else
               🚧

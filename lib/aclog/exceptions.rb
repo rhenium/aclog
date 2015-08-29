@@ -10,6 +10,7 @@ module Aclog
     class UserNotRegistered < NotFound; end
     class DocumentNotFound < NotFound; end
 
+    class UserOptedOut < Forbidden; end
     class UserProtected < Forbidden; end
 
     class OAuthEchoError < Unauthorized; end

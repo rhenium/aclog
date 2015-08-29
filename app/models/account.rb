@@ -2,6 +2,7 @@ class Account < ActiveRecord::Base
   ACTIVE = 0
   INACTIVE = 1
   REVOKED = 2
+  OPTOUT = 3
 
   belongs_to :user
   scope :active, -> { where(status: ACTIVE) }
@@ -14,12 +15,19 @@ class Account < ActiveRecord::Base
     status == ACTIVE
   end
 
+  def opted_out?
+    status == OPTOUT
+  end
+
   class << self
     # Registers a new account or updates an existing account.
     # @param [Hash] hash data
     # @return [Account] The target account object.
     def register(hash)
       account = where(user_id: hash[:user_id]).first_or_initialize
+      if account.opted_out?
+        raise UserOptedOut.new
+      end
       account.oauth_token = hash[:oauth_token]
       account.oauth_token_secret = hash[:oauth_token_secret]
       account.status = ACTIVE

@@ -31,6 +31,7 @@ class ApplicationController < ActionController::Base
   def authorize!(object)
     if object.is_a? User
       authorized_to_show_user?(object) || raise(Aclog::Exceptions::UserProtected, object)
+      object.try(:account).try(:opted_out?) && raise(Aclog::Exceptions::UserOptedOut, object)
     elsif object.is_a? Tweet
       authorize! object.user
     else

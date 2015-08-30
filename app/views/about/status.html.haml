@@ -19,7 +19,7 @@
           %td {{$index}}
           %td \#{{$value}}
           %td Running
-          %td {{uptime($index)}}
+          %td {{uptime($value)}}
         %tr.danger{data: {"v-if" => "!nodes[$value]"}}
           %td {{$index}}
           %td -

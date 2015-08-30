@@ -11,10 +11,6 @@ class Internal::TweetsController < Internal::ApplicationController
     render :show
   end
 
-  def update_later
-    TweetUpdateJob.perform_later(params[:id].to_i)
-  end
-
   # action specific:
   def show
     @tweet = Tweet.find(params[:id])

@@ -27,7 +27,7 @@
     .status-responses{data: {"v-if" => "allowed"}}
       %dl{data: {"v-if" => "favorites_count > 0"}}
         %dt
-          %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandFavorites(this, $event)"}}<
+          %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandFavorites"}}<
             %span> {{favorites_count}}
             Favs
         %dd{data: {"v-class" => "collapsed: !expandFavorites"}}
@@ -40,7 +40,7 @@
               %img{data: {"v-if" => "!allowed"}, src: image_path("profile_image_protected.png"), alt: "protected user"}
       %dl{data: {"v-if" => "retweets_count > 0"}}
         %dt
-          %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandRetweets(this, $event)"}}<
+          %a.expand-responses-button{href: "#", title: "すべて見る", data: {"v-on" => "click: toggleExpandRetweets"}}<
             %span> {{retweets_count}}
             RTs
         %dd{data: {"v-class" => "collapsed: !expandRetweets"}}

@@ -78,7 +78,6 @@ Views.tweets = {
             .accept("json")
             .end(function(err, res) {
               var json = res.body;
-              console.log(json);
               vm.statuses = json.statuses;
               vm.loading = false;
             });

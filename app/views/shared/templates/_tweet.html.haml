@@ -58,6 +58,7 @@
         .status-head
           %span.time
             %time{datetime: "{{tweeted_at}}"} {{tweeted_at | toLocaleString}}
-            .source.aclogicon.aclogicon-twitter
-        .status-text.protected ユーザーはツイートを非公開にしています
+            %a.source.aclogicon.aclogicon-twitter{data: {"v-if" => "id_str"}, href: "https://twitter.com/{{user.screen_name}}/status/{{id_str}}", title: "Twitter で見る"}
+            .source.aclogicon.aclogicon-twitter{data: {"v-if" => "!id_str"}}
+        .status-text.protected {{text}}
         .status-foot

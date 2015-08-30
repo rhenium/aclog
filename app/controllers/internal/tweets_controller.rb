@@ -30,24 +30,24 @@ class Internal::TweetsController < Internal::ApplicationController
   end
 
   def user_favorites
-    @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC").eager_load(:user).paginate(params)
+    @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC").includes(user: :account).paginate(params)
   end
 
   def user_favorited_by
     @source_user = authorize! User.find(screen_name: params[:source_screen_name])
-    @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id.eager_load(:user).paginate(params)
+    @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id.paginate(params)
   end
 
   def all_best
-    @tweets = Tweet.reacted.parse_recent(params[:recent]).order_by_reactions.eager_load(:user).paginate(params)
+    @tweets = Tweet.reacted.parse_recent(params[:recent]).order_by_reactions.includes(user: :account).paginate(params)
   end
 
   def all_timeline
-    @tweets = Tweet.reacted(params[:reactions]).order_by_id.eager_load(:user).paginate(params)
+    @tweets = Tweet.reacted(params[:reactions]).order_by_id.includes(user: :account).paginate(params)
   end
 
   def filter
-    @tweets = Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.eager_load(:user).paginate(params)
+    @tweets = Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.includes(user: :account).paginate(params)
   end
 
   private

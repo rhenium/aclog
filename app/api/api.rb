@@ -39,6 +39,10 @@ class Api < Grape::API
       end
     end
 
+    def logged_in?
+      !!current_user
+    end
+
     def authorized?(object)
       case object
       when User

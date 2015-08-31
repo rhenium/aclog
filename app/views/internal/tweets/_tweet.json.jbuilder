@@ -24,7 +24,9 @@ else
   end
   
   json.(tweet, :text, :tweeted_at, :source, :favorites_count, :retweets_count, :reactions_count)
-  
-  json.favorites []
-  json.retweets []
+
+  if tweet.reactions_count <= 20
+    json.partial! "responses", tweet: tweet
+    json.include_reactions true
+  end
 end

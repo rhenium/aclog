@@ -58,6 +58,8 @@ Vue.component("tweet", {
     },
   },
   ready: function() {
-    this.updateReactions();
+    if (!this.include_reactions) {
+      this.updateReactions();
+    }
   },
 });

@@ -2,9 +2,11 @@ Vue.component("tweet", {
   template: "#tweet-template",
   data: function() {
     return {
-      loading: false,
       expandFavorites: false,
       expandRetweets: false,
+      loading: false,
+      favorites: [],
+      retweets: [],
     };
   },
   filters: {

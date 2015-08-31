@@ -77,7 +77,7 @@ class User < ActiveRecord::Base
 
   def stats
     Rails.cache.fetch("users/#{self.id}/stats", expires_in: Settings.cache.stats) do
-      plucked = self.tweets.select("COUNT(*) AS count, SUM(reactions_count) AS sum").first.attributes
+      plucked = self.tweets.select("COUNT(*) AS count, SUM(reactions_count) AS sum").reorder("").first.attributes
 
       ret = OpenStruct.new
       ret.updated_at = Time.now
@@ -96,8 +96,8 @@ class User < ActiveRecord::Base
   def count_favorited_by
     Favorite
       .joins("INNER JOIN (#{self.tweets.reacted.order_by_id.limit(100).to_sql}) tweets ON tweets.id = favorites.tweet_id")
-      .group("`favorites`.`user_id`")
-      .count("`favorites`.`user_id`")
+      .group("favorites.user_id")
+      .count("favorites.user_id")
       .sort_by { |user_id, count| -count }.to_h
   end
 

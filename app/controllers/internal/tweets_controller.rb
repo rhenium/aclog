@@ -26,7 +26,7 @@ class Internal::TweetsController < Internal::ApplicationController
   end
 
   def user_favorites
-    @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("`favorites`.`id` DESC").includes(user: :account).paginate(params)
+    @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("favorites.id DESC").includes(user: :account).paginate(params)
   end
 
   def user_favorited_by

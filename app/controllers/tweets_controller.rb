@@ -41,7 +41,7 @@ class TweetsController < ApplicationController
     @title = "@#{@user.screen_name}'s Timeline"
 
     if request.format == :atom
-      @tweets = @user.tweets.reacted(params[:reactions]).order_by_id.paginate(params)
+      @tweets = @user.tweets.reacted(params[:reactions] || 0).order_by_id.paginate(params)
     end
   end
 

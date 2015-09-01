@@ -1,4 +1,4 @@
-atom_feed do |feed|
+atom_feed(root_url: url_for(params.merge(format: nil, only_path: false))) do |feed|
   feed.title title
   feed.subtitle title
   feed.updated DateTime.now
@@ -16,4 +16,3 @@ atom_feed do |feed|
     end
   end
 end
-

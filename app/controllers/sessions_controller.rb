@@ -1,16 +1,22 @@
 class SessionsController < ApplicationController
-  def create
-    auth = request.env["omniauth.auth"]
+  include OAuthUtils
 
-    account = Account.register(user_id: auth.uid,
-                               oauth_token: auth.credentials.token,
-                               oauth_token_secret: auth.credentials.secret)
-    User.create_or_update_from_json(
-      { id: account.user_id,
-        screen_name: auth.extra.raw_info.screen_name,
-        name: auth.extra.raw_info.name,
-        profile_image_url_https: auth.extra.raw_info.profile_image_url_https,
-        protected: auth.extra.raw_info.protected })
+  def new
+    return redirect_to root_path if logged_in?
+
+    session[:redirect_after_login] = params[:redirect_after_login]
+    oauth_redirect(sessions_create_url)
+  end
+
+  def create
+    return redirect_to root_path if logged_in?
+
+    access_token = oauth_verify!
+
+    account = Account.register(user_id: access_token.params[:user_id],
+                               oauth_token: access_token.token,
+                               oauth_token_secret: access_token.secret)
+    User.update_from_twitter(account.user_id, account) rescue nil
 
     begin
       WorkerManager.update_account(account)
@@ -19,11 +25,10 @@ class SessionsController < ApplicationController
 
     session[:user_id] = account.user_id
 
-    to = request.env["omniauth.params"]["redirect_after_login"].to_s
-    if safe_redirect?(to)
-      redirect_to to
+    if safe_redirect?(session[:redirect_after_login])
+      redirect_to session[:redirect_after_login]
     else
-      redirect_to user_path(auth.extra.raw_info.screen_name)
+      redirect_to user_path(account.user.screen_name)
     end
   end
 

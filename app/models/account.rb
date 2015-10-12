@@ -10,12 +10,9 @@ class Account < ActiveRecord::Base
     # @return [Account] The target account object.
     def register(hash)
       account = where(user_id: hash[:user_id]).first_or_initialize
-      if account.opted_out?
-        raise UserOptedOut, account
-      end
       account.oauth_token = hash[:oauth_token]
       account.oauth_token_secret = hash[:oauth_token_secret]
-      account.status = :active
+      account.status = :active if [:inactive, :revoked].include?(account.status)
       account.save! if account.changed?
       account
     end
@@ -32,7 +29,7 @@ class Account < ActiveRecord::Base
   def verify_token!
     client.user
   rescue Twitter::Error::Unauthorized
-    revoked!
+    inactive!
   end
 
   # Returns whether following the target user or not.

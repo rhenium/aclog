@@ -1,0 +1,16 @@
+- title "Optout"
+.container
+  .row
+    .col-sm-3.col-md-offset-1
+      .sidebar
+        %h1 Optout
+    .col-sm-9.col-md-7.col-lg-6
+      %p オプトアウト設定をすることで、今後あなたのツイートが aclog に表示されるのを拒否することができます。
+      %p Continue ボタンを押し、OAuth 認証（本人確認のために行います）をすることで設定が完了します。
+      %p
+        設定完了後、
+        = link_to "https://twitter.com/settings/applications", "https://twitter.com/settings/applications"
+        から "aclog collector" のアクセス許可を取り消してください。
+      = form_tag optout_create_url, method: "post" do
+        .form-group
+          %input.btn.btn-default{type: "submit", value: "Continue"}

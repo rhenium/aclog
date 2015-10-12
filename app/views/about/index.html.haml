@@ -75,6 +75,6 @@
       %a{href: "https://twitter.com/KOBA789", target: "_blank"}
         %img{alt: "@KOBA789", title: "@KOBA789", src: User.find_by(screen_name: "KOBA789").profile_image_url}
   %p
-    = link_to "Home", root_path
     = link_to "API", about_api_path
+    = link_to "Optout", optout_path
     = link_to "Status", status_path

@@ -2,6 +2,6 @@
 .container
   .row
     %h1 Deactivation
-    = form_tag "/i/settings/deactivate", method: :post do
+    = form_tag "/settings/deactivate", method: :post do
       = link_to "Cancel", action: "index"
       = submit_tag

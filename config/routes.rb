@@ -16,8 +16,14 @@ Rails.application.routes.draw do
   get "/settings/confirm_deactivation" =>       "settings#confirm_deactivation"
   post "/settings/deactivate" =>                "settings#deactivate"
 
-  get "/i/callback" =>                          "sessions#create"
+  post "/i/login" =>                            "sessions#new",                     as: "login"
+  get "/i/callback" =>                          "sessions#create",                  as: "sessions_create"
   post "/i/logout" =>                           "sessions#destroy",                 as: "logout"
+
+  get "/i/optout" =>                            "optout#index",                     as: "optout"
+  post "/i/optout" =>                           "optout#create",                    as: "optout_create"
+  get "/i/optout/callback" =>                   "optout#callback",                  as: "optout_callback"
+  delete "/i/optout" =>                         "optout#destroy",                   as: "optout_destroy"
 
   get "/i/:id" =>                               "tweets#show",                      as: "tweet", constraints: { id: /\d+/ }
   post "/i/:id" =>                              "tweets#update",                    as: "update", constraints: { id: /\d+/ }

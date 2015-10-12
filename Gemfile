@@ -21,7 +21,7 @@ gem "connection_pool"
 gem "delayed_job_active_record"
 gem "daemons"
 
-gem "omniauth-twitter"
+gem "oauth"
 gem "twitter"
 gem "twitter-text"
 gem "eventmachine"

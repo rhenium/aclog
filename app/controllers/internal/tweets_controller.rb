@@ -31,7 +31,7 @@ class Internal::TweetsController < Internal::ApplicationController
 
   def user_favorited_by
     @source_user = authorize! User.find(screen_name: params[:source_screen_name])
-    @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order_by_id.paginate(params)
+    @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order("favorites.tweet_id DESC").paginate(params)
   end
 
   def all_best

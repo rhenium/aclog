@@ -6,7 +6,7 @@ class SettingsController < ApplicationController
   end
 
   def update
-    @account.update(notification_enabled: !!params[:notification_enabled])
+    @account.update!(notification_enabled: params[:notification_enabled] == "true")
     render_json data: { notification_enabled: @account.notification_enabled }
   end
 

@@ -1,7 +1,10 @@
 <template>
   <div class="sidebar">
     <div class="sidebar-list">
-      <div class="list-group list-group-scroll">
+      <div class="loading-box" v-if="loading">
+        <img class="loading-image" src="/assets/loading.gif" />
+      </div>
+      <div class="list-group list-group-scroll" v-else>
         <template v-for="(name, namespace) in apidocs">
           <span class="list-group-head">{{name | capitalize}}</span>
           <a class="list-group-item" v-for="endpoint in namespace" v-link="endpoint_link(endpoint)">{{endpoint_string(endpoint)}}</a>
@@ -17,7 +20,8 @@ import aclog from "aclog";
 export default {
   data() {
     return {
-      apidocs: {}
+      apidocs: {},
+      loading: false,
     };
   },
   methods: {
@@ -28,8 +32,12 @@ export default {
       return endpoint.method + " " + endpoint.path;
     },
   },
-  ready() {
-    aclog.apidocs.load().then(docs => this.apidocs = docs.namespaces);
+  created() {
+    this.loading = true;
+    aclog.apidocs.load().then(docs => {
+      this.loading = false;
+      this.apidocs = docs.namespaces
+    });
   }
 };
 </script>

@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 
 import storage from "storage";
+import aclog from "aclog";
 
 import App from "./app.vue";
 import AboutIndexPage from "./components/about/index.vue";
@@ -126,6 +127,15 @@ router.map({
       ":reactions": { name: "user-favorites", component: Vue.extend() }
     }
   },
+  "/:screen_name/favorited_by/:source_screen_name": {
+    name: "user-favorited-by-top",
+    component: TweetsPage,
+    api: "tweets/user_favorited_by",
+    filtering: "reactions",
+    subRoutes: {
+      ":reactions": { name: "user-favorited-by", component: Vue.extend() }
+    }
+  },
   "/:screen_name/stats": {
     name: "user-stats",
     component: UsersStatsPage,
@@ -140,5 +150,5 @@ router.redirect({
   "/i/best": "/i/public/best",
 });
 
-storage.init();
-router.start(App, "body");
+var start = () => router.start(App, "body");
+aclog.sessions.verify().then(start).catch(start);

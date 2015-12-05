@@ -17,6 +17,6 @@ class ApidocsController < ApplicationController
       nss
     end
 
-    render_json success: { namespaces: apidocs }
+    render_json data: { namespaces: apidocs }
   end
 end

@@ -8,7 +8,7 @@
         <h1 v-if="$route.title">{{$route.title}}</h1>
         <div class="statuses" v-el:tweets>
           <tweet v-for="tweet in statuses" v-bind:tweet="tweet"></tweet>
-          <div class="loading-box" data-v-if="loading">
+          <div class="loading-box" v-if="loading">
             <img class="loading-image" src="/assets/loading.gif" />
           </div>
         </div>
@@ -53,7 +53,7 @@ export default {
         statuses: [],
         loading: false,
         next: null,
-        prev: null
+        prev: null,
       };
     },
   },

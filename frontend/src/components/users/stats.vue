@@ -26,12 +26,12 @@
                   </div>
                 </div>
               </div>
-              <div class="statuses" v-el:tweets v-if="one.showTweets">
+              <div class="statuses" v-if="one.showTweets">
                 <tweet v-for="tweet in one.tweets" v-bind:tweet="tweet"></tweet>
-                <div class="loading-box" data-v-if="one.loadingTweets">
+                <div class="loading-box" v-if="one.loadingTweets">
                   <img class="loading-image" src="/assets/loading.gif" />
                 </div>
-                <div class="refresh-box"><a v-link="currentPermalink(one)">&#187;</a></div>
+                <div class="refresh-box" v-else><a v-link="currentPermalink(one)">&#187;</a></div>
               </div>
             </template>
           </div>
@@ -53,12 +53,16 @@ export default {
       {
         title: "Favorited by..",
         loading: true,
-        tweets: []
+        tweets: [],
+        showTweets: false,
+        loadingTweets: false
       },
       {
         title: "Favoriting..",
         loading: true,
-        tweets: []
+        tweets: [],
+        showTweets: false,
+        loadingTweets: false
       }
       ],
       user: null,
@@ -72,9 +76,37 @@ export default {
       var sn = one.lastUser.screen_name;
       return one._permalink.replace(/:screen_name/, sn);
     },
-    loadData: function() {
-      var sn = this.$route.params.screen_name;
+    openTweets: function(user, one, e) {
+      if (!one.showTweets || user === one.lastUser) {
+        one.showTweets = !one.showTweets;
+      }
+      if (one.showTweets) {
+        one.lastUser = user;
+        one.loadingTweets = true;
+        var params = {};
+        Object.keys(one._tweets).forEach(key => {
+          if (one._tweets[key] === ":screen_name") {
+            params[key] = user.screen_name
+          } else {
+            params[key] = one._tweets[key]
+          }
+        });
+        aclog.tweets.__tweets("tweets/user_favorited_by", Object.assign({ count: 3 }, params)).then(res => {
+          one.loadingTweets = false;
+          one.tweets = res.statuses;
+        });
+      }
+    },
+    failProfileImage: function(e) {
+      e.preventDefault();
+      e.target.src = "/assets/profile_image_missing.png";
+    },
+  },
+  route: {
+    data(tr) {
+      var sn = tr.to.params.screen_name;
       aclog.users.favorited_by(sn).then(res => {
+        this.user = res.user;
         this.data.$set(0, Object.assign(this.data[0], {
           loading: false,
           users: res.users,
@@ -86,9 +118,9 @@ export default {
           _permalink: "/" + sn + "/favorited_by/:screen_name",
           _tweets: { screen_name: sn, source_screen_name: ":screen_name" },
         }));
-        this.user = res.user;
       });
       aclog.users.favorited_users(sn).then(res => {
+        this.user = res.user;
         this.data.$set(1, Object.assign(this.data[1], {
           loading: false,
           users: res.users,
@@ -100,35 +132,8 @@ export default {
           _permalink: "/:screen_name/favorited_by/" + sn,
           _tweets: { screen_name: ":screen_name", source_screen_name: sn },
         }));
-        this.user = res.user;
       });
-    },
-    openTweets: function(user, one, e) {
-      if (!one.showTweets || user === one.lastUser) {
-        one.showTweets = !one.showTweets;
-      }
-      if (one.showTweets) {
-        one.lastUser = user;
-        var params = {};
-        Object.keys(one._tweets).forEach(key => {
-          if (one._tweets[key] === ":screen_name") {
-            params[key] = user.screen_name
-          } else {
-            params[key] = one._tweets[key]
-          }
-        });
-        aclog.tweets.__tweets("tweets/user_favorited_by", Object.assign({ count: 3 }, params)).then(res => {
-          one.tweets = res.statuses;
-        });
-      }
-    },
-    failProfileImage: function(e) {
-      e.preventDefault();
-      e.target.src = "/assets/profile_image_missing.png";
-    },
-  },
-  ready: function() {
-    this.loadData();
+    }
   }
 };
 </script>

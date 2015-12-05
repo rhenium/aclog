@@ -93,7 +93,9 @@ export default {
     },
     submit: function(e) {
       e.preventDefault();
-      this.$route.router.go("/" + this.enteredUserName);
+      if (this.enteredUserName !== "") {
+        this.$route.router.go("/" + this.enteredUserName);
+      }
     },
     logout(e) {
       e.preventDefault();

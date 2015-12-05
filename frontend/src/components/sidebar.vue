@@ -5,7 +5,10 @@
       <p>@{{user.screen_name}}</p>
       <p><a class="aclogicon aclogicon-twitter" href="https://twitter.com/{{user.screen_name}}"></a></p>
       <div class="user-stats">
-        <template v-if="stats">
+        <div class="loading-box" v-if="loading">
+          <img class="loading-image" src="/assets/loading.gif" />
+        </div>
+        <template v-else>
           <ul class="records" v-if="stats.registered">
             <li><span>Received</span><span class="data">{{stats.reactions_count}}</span></li>
             <li><span>Average</span><span class="data">{{average}}</span></li>
@@ -13,9 +16,6 @@
           </ul>
           <div class="alert alert-aclog" v-else>@{{user.screen_name}} は aclog に登録していません</div>
         </template>
-        <div class="loading-box" v-if="loading">
-          <img class="loading-image" src="/assets/loading.gif" />
-        </div>
       </div>
     </div>
     <h1 v-else>All</h1>
@@ -100,10 +100,17 @@ export default {
       e.preventDefault();
       this.$route.router.go({ name: "public-filter", query: { q: this.query } });
     },
+    updateUser(u) {
+      this.loading = true;
+      aclog.users.stats_compact(newval.screen_name).then(res => {
+        this.stats = res;
+        this.loading = false;
+      });
+    }
   },
   watch: {
     user(newval, oldval) {
-      if (newval) {
+      if (newval && (!oldval || newval.id != oldval.id)) {
         this.loading = true;
         aclog.users.stats_compact(newval.screen_name).then(res => {
           this.stats = res;
@@ -112,10 +119,8 @@ export default {
       }
     }
   },
-  route: {
-    data(tr) {
-      if (tr.to.query.q) { return { q: tr.to.query.q }; }
-    }
+  created() {
+    if (this.$route.query.q) { this.query = this.$route.query.q; }
   }
 };
 </script>

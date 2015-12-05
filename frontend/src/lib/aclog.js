@@ -76,6 +76,6 @@ export default {
   },
   settings: {
     get: () => get("settings/get"),
-    update: (settings) => post("settings/update"),
+    update: (settings) => post("settings/update", settings),
   }
 };

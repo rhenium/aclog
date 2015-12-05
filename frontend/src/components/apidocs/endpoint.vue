@@ -1,5 +1,8 @@
 <template>
-  <template v-if="endpoint">
+  <div class="loading-box" v-if="$loadingRouteData">
+    <img class="loading-image" src="/assets/loading.gif" />
+  </div>
+  <template v-else>
     <h1>{{endpoint.method}} {{endpoint.path}}</h1>
     <p>{{endpoint.description}}</p>
     <h2>Resource URL</h2>
@@ -26,7 +29,6 @@
       <pre><code><div v-if="example.loading"><img alt="loading..." src="/assets/loading.gif" /></div>{{example.result}}</code></pre>
     </template>
   </template>
-  <div v-else><img alt="loading..." src="/assets/loading.gif" /></div>
 </template>
 
 <script>

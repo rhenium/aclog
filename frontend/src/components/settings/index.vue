@@ -7,9 +7,10 @@
         </div>
       </div>
       <div class="col-sm-9 col-md-7 col-lg-6">
-        <form v-on:submit="submit">
+        <div class="loading-box" v-if="!settings"><img class="loading-image" src="/assets/loading.gif" /></div>
+        <form v-on:submit="submit" v-else>
           <div class="checkbox">
-            <input checked="checked" name="notification_enabled" type="checkbox" />
+            <input v-model="settings.notification_enabled" type="checkbox" />
             <label for="notification_enabled">リプライ通知を有効にする</label>
           </div>
           <div class="form-group">
@@ -35,6 +36,7 @@ export default {
     submit(e) {
       e.preventDefault();
       Aclog.settings.update(this.settings).then(res => {
+        console.log(res);
         this.settings = res;
       });
     },
@@ -43,6 +45,7 @@ export default {
     data(tr) {
       if (Storage.isLoggedIn()) {
         Aclog.settings.get().then(res => {
+        console.log(res);
           tr.next({ settings: res });
         });
       } else {

@@ -1,5 +1,5 @@
 export default {
-  backendPrefix: "http://chikuwa.rhe.jp:3000",
-  apiPrefix: "http://chikuwa.rhe.jp:3000",
+  backendPrefix: "",
+  apiPrefix: "http://chikuwa.rhe.jp:8000",
   debug: true,
 };

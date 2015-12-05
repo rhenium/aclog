@@ -1,12 +1,1 @@
 ja:
-  error:
-    not_found: このページは存在しません
-    forbidden: このページを表示する権限がありません
-    unauthorized: このページを表示する権限がありません
-    internal_error: エラー
-  views:
-    settings:
-      enable_notification: リプライ通知を有効にする
-      confirm_deactivation: 記録を停止する
-    sidebar:
-      user_not_registered: は aclog に登録していません

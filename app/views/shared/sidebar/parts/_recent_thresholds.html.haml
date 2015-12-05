@@ -1,8 +1,0 @@
-.list-group
-  - ["All Time", "1d", "1w", "1m", "3m", "1y"].each_slice(2).to_a.transpose.each do |ns|
-    .list-group-col
-      - ns.each do |n|
-        - if n.to_s == (params[:recent] || "All Time").to_s
-          = link_to n, params, class: "list-group-item active"
-        - else
-          = link_to n, params.merge(recent: (n == "All Time" ? nil : n)), class: "list-group-item"

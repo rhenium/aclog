@@ -1,23 +1,19 @@
 class OptoutController < ApplicationController
   include OAuthUtils
 
-  def index
-  end
-
-  def create
-    oauth_redirect(optout_callback_url)
+  def redirect
+    render_json data: { redirect: oauth_redirect }
   end
 
   def callback
-    access_token = oauth_verify!
-
-    account = Account.register(user_id: access_token.params[:user_id],
-                               oauth_token: access_token.token,
-                               oauth_token_secret: access_token.secret)
+    account = oauth_callback
     account.opted_out!
-    reset_session if logged_in?
+    reset_session
+
+    render_json data: { }
   end
 
+  # TODO:
   def destroy
     if logged_in? && current_user.opted_out?
       current_user.account.active!

@@ -1,0 +1,84 @@
+/* ================ Sidebar ================ */
+@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+
+.sidebar {
+    @include clearfix;
+    h1 {
+        margin-top: 0;
+        font-size: 32px;
+    }
+
+    p {
+        text-align: center;
+        margin-bottom: 5px;
+        vertical-align: top;
+    }
+
+    a.aclogicon {
+        color: #999;
+        font-size: 20px;
+
+        &:hover {
+            color: #333;
+            text-decoration: none;
+        }
+    }
+
+    .user-stats {
+        ul.records {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 30px;
+
+            li {
+                @include clearfix;
+
+                padding: 5px 15px;
+                border-bottom: 1px solid #ccc;
+
+                span {
+                    float: left;
+                    padding-top: 4px;
+                }
+
+                span.data {
+                    padding-top: 0;
+                    float: right;
+                    font-size: 18px;
+                    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+
+                    span {
+                        float: none;
+                        padding-left: 7px;
+                        color: #999;
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar-flex {
+            display: flex;
+
+            .list-group {
+                flex: auto;
+                width: 100%;
+                margin-right: 15px;
+                &:last-child {
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+}
+
+.search-box {
+    margin-bottom: 15px;
+
+    .btn {
+        padding: 6px 12px;
+        height: 34px;
+    }
+}

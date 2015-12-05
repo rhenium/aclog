@@ -8,6 +8,8 @@ class ApplicationController < ActionController::Base
   helper_method :logged_in?, :current_user
   helper_method :authorized?
 
+  before_action :force_json
+
   def routing_error
     raise ActionController::RoutingError, "No route matches #{params[:unmatched_route]}"
   end
@@ -29,8 +31,8 @@ class ApplicationController < ActionController::Base
     when User
       !object.protected? ||
         logged_in? &&
-          (object.id == current_user.id ||
-           current_user.account.following?(object))
+        (object.id == current_user.id ||
+         current_user.account.following?(object))
     when Tweet
       authorized?(object.user)
     else
@@ -48,7 +50,17 @@ class ApplicationController < ActionController::Base
     object
   end
 
-  def safe_redirect?(to)
-    to[0] == "/" && !to.include?("//")
+  def force_json
+    request.format = :json unless params[:format] == :atom
+  end
+
+  alias __render__ render
+
+  def render(*args)
+    raise ArgumentError, "don't use render, use render_json"
+  end
+
+  def render_json(data:, **kwargs)
+    __render__({ json: { authenticity_token: form_authenticity_token, current_user: current_user, data: data } }.merge(kwargs))
   end
 end

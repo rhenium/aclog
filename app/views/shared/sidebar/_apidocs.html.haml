@@ -1,6 +1,0 @@
-.sidebar-list
-  .list-group.list-group-scroll
-    - @apidocs.values.inject(:merge).each do |namespace, endpoints|
-      %span.list-group-head= namespace.titleize
-      - endpoints.reject {|_, e| e.route_nodoc || e.route_deprecated }.each do |action, endpoint|
-        = link_to_with_active format_endpoint_name(endpoint), about_api_endpoint_path(endpoint.route_method.downcase, namespace, action), class: "list-group-item"

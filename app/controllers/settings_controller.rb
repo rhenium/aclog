@@ -1,12 +1,13 @@
 class SettingsController < ApplicationController
   before_action :set_account
 
-  def index
+  def get
+    render_json data: { notification_enabled: @account.notification_enabled }
   end
 
   def update
     @account.update(notification_enabled: !!params[:notification_enabled])
-    redirect_to action: "index"
+    render_json data: { notification_enabled: @account.notification_enabled }
   end
 
   def confirm_deactivation
@@ -25,8 +26,7 @@ class SettingsController < ApplicationController
 
   private
   def set_account
-    return redirect_to "/i/login?redirect_after_login=" + CGI.escape(url_for(only_path: true)) unless logged_in?
-
+    raise Aclog::Exceptions::Unauthorized unless logged_in?
     @account = current_user.account
   end
 end

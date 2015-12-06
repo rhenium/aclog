@@ -8,9 +8,7 @@
         <div class="favorite-graph">
           <div v-for="one in data">
             <h2>{{one.title}}</h2>
-            <div class="loading-box" v-if="one.loading">
-              <img class="loading-image" src="/assets/loading.gif" />
-            </div>
+            <partial name="loading-box" v-if="one.loading"></partial>
             <template v-else>
               <div class="chart">
                 <div class="chart-item other" v-if="one.users_count &gt; one.users.length" v-bind:style="{ 'background-color': itemColor(one.users.length) }">
@@ -28,9 +26,7 @@
               </div>
               <div class="statuses" v-if="one.showTweets">
                 <tweet v-for="tweet in one.tweets" v-bind:tweet="tweet"></tweet>
-                <div class="loading-box" v-if="one.loadingTweets">
-                  <img class="loading-image" src="/assets/loading.gif" />
-                </div>
+                <partial name="loading-box" v-if="one.loadingTweets"></partial>
                 <div class="refresh-box" v-else><a v-link="currentPermalink(one)">&#187;</a></div>
               </div>
             </template>

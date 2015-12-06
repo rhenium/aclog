@@ -23,10 +23,10 @@ export default {
     data(tr) {
       this.$root.updateTitle("Authenticating...");
       aclog.optout.callback(this.$route.query.oauth_verifier).then(res => {
-        tr.next({});
+        tr.next();
       }).catch(err => {
-        // TODO: flash message?
-        tr.redirect("/");
+        this.$root.setFlash(err);
+        tr.abort();
       });
     },
   },

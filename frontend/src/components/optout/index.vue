@@ -30,6 +30,8 @@ export default {
       var callback = location.protocol + "//" + location.host + "/i/optout/callback";
       aclog.optout.redirect(callback).then(res => {
         location.href = res.redirect;
+      }).catch(err => {
+        this.$root.setFlash(err);
       });
     },
   },

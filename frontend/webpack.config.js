@@ -10,7 +10,7 @@ module.exports = {
     filename: "app.build.js"
   },
   resolve: {
-    root: [__dirname + "/src/lib"],
+    root: [__dirname + "/src/lib", __dirname + "/src"],
   },
   module: {
     loaders: [

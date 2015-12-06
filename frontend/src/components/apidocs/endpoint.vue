@@ -5,9 +5,7 @@
         <apidocs-sidebar></apidocs-sidebar>
       </div>
       <div class="col-sm-9">
-        <div class="loading-box" v-if="$loadingRouteData">
-          <img class="loading-image" src="/assets/loading.gif" />
-        </div>
+        <partial name="loading-box" v-if="$loadingRouteData"></partial>
         <template v-else>
           <h1>{{endpoint.method}} {{endpoint.path}}</h1>
           <p>{{endpoint.description}}</p>
@@ -32,7 +30,7 @@
             <span>{{endpoint.method}}</span>
             <code>{{example_url}}</code>
             </p>
-            <pre><code><div v-if="example.loading"><img alt="loading..." src="/assets/loading.gif" /></div>{{example.result}}</code></pre>
+            <pre><code><partial name="loading-box" v-if="example.loading"></partial>{{example.result}}</code></pre>
           </template>
         </template>
       </div>
@@ -68,18 +66,22 @@ export default {
   route: {
     data(transition) {
       this.$root.updateTitle(this.$route.params.method.toUpperCase() + " " + this.$route.params.path + " - API Documentation");
+
+      var notFound = (e) => {
+        if (e) this.$root.setFlash(e);
+        transition.abort();
+      };
+
       aclog.apidocs.load().then(docs => {
         const path = this.$route.params.path;
         const ns = path.split("/", 2)[0];
         const es = docs.namespaces[ns];
-        if (!es) return transition.redirect("/");
+        if (!es) return notFound();
         const endpoint = es.find(endp => endp.path === path);
-        if (!endpoint) return transition.redirect("/");
+        if (!endpoint) return notFound();
 
         transition.next({ endpoint: endpoint, example: { loading: false, result: null } });
-      }).catch(err => {
-        transition.redirect("*");
-      }).then(() => {
+      }).catch(notFound).then(() => {
         this.example.loading = true;
         fetch(this.example_url).then(res => {
           if (res.status >= 400) {

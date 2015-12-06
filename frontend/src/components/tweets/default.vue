@@ -2,14 +2,13 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-3 col-md-offset-1">
-        <sidebar v-bind:user="user"></sidebar>
+        <sidebar-user v-bind:user="user" v-if="isUserPage"></sidebar-user>
+        <sidebar-public v-else></sidebar-public>
       </div>
       <div class="col-sm-9 col-md-7 col-lg-6">
         <div class="statuses" v-el:tweets>
           <tweet v-for="tweet in statuses" v-bind:tweet="tweet"></tweet>
-          <div class="loading-box" v-if="loading">
-            <img class="loading-image" src="/assets/loading.gif" />
-          </div>
+          <partial name="loading-box" v-if="loading"></partial>
         </div>
       </div>
     </div>
@@ -18,9 +17,15 @@
 
 <script>
 import aclog from "aclog";
+import SidebarUser from "components/sidebar/user.vue";
+import SidebarPublic from "components/sidebar/public.vue";
 
 export default {
-  data: function() {
+  components: {
+    "sidebar-user": SidebarUser,
+    "sidebar-public": SidebarPublic
+  },
+  data() {
     return {
       statuses: [],
       user: null,
@@ -30,11 +35,16 @@ export default {
       scrollListener: null,
     };
   },
+  computed: {
+    isUserPage() {
+      return !this.$route.fullPath.startsWith("/i/public"); // TODO: kakkowarui
+    }
+  },
   methods: {
-    loadNext: function(queryString) {
-      if (this.loading || (!queryString && !this.next)) { return; }
+    loadNext() {
+      if (this.loading || !this.next) return;
       this.loading = true;
-      aclog.tweets.__tweets(this.$route.api, queryString || this.next).then(json => {
+      aclog.tweets.__tweets(this.$route.api, this.next).then(json => {
         this.loading = false;
         this.statuses = this.statuses.concat(json.statuses);
         this.user = json.user;
@@ -47,15 +57,26 @@ export default {
     },
   },
   route: {
-    data() {
+    data(transition) {
       this.$root.updateTitle(Object.keys(this.$route.params).reduce((p, c) => p.replace(":" + c, this.$route.params[c]), this.$route.title));
-      this.loadNext(Object.assign({}, this.$route.params, this.$route.query));
-      return {
-        statuses: [],
-        loading: true,
-        next: null,
-        prev: null,
-      };
+      if (this.isUserPage && (this.user === null || this.user.screen_name !== this.$route.params.screen_name)) {
+        this.user = { screen_name: this.$route.params.screen_name, profile_image_url: "/assets/loading.gif", registered: true };
+      }
+      this.statuses = [];
+      this.loading = true;
+      this.prev = this.next = null;
+      aclog.tweets.__tweets(this.$route.api, Object.assign({}, this.$route.params, this.$route.query)).then(res => {
+        transition.next({
+          user: res.user,
+          next: res.next,
+          prev: res.prev,
+          statuses: res.statuses,
+          loading: false
+        });
+      }).catch(err => {
+        this.$root.setFlash(err);
+        transition.abort();
+      });
     },
   },
   ready: function() {

@@ -1,9 +1,7 @@
 <template>
   <div class="sidebar">
     <div class="sidebar-list">
-      <div class="loading-box" v-if="loading">
-        <img class="loading-image" src="/assets/loading.gif" />
-      </div>
+      <partial name="loading-box" v-if="loading"></partial>
       <div class="list-group list-group-scroll" v-else>
         <template v-for="(name, namespace) in apidocs">
           <span class="list-group-head">{{name | capitalize}}</span>

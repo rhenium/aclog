@@ -12,6 +12,11 @@
   </head>
   <body>
     <navbar></navbar>
+    <div class="container" v-if="flash">
+      <div class="alert alert-danger">
+        <strong>{{flash}}</strong>
+      </div>
+    </div>
     <router-view></router-view>
     <script src="/assets/app.build.js"></script>
   </body>

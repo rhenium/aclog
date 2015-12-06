@@ -39,9 +39,7 @@
         </template>
       </tbody>
     </table>
-    <div class="loading-box" v-if="loading">
-      <img class="loading-image" src="/assets/loading.gif" />
-    </div>
+    <partial name="loading-box" v-if="loading"></partial>
     <div class="refresh-box" v-else>
       <a v-on:click="load" href="#" title="Refresh"><span class="glyphicon glyphicon-refresh" /></a>
     </div>
@@ -84,16 +82,17 @@ export default {
         this.active_nodes = res.active_nodes;
         this.inactive_nodes = res.inactive_nodes;
       }).catch(err => {
-        this.nodes = this.active_nodes = this.inactive_nodes = null;
         this.loading = false;
         this.error = "Failed to fetch (" + err + ")";
+        this.nodes = this.active_nodes = this.inactive_nodes = null;
       });
     },
   },
   route: {
     data() { // show page before data
-      this.load();
       this.$root.updateTitle("Status");
+      this.load();
+      return {};
     }
   }
 };

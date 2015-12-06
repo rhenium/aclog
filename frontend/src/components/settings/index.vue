@@ -7,7 +7,7 @@
         </div>
       </div>
       <div class="col-sm-9 col-md-7 col-lg-6">
-        <div class="loading-box" v-if="!settings"><img class="loading-image" src="/assets/loading.gif" /></div>
+        <partial name="loading-box" v-if="!settings"></partial>
         <form v-on:submit="submit" v-else>
           <div class="checkbox">
             <input v-model="settings.notification_enabled" type="checkbox" />

@@ -14,14 +14,14 @@ export default {
       this.$root.updateTitle("Authenticating...");
       aclog.sessions.callback(this.$route.query.oauth_verifier).then(res => {
         const redirect = tr.to.query.redirect_after_login;
-        if (redirect.startsWith("/") && !redirect.index("//")) {
-          tr.redirect(redirect);
+        if (redirect && redirect.startsWith("/") && !redirect.indexOf("//")) {
+          tr.redirect({ path: redirect, query: null });
         } else {
-          tr.redirect("/" + res.current_user.screen_name);
+          tr.redirect({ path: "/" + res.current_user.screen_name, query: null });
         }
       }).catch(err => {
-        // TODO: flash message?
-        tr.redirect("/");
+        this.$root.setFlash(err);
+        tr.abort();
       });
     },
   }

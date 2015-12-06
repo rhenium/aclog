@@ -1,13 +1,14 @@
 <template>
   <div class="container">
-    <div class="row">
+    <partial name="loading-box" v-if="$loadingRouteData"></partial>
+    <div class="row" v-else>
       <div class="col-sm-3 col-md-offset-1">
-        <sidebar v-bind:user="user"></sidebar>
+        <sidebar-user v-bind:user="user"></sidebar-user>
       </div>
       <div class="col-sm-9 col-md-7 col-lg-6">
         <div class="statuses" v-el:tweets>
           <tweet v-for="tweet in statuses" v-bind:tweet="tweet"></tweet>
-          <div class="loading-box" v-if="loading"><img class="loading-image" src="/assets/loading.gif" /></div>
+          <partial name="loading-box" v-if="loading"></partial>
           <div class="refresh-box" v-else><a v-on:click="refresh" href="#" title="Refresh"><span class="glyphicon glyphicon-refresh" /></a></div>
         </div>
       </div>
@@ -18,9 +19,13 @@
 <script>
 import aclog from "aclog";
 import Utils from "utils";
+import SidebarUser from "components/sidebar/user.vue";
 
 export default {
-  data: function() {
+  components: {
+    "sidebar-user": SidebarUser
+  },
+  data() {
     return {
       statuses: [],
       user: null,
@@ -35,7 +40,7 @@ export default {
         this.statuses = res.statuses;
         this.user = res.user;
         this.loading = false;
-      });
+      }).catch(err => this.$root.setFlash(err));
     },
   },
   route: {
@@ -50,7 +55,7 @@ export default {
           loading: false
         });
       }).catch(err => {
-        console.log(err);
+        this.$root.setFlash(err);
         transition.abort();
       });
     },

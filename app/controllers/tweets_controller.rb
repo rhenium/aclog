@@ -71,13 +71,13 @@ class TweetsController < ApplicationController
       sts << transform_tweet(t).merge(aside: true) }
 
     render_json data: {
-      user: @user,
+      user: @user.as_json(methods: :registered),
       statuses: sts }
   end
 
   def render_tweets
     hash = {
-      user: @user,
+      user: @user.as_json(methods: :registered),
       statuses: @tweets.map(&method(:transform_tweet)) }
 
     if @tweets.length > 0

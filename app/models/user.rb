@@ -70,6 +70,7 @@ class User < ActiveRecord::Base
   def registered?
     !!account && account.active?
   end
+  alias registered registered?
 
   def opted_out?
     !!account && account.opted_out?

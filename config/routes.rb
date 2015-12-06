@@ -4,6 +4,5 @@ Rails.application.routes.draw do
   root "about#index"
   get "/:screen_name/timeline.atom" => "tweets#user_timeline", defaults: { format: :atom } # Atom feed
   match "/i/api/:controller/:action", via: [:get, :post]
-  get "*unmatched_route" =>                     "application#routing_error"
+  get "*unmatched_route" => "application#action_missing"
 end
-

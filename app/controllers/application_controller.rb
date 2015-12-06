@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
 
   before_action :force_json
 
-  def routing_error
+  def action_missing(*args, &blk)
     raise ActionController::RoutingError, "No route matches #{params[:unmatched_route]}"
   end
 
@@ -60,7 +60,6 @@ class ApplicationController < ActionController::Base
   end
 
   def render_json(data:, **kwargs)
-    sleep 1
     __render__({ json: { authenticity_token: form_authenticity_token, current_user: current_user, data: data } }.merge(kwargs))
   end
 end

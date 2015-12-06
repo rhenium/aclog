@@ -22,6 +22,12 @@ class UsersController < ApplicationController
     render_json data: format_favorited_by(data)
   end
 
+  def lookup
+    sns = params[:screen_name].split(",")
+    queried = User.where(screen_name: sns).map { |u| [u.screen_name, u] }.to_h
+    render_json data: sns.map { |sn| queried[sn] }
+  end
+
   private
   def format_favorited_by(data)
     tops = data.take(Settings.users.count)
@@ -30,7 +36,7 @@ class UsersController < ApplicationController
 
     { users_count: data.size,
       reactions_count: all_reactions,
-      user: @user,
+      user: @user.as_json(methods: :registered),
       users: tops.reverse_each.map { |user_id, count|
         u = cached_users[user_id]
         { user_id: user_id,
@@ -45,6 +51,6 @@ class UsersController < ApplicationController
   end
 
   def require_registered!
-    @user.registered? || raise(Aclog::Exceptions::UserNotRegistered, self)
+    @user.registered? || raise(Aclog::Exceptions::UserNotRegistered)
   end
 end

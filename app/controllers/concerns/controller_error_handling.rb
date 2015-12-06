@@ -17,11 +17,11 @@ module ControllerErrorHandling
 
     rescue_from \
       ActionController::RoutingError,
-      ActionView::MissingTemplate,
+      AbstractController::ActionNotFound,
       ActiveRecord::RecordNotFound,
       Aclog::Exceptions::NotFound,
       Twitter::Error::NotFound do |exception|
-      message = "Page or object not found"
+      message = "Page or object not found (#{exception.message})"
       render_json data: { error: { message: message } }, status: 404
     end
 

@@ -82,8 +82,8 @@ class TweetsController < ApplicationController
 
     if @tweets.length > 0
       if !params[:page] && @tweets.order_values.all? {|o| !o.is_a?(String) && o.expr.name == :id }
-        hash[:prev] = params.dup.tap {|h| h.delete(:max_id) }.merge!(since_id: @tweets.first.id)
-        hash[:next] = params.dup.tap {|h| h.delete(:since_id) }.merge!(max_id: @tweets.last.id - 1)
+        hash[:prev] = params.dup.tap {|h| h.delete(:max_id) }.merge!(since_id: @tweets.first.id.to_s)
+        hash[:next] = params.dup.tap {|h| h.delete(:since_id) }.merge!(max_id: (@tweets.last.id - 1).to_s)
       else
         page = [params[:page].to_i, 1].max
         hash[:prev] = page == 1 ? nil : params.merge(page: page - 1)
@@ -98,14 +98,11 @@ class TweetsController < ApplicationController
     if !authorized?(tweet.user)
       { allowed: false,
         tweeted_at: tweet.tweeted_at }
-      # text "ユーザーはツイートを非公開にしています"
     elsif tweet.user.opted_out?
       { id_str: tweet.id.to_s,
         allowed: false,
         opted_out: true,
-        tweeted_at: tweet.tweeted_at,
-        user: tweet.user }
-      # json.text "ユーザーはオプトアウトしているため表示されません"
+        tweeted_at: tweet.tweeted_at }
     else
       hash = {
         id_str: tweet.id.to_s,

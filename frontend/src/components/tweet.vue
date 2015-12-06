@@ -68,7 +68,7 @@
             <div class="source aclogicon aclogicon-twitter" v-if="!tweet.id_str"></div>
           </span>
         </div>
-        <div class="status-text protected">{{tweet.text}}</div>
+        <div class="status-text protected">ツイートが非公開に設定されているため表示されません</div>
         <div class="status-foot"></div>
       </div>
     </div>

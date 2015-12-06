@@ -6,15 +6,12 @@
 
 <script>
 import aclog from "aclog";
-import storage from "storage";
 
 export default {
   route: {
     canReuse() { return false; },
-    canActivate() {
-      return !storage.isLoggedIn();
-    },
     data(tr) {
+      this.$root.updateTitle("Authenticating...");
       aclog.sessions.callback(this.$route.query.oauth_verifier).then(res => {
         const redirect = tr.to.query.redirect_after_login;
         if (redirect.startsWith("/") && !redirect.index("//")) {

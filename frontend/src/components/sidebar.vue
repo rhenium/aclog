@@ -5,17 +5,19 @@
       <p>@{{user.screen_name}}</p>
       <p><a class="aclogicon aclogicon-twitter" href="https://twitter.com/{{user.screen_name}}"></a></p>
       <div class="user-stats">
-        <div class="loading-box" v-if="loading">
-          <img class="loading-image" src="/assets/loading.gif" />
-        </div>
-        <template v-else>
-          <ul class="records" v-if="stats.registered">
-            <li><span>Received</span><span class="data">{{stats.reactions_count}}</span></li>
-            <li><span>Average</span><span class="data">{{average}}</span></li>
-            <li><span>Joined</span><span class="data">{{stats.since_join}}<span>d ago</span></span></li>
-          </ul>
-          <div class="alert alert-aclog" v-else>@{{user.screen_name}} は aclog に登録していません</div>
+        <template v-if="user.registered">
+          <div class="loading-box" v-if="loading">
+            <img class="loading-image" src="/assets/loading.gif" />
+          </div>
+          <template v-else>
+            <ul class="records">
+              <li><span>Received</span><span class="data">{{stats.reactions_count}}</span></li>
+              <li><span>Average</span><span class="data">{{average}}</span></li>
+              <li><span>Joined</span><span class="data">{{stats.since_join}}<span>d ago</span></span></li>
+            </ul>
+          </template>
         </template>
+        <div class="alert alert-aclog" v-else>@{{user.screen_name}} は aclog に登録していません</div>
       </div>
     </div>
     <h1 v-else>All</h1>
@@ -24,7 +26,7 @@
         <a class="list-group-item" v-link="{ exact: true, name: 'user-best-top', params: { screen_name: user.screen_name } }">Best</a>
         <a class="list-group-item" v-link="{ exact: true, name: 'user-timeline-top', params: { screen_name: user.screen_name } }">Timeline</a>
         <a class="list-group-item" v-link="{ exact: true, name: 'user-favorites-top', params: { screen_name: user.screen_name } }">Favorites</a>
-        <a class="list-group-item" v-link="{ exact: true, name: 'user-stats', params: { screen_name: user.screen_name } }">Stats</a>
+        <a class="list-group-item" v-link="{ exact: true, name: 'user-stats', params: { screen_name: user.screen_name } }" v-if="user.registered">Stats</a>
       </div>
       <div class="list-group" v-else>
         <a class="list-group-item" v-link="{ name: 'public-best-top' }">Best</a>
@@ -100,17 +102,10 @@ export default {
       e.preventDefault();
       this.$route.router.go({ name: "public-filter", query: { q: this.query } });
     },
-    updateUser(u) {
-      this.loading = true;
-      aclog.users.stats_compact(newval.screen_name).then(res => {
-        this.stats = res;
-        this.loading = false;
-      });
-    }
   },
   watch: {
     user(newval, oldval) {
-      if (newval && (!oldval || newval.id != oldval.id)) {
+      if (newval && newval.registered && (!oldval || newval.id != oldval.id)) {
         this.loading = true;
         aclog.users.stats_compact(newval.screen_name).then(res => {
           this.stats = res;

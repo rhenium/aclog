@@ -6,15 +6,12 @@
 
 <script>
 import aclog from "aclog";
-import storage from "storage";
 
 export default {
   route: {
     canReuse() { return false; },
-    canActivate() {
-      return !storage.isLoggedIn();
-    },
-    activate(tr) {
+    data(tr) {
+      this.$root.updateTitle("Authenticating...");
       var callback = location.protocol + "//" + location.host + "/i/callback?redirect_after_login=" + encodeURIComponent(this.$route.query.redirect_after_login);
       aclog.sessions.redirect(callback).then(res => {
         location.href = res.redirect;

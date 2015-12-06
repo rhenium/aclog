@@ -14,6 +14,13 @@
     margin-right: 0;
 }
 
+
+.navbar-nav > .navbar-initializing {
+    height: 44px;
+    min-width: 44px;
+    padding: 14px; // (44 - 16) / 2
+}
+
 .navbar-nav > li > a,
 .navbar-brand {
     padding-top: 0;

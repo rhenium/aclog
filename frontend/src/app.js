@@ -4,7 +4,7 @@ import VueRouter from "vue-router";
 import storage from "storage";
 import aclog from "aclog";
 
-import App from "./app.vue";
+import App from "./components/app.vue";
 import AboutIndexPage from "./components/about/index.vue";
 import AboutStatusPage from "./components/about/status.vue";
 import TweetsPage from "./components/tweets/default.vue";
@@ -12,12 +12,12 @@ import TweetDetailPage from "./components/tweets/show.vue";
 import UsersStatsPage from "./components/users/stats.vue";
 import SessionsLoginPage from "./components/sessions/login.vue";
 import SessionsCallbackPage from "./components/sessions/callback.vue";
-import ApidocsLayoutPage from "./components/apidocs/layout.vue";
 import ApidocsIndex from "./components/apidocs/index.vue";
 import ApidocsEndpoint from "./components/apidocs/endpoint.vue";
 import SettingsPage from "./components/settings/index.vue";
 import OptoutPage from "./components/optout/index.vue";
 import OptoutCallbackPage from "./components/optout/callback.vue";
+import NotFoundPage from "./components/errors/not_found.vue";
 
 Vue.config.debug = true;
 
@@ -42,15 +42,10 @@ router.map({
     component: AboutStatusPage,
   },
   "/about/api": {
-    component: ApidocsLayoutPage,
-    subRoutes: {
-      "/:method/*path": {
-        component: ApidocsEndpoint,
-      },
-      "/": {
-        component: ApidocsIndex,
-      },
-    }
+      component: ApidocsIndex
+  },
+  "/about/api/:method/*path": {
+      component: ApidocsEndpoint
   },
   "/i/login": {
     name: "login",
@@ -71,12 +66,14 @@ router.map({
   "/i/public/filter": {
     name: "public-filter",
     component: TweetsPage,
+    title: "Public Timeline",
     api: "tweets/filter",
     filtering: "query",
   },
   "/i/public/best": {
     name: "public-best-top",
     component: TweetsPage,
+    title: "Top Tweets",
     api: "tweets/all_best",
     filtering: "time",
     subRoutes: {
@@ -86,6 +83,7 @@ router.map({
   "/i/public/timeline": {
     name: "public-timeline-top",
     component: TweetsPage,
+    title: "Public Timeline",
     api: "tweets/all_timeline",
     filtering: "reactions",
     subRoutes: {
@@ -103,6 +101,7 @@ router.map({
   "/:screen_name": {
     name: "user-best-top",
     component: TweetsPage,
+    title: "@:screen_name's Best Tweets",
     api: "tweets/user_best",
     filtering: "time",
     subRoutes: {
@@ -112,6 +111,7 @@ router.map({
   "/:screen_name/timeline": {
     name: "user-timeline-top",
     component: TweetsPage,
+    title: "@:screen_name's Timeline",
     api: "tweets/user_timeline",
     filtering: "reactions",
     subRoutes: {
@@ -121,6 +121,7 @@ router.map({
   "/:screen_name/favorites": {
     name: "user-favorites-top",
     component: TweetsPage,
+    title: "@:screen_name's Favorites",
     api: "tweets/user_favorites",
     filtering: "reactions",
     subRoutes: {
@@ -130,6 +131,7 @@ router.map({
   "/:screen_name/favorited_by/:source_screen_name": {
     name: "user-favorited-by-top",
     component: TweetsPage,
+    title: "@:screen_name's Tweets favorited by @:source_screen_name",
     api: "tweets/user_favorited_by",
     filtering: "reactions",
     subRoutes: {
@@ -141,14 +143,15 @@ router.map({
     component: UsersStatsPage,
   },
   "*": {
-    component: Vue.extend({ template: "not found" })
+    component: NotFoundPage,
   },
 });
 
 router.redirect({
   "/i/timeline": "/i/public/timeline",
   "/i/best": "/i/public/best",
+  "/i/filter": "/i/public/filter",
 });
 
-var start = () => router.start(App, "body");
-aclog.sessions.verify().then(start).catch(start);
+aclog.sessions.verify();
+router.start(App, "body");

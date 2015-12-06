@@ -17,6 +17,7 @@
 
 <script>
 import aclog from "aclog";
+import Utils from "utils";
 
 export default {
   data: function() {
@@ -27,19 +28,6 @@ export default {
     };
   },
   methods: {
-    load: function(queryString) {
-      if (this.loading || (!queryString && !this.next)) { return; }
-      this.loading = true;
-      aclog.tweets.__tweets(this.$route.api, queryString || this.next).then(json => {
-        this.statuses = this.statuses.concat(json.statuses);
-        this.user = json.user;
-        this.next = json.next;
-        this.loading = false;
-      }).catch(err => {
-        console.log(err);
-        // TODO
-      });
-    },
     refresh(e) {
       e.preventDefault();
       this.loading = true;
@@ -52,13 +40,17 @@ export default {
   },
   route: {
     data(transition) {
+      this.$root.updateTitle("Loading...");
       aclog.tweets.show(this.$route.params.id).then(res => {
+        var tweet = res.statuses.find(st => st.id_str === this.$route.params.id);
+        this.$root.updateTitle('"' + Utils.truncateString(tweet.text, 30) + '" from @' + res.user.screen_name);
         transition.next({
           statuses: res.statuses,
           user: res.user,
           loading: false
         });
       }).catch(err => {
+        console.log(err);
         transition.abort();
       });
     },

@@ -76,21 +76,15 @@
     <section class="contributors">
       <div class="contributor">
         <em>Created by</em>
-        <a href="https://twitter.com/rhe__" target="_blank">
-          <img alt="@rhe__" src="https://almond.rhe.jp/profile_images/664466361180123136/kfv_DwGa_normal.png" title="@rhe__" />
-        </a>
+        <a href="https://twitter.com/{{created_by.screen_name}}" target="_blank"><img alt="@{{created_by.screen_name}}" v-bind:src="created_by.profile_image_url" title="@{{created_by.screen_name}}" /></a>
       </div>
       <div class="contributor">
         <em>Designed by</em>
-        <a href="https://twitter.com/aayh" target="_blank">
-          <img alt="@aayh" src="https://almond.rhe.jp/profile_images/664818955761004544/InM3jsX2_normal.png" title="@aayh" />
-        </a>
+        <a href="https://twitter.com/{{designed_by.screen_name}}" target="_blank"><img alt="@{{designed_by.screen_name}}" v-bind:src="designed_by.profile_image_url" title="@{{designed_by.screen_name}}" /></a>
       </div>
       <div class="contributor">
         <em>Hosted by</em>
-        <a href="https://twitter.com/KOBA789" target="_blank">
-          <img alt="@KOBA789" src="https://almond.rhe.jp/profile_images/668468876590473216/XYjK9Kao_normal.png" title="@KOBA789" />
-        </a>
+        <a href="https://twitter.com/{{hosted_by.screen_name}}" target="_blank"><img alt="@{{hosted_by.screen_name}}" v-bind:src="hosted_by.profile_image_url" title="@{{hosted_by.screen_name}}" /></a>
       </div>
     </section>
     <section>
@@ -102,8 +96,30 @@
 </template>
 
 <script>
+import aclog from "aclog";
+
 export default {
-  ready: function() {
+  data() {
+    return {
+      created_by: { screen_name: "rhe__", profile_image_url: "/assets/loading.gif" },
+      designed_by: { screen_name: "aayh", profile_image_url: "/assets/loading.gif" },
+      hosted_by: { screen_name: "KOBA789", profile_image_url: "/assets/loading.gif" },
+      loaded: false,
+    };
+  },
+  route: {
+    data() {
+      this.$root.updateTitle("");
+      if (this.loaded) return;
+      aclog.users.lookup([this.created_by, this.designed_by, this.hosted_by].map(u => u.screen_name)).then(users => {
+        this.created_by = users[0];
+        this.designed_by = users[1];
+        this.hosted_by = users[2];
+        this.loaded = true;
+      });
+    }
+  },
+  ready() {
     Array.prototype.forEach.call(document.querySelectorAll(".tweet-button a"), function(node) {
       node.onclick = function(e) {
         e.preventDefault();

@@ -5,7 +5,6 @@
         <sidebar v-bind:user="user"></sidebar>
       </div>
       <div class="col-sm-9 col-md-7 col-lg-6">
-        <h1 v-if="$route.title">{{$route.title}}</h1>
         <div class="statuses" v-el:tweets>
           <tweet v-for="tweet in statuses" v-bind:tweet="tweet"></tweet>
           <div class="loading-box" v-if="loading">
@@ -36,11 +35,12 @@ export default {
       if (this.loading || (!queryString && !this.next)) { return; }
       this.loading = true;
       aclog.tweets.__tweets(this.$route.api, queryString || this.next).then(json => {
+        this.loading = false;
         this.statuses = this.statuses.concat(json.statuses);
         this.user = json.user;
         this.next = json.next;
-        this.loading = false;
       }).catch(err => {
+        this.loading = false;
         console.log(err);
         // TODO
       });
@@ -48,10 +48,11 @@ export default {
   },
   route: {
     data() {
+      this.$root.updateTitle(Object.keys(this.$route.params).reduce((p, c) => p.replace(":" + c, this.$route.params[c]), this.$route.title));
       this.loadNext(Object.assign({}, this.$route.params, this.$route.query));
       return {
         statuses: [],
-        loading: false,
+        loading: true,
         next: null,
         prev: null,
       };

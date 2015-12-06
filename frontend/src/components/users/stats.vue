@@ -74,7 +74,11 @@ export default {
     },
     currentPermalink: function(one) {
       var sn = one.lastUser.screen_name;
-      return one._permalink.replace(/:screen_name/, sn);
+      if (one.isTarget) {
+        return "/" + this.user.screen_name + "/favorited_by/" + sn;
+      } else {
+        return "/" + sn + "/favorited_by/" + this.user.screen_name;
+      }
     },
     openTweets: function(user, one, e) {
       if (!one.showTweets || user === one.lastUser) {
@@ -84,13 +88,13 @@ export default {
         one.lastUser = user;
         one.loadingTweets = true;
         var params = {};
-        Object.keys(one._tweets).forEach(key => {
-          if (one._tweets[key] === ":screen_name") {
-            params[key] = user.screen_name
-          } else {
-            params[key] = one._tweets[key]
-          }
-        });
+        if (one.isTarget) {
+          params.screen_name = this.user.screen_name;
+          params.source_screen_name = user.screen_name
+        } else {
+          params.screen_name = user.screen_name;
+          params.source_screen_name = this.user.screen_name
+        }
         aclog.tweets.__tweets("tweets/user_favorited_by", Object.assign({ count: 3 }, params)).then(res => {
           one.loadingTweets = false;
           one.tweets = res.statuses;
@@ -105,6 +109,7 @@ export default {
   route: {
     data(tr) {
       var sn = tr.to.params.screen_name;
+      this.$root.updateTitle("@" + sn + "'s Stats");
       aclog.users.favorited_by(sn).then(res => {
         this.user = res.user;
         this.data.$set(0, Object.assign(this.data[0], {
@@ -115,8 +120,7 @@ export default {
           showTweets: false,
           tweets: [],
           lastUser: null,
-          _permalink: "/" + sn + "/favorited_by/:screen_name",
-          _tweets: { screen_name: sn, source_screen_name: ":screen_name" },
+          isTarget: true,
         }));
       });
       aclog.users.favorited_users(sn).then(res => {
@@ -129,8 +133,7 @@ export default {
           showTweets: false,
           tweets: [],
           lastUser: null,
-          _permalink: "/:screen_name/favorited_by/" + sn,
-          _tweets: { screen_name: ":screen_name", source_screen_name: sn },
+          isTarget: false,
         }));
       });
     }

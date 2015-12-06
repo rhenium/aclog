@@ -24,7 +24,6 @@
 
 <script>
 import Aclog from "aclog";
-import Storage from "storage";
 
 export default {
   data() {
@@ -43,14 +42,12 @@ export default {
   },
   route: {
     data(tr) {
-      if (Storage.isLoggedIn()) {
-        Aclog.settings.get().then(res => {
-        console.log(res);
-          tr.next({ settings: res });
-        });
-      } else {
+      this.$root.updateTitle("Settings");
+      Aclog.settings.get().then(res => {
+        tr.next({ settings: res });
+      }).catch(err => {
         tr.redirect("/i/login");
-      }
+      });
     }
   }
 };

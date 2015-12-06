@@ -32,6 +32,11 @@ export default {
         location.href = res.redirect;
       });
     },
+  },
+  route: {
+    data() {
+      this.$root.updateTitle("Authenticating...");
+    }
   }
 };
 </script>

@@ -51,6 +51,7 @@ export default {
     favorited_by: (sn) => get("users/favorited_by", { screen_name: sn }),
     favorited_users: (sn) => get("users/favorited_users", { screen_name: sn }),
     stats_compact: (sn) => get("users/stats_compact", { screen_name: sn }),
+    lookup: (sns) => get("users/lookup", { screen_name: sns.join(",") }),
   },
   tweets: {
     __tweets: (url, query) => get(url, query),

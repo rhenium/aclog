@@ -90,8 +90,11 @@ export default {
       });
     },
   },
-  ready() { // show page before data
-    return this.load();
+  route: {
+    data() { // show page before data
+      this.load();
+      this.$root.updateTitle("Status");
+    }
   }
 };
 </script>

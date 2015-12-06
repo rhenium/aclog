@@ -1,41 +1,52 @@
 <template>
-  <div class="loading-box" v-if="$loadingRouteData">
-    <img class="loading-image" src="/assets/loading.gif" />
-  </div>
-  <template v-else>
-    <h1>{{endpoint.method}} {{endpoint.path}}</h1>
-    <p>{{endpoint.description}}</p>
-    <h2>Resource URL</h2>
-    <p>{{endpoint.url}}</p>
-    <h2>Parameters</h2>
-    <table class="table api-params">
-      <tbody>
-        <tr v-for="(name, param) in endpoint.params">
-          <th>{{name}} <small v-if="param.required">required</small></th>
-          <td>
-            <p>{{param.description}}</p>
-            <p><b>Type</b>: {{param.type}}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-3">
+        <apidocs-sidebar></apidocs-sidebar>
+      </div>
+      <div class="col-sm-9">
+        <div class="loading-box" v-if="$loadingRouteData">
+          <img class="loading-image" src="/assets/loading.gif" />
+        </div>
+        <template v-else>
+          <h1>{{endpoint.method}} {{endpoint.path}}</h1>
+          <p>{{endpoint.description}}</p>
+          <h2>Resource URL</h2>
+          <p>{{endpoint.url}}</p>
+          <h2>Parameters</h2>
+          <table class="table api-params">
+            <tbody>
+              <tr v-for="(name, param) in endpoint.params">
+                <th>{{name}} <small v-if="param.required">required</small></th>
+                <td>
+                  <p>{{param.description}}</p>
+                  <p><b>Type</b>: {{param.type}}
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <template v-if="endpoint.example_params">
+            <h2>Example Request</h2>
+            <p>
+            <span>{{endpoint.method}}</span>
+            <code>{{example_url}}</code>
             </p>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <template v-if="endpoint.example_params">
-      <h2>Example Request</h2>
-      <p>
-      <span>{{endpoint.method}}</span>
-      <code>{{example_url}}</code>
-      </p>
-      <pre><code><div v-if="example.loading"><img alt="loading..." src="/assets/loading.gif" /></div>{{example.result}}</code></pre>
-    </template>
-  </template>
+            <pre><code><div v-if="example.loading"><img alt="loading..." src="/assets/loading.gif" /></div>{{example.result}}</code></pre>
+          </template>
+        </template>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
+import ApidocsSidebar from "./sidebar.vue";
 import aclog from "aclog";
 import Settings from "../../settings";
 
 export default {
+  components: { "apidocs-sidebar": ApidocsSidebar },
   data() {
     return {
       endpoint: null,
@@ -56,14 +67,14 @@ export default {
   },
   route: {
     data(transition) {
+      this.$root.updateTitle(this.$route.params.method.toUpperCase() + " " + this.$route.params.path + " - API Documentation");
       aclog.apidocs.load().then(docs => {
         const path = this.$route.params.path;
-        const method = this.$route.params.method;
         const ns = path.split("/", 2)[0];
         const es = docs.namespaces[ns];
-        if (!es) return this.$route.router.replace("*");
+        if (!es) return transition.redirect("/");
         const endpoint = es.find(endp => endp.path === path);
-        if (!endpoint) return this.$route.router.replace("*");
+        if (!endpoint) return transition.redirect("/");
 
         transition.next({ endpoint: endpoint, example: { loading: false, result: null } });
       }).catch(err => {

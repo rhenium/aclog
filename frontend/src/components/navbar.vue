@@ -42,22 +42,25 @@
             </li>
           </ul>
         </li>
-        <li class="dropdown" v-if="currentUser">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <img alt="@{{currentUser.screen_name}}" class="twitter-icon" v-bind:src="currentUser.profile_image_url" />
-            <span class="caret" />
-          </a>
-          <ul class="dropdown-menu">
-            <li><a v-link="{ name: 'user-best-top', params: { screen_name: currentUser.screen_name } }">Best</a></li>
-            <li><a v-link="{ name: 'user-timeline-top', params: { screen_name: currentUser.screen_name } }">Timeline</a></li>
-            <li><a v-link="{ name: 'user-favorites-top', params: { screen_name: currentUser.screen_name } }">Favorites</a></li>
-            <li><a v-link="{ name: 'user-stats', params: { screen_name: currentUser.screen_name } }">Stats</a></li>
-            <li class="divider"></li>
-            <li><a v-link="'/settings'">Settings</a></li>
-            <li><a rel="nofollow" v-on:click="logout" href="#">Sign out</a></li>
-          </ul>
-        </li>
-        <li v-else><a class="signup" rel="nofollow" v-link="'/i/login?redirect_after_login=%2F'">Sign in</a></li>
+        <li class="navbar-initializing" v-if="!initialized"><img class="loading-image" src="/assets/loading.gif" /></li>
+        <template v-else>
+          <li class="dropdown" v-if="currentUser">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+              <img alt="@{{currentUser.screen_name}}" class="twitter-icon" v-bind:src="currentUser.profile_image_url" />
+              <span class="caret" />
+            </a>
+            <ul class="dropdown-menu">
+              <li><a v-link="{ name: 'user-best-top', params: { screen_name: currentUser.screen_name } }">Best</a></li>
+              <li><a v-link="{ name: 'user-timeline-top', params: { screen_name: currentUser.screen_name } }">Timeline</a></li>
+              <li><a v-link="{ name: 'user-favorites-top', params: { screen_name: currentUser.screen_name } }">Favorites</a></li>
+              <li><a v-link="{ name: 'user-stats', params: { screen_name: currentUser.screen_name } }">Stats</a></li>
+              <li class="divider"></li>
+              <li><a v-link="'/settings'">Settings</a></li>
+              <li><a rel="nofollow" v-on:click="logout" href="#">Sign out</a></li>
+            </ul>
+          </li>
+          <li v-else><a class="signup" rel="nofollow" v-link="'/i/login?redirect_after_login=%2F'">Sign in</a></li>
+        </template>
       </ul>
     </div>
   </nav>
@@ -81,6 +84,9 @@ export default {
   computed: {
     currentUser() {
       return this.store.currentUser;
+    },
+    initialized() {
+      return !!this.store.authenticity_token;
     }
   },
   methods: {

@@ -16,13 +16,12 @@
 
 <script>
 import aclog from "aclog";
-import storage from "storage";
 
 export default {
   route: {
     canReuse() { return false; },
-    canActivate() { return !storage.isLoggedIn(); },
-    activate(tr) {
+    data(tr) {
+      this.$root.updateTitle("Authenticating...");
       aclog.optout.callback(this.$route.query.oauth_verifier).then(res => {
         tr.next({});
       }).catch(err => {

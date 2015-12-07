@@ -23,7 +23,6 @@ Vue.config.debug = true;
 
 Vue.use(VueRouter);
 
-Vue.filter("toLocaleString", (string) => new Date(string).toLocaleString());
 Vue.filter("removeInvalidCharacters", (str) => str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/gm, "")); /* unyaa: http://www.w3.org/TR/xml/#charsets */
 Vue.mixin({
   methods: {
@@ -131,7 +130,7 @@ router.map({
   "/:screen_name/favorites": {
     name: "user-favorites-top",
     component: TweetsPage,
-    title: "@:screen_name's Favorites",
+    title: "@:screen_name's Likes",
     api: "tweets/user_favorites",
     filtering: "reactions",
     subRoutes: {

@@ -52,7 +52,7 @@
             <ul class="dropdown-menu">
               <li><a v-link="{ name: 'user-best-top', params: { screen_name: currentUser.screen_name } }">Best</a></li>
               <li><a v-link="{ name: 'user-timeline-top', params: { screen_name: currentUser.screen_name } }">Timeline</a></li>
-              <li><a v-link="{ name: 'user-favorites-top', params: { screen_name: currentUser.screen_name } }">Favorites</a></li>
+              <li><a v-link="{ name: 'user-favorites-top', params: { screen_name: currentUser.screen_name } }">Likes</a></li>
               <li><a v-link="{ name: 'user-stats', params: { screen_name: currentUser.screen_name } }">Stats</a></li>
               <li class="divider"></li>
               <li><a v-link="'/settings'">Settings</a></li>

@@ -1,9 +1,10 @@
 <template>
   <div class="sidebar">
     <div class="sidebar-list">
-      <partial name="loading-box" v-if="loading"></partial>
-      <div class="list-group list-group-scroll" v-else>
-        <template v-for="(name, namespace) in apidocs">
+      <div class="list-group list-group-scroll">
+        <a class="list-group-item" v-link="{ path: '/about/api', exact: true }">About API</a>
+        <partial name="loading-box" v-if="loading"></partial>
+        <template v-for="(name, namespace) in apidocs" v-if="!loading">
           <span class="list-group-head">{{name | capitalize}}</span>
           <a class="list-group-item" v-for="endpoint in namespace" v-link="endpoint_link(endpoint)">{{endpoint_string(endpoint)}}</a>
         </template>

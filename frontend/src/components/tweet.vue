@@ -7,7 +7,7 @@
       <div class="status-content">
         <div class="status-head">
           <span class="user"><a v-link="'/' + tweet.user.screen_name"><span>{{tweet.user.name | removeInvalidCharacters}}</span> <span>@{{tweet.user.screen_name}}</span></a></span>
-          <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time datetime="{{tweet.tweeted_at}}">{{tweet.tweeted_at | toLocaleString}}</time></a> <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a></span>
+          <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time datetime="{{tweet.tweeted_at}}">{{formattedTweetedAt}}</time></a> <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a></span>
         </div>
         <div class="status-text">{{{tweet.text | removeInvalidCharacters | formatText}}}</div>
         <div class="status-foot">
@@ -23,7 +23,7 @@
     <div class="status-responses">
       <dl v-if="tweet.favorites_count &gt; 0">
         <dt>
-        <a class="expand-responses-button" v-on:click="toggleExpandFavorites" href="#" title="すべて見る"><span>{{tweet.favorites_count}}</span>Favs</a>
+        <a class="expand-responses-button" v-on:click="toggleExpandFavorites" href="#" title="すべて見る"><span>{{tweet.favorites_count}}</span>Likes</a>
         </dt>
         <dd v-bind:class="{ 'collapsed': !expandFavorites }">
         <ul class="status-responses-favorites">
@@ -63,7 +63,7 @@
       <div class="status-content">
         <div class="status-head">
           <span class="time">
-            <time datetime="{{tweet.tweeted_at}}">{{tweet.tweeted_at | toLocaleString}}</time>
+            <time datetime="{{tweet.tweeted_at}}">{{formattedTweetedAt}}</time>
             <a class="source aclogicon aclogicon-twitter" v-if="tweet.id_str" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a>
             <div class="source aclogicon aclogicon-twitter" v-else></div>
           </span>
@@ -79,6 +79,7 @@
 import aclog from "aclog";
 import twitterText from "twitter-text";
 import Utils from "utils";
+import moment from "moment";
 
 export default {
   props: ["tweet"],
@@ -88,6 +89,11 @@ export default {
       expandRetweets: false,
       loading: false,
     };
+  },
+  computed: {
+    formattedTweetedAt() {
+      return moment(this.tweet.tweeted_at).format("YYYY-MM-DD HH:mm:ss");
+    }
   },
   filters: {
     formatSource(str) {

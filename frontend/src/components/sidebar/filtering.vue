@@ -14,13 +14,13 @@
   <div class="list-group" v-if="$route.filtering == 'time'">
     <div class="list-group-col">
       <a class="list-group-item" v-link="{ exact: true, name: jumpBase + '-top', params: fixParams() }">All Time</a>
-      <a class="list-group-item" v-link="{ exact: true, name: jumpBase, params: fixParams({ recent: '1w' }) }">1w</a>
       <a class="list-group-item" v-link="{ exact: true, name: jumpBase, params: fixParams({ recent: '3m' }) }">3m</a>
+      <a class="list-group-item" v-link="{ exact: true, name: jumpBase, params: fixParams({ recent: '1w' }) }">1w</a>
     </div>
     <div class="list-group-col">
-      <a class="list-group-item" v-link="{ exact: true, name: jumpBase, params: fixParams({ recent: '1d' }) }">1d</a>
-      <a class="list-group-item" v-link="{ exact: true, name: jumpBase, params: fixParams({ recent: '1m' }) }">1m</a>
       <a class="list-group-item" v-link="{ exact: true, name: jumpBase, params: fixParams({ recent: '1y' }) }">1y</a>
+      <a class="list-group-item" v-link="{ exact: true, name: jumpBase, params: fixParams({ recent: '1m' }) }">1m</a>
+      <a class="list-group-item" v-link="{ exact: true, name: jumpBase, params: fixParams({ recent: '1d' }) }">1d</a>
     </div>
   </div>
   <div class="list-group" v-if="$route.filtering == 'query'">

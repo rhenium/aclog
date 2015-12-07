@@ -19,7 +19,7 @@
         <div class="col-sm-6 col-sm-push-6"><img alt="Collect activities automatically" height="200" src="/assets/feature_1.png" width="400" /></div>
         <div class="col-sm-6 col-sm-pull-6">
           <h1>Collect Activities</h1>
-          <p>aclog に一度サインアップするだけで、ツイート、お気に入り、リツイートをリアルタイムで自動収集。</p>
+          <p>aclog に一度サインアップするだけで、いいね！やリツイートをリアルタイムで自動収集。</p>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@
       <div class="row">
         <div class="col-sm-3">
           <h1>Notification</h1>
-          <p>一定数のふぁぼ・RT が集まると、通知アカウントがリプライで通知します。</p>
+          <p>一定数のいいね！が集まると、通知アカウントがリプライで通知してくれます。</p>
         </div>
         <div class="col-sm-3">
           <h1>Atom Feeds</h1>

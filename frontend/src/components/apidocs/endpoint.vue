@@ -10,7 +10,7 @@
           <h1>{{endpoint.method}} {{endpoint.path}}</h1>
           <p>{{endpoint.description}}</p>
           <h2>Resource URL</h2>
-          <p>{{endpoint.url}}</p>
+          <p>{{endpoint_url}}</p>
           <h2>Parameters</h2>
           <table class="table api-params">
             <tbody>
@@ -52,14 +52,16 @@ export default {
     };
   },
   computed: {
+    endpoint_url() {
+      return Settings.apiPrefix + "/api/" + this.endpoint.path + ".json";
+    },
     example_url() {
-      var url = Settings.apiPrefix + "/api/" + this.endpoint.path;
       var params = this.endpoint.example_params;
       var keys = Object.keys(params);
       if (keys.length === 0) {
-        return url;
+        return this.endpoint_url;
       } else {
-        return url + ".json?" + keys.map(key => [key, params[key]].map(encodeURIComponent).join("=")).join("&");
+        return this.endpoint_url + "?" + keys.map(key => [key, params[key]].map(encodeURIComponent).join("=")).join("&");
       }
     },
   },

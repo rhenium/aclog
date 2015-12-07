@@ -23,7 +23,7 @@
       <div class="list-group">
         <a class="list-group-item" v-link="{ exact: true, name: 'user-best-top', params: { screen_name: user.screen_name } }">Best</a>
         <a class="list-group-item" v-link="{ exact: true, name: 'user-timeline-top', params: { screen_name: user.screen_name } }">Timeline</a>
-        <a class="list-group-item" v-link="{ exact: true, name: 'user-favorites-top', params: { screen_name: user.screen_name } }">Favorites</a>
+        <a class="list-group-item" v-link="{ exact: true, name: 'user-favorites-top', params: { screen_name: user.screen_name } }">Likes</a>
         <a class="list-group-item" v-link="{ exact: true, name: 'user-stats', params: { screen_name: user.screen_name } }" v-if="user.registered">Stats</a>
       </div>
       <sidebar-filtering></sidebar-filtering>

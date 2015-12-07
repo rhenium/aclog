@@ -19,7 +19,7 @@
                     <img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="placeholderImage" />
                     <div class="count">
                       <span>{{user.count}}</span>
-                      favs
+                      Likes
                     </div>
                   </div>
                 </div>
@@ -51,14 +51,14 @@ export default {
     return {
       data: [
       {
-        title: "Favorited by..",
+        title: "Liked by..",
         loading: true,
         tweets: [],
         showTweets: false,
         loadingTweets: false
       },
       {
-        title: "Favoriting..",
+        title: "You like..",
         loading: true,
         tweets: [],
         showTweets: false,

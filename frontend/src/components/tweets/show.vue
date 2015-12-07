@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <partial name="loading-box" v-if="$loadingRouteData"></partial>
     <div class="row" v-else>
       <div class="col-sm-3 col-md-offset-1">
         <sidebar-user v-bind:user="user"></sidebar-user>
@@ -28,7 +27,7 @@ export default {
   data() {
     return {
       statuses: [],
-      user: null,
+      user: { screen_name: this.$route.params.screen_name, profile_image_url: "/assets/loading.gif", registered: true },
       loading: true,
     };
   },
@@ -55,7 +54,7 @@ export default {
           loading: false
         });
       }).catch(err => {
-        this.$root.setFlash(err);
+        this.$root.setFlashNext(err);
         transition.abort();
       });
     },

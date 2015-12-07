@@ -6,6 +6,7 @@
 
 <script>
 import aclog from "aclog";
+import storage from "storage";
 
 export default {
   route: {
@@ -14,13 +15,13 @@ export default {
       this.$root.updateTitle("Authenticating...");
       aclog.sessions.callback(this.$route.query.oauth_verifier).then(res => {
         const redirect = tr.to.query.redirect_after_login;
-        if (redirect && redirect.startsWith("/") && !redirect.indexOf("//")) {
+        if (redirect && redirect.startsWith("/") && redirect.indexOf("//") == -1) {
           tr.redirect({ path: redirect, query: null });
         } else {
-          tr.redirect({ path: "/" + res.current_user.screen_name, query: null });
+          tr.redirect({ path: "/" + storage.store.currentUser.screen_name, query: null });
         }
       }).catch(err => {
-        this.$root.setFlash(err);
+        this.$root.setFlashNext(err);
         tr.abort();
       });
     },

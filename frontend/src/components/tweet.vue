@@ -1,15 +1,13 @@
 <template>
-  <div class="status" v-bind:class="{ 'status-reply': tweet.aside }">
-    <div class="status-tweet" v-if="tweet.allowed">
+  <div class="status" v-bind:class="{ 'status-reply': tweet.aside }" v-if="tweet.allowed">
+    <div class="status-tweet">
       <div class="status-user">
-        <a v-link="'/' + tweet.user.screen_name" title="{{tweet.user.name | removeInvalidCharacters}} (@{{tweet.user.screen_name}})"><img alt="@{{tweet.user.screen_name}}" class="twitter-icon" v-bind:src="tweet.user.profile_image_url" v-on:error="failProfileImage" /></a>
+        <profile-image v-bind:user="tweet.user"></profile-image>
       </div>
       <div class="status-content">
         <div class="status-head">
-          <span class="user"><a v-link="'/' + tweet.user.screen_name"><span>{{tweet.user.name | removeInvalidCharacters}}</span>
-              <span>@{{tweet.user.screen_name}}</span></a></span>
-          <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time datetime="{{tweet.tweeted_at}}">{{tweet.tweeted_at | toLocaleString}}</time></a>
-            <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a></span>
+          <span class="user"><a v-link="'/' + tweet.user.screen_name"><span>{{tweet.user.name | removeInvalidCharacters}}</span> <span>@{{tweet.user.screen_name}}</span></a></span>
+          <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time datetime="{{tweet.tweeted_at}}">{{tweet.tweeted_at | toLocaleString}}</time></a> <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a></span>
         </div>
         <div class="status-text">{{{tweet.text | removeInvalidCharacters | formatText}}}</div>
         <div class="status-foot">
@@ -22,7 +20,7 @@
         </div>
       </div>
     </div>
-    <div class="status-responses" v-if="tweet.allowed">
+    <div class="status-responses">
       <dl v-if="tweet.favorites_count &gt; 0">
         <dt>
         <a class="expand-responses-button" v-on:click="toggleExpandFavorites" href="#" title="すべて見る"><span>{{tweet.favorites_count}}</span>Favs</a>
@@ -32,9 +30,9 @@
           <li v-if="loading">
             <img class="loading-image" src="/assets/loading.gif" />
           </li>
-          <li v-for="user in tweet.favorites">
-            <a v-if="user.allowed" v-link="'/' + user.screen_name" title="{{user.name | removeInvalidCharacters}} (@{{user.screen_name}})"><img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="failProfileImage" /></a>
-            <img alt="protected user" v-if="!user.allowed" src="/assets/profile_image_protected.png" />
+          <li v-for="user in tweet.favorites" track-by="$index">
+            <partial name="profile-image" v-if="user"></partial>
+            <img alt="protected user" v-else src="/assets/profile_image_protected.png" />
           </li>
         </ul>
         </dd>
@@ -48,15 +46,17 @@
           <li v-if="loading">
             <img class="loading-image" src="/assets/loading.gif" />
           </li>
-          <li v-for="user in tweet.retweets">
-            <a v-if="user.allowed" v-link="'/' + user.screen_name" title="{{user.name | removeInvalidCharacters}} (@{{user.screen_name}})"><img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="failProfileImage" /></a>
-            <img alt="protected user" v-if="!user.allowed" src="/assets/profile_image_protected.png" />
+          <li v-for="user in tweet.retweets" track-by="$index">
+            <partial name="profile-image" v-if="user"></partial>
+            <img alt="protected user" v-else src="/assets/profile_image_protected.png" />
           </li>
         </ul>
         </dd>
       </dl>
     </div>
-    <div class="status-tweet" v-if="!tweet.allowed">
+  </div>
+  <div class="status" v-bind:class="{ 'status-reply': tweet.aside }" v-else>
+    <div class="status-tweet">
       <div class="status-user">
         <img alt="protected user" src="/assets/profile_image_protected.png" />
       </div>
@@ -65,7 +65,7 @@
           <span class="time">
             <time datetime="{{tweet.tweeted_at}}">{{tweet.tweeted_at | toLocaleString}}</time>
             <a class="source aclogicon aclogicon-twitter" v-if="tweet.id_str" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a>
-            <div class="source aclogicon aclogicon-twitter" v-if="!tweet.id_str"></div>
+            <div class="source aclogicon aclogicon-twitter" v-else></div>
           </span>
         </div>
         <div class="status-text protected">ツイートは非公開に設定されています</div>
@@ -78,10 +78,11 @@
 <script>
 import aclog from "aclog";
 import twitterText from "twitter-text";
+import Utils from "utils";
 
 export default {
   props: ["tweet"],
-  data: function() {
+  data() {
     return {
       expandFavorites: false,
       expandRetweets: false,
@@ -89,14 +90,14 @@ export default {
     };
   },
   filters: {
-    formatSource: function(str) {
+    formatSource(str) {
       if (/^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)) {
         return str.replace(/&/g, "&amp;");
-    } else {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
+      } else {
+        return Utils.escapeHTML(str);
+      }
     },
-    formatText: function(str) {
+    formatText(str) {
       var autolinked = twitterText.autoLink(str, {
         suppressLists: true,
         usernameIncludeSymbol: true,
@@ -106,19 +107,15 @@ export default {
     }
   },
   methods: {
-    failProfileImage: function(e) {
-      e.preventDefault();
-      e.target.src = "/assets/profile_image_missing.png";
-    },
-    toggleExpandFavorites: function(e) {
+    toggleExpandFavorites(e) {
       e.preventDefault();
       this.expandFavorites = !this.expandFavorites;
     },
-    toggleExpandRetweets: function(e) {
+    toggleExpandRetweets(e) {
       e.preventDefault();
       this.expandRetweets = !this.expandRetweets;
     },
-    openIntent: function(e) {
+    openIntent(e) {
       e.preventDefault();
       var w = 550;
       var h = 420;
@@ -129,16 +126,22 @@ export default {
       var options = "scrollbars=yes, resizable=yes, toolbar=no, location=yes, width=" + w + ", height=" + h + ", left=" + left + ", top=" + top;
       window.open(e.target.getAttribute("href"), null, options);
     },
-    updateReactions: function() {
-      if (!this.tweet.allowed || this.tweet.reactions_count == 0) { return; }
+    updateReactions() {
+      if (!this.tweet.allowed || this.tweet.reactions_count === 0 || this.loading) return;
+      this.loading = true;
       aclog.tweets.responses(this.tweet.id_str).then(res => {
         this.$set("tweet.favorites", res.favorites);
         this.$set("tweet.retweets", res.retweets);
+        this.$set("tweet.include_reactions", true);
+        this.loading = false;
+      }).catch(err => {
+        // should not fail
+        this.$root.setFlash(err);
         this.loading = false;
       });
     },
   },
-  ready: function() {
+  ready() {
     if (!this.tweet.include_reactions) {
       this.updateReactions();
     }

@@ -226,6 +226,10 @@ class Tweet < ActiveRecord::Base
     "https://twitter.com/#{user.screen_name}/status/#{self.id}"
   end
 
+  def id_str
+    id.to_s
+  end
+
   # Searches the ancestors of this Tweet recursively up to specified level.
   # @param [Integer] max_level
   # @return [Array<Tweet>] The search result.
@@ -254,5 +258,14 @@ class Tweet < ActiveRecord::Base
       level += 1
     end
     nodes.sort_by(&:id)
+  end
+
+  def serializable_hash(options = nil)
+    options ||= {}
+    options[:methods] = Array(options[:methods])
+    options[:methods] << :id_str
+    options[:except] = Array(options[:except])
+    options[:except] << :updated_at << :id
+    super(options)
   end
 end

@@ -74,7 +74,7 @@ export default {
           loading: false
         });
       }).catch(err => {
-        this.$root.setFlash(err);
+        this.$root.setFlashNext(err);
         transition.abort();
       });
     },

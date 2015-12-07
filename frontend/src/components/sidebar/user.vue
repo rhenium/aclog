@@ -38,13 +38,13 @@ import SidebarFiltering from "components/sidebar/filtering.vue";
 export default {
   props: ["user"],
   components: { "sidebar-filtering": SidebarFiltering },
-  data: function() {
+  data() {
     return {
       stats: null,
     };
   },
   computed: {
-    average: function() {
+    average() {
       return Math.round(this.stats.reactions_count / this.stats.tweets_count * 100) / 100;
     },
     isUserPage() {
@@ -54,7 +54,7 @@ export default {
   },
   watch: {
     user(newval, oldval) {
-      if (newval && newval.registered && (!oldval || newval.id != oldval.id)) {
+      if (newval && newval.registered && (!oldval || newval.id_str !== oldval.id_str)) {
         this.stats = null;
         aclog.users.stats_compact(newval.screen_name).then(res => {
           this.stats = res;

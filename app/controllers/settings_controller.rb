@@ -21,7 +21,7 @@ class SettingsController < ApplicationController
     rescue Aclog::Exceptions::WorkerConnectionError
     end
 
-    reset_session
+    session.delete(:user_id)
   end
 
   private

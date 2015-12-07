@@ -8,7 +8,7 @@ class OptoutController < ApplicationController
   def callback
     account = oauth_callback
     account.opted_out!
-    reset_session
+    session.delete(:user_id)
 
     render_json data: { }
   end

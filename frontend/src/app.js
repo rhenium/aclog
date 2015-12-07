@@ -25,8 +25,18 @@ Vue.use(VueRouter);
 
 Vue.filter("toLocaleString", (string) => new Date(string).toLocaleString());
 Vue.filter("removeInvalidCharacters", (str) => str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/gm, "")); /* unyaa: http://www.w3.org/TR/xml/#charsets */
+Vue.mixin({
+  methods: {
+    placeholderImage(e) {
+      e.preventDefault();
+      e.target.src = "/assets/profile_image_missing.png";
+    }
+  }
+});
 Vue.component("tweet", require("./components/tweet.vue"));
 Vue.partial("loading-box", '<div class="loading-box"><img class="loading-image" src="/assets/loading.gif" /></div>');
+Vue.partial("profile-image", '<a v-link="\'/\' + user.screen_name" title="{{user.name | removeInvalidCharacters}} (@{{user.screen_name}})"><img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="placeholderImage" /></a>');
+Vue.component("profile-image", Vue.extend({ props: ["user"], template: '<partial name="profile-image"></partial>' }));
 
 export const router = new VueRouter({
   history: true,

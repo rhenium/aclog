@@ -99,23 +99,14 @@ class TweetsController < ApplicationController
       { allowed: false,
         tweeted_at: tweet.tweeted_at }
     elsif tweet.user.opted_out?
-      { id_str: tweet.id.to_s,
-        allowed: false,
-        opted_out: true,
+      { allowed: false,
+        id_str: tweet.id.to_s,
         tweeted_at: tweet.tweeted_at }
     else
       hash = {
-        id_str: tweet.id.to_s,
         allowed: true,
-        opted_out: false,
-        tweeted_at: tweet.tweeted_at,
-        text: tweet.text,
-        source: tweet.source,
-        favorites_count: tweet.favorites_count,
-        retweets_count: tweet.retweets_count,
-        reactions_count: tweet.reactions_count,
-        user: tweet.user }
-      
+      }.merge!(tweet.serializable_hash(include: :user))
+
       if tweet.reactions_count <= 20
         hash.merge!(extract_reactions(tweet))
         hash[:include_reactions] = true
@@ -127,11 +118,7 @@ class TweetsController < ApplicationController
 
   def extract_reactions(tweet)
     tr = -> u {
-      if current_user == tweet.user || authorized?(u)
-        u.attributes.merge(allowed: true)
-      else
-        { allowed: false }
-      end
+      (current_user == tweet.user || authorized?(u)) ? u : nil
     }
 
     { favorites: tweet.favoriters.map(&tr),

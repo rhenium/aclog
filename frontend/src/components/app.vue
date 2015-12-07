@@ -1,7 +1,10 @@
 <script>
+import Utils from "utils";
+import Navbar from "components/navbar.vue";
+
 export default {
   replace: false,
-  components: { "navbar": require("./navbar.vue") },
+  components: { "navbar": Navbar },
   data() {
     return {
       flash: null,
@@ -26,12 +29,11 @@ export default {
       }
     },
     setFlash(obj) {
-      if (obj instanceof Error && obj.response) {
-        this.flashNext = obj.response.data.error.message;
-      } else {
-        this.flashNext = obj;
-      }
-    }
+      this.flash = Utils.stringifyMessage(obj);
+    },
+    setFlashNext(obj) {
+      this.flashNext = Utils.stringifyMessage(obj);
+    },
   }
 };
 </script>

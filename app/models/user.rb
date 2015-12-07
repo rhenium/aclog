@@ -63,6 +63,10 @@ class User < ActiveRecord::Base
     attributes["profile_image_url"].sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "#{suffix}\\1")
   end
 
+  def id_str
+    id.to_s
+  end
+
   def protected?
     protected
   end
@@ -108,5 +112,14 @@ class User < ActiveRecord::Base
       .group("tweets.user_id")
       .count("tweets.user_id")
       .sort_by { |user_id, count| -count }.to_h
+  end
+
+  def serializable_hash(options = nil)
+    options ||= {}
+    options[:methods] = Array(options[:methods])
+    options[:methods] << :id_str
+    options[:except] = Array(options[:except])
+    options[:except] << :updated_at << :id
+    super(options)
   end
 end

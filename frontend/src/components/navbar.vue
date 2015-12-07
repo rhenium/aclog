@@ -35,7 +35,7 @@
               </form>
             </li>
             <li class="user-jump-suggestion" v-for="user in users">
-              <a v-link="'/' + user.screen_name" title="{{user.name | removeInvalidCharacters}} (@{{user.screen_name}})"><img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="failProfileImage" /><span>@{{user.screen_name}}</span></a>
+              <partial name="profile-image"></partial>
             </li>
             <li class="loading-box" v-if="loading">
               <img class="loading-image" src="/assets/loading.gif" />
@@ -72,7 +72,7 @@ import storage from "storage";
 import BootstrapHelper from "bootstrap-helper";
 
 export default {
-  data: function() {
+  data() {
     return {
       users: [],
       enteredUserName: "",
@@ -90,14 +90,11 @@ export default {
     }
   },
   methods: {
-    failProfileImage: function(e) {
-      e.target.src = "/assets/profile_image_missing.png";
-    },
-    focus: function(e) {
+    focus(e) {
       e.preventDefault();
       setTimeout(() => this.$els.input.focus(), 0);
     },
-    submit: function(e) {
+    submit(e) {
       e.preventDefault();
       if (this.enteredUserName !== "") {
         this.$route.router.go("/" + this.enteredUserName);
@@ -107,11 +104,13 @@ export default {
       e.preventDefault();
       aclog.sessions.destroy().then(res => {
         storage.store.currentUser = null;
+      }).catch(err => {
+        this.$root.setFlash(err);
       });
     },
   },
   watch: {
-    enteredUserName: function(newVal, oldVal) {
+    enteredUserName(newVal, oldVal) {
       if (newVal.length == 0 || newVal === oldVal) { return; }
       this.users = [];
       this.loading = true;
@@ -123,10 +122,10 @@ export default {
       this.currentReq = req;
     },
   },
-  ready: function() {
+  ready() {
     BootstrapHelper.registerEvents();
   },
-  beforeDestroy: function() {
+  beforeDestroy() {
     BootstrapHelper.unregisterEvents();
   }
 };

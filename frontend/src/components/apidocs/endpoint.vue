@@ -68,7 +68,7 @@ export default {
       this.$root.updateTitle(this.$route.params.method.toUpperCase() + " " + this.$route.params.path + " - API Documentation");
 
       var notFound = (e) => {
-        if (e) this.$root.setFlash(e);
+        if (e) this.$root.setFlashNext(e);
         transition.abort();
       };
 

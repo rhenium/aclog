@@ -16,8 +16,7 @@ export default {
       aclog.sessions.redirect(callback).then(res => {
         location.href = res.redirect;
       }).catch(err => {
-        // TODO: flash message?
-        tr.redirect("/");
+        this.$root.setFlash(err);
       });
     },
   },

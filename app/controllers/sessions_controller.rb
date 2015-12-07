@@ -17,7 +17,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    reset_session
+    session.delete(:user_id)
     render_json data: { }
   end
 

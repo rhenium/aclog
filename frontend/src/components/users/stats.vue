@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-3 col-md-offset-1">
-        <sidebar v-bind:user="user"></sidebar>
+        <sidebar-user v-bind:user="user"></sidebar-user>
       </div>
       <div class="col-sm-9 col-md-7 col-lg-6">
         <div class="favorite-graph">
@@ -16,7 +16,7 @@
                 </div>
                 <div class="chart-item" v-on:click="openTweets(user, one)" v-for="user in one.users" v-bind:style="{ 'width': (100 * user.count / one.reactions_count) + '%', 'background-color': itemColor(one.users.length - $index - 1) }">
                   <div class="popout">
-                    <img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="failProfileImage" />
+                    <img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="placeholderImage" />
                     <div class="count">
                       <span>{{user.count}}</span>
                       favs
@@ -39,11 +39,15 @@
 
 <script>
 import aclog from "aclog";
+import SidebarUser from "components/sidebar/user.vue";
 
 const itemColors = ["#393b79", "#5254a3", "#6b6ecf", "#9c9ede", "#637939", "#8ca252", "#b5cf6b", "#cedb9c", "#8c6d31", "#bd9e39", "#e7ba52", "#e7cb94", "#843c39", "#ad494a", "#d6616b", "#e7969c", "#7b4173", "#a55194", "#ce6dbd", "#de9ed6"];
 
 export default {
-  data: function() {
+  components: {
+    "sidebar-user": SidebarUser
+  },
+  data() {
     return {
       data: [
       {
@@ -65,10 +69,10 @@ export default {
     };
   },
   methods: {
-    itemColor: function(i) {
+    itemColor(i) {
       return itemColors[i % itemColors.length];
     },
-    currentPermalink: function(one) {
+    currentPermalink(one) {
       var sn = one.lastUser.screen_name;
       if (one.isTarget) {
         return "/" + this.user.screen_name + "/favorited_by/" + sn;
@@ -76,7 +80,7 @@ export default {
         return "/" + sn + "/favorited_by/" + this.user.screen_name;
       }
     },
-    openTweets: function(user, one, e) {
+    openTweets(user, one, e) {
       if (!one.showTweets || user === one.lastUser) {
         one.showTweets = !one.showTweets;
       }
@@ -96,10 +100,6 @@ export default {
           one.tweets = res.statuses;
         });
       }
-    },
-    failProfileImage: function(e) {
-      e.preventDefault();
-      e.target.src = "/assets/profile_image_missing.png";
     },
   },
   route: {

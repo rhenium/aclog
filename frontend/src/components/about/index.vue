@@ -76,15 +76,15 @@
     <section class="contributors">
       <div class="contributor">
         <em>Created by</em>
-        <a href="https://twitter.com/{{created_by.screen_name}}" target="_blank"><img alt="@{{created_by.screen_name}}" v-bind:src="created_by.profile_image_url" title="@{{created_by.screen_name}}" /></a>
+        <profile-image v-bind:user="created_by"></profile-image>
       </div>
       <div class="contributor">
         <em>Designed by</em>
-        <a href="https://twitter.com/{{designed_by.screen_name}}" target="_blank"><img alt="@{{designed_by.screen_name}}" v-bind:src="designed_by.profile_image_url" title="@{{designed_by.screen_name}}" /></a>
+        <profile-image v-bind:user="designed_by"></profile-image>
       </div>
       <div class="contributor">
         <em>Hosted by</em>
-        <a href="https://twitter.com/{{hosted_by.screen_name}}" target="_blank"><img alt="@{{hosted_by.screen_name}}" v-bind:src="hosted_by.profile_image_url" title="@{{hosted_by.screen_name}}" /></a>
+        <profile-image v-bind:user="hosted_by"></profile-image>
       </div>
     </section>
     <section>
@@ -101,9 +101,9 @@ import aclog from "aclog";
 export default {
   data() {
     return {
-      created_by: { screen_name: "rhe__", profile_image_url: "/assets/loading.gif" },
-      designed_by: { screen_name: "aayh", profile_image_url: "/assets/loading.gif" },
-      hosted_by: { screen_name: "KOBA789", profile_image_url: "/assets/loading.gif" },
+      created_by: { screen_name: "rhe__", profile_image_url: "/assets/loading.gif", name: "loading" },
+      designed_by: { screen_name: "aayh", profile_image_url: "/assets/loading.gif", name: "loading" },
+      hosted_by: { screen_name: "KOBA789", profile_image_url: "/assets/loading.gif", name: "loading" },
       loaded: false,
     };
   },

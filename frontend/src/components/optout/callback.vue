@@ -25,7 +25,7 @@ export default {
       aclog.optout.callback(this.$route.query.oauth_verifier).then(res => {
         tr.next();
       }).catch(err => {
-        this.$root.setFlash(err);
+        this.$root.setFlashNext(err);
         tr.abort();
       });
     },

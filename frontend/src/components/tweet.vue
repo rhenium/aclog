@@ -13,7 +13,7 @@
         <div class="status-foot">
           <span class="source">{{{tweet.source | removeInvalidCharacters | formatSource}}}</span>
           <ul>
-            <li><a class="aclogicon aclogicon-fav" v-on:click="openIntent" href="https://twitter.com/intent/favorite?tweet_id={{tweet.id_str}}" title="お気に入り登録"></a></li>
+            <li><a class="aclogicon aclogicon-like" v-on:click="openIntent" href="https://twitter.com/intent/favorite?tweet_id={{tweet.id_str}}" title="いいね！"></a></li>
             <li><a class="aclogicon aclogicon-retweet" v-on:click="openIntent" href="https://twitter.com/intent/retweet?tweet_id={{tweet.id_str}}" title="リツイート"></a></li>
             <li><a class="aclogicon aclogicon-reply" v-on:click="openIntent" href="https://twitter.com/intent/tweet?in_reply_to={{tweet.id_str}}" title="返信"></a></li>
           </ul>

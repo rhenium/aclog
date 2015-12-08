@@ -1,45 +1,43 @@
-var gulp = require("gulp");
-var sass = require("gulp-sass");
-var webpack = require("webpack");
-var gwebpack = require("webpack-stream");
-var WebpackDevServer = require("webpack-dev-server");
-var iconfont = require("gulp-iconfont");
-var consolidate = require("gulp-consolidate");
+"use strict";
+
+const gulp = require("gulp");
+const sass = require("gulp-sass");
+const webpack = require("webpack");
+const gwebpack = require("webpack-stream");
+const WebpackDevServer = require("webpack-dev-server");
+const iconfont = require("gulp-iconfont");
+const consolidate = require("gulp-consolidate");
 
 gulp.task("default", ["sass", "copy", "watch"]);
 gulp.task("build", ["webpack-build", "sass", "copy"]);
 
-gulp.task("watch", function(cb) {
-  gulp.watch("./src/**/*.scss", function() {
-    gulp.start(["sass"]);
-  });
-  gulp.watch(["./src/index.html", "./src/robots.txt", "./src/assets/**"], function() {
-    gulp.start(["copy"]);
-  });
+gulp.task("watch", (cb) => {
+  gulp.watch("./src/**/*.scss", ["sass"]);
+  gulp.watch(["./src/index.html", "./src/robots.txt", "./src/assets/**"], ["copy"]);
   gulp.start(["webpack-dev-server"]);
 });
 
-gulp.task("copy", function() {
+gulp.task("copy", () => {
   gulp
     .src(["./src/index.html", "./src/robots.txt", "./src/assets/**"], { base: "./src" })
     .pipe(gulp.dest("./dest"));
 });
 
-gulp.task("sass", ["iconfont", "bootstrap"], function() {
+gulp.task("sass", ["iconfont", "bootstrap"], () => {
   gulp
     .src("./src/stylesheets/app.scss")
     .pipe(sass().on("error", sass.logError))
     .pipe(gulp.dest("./dest/assets"));
 });
 
-gulp.task("bootstrap", function() {
-  gulp
+gulp.task("bootstrap", () => {
+  return gulp
     .src("./node_modules/bootstrap-sass/assets/fonts/bootstrap/**")
     .pipe(gulp.dest("./dest/assets/bootstrap/fonts"));
 });
 
-gulp.task("webpack-build", function() {
-  var config = require("./webpack.config.js");
+gulp.task("webpack-build", () => {
+  let config = require("./webpack.config.js");
   config.plugins.unshift(new webpack.optimize.UglifyJsPlugin(), new webpack.optimize.DedupePlugin());
   gulp
     .src("./src/app.js")
@@ -47,8 +45,8 @@ gulp.task("webpack-build", function() {
     .pipe(gulp.dest("./dest/assets"));
 });
 
-gulp.task("webpack-dev-server", function() {
-  var config = require("./webpack.config.js");
+gulp.task("webpack-dev-server", () => {
+  let config = require("./webpack.config.js");
   config.entry.app.unshift("webpack-dev-server/client?http://localhost:3001", "webpack/hot/dev-server");
   config.plugins.unshift(new webpack.HotModuleReplacementPlugin());
   new WebpackDevServer(webpack(config), {
@@ -60,11 +58,15 @@ gulp.task("webpack-dev-server", function() {
   }).listen(3001);
 });
 
-gulp.task("iconfont", function() {
-  gulp
+gulp.task("iconfont", () => {
+  return gulp
     .src("./src/iconfont/*.svg")
-    .pipe(iconfont({ fontName: "aclog" }))
-    .on("glyphs", function(glyphs, options) {
+    .pipe(iconfont({
+      fontName: "aclog",
+      formats: ["ttf", "eot", "svg", "woff"],
+      timestamp: Math.round(Date.now() / 1000)
+    }))
+    .on("glyphs", (glyphs, options) => {
       gulp.src("./src/iconfont/_fonticon.scss")
         .pipe(consolidate("lodash", { glyphs: glyphs }))
         .pipe(gulp.dest("./src/stylesheets/generated/"));

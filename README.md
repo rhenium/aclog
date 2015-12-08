@@ -1,124 +1,104 @@
 # Aclog [![Build Status](https://travis-ci.org/rhenium/aclog.png?branch=master)](https://travis-ci.org/rhenium/aclog) [![Coverage Status](https://coveralls.io/repos/rhenium/aclog/badge.png)](https://coveralls.io/r/rhenium/aclog)
-Collects favs and retweets in real time by UserStreams.
+is a web application that tracks users' retweeting and favoriting on Twitter in real-time.
 
-## Aclog is
-* powered by Ruby on Rails and EventMachine
-* completely free and open source ([The MIT License](https://github.com/rhenium/aclog/blob/master/LICENSE.txt))
-* Scalable structure
-
-        |------------|           |-----------| (MsgPack) |---------|   |---|
-        |            -------------           ------------- Worker  =====   |
-        | Web Server (MsgPack-RPC)           -------------    Node ===== T |
-        |            -------------           |           |---------|   | w |
-        |-----| |----|           |           ------------- Worker  ===== i |
-              | |                | Collector -------------    Node ===== t |
-        |-----| |----|           |           |           |---------|   | t |
-        |            -------------           ------------- Worker  ===== e |
-        | DB (MySQL)                         -------------    Node ===== r |
-        |            -------------           |    :      |---------|   |   |
-        |------------|           |-----------|    :           :        |---|
+* is powered by Ruby, EventMachine, Ruby on Rails and Vue.js
+* is completely free and open source ([The MIT License](https://github.com/rhenium/aclog/blob/master/LICENSE.txt))
+* has scalable structure: capable of handling over 6k users = 6k simultaneous UserStream connections.
 
 ## Status
 * Working on [aclog.koba789.com](http://aclog.koba789.com)
 
 ## Features
-* Collecting favorites and retweets from Twitter Streaming API
-* Protected account support
+* Collecting likes and retweets via Twitter Streaming API
+* Protected accounts support
 * JSON API (with OAuth Echo)
 * Atom feed
 
 ## Requirements
 * Linux (WorkerNode optionally needs epoll)
-* Ruby 2.2+
-* MySQL/MariaDB 5.5.14+ (needs utf8mb4 support)
+* Ruby >= 2.2.3
+* MySQL/MariaDB >= 5.5.14 (utf8mb4 support is required)
 * memcached
-* JavaScript runtime (see https://github.com/rails/execjs)
+* Node.js >= 4.0
 
 ## Installation
-### Database
-* Create MySQL user
+Aclog has 3 components:
 
-### Application Server
-* Clone the source
+* / : application backend (Rails, requires MySQL and memcached)
+* /frontend : client side code (Node.js)
+* /worker_node: event collecter node (plain Ruby, requires memcached)
 
-        $ # We'll install aclog into /var/webapps/aclog
-        $ cd /var/webapps
-        $ git clone https://github.com/rhenium/aclog.git
-        $ cd /var/webapps/aclog
+### Application (backend)
 
-* Install Gems
+```sh
+# installing aclog at /var/webapps/aclog
+git clone https://github.com/rhenium/aclog.git /var/webapps/aclog
+cd /var/webapps/aclog
 
-        $ bundle install
+bundle install
 
-* Configure
+# Copy the example aclog config
+cp config/settings.yml.example config/settings.yml
+vi config/settings.yml
 
-        $ # Copy the example aclog config
-        $ cp config/settings.yml.example config/settings.yml
-        $ # Edit it
-        $ vi config/settings.yml
+# Copy the example aclog database config
+cp config/database.yml.example config/database.yml
+vi config/database.yml
 
-        $ # Copy the example aclog database config
-        $ cp config/database.yml.example config/database.yml
-        $ vi config/database.yml
+# Set random secret_token
+cp config/secrets.yml.example config/secrets.yml
+sed -i s/replace_here/$(rake secret)/g config/secrets.yml
 
-        $ # Set random secret_token
-        $ cp config/secrets.yml.example config/secrets.yml
-        $ sed -i s/replace_here/$(rake secret)/g config/secrets.yml
+# Setup database. This will create database and tables on MySQL server.
+RAILS_ENV=production bundle exec rake db:setup
 
-        $ # Setup database. This will create database and tables on MySQL server.
-        $ RAILS_ENV=production bundle exec rake db:setup
+# start your aclog:
+# with Rake
+RAILS_ENV=production bundle exec rake web:start
+RAILS_ENV=production bundle exec rake collector:start
+RAILS_ENV=production bundle exec bin/delayed_job start
 
-* Start your aclog
+# or, with systemd
+cp example/systemd/aclog-{webserver,collector,delayed_job}.service /usr/lib/systemd/system/
+systemctl start aclog-webserver.service
+systemctl start aclog-collector.service
+systemctl start aclog-delayed_job.service
+```
 
-    * Rake
+### Application (frontend)
 
-            $ RAILS_ENV=production bundle exec rake web:start
-            $ RAILS_ENV=production bundle exec rake collector:start
-            $ RAILS_ENV=production bundle exec bin/delayed_job start
+```sh
+cd /var/webapps/aclog/frontend
+npm install
+node_modules/gulp/bin/gulp.js build
 
-    * systemd
+# and edit your nginx configuration like example/nginx.conf
+```
 
-            $ cp example/systemd/aclog-{webserver,collector,delayed_job}.service /usr/lib/systemd/system/
-            $ systemctl start aclog-webserver.service
-            $ systemctl start aclog-collector.service
-            $ systemctl start aclog-delayed_job.service
+### Collector worker node(s)
 
-### Collector worker nodes
-* Copy the source
+```sh
+git clone https://github.com/rhenium/aclog.git /var/webapps/aclog
+cd /var/webapps/aclog/worker_node
 
-        $ cd /var/webapps
-        $ git clone https://github.com/rhenium/aclog.git
-        $ cd /var/webapps/aclog/worker_node
+bundle install
 
-* Install Gems
+# Copy the example collector config
+cp settings.yml.example settings.yml
+vi settings.yml
 
-        $ bundle install
+# start a node:
+# with Rake
+bundle exec rake worker_node:run
 
-* Configure it
-
-        $ # Copy the example collector config
-        $ cp settings.yml.example settings.yml
-        $ # Edit it
-        $ vi settings.yml
-
-* Start worker
-
-    * Rake
-
-            $ bundle exec rake worker_node:run
-
-    * systemd
-
-            $ cp example/systemd/aclog-worker-node.service /usr/lib/systemd/system/
-            $ systemctl start aclog-worker-node.service
+# or, with systemd
+cp example/systemd/aclog-worker-node.service /usr/lib/systemd/system/
+systemctl start aclog-worker-node.service
+```
 
 ## Special Thanks
 * KOBA789 ([@KOBA789](https://twitter.com/KOBA789) / [koba789.com](http://koba789.com)) - Hosting aclog.koba789.com
-* rot ([@aayh](https://twitter.com/aayh)) - Web UI design
+* rot ([@aayh](https://twitter.com/aayh)) - UI design
 
-## Contributing
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+## License
+MIT License. See the LICENSE file for details.

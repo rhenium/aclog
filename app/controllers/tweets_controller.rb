@@ -76,6 +76,10 @@ class TweetsController < ApplicationController
   end
 
   def render_tweets
+    if request.format.atom?
+      return render("tweets")
+    end
+
     hash = {
       user: @user.as_json(methods: :registered),
       statuses: @tweets.map(&method(:transform_tweet)) }

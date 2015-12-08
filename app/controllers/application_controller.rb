@@ -50,13 +50,18 @@ class ApplicationController < ActionController::Base
   end
 
   def force_json
-    request.format = :json unless params[:format] == :atom
+    request.format = :json unless request.format.atom?
   end
 
   alias __render__ render
-
-  def render(*args)
-    raise ArgumentError, "don't use render, use render_json"
+  if Rails.env.development?
+    def render(*args)
+      if request.format.atom?
+        super(*args)
+      else
+        raise ArgumentError, "don't use render, use render_json"
+      end
+    end
   end
 
   def render_json(data:, **kwargs)

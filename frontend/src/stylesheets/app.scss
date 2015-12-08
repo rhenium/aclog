@@ -2,7 +2,7 @@ $icon-font-path: "/assets/bootstrap/fonts/";
 
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 @import "base";
-@import "aclog_fonticon";
+@import "generated/fonticon";
 @import "index";
 @import "apidocs";
 @import "error_page";

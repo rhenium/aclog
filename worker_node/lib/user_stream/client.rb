@@ -39,12 +39,7 @@ module UserStream
       error = nil
       errorbuf = ""
       buftok = BufferedTokenizer.new("\r\n")
-      json_parser = Yajl::Parser.new(symbolize_keys: true)
       @http = setup_connection
-
-      json_parser.on_parse_complete = -> json {
-        callback(:item, json)
-      }
 
       @http.headers do |headers|
         case status = @http.response_header.status
@@ -68,7 +63,7 @@ module UserStream
         end
 
         buftok.extract(chunk).each do |line|
-          json_parser << line
+          callback(:item, Oj.load(line))
         end
       end
 

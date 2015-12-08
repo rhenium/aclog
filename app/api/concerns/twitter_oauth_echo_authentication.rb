@@ -11,7 +11,7 @@ module TwitterOauthEchoAuthentication
     end
 
     open(twitter_provider, "Authorization" => credentials) do |res|
-      json = Yajl::Parser.parse(res.read)
+      json = Oj.load(res.read)
       json["id"]
     end
   rescue OpenURI::HTTPError

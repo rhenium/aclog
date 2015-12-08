@@ -5,6 +5,7 @@ require "event_channel"
 require "user_stream/client"
 require "collector_connection"
 require "user_connection"
+require "oj"
 
 Settings = OpenStruct.new(YAML.load_file(File.expand_path("../../settings.yml", __FILE__)))
 
@@ -12,6 +13,7 @@ class WorkerNode
   class << self
     def run
       EventChannel.setup
+      Oj.default_options = { symbol_keys: true }
 
       EM.epoll if Settings.epoll
       EM.set_descriptor_table_size(Settings.descriptor_table_size || 1024)

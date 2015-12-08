@@ -220,12 +220,6 @@ class Tweet < ActiveRecord::Base
     end
   end
 
-  # Returns the URI of the tweet on twitter.com.
-  # @return [String] The URI.
-  def twitter_url
-    "https://twitter.com/#{user.screen_name}/status/#{self.id}"
-  end
-
   def id_str
     id.to_s
   end

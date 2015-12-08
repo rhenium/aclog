@@ -2,7 +2,7 @@
   <div class="sidebar" v-if="!user"><partial name="loading-box"></partial></div>
   <div class="sidebar" v-else>
     <div>
-      <p><img alt="@{{user.screen_name}}" class="img-rounded twitter-icon" height="64" v-bind:src="user.profile_image_url" width="64" /></p>
+      <p><img alt="@{{user.screen_name}}" class="img-rounded twitter-icon" height="64" v-bind:src="profile_image_url_full" width="64" /></p>
       <p>@{{user.screen_name}}</p>
       <p><a class="aclogicon aclogicon-twitter" href="https://twitter.com/{{user.screen_name}}"></a></p>
       <div class="user-stats">
@@ -48,8 +48,10 @@ export default {
       return Math.round(this.stats.reactions_count / this.stats.tweets_count * 100) / 100;
     },
     isUserPage() {
-      console.log(this.$route);
       return !!this.user || !!this.$route.params.screen_name || this.$route.fullPath === "/i/:id"
+    },
+    profile_image_url_full() {
+      return this.user.profile_image_url.replace(/_normal(\.\w+)$/, "$1");
     }
   },
   watch: {

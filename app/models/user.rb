@@ -49,20 +49,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def twitter_url
-    "https://twitter.com/#{self.screen_name}"
-  end
-
-  def profile_image_url(size = nil)
-    if size == :original
-      suffix = ""
-    else
-      suffix = "_#{size || :normal}"
-    end
-
-    attributes["profile_image_url"].sub(/_normal((?:\.(?:png|jpeg|gif))?)/, "#{suffix}\\1")
-  end
-
   def id_str
     id.to_s
   end

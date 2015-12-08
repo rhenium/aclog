@@ -11,7 +11,7 @@ atom_feed(root_url: url_for(params.merge(format: nil, only_path: false))) do |fe
         "retweeted by #{tweet.retweets_count} #{tweet.retweets_count != 1 ? "people" : "person"}."
       entry.author do |author|
         author.name "#{tweet.user.name} (@#{tweet.user.screen_name})"
-        author.uri tweet.user.twitter_url
+        author.uri "https://twitter.com/#{tweet.user.screen_name}"
       end
     end
   end

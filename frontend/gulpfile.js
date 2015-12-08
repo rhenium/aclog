@@ -39,6 +39,8 @@ gulp.task("bootstrap", () => {
 gulp.task("webpack-build", () => {
   let config = require("./webpack.config.js");
   config.plugins.unshift(new webpack.optimize.UglifyJsPlugin(), new webpack.optimize.DedupePlugin());
+  config.plugins.unshift(new webpack.DefinePlugin({ "process.env": { NODE_ENV: '"production"' } }));
+  config.plugins.unshift(new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/));
   gulp
     .src("./src/app.js")
     .pipe(gwebpack(config, webpack))

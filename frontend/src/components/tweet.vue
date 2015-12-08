@@ -6,12 +6,12 @@
       </div>
       <div class="status-content">
         <div class="status-head">
-          <span class="user"><a v-link="'/' + tweet.user.screen_name"><span>{{tweet.user.name | removeInvalidCharacters}}</span> <span>@{{tweet.user.screen_name}}</span></a></span>
+          <span class="user"><a v-link="'/' + tweet.user.screen_name"><span>{{tweet.user.name}}</span> <span>@{{tweet.user.screen_name}}</span></a></span>
           <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time datetime="{{tweet.tweeted_at}}">{{formattedTweetedAt}}</time></a> <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a></span>
         </div>
-        <div class="status-text">{{{tweet.text | removeInvalidCharacters | formatText}}}</div>
+        <div class="status-text">{{{tweet.text | formatText}}}</div>
         <div class="status-foot">
-          <span class="source">{{{tweet.source | removeInvalidCharacters | formatSource}}}</span>
+          <span class="source">{{{tweet.source | formatSource}}}</span>
           <ul>
             <li><a class="aclogicon aclogicon-like" v-on:click="openIntent" href="https://twitter.com/intent/favorite?tweet_id={{tweet.id_str}}" title="いいね！"></a></li>
             <li><a class="aclogicon aclogicon-retweet" v-on:click="openIntent" href="https://twitter.com/intent/retweet?tweet_id={{tweet.id_str}}" title="リツイート"></a></li>

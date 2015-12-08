@@ -23,7 +23,6 @@ Vue.config.debug = true;
 
 Vue.use(VueRouter);
 
-Vue.filter("removeInvalidCharacters", (str) => str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/gm, "")); /* unyaa: http://www.w3.org/TR/xml/#charsets */
 Vue.mixin({
   methods: {
     placeholderImage(e) {
@@ -34,7 +33,7 @@ Vue.mixin({
 });
 Vue.component("tweet", require("./components/tweet.vue"));
 Vue.partial("loading-box", '<div class="loading-box"><img class="loading-image" src="/assets/loading.gif" /></div>');
-Vue.partial("profile-image", '<a v-link="\'/\' + user.screen_name" title="{{user.name | removeInvalidCharacters}} (@{{user.screen_name}})"><img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="placeholderImage" /></a>');
+Vue.partial("profile-image", '<a v-link="\'/\' + user.screen_name" title="{{user.name}} (@{{user.screen_name}})"><img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="placeholderImage" /></a>');
 Vue.component("profile-image", Vue.extend({ props: ["user"], template: '<partial name="profile-image"></partial>' }));
 
 export const router = new VueRouter({

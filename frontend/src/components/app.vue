@@ -34,6 +34,9 @@ export default {
     setFlashNext(obj) {
       this.flashNext = Utils.stringifyMessage(obj);
     },
+  },
+  attached() {
+    this.$el.style.display = "block";
   }
 };
 </script>

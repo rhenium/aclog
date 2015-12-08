@@ -163,4 +163,4 @@ router.redirect({
 });
 
 aclog.sessions.verify();
-router.start(App, "body");
+router.start(App, "#app");

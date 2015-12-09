@@ -26,7 +26,7 @@ class TweetResponseNotificationJob < ActiveJob::Base
     end
 
     if t_count
-      notify(tweet, "#{ t_count }favs!")
+      notify(tweet, "#{ t_count } likes!")
     end
   end
 

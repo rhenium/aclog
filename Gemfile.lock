@@ -52,6 +52,7 @@ GEM
     concurrent-ruby (1.0.0)
     connection_pool (2.2.0)
     cool.io (1.2.4)
+    daemons (1.2.3)
     dalli (2.7.4)
     delayed_job (4.1.1)
       activesupport (>= 3.0, < 5.0)
@@ -205,6 +206,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import
   connection_pool
+  daemons
   dalli
   delayed_job_active_record
   eventmachine

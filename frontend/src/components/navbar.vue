@@ -35,7 +35,7 @@
               </form>
             </li>
             <li class="user-jump-suggestion" v-for="user in users">
-              <a v-link="'/' + user.screen_name"><img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="placeholderImage" /><span>@{{user.screen_name}}</span></a>
+              <a v-link="'/' + user.screen_name"><img v-bind:alt="'@' + user.screen_name" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="placeholderImage" /><span v-text="'@' + user.screen_name"></span></a>
             </li>
             <li class="loading-box" v-if="loading">
               <img class="loading-image" src="/assets/loading.gif" />

@@ -6,8 +6,8 @@
       </div>
       <div class="status-content">
         <div class="status-head">
-          <span class="user"><a v-link="'/' + tweet.user.screen_name"><span>{{tweet.user.name}}</span> <span>@{{tweet.user.screen_name}}</span></a></span>
-          <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time datetime="{{tweet.tweeted_at}}">{{formattedTweetedAt}}</time></a> <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a></span>
+          <span class="user"><a v-link="'/' + tweet.user.screen_name"><span v-text="tweet.user.name"></span> <span v-text="'@' + tweet.user.screen_name"></span></a></span>
+          <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time v-bind:datetime="tweet.tweeted_at" v-text="formattedTweetedAt"></time></a> <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a></span>
         </div>
         <div class="status-text">{{{tweet.text | formatText}}}</div>
         <div class="status-foot">
@@ -23,7 +23,7 @@
     <div class="status-responses">
       <dl v-if="tweet.favorites_count &gt; 0">
         <dt>
-        <a class="expand-responses-button" v-on:click="toggleExpandFavorites" href="#" title="すべて見る"><span>{{tweet.favorites_count}}</span>Likes</a>
+        <a class="expand-responses-button" v-on:click="toggleExpandFavorites" href="#" title="すべて見る"><span v-text="tweet.favorites_count"></span>Likes</a>
         </dt>
         <dd v-bind:class="{ 'collapsed': !expandFavorites }">
         <ul class="status-responses-favorites">
@@ -39,7 +39,7 @@
       </dl>
       <dl v-if="tweet.retweets_count &gt; 0">
         <dt>
-        <a class="expand-responses-button" v-on:click="toggleExpandRetweets" href="#" title="すべて見る"><span>{{tweet.retweets_count}}</span>RTs</a>
+        <a class="expand-responses-button" v-on:click="toggleExpandRetweets" href="#" title="すべて見る"><span v-text="tweet.retweets_count"></span>RTs</a>
         </dt>
         <dd v-bind:class="{ 'collapsed': !expandRetweets }">
         <ul class="status-responses-retweets">
@@ -63,7 +63,7 @@
       <div class="status-content">
         <div class="status-head">
           <span class="time">
-            <time datetime="{{tweet.tweeted_at}}">{{formattedTweetedAt}}</time>
+            <time v-bind:datetime="tweet.tweeted_at" v-text="formattedTweetedAt"></time>
             <a class="source aclogicon aclogicon-twitter" v-if="tweet.id_str" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a>
             <div class="source aclogicon aclogicon-twitter" v-else></div>
           </span>

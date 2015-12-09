@@ -162,4 +162,4 @@ router.redirect({
 });
 
 aclog.sessions.verify();
-router.start(App, "#app");
+router.start(App, "html");

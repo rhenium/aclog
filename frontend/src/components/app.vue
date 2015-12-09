@@ -9,6 +9,7 @@ export default {
     return {
       flash: null,
       flashNext: null,
+      title: "aclog",
     };
   },
   watch: {
@@ -22,11 +23,14 @@ export default {
   },
   methods: {
     updateTitle(str) {
+      var newStr;
       if (str && str !== "") {
-        document.title = str + " - aclog";
+        newStr = str + " - aclog";
       } else {
-        document.title = "aclog";
+        newStr = "aclog";
       }
+      document.title = newStr;
+      this.title = newStr;
     },
     setFlash(obj) {
       this.flash = Utils.stringifyMessage(obj);
@@ -36,7 +40,7 @@ export default {
     },
   },
   attached() {
-    this.$el.style.display = "block";
+    document.querySelector("#app").style.display = "block";
   }
 };
 </script>

@@ -11,6 +11,7 @@
     "babel-runtime": "^6.2.0",
     "bootstrap-sass": "^3.3.6",
     "css-loader": "^0.23.0",
+    "es6-promise": "^3.0.2",
     "exports-loader": "^0.6.2",
     "gulp": "^3.9.0",
     "gulp-consolidate": "^0.1.2",

@@ -35,8 +35,7 @@ class TweetResponseNotificationJob < ActiveJob::Base
     account = user.account
 
     if account && account.active? && account.notification_enabled?
-      url = Rails.application.routes.url_helpers.tweet_url(host: Settings.base_url, id: tweet.id)
-      post("@#{ user.screen_name } #{ text } #{ url }", tweet.id)
+      post("@#{user.screen_name} #{text} #{Settings.base_url}/i/#{tweet.id}", tweet.id)
     end
   end
 

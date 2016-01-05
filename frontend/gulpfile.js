@@ -42,7 +42,7 @@ gulp.task("webpack-build", () => {
   config.plugins.unshift(new webpack.DefinePlugin({ "process.env": { NODE_ENV: '"production"' } }));
   config.plugins.unshift(new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/));
   gulp
-    .src("./src/app.js")
+    .src("./src/bootstrap.js")
     .pipe(gwebpack(config, webpack))
     .pipe(gulp.dest("./dest/assets"));
 });

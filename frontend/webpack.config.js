@@ -2,12 +2,12 @@ var webpack = require("webpack");
 
 module.exports = {
   entry: {
-    app: ["./src/app.js"]
+    app: ["./src/bootstrap.js"]
   },
   output: {
     path: __dirname + "/dest/assets",
     publicPath: "/assets",
-    filename: "app.build.js"
+    filename: "[name].build.js"
   },
   resolve: {
     root: [__dirname + "/src/lib", __dirname + "/src"],

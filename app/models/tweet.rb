@@ -201,7 +201,7 @@ class Tweet < ActiveRecord::Base
     private
     # replace t.co with expanded_url
     def extract_entities(json)
-      entity_values = (json[:extended_entities] || json[:entities]).values.flatten.select { |e| e[:url] }.sort_by.with_index {|e, i| [e[:indices].first, i] }
+      entity_values = ((json[:extended_entities]&.[](:media) || []) + (json[:entities]&.[](:urls) || [])).select { |e| e[:url] }.sort_by.with_index {|e, i| [e[:indices].first, i] }
       text = json[:text]
 
       result = +""

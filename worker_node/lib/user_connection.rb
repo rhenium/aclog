@@ -163,6 +163,7 @@ class UserConnection
     { id: status[:id],
       text: status[:text],
       entities: status[:entities],
+      extended_entities: status[:extended_entities],
       source: status[:source],
       created_at: status[:created_at],
       in_reply_to_status_id: status[:in_reply_to_status_id],

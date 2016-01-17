@@ -113,6 +113,27 @@
     }
 }
 
+.status-media {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+
+    a {
+        display: block;
+        margin: 0 5px 0 0;
+
+        img {
+            opacity: 1;
+            width: 100%;
+            height: auto;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+}
+
 .status-foot .source {
     margin: 5px 0;
     float: left;

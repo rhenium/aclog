@@ -9,9 +9,12 @@
           <span class="user"><a v-link="'/' + tweet.user.screen_name"><span v-text="tweet.user.name"></span> <span v-text="'@' + tweet.user.screen_name"></span></a></span>
           <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time v-bind:datetime="tweet.tweeted_at" v-text="formattedTweetedAt"></time></a> <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a></span>
         </div>
-        <div class="status-text">{{{tweet.text | formatText}}}</div>
+        <div class="status-text">{{{formattedText}}}</div>
+        <div class="status-media" v-if="hasMedia">
+          <a v-for="mediaUrl in media" v-bind:href="mediaUrl"><img alt="img" v-bind:src="mediaUrl"></a>
+        </div>
         <div class="status-foot">
-          <span class="source">{{{tweet.source | formatSource}}}</span>
+          <span class="source">{{{formattedSource}}}</span>
           <ul>
             <li><a class="aclogicon aclogicon-like" v-on:click="openIntent" href="https://twitter.com/intent/favorite?tweet_id={{tweet.id_str}}" title="いいね！"></a></li>
             <li><a class="aclogicon aclogicon-retweet" v-on:click="openIntent" href="https://twitter.com/intent/retweet?tweet_id={{tweet.id_str}}" title="リツイート"></a></li>
@@ -88,31 +91,50 @@ export default {
       expandFavorites: false,
       expandRetweets: false,
       loading: false,
+      media: null,
     };
   },
   computed: {
     formattedTweetedAt() {
       return moment(this.tweet.tweeted_at).format("YYYY-MM-DD HH:mm:ss");
-    }
-  },
-  filters: {
-    formatSource(str) {
-      if (/^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)) {
-        return str.replace(/&/g, "&amp;");
-      } else {
-        return Utils.escapeHTML(str);
-      }
     },
-    formatText(str) {
+    formattedText() {
+      if (this.media === null) this.initMediaUrls();
+      const str = this.tweet.text;
       var autolinked = twitterText.autoLink(str, {
         suppressLists: true,
         usernameIncludeSymbol: true,
         usernameUrlBase: "/"
       });
       return autolinked.replace(/\r?\n/g, "<br />\n");
+    },
+    formattedSource() {
+      const str = this.tweet.source;
+      if (/^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)) {
+        return str.replace(/&/g, "&amp;");
+      } else {
+        return Utils.escapeHTML(str);
+      }
+    },
+    hasMedia() {
+      if (this.media === null) this.initMediaUrls();
+      return this.media.length > 0
+    },
+    mediaUrls() {
+      if (this.media === null) this.initMediaUrls();
+      return this.media;
     }
   },
   methods: {
+    initMediaUrls() {
+      const orig = this.tweet.text;
+      const media = [];
+      this.tweet.text = orig.replace(/\s?(https?:\/\/pbs\.twimg\.com\/media\/[_A-Za-z0-9-]+\.(png|jpg|jpeg))/gi, (match, p1) => {
+        media.push(p1);
+        return "";
+      });
+      this.media = media;
+    },
     toggleExpandFavorites(e) {
       e.preventDefault();
       this.expandFavorites = !this.expandFavorites;

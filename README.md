@@ -16,7 +16,7 @@ is a web application that tracks users' retweeting and favoriting on Twitter in 
 
 ## Requirements
 * Linux (WorkerNode optionally needs epoll)
-* Ruby >= 2.2.3
+* Ruby 2.3.0
 * MySQL/MariaDB >= 5.5.14 (utf8mb4 support is required)
 * memcached
 * Node.js >= 4.0

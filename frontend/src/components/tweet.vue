@@ -7,11 +7,11 @@
       <div class="status-content">
         <div class="status-head">
           <span class="user"><a v-link="'/' + tweet.user.screen_name"><span v-text="tweet.user.name"></span> <span v-text="'@' + tweet.user.screen_name"></span></a></span>
-          <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time v-bind:datetime="tweet.tweeted_at" v-text="formattedTweetedAt"></time></a> <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a></span>
+          <span class="time"><a v-link="'/i/' + tweet.id_str" title="このツイートの詳細を見る"><time v-bind:datetime="tweet.tweeted_at" v-text="formattedTweetedAt"></time></a> <a class="source aclogicon aclogicon-twitter" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る" target="_blank"></a></span>
         </div>
         <div class="status-text">{{{formattedText}}}</div>
         <div class="status-media" v-if="hasMedia">
-          <a v-for="mediaUrl in media" v-bind:href="mediaUrl"><img alt="img" v-bind:src="mediaUrl"></a>
+          <a v-for="mediaUrl in media" v-bind:href="mediaUrl" target="_blank"><img alt="img" v-bind:src="mediaUrl"></a>
         </div>
         <div class="status-foot">
           <span class="source">{{{formattedSource}}}</span>
@@ -67,7 +67,7 @@
         <div class="status-head">
           <span class="time">
             <time v-bind:datetime="tweet.tweeted_at" v-text="formattedTweetedAt"></time>
-            <a class="source aclogicon aclogicon-twitter" v-if="tweet.id_str" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る"></a>
+            <a class="source aclogicon aclogicon-twitter" v-if="tweet.id_str" href="https://twitter.com/{{tweet.user.screen_name}}/status/{{tweet.id_str}}" title="Twitter で見る" target="_blank"></a>
             <div class="source aclogicon aclogicon-twitter" v-else></div>
           </span>
         </div>

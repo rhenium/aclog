@@ -11,7 +11,10 @@
         </div>
         <div class="status-text">{{{formattedText}}}</div>
         <div class="status-media" v-if="hasMedia">
-          <a v-for="mediaUrl in media" v-bind:href="mediaUrl" target="_blank"><img alt="img" v-bind:src="mediaUrl"></a>
+          <div v-for="mediaItem in media">
+            <video v-if="mediaItem.isVideo" v-bind:src="mediaItem.url" controls></video>
+            <a v-else v-bind:href="mediaItem.url" target="_blank"><img alt="img" v-bind:src="mediaItem.url"></a>
+          </div>
         </div>
         <div class="status-foot">
           <span class="source">{{{formattedSource}}}</span>
@@ -129,8 +132,8 @@ export default {
     initMediaUrls() {
       const orig = this.tweet.text;
       const media = [];
-      this.tweet.text = orig.replace(/\s?(https?:\/\/pbs\.twimg\.com\/media\/[_A-Za-z0-9-]+\.(png|jpg|jpeg))/gi, (match, p1) => {
-        media.push(p1);
+      this.tweet.text = orig.replace(/\s?(https?:\/\/(pbs|video)\.twimg\.com\/[-\/_A-Za-z0-9]+\.(png|jpg|jpeg|mp4|gif))/gi, (match, p1) => {
+        media.push({ url: p1, isVideo: p1.endsWith("mp4") });
         return "";
       });
       this.media = media;

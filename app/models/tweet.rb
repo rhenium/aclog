@@ -201,7 +201,7 @@ class Tweet < ActiveRecord::Base
     private
     # replace t.co with expanded_url
     def extract_entities(json)
-      entity_values = ((json[:extended_entities]&.[](:media) || []) + (json[:entities]&.[](:urls) || [])).select { |e| e[:url] }.sort_by.with_index {|e, i| [e[:indices].first, i] }
+      entity_values = ((json.dig(:extended_entities, :media) || []) + (json.dig(:entities, :urls) || [])).select { |e| e && e[:url] }.sort_by.with_index {|e, i| [e[:indices].first, i] }
       text = json[:text]
 
       result = +""
@@ -210,8 +210,9 @@ class Tweet < ActiveRecord::Base
         url = case entity[:type]
               when "photo"
                 entity[:media_url_https]
-              else
-                # when "video" or not media
+              when "animated_gif", "video"
+                entity.dig(:video_info, :variants)&.select { |var| var&.[](:content_type) == "video/mp4" }&.max_by { |var| var[:bitrate] }&.[](:url)
+              else # plain url or unknown
                 entity[:expanded_url]
               end
         if is.first >= last_index

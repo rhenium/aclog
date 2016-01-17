@@ -118,11 +118,11 @@
     display: flex;
     align-items: center;
 
-    a {
+    div {
         display: block;
         margin: 0 5px 0 0;
 
-        img {
+        img, video {
             opacity: 1;
             width: 100%;
             height: auto;
@@ -131,6 +131,10 @@
                 opacity: 1;
             }
         }
+    }
+
+    &:last-child {
+        margin: 0;
     }
 }
 

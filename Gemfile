@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "rails", "~> 4.2.1"
+gem "rails", "~> 4.2.5"
 gem "activerecord-import"
 gem "tzinfo-data"
 gem "mysql2", "~> 0.3.20"
@@ -24,6 +24,8 @@ gem "msgpack-rpc"
 
 group :development, :test do
   gem "pry-rails"
+  gem "foreman"
+  gem "rack-reverse-proxy", require: false
   # gem "byebug"
   # gem "oink"
 end

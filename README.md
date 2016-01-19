@@ -47,8 +47,9 @@ bundle exec rake db:setup
 cd worker_node && bundle install && cd ..
 cd frontend && npm install && cd ..
 
-gem install foreman
-foreman run # will run all components in foreground
+foreman run
+# will run all components in foreground (this currently listens tcp/3000 (backend), tcp/3001 (frontend), tcp/3002 (reverse proxy)
+# you will be able to access your aclog at http://localhost:8001/
 ```
 
 ## Special Thanks

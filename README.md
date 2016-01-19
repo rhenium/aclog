@@ -24,76 +24,31 @@ is a web application that tracks users' retweeting and favoriting on Twitter in 
 ## Installation
 Aclog has 3 components:
 
-* / : application backend (Rails, requires MySQL and memcached)
-* /frontend : client side code (Node.js)
-* /worker_node: event collecter node (plain Ruby, requires memcached)
+* `/` - application backend (Rails, requires MySQL and memcached)
+* `/frontend` - client side code (Node.js)
+* `/worker_node` - event collecter node (plain Ruby, requires memcached)
 
-### Application (backend)
+So, there are some files you have to configure:
+
+* `/config/settings.yml`      - Main configuration
+* `/config/database.yml`      - Database user / password
+* `/config/secrets.yml`       - Rails's `secret_key_base`
+* `/frontend/settings.js`     - Frontend configuration
+* `/worker_node/settings.yml` - WorkerNode configuration
+
+For production, read `INSTALL.md` for details.  
+For development, you can run aclog on your machine with foreman, after configuration.
 
 ```sh
-# installing aclog at /var/webapps/aclog
-git clone https://github.com/rhenium/aclog.git /var/webapps/aclog
-cd /var/webapps/aclog
-
+cd /path/to/aclog
 bundle install
+bundle exec rake db:setup
 
-# Copy the example aclog config
-cp config/settings.yml.example config/settings.yml
-vi config/settings.yml
+cd worker_node && bundle install && cd ..
+cd frontend && npm install && cd ..
 
-# Copy the example aclog database config
-cp config/database.yml.example config/database.yml
-vi config/database.yml
-
-# Set random secret_token
-cp config/secrets.yml.example config/secrets.yml
-sed -i s/replace_here/$(rake secret)/g config/secrets.yml
-
-# Setup database. This will create database and tables on MySQL server.
-RAILS_ENV=production bundle exec rake db:setup
-
-# start your aclog:
-# with Rake
-RAILS_ENV=production bundle exec rake web:start
-RAILS_ENV=production bundle exec rake collector:start
-RAILS_ENV=production bundle exec bin/delayed_job start
-
-# or, with systemd
-cp example/systemd/aclog-{webserver,collector,delayed_job}.service /usr/lib/systemd/system/
-systemctl start aclog-webserver.service
-systemctl start aclog-collector.service
-systemctl start aclog-delayed_job.service
-```
-
-### Application (frontend)
-
-```sh
-cd /var/webapps/aclog/frontend
-npm install
-node_modules/gulp/bin/gulp.js build
-
-# and edit your nginx configuration like example/nginx.conf
-```
-
-### Collector worker node(s)
-
-```sh
-git clone https://github.com/rhenium/aclog.git /var/webapps/aclog
-cd /var/webapps/aclog/worker_node
-
-bundle install
-
-# Copy the example collector config
-cp settings.yml.example settings.yml
-vi settings.yml
-
-# start a node:
-# with Rake
-bundle exec rake worker_node:run
-
-# or, with systemd
-cp example/systemd/aclog-worker-node.service /usr/lib/systemd/system/
-systemctl start aclog-worker-node.service
+gem install foreman
+foreman run # will run all components in foreground
 ```
 
 ## Special Thanks
@@ -101,4 +56,4 @@ systemctl start aclog-worker-node.service
 * rot ([@aayh](https://twitter.com/aayh)) - UI design
 
 ## License
-MIT License. See the LICENSE file for details.
+MIT License. See the `LICENSE` file for details.

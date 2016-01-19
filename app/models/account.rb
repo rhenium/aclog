@@ -39,6 +39,8 @@ class Account < ActiveRecord::Base
   def following?(target_id)
     target_id = target_id.id if target_id.is_a?(User)
     friends.member? target_id
+  rescue Twitter::Error::ServerError
+    nil
   end
 
   # Returns Twitter Gem's Client instance.

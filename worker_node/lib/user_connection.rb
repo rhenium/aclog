@@ -97,7 +97,7 @@ class UserConnection
   end
 
   def on_user(json, timestamp = nil)
-    log(:debug, "user-#{json[:id]} (#{timestamp})")
+    log(:debug, "user-#{json[:id]} (#{timestamp})") if $VERBOSE
     EventChannel << { event: :user,
                       identifier: "user-#{json[:id]}",
                       version: timestamp,
@@ -106,7 +106,7 @@ class UserConnection
 
   def on_tweet(json, timestamp = nil)
     timestamp ||= json[:timestamp_ms].to_i
-    log(:debug, "tweet-#{json[:id]} (#{timestamp})")
+    log(:debug, "tweet-#{json[:id]} (#{timestamp})") if $VERBOSE
     on_user(json[:user], timestamp)
     EventChannel << { event: :tweet,
                       identifier: "tweet-#{json[:id]}",
@@ -116,7 +116,7 @@ class UserConnection
 
   def on_retweet(json, timestamp = nil)
     timestamp ||= json[:timestamp_ms].to_i
-    log(:debug, "retweet-#{json[:id]} (#{timestamp})")
+    log(:debug, "retweet-#{json[:id]} (#{timestamp})") if $VERBOSE
     on_user(json[:user], timestamp)
     on_tweet(json[:retweeted_status], timestamp)
     EventChannel << { event: :retweet,
@@ -130,7 +130,7 @@ class UserConnection
 
   def on_event_tweet(json, timestamp = nil)
     timestamp ||= (json[:timestamp_ms] || (Time.parse(json[:created_at]).to_i * 1000)).to_i
-    log(:debug, "#{json[:event]}-#{json[:source][:id]}-#{json[:target_object][:id]} (#{timestamp})")
+    log(:debug, "#{json[:event]}-#{json[:source][:id]}-#{json[:target_object][:id]} (#{timestamp})") if $VERBOSE
     on_user(json[:source], timestamp)
     on_user(json[:target], timestamp)
     on_tweet(json[:target_object], timestamp)
@@ -144,7 +144,7 @@ class UserConnection
 
   def on_delete(json, timestamp = nil)
     timestamp ||= json[:timestamp_ms].to_i
-    log(:debug, "delete-#{json[:delete][:status][:id]} (#{timestamp})")
+    log(:debug, "delete-#{json[:delete][:status][:id]} (#{timestamp})") if $VERBOSE
     EventChannel << { event: :delete,
                       identifier: "delete-#{json[:delete][:status][:id]}",
                       version: timestamp,

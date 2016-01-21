@@ -98,7 +98,7 @@ module Collector
         if version = object[:version]
           cur = @dalli.get(id)
           if cur && cur >= version
-            Rails.logger.debug("EventQueue") { "dup: #{id}/#{cur} <=> #{version}" }
+            Rails.logger.debug("EventQueue") { "dup: #{id}/#{cur} <=> #{version}" } if $VERBOSE
             return
           else
             @dalli.set(id, version)

@@ -11,7 +11,7 @@ class EventChannel
         if version = data[:version]
           cur = @dalli.get(id)
           if cur && cur >= version
-            WorkerNode.logger.debug("UniqueChannel") { "dup: #{id}/#{cur} <=> #{version}" }
+            WorkerNode.logger.debug("UniqueChannel") { "dup: #{id}/#{cur} <=> #{version}" } if $VERBOSE
             return
           else
             @dalli.set(id, version)

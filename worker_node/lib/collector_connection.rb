@@ -7,7 +7,7 @@ class CollectorConnection < EM::Connection
     EventChannel.subscribe &method(:send_message)
   end
 
-  def post_init
+  def connection_completed
     log(:info, "Connection established, trying to authenticate...")
     send_message(event: :auth,
                  data: { secret_key: Settings.secret_key })
@@ -19,7 +19,6 @@ class CollectorConnection < EM::Connection
 
       EM.add_timer(10) do
         reconnect(Settings.collector_host, Settings.collector_port)
-        post_init
       end
     end
   end
@@ -53,7 +52,7 @@ class CollectorConnection < EM::Connection
     when "unregister"
       unregister_account(msg[:data])
     when "heartbeat"
-      log(:debug, "Heartbeat: #{msg[:data]}")
+      log(:debug, "Heartbeat: #{msg[:data]}") if $VERBOSE
       send_message(msg)
     else
       log(:warn, "Unknown message: #{msg.inspect}")

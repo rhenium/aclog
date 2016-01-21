@@ -33,7 +33,6 @@ module ControllerErrorHandling
       render_json data: { error: { message: message } }, status: 403
     end
 
-
     rescue_from Aclog::Exceptions::WorkerConnectionError do |ex|
       message = "Unable to connect to collector service (is down?)"
       render_json data: { error: { message: message } }, status: 500

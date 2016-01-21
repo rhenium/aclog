@@ -84,29 +84,29 @@ module Collector
         log(:info, "Received unauthorized: ##{msg[:data][:id]}/#{msg[:data][:user_id]}")
         @queue.push_unauthorized(msg)
       when "user"
-        log(:debug, "Received user: #{msg[:identifier]}")
+        log(:debug, "Received user: #{msg[:identifier]}") if $VERBOSE
         @queue.push_user(msg)
       when "tweet"
-        log(:debug, "Received tweet: #{msg[:identifier]}")
+        log(:debug, "Received tweet: #{msg[:identifier]}") if $VERBOSE
         @queue.push_tweet(msg)
       when "favorite"
-        log(:debug, "Receive favorite: #{msg[:identifier]}")
+        log(:debug, "Receive favorite: #{msg[:identifier]}") if $VERBOSE
         @queue.push_favorite(msg)
       when "unfavorite"
-        log(:debug, "Receive unfavorite: #{msg[:identifier]}")
+        log(:debug, "Receive unfavorite: #{msg[:identifier]}") if $VERBOSE
         @queue.push_unfavorite(msg)
       when "retweet"
-        log(:debug, "Receive retweet: #{msg[:identifier]}")
+        log(:debug, "Receive retweet: #{msg[:identifier]}") if $VERBOSE
         @queue.push_retweet(msg)
       when "delete"
-        log(:debug, "Receive delete: #{msg[:identifier]}")
+        log(:debug, "Receive delete: #{msg[:identifier]}") if $VERBOSE
         @queue.push_delete(msg)
       when "exit"
         log(:info, "Closing this connection...")
         @closing = true
         NodeManager.unregister(self)
       when "heartbeat"
-        log(:debug, "Heartbeat reply: #{msg[:data]}")
+        log(:debug, "Heartbeat reply: #{msg[:data]}") if $VERBOSE
         @heartbeats.delete(msg[:data])
       else
         log(:warn, "Unknown message: #{msg.inspect}")

@@ -13,7 +13,7 @@ class WorkerNode
   class << self
     def run
       EventChannel.setup
-      Oj.default_options = { symbol_keys: true }
+      Oj.default_options = { symbol_keys: true, mode: :strict }
 
       EM.epoll if Settings.epoll
       EM.set_descriptor_table_size(Settings.descriptor_table_size || 1024)
@@ -34,8 +34,8 @@ class WorkerNode
     end
 
     def logger
-      @logger ||= Logger.new(STDOUT).tap {|l|
-        l.level = Logger.const_get(Settings.log_level.upcase) }
+      @logger ||= Logger.new(STDOUT).tap { |logger|
+        logger.level = Settings.log_level.downcase.intern }
     end
   end
 end

@@ -224,9 +224,11 @@ class Tweet < ActiveRecord::Base
           last_index
         end
       end
-      result << text[last_index..-1]
 
-      result
+      result << text[last_index..-1]
+    rescue => e
+      Rails.logger.error(e)
+      json[:text]
     end
 
     def snowflake_min(time)

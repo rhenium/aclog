@@ -26,7 +26,7 @@ gulp.task("copy", () => {
 gulp.task("sass", ["iconfont", "bootstrap"], () => {
   gulp
     .src("./src/stylesheets/app.scss")
-    .pipe(sass().on("error", sass.logError))
+    .pipe(sass({ outputStyle: "compressed" }).on("error", sass.logError))
     .pipe(gulp.dest("./dest/assets"));
 });
 

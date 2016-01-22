@@ -15,7 +15,7 @@ module Collector
 
         EM.run do
           sock_path = File.join(Rails.root, "tmp", "sockets", "collector.sock")
-          File.delete(sock_path) if File.exists?(sock_path)
+          File.delete(sock_path) if File.exist?(sock_path)
           control = MessagePack::RPC::Server.new
           control.listen(MessagePack::RPC::UNIXServerTransport.new(sock_path), Collector::ControlServer.new)
           EM.defer { control.run }

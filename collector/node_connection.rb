@@ -41,12 +41,7 @@ module Collector
 
     def register_account(account)
       send_message(event: :register,
-                   data: { id: account.id,
-                           consumer_key: Settings.consumer.key,
-                           consumer_secret: Settings.consumer.secret,
-                           oauth_token: account.oauth_token,
-                           oauth_token_secret: account.oauth_token_secret,
-                           user_id: account.user_id })
+                   data: account_data(account))
       log(:info, "Registered account ##{account.id}/#{account.user_id}")
     end
 
@@ -59,11 +54,9 @@ module Collector
 
     def activate(block_number)
       @activated_at = Time.now
+      accs = Account.active.where("id % ? = ?", Settings.collector.nodes_count, block_number)
       send_message(event: :activate,
-                   data: { users: [] })
-      Account.active.where("id % ? = ?", Settings.collector.nodes_count, block_number).each do |a|
-        register_account(a)
-      end
+                   data: { accounts: accs.map(&method(:account_data)) })
     end
 
     private
@@ -147,6 +140,15 @@ module Collector
       id = Time.now.to_i
       @heartbeats << id
       send_message(event: :heartbeat, data: id)
+    end
+
+    def account_data(account)
+      { id: account.id,
+        consumer_key: Settings.consumer.key,
+        consumer_secret: Settings.consumer.secret,
+        oauth_token: account.oauth_token,
+        oauth_token_secret: account.oauth_token_secret,
+        user_id: account.user_id }
     end
 
     def log(level, message)

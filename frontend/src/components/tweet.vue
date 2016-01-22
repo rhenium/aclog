@@ -113,8 +113,10 @@ export default {
     },
     formattedSource() {
       const str = this.tweet.source;
-      if (/^<a href="([^"]+?)" rel="nofollow">([^<>]+?)<\/a>$/.test(str)) {
-        return str.replace(/&/g, "&amp;");
+      const re = /^<a href="([^"]*)" rel="nofollow">([^<>]*)<\/a>$/;
+      const match = str.match(re);
+      if (match !== null) {
+        return '<a href="' + Utils.escapeHTML(match[1]) + '" rel="nofollow" target="_blank">' + Utils.escapeHTML(match[2]) + '</a>';
       } else {
         return Utils.escapeHTML(str);
       }

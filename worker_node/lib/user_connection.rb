@@ -61,8 +61,8 @@ class UserConnection
     client.on_item do |json|
       begin
         if json[:friends]
-          log(:info, "Connection established (friends: #{json[:friends].size})")
-        elsif json[:delete] && json[:delete][:status]
+          log(:info, "Connection established (friends: #{json[:friends]&.size})")
+        elsif json.dig(:delete, :status)
           on_delete(json)
         elsif json[:event] == "favorite" || json[:event] == "unfavorite"
           on_event_tweet(json)
@@ -124,30 +124,30 @@ class UserConnection
                       identifier: "retweet-#{json[:id]}",
                       version: timestamp,
                       data: { id: json[:id],
-                              user: { id: json[:user][:id] },
-                              retweeted_status: { id: json[:retweeted_status][:id],
-                                                  user: { id: json[:retweeted_status][:user][:id] } } } }
+                              user: { id: json.dig(:user, :id) },
+                              retweeted_status: { id: json.dig(:retweeted_status, :id),
+                                                  user: { id: json.dig(:retweeted_status, :user, :id) } } } }
   end
 
   def on_event_tweet(json, timestamp = nil)
     timestamp ||= (json[:timestamp_ms] || (Time.parse(json[:created_at]).to_i * 1000)).to_i
-    log(:debug, "#{json[:event]}-#{json[:source][:id]}-#{json[:target_object][:id]} (#{timestamp})") if $VERBOSE
+    log(:debug, "#{json[:event]}-#{json.dig(:source, :id)}-#{json.dig(:target_object, :id)} (#{timestamp})") if $VERBOSE
     on_user(json[:source], timestamp)
     on_user(json[:target], timestamp)
     on_tweet(json[:target_object], timestamp)
     EventChannel << { event: json[:event].to_sym,
-                      identifier: "#{json[:event]}-#{json[:source][:id]}-#{json[:target_object][:id]}",
+                      identifier: "#{json[:event]}-#{json.dig(:source, :id)}-#{json.dig(:target_object, :id)}",
                       version: timestamp,
-                      data: { source: { id: json[:source][:id] },
-                              target: { id: json[:target][:id] },
-                              target_object: { id: json[:target_object][:id] } } }
+                      data: { source: { id: json.dig(:source, :id) },
+                              target: { id: json.dig(:target, :id) },
+                              target_object: { id: json.dig(:target_object, :id) } } }
   end
 
   def on_delete(json, timestamp = nil)
     timestamp ||= json[:timestamp_ms].to_i
-    log(:debug, "delete-#{json[:delete][:status][:id]} (#{timestamp})") if $VERBOSE
+    log(:debug, "delete-#{json.dig(:delete, :status, :id)} (#{timestamp})") if $VERBOSE
     EventChannel << { event: :delete,
-                      identifier: "delete-#{json[:delete][:status][:id]}",
+                      identifier: "delete-#{json.dig(:delete, :status, :id)}",
                       version: timestamp,
                       data: json }
   end
@@ -170,7 +170,7 @@ class UserConnection
       in_reply_to_status_id: status[:in_reply_to_status_id],
       favorite_count: (status[:favorite_count] || 0),
       retweet_count: (status[:retweet_count] || 0),
-      user: { id: status[:user][:id] } }
+      user: { id: status.dig(:user, :id) } }
   end
 
   def log(level, message)

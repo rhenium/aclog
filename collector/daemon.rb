@@ -3,6 +3,7 @@ require_relative "event_queue"
 require_relative "node_connection"
 require_relative "node_manager"
 require_relative "control_server"
+require_relative "notification_queue"
 
 module Collector
   module Daemon
@@ -24,6 +25,7 @@ module Collector
           EM.add_periodic_timer(Settings.collector.flush_interval) do
             event_queue.flush
           end
+          NotificationQueue.start
 
           nodes = EM.start_server("0.0.0.0", Settings.collector.server_port, Collector::NodeConnection, event_queue)
 

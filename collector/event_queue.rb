@@ -41,10 +41,8 @@ module Collector
       end
 
       if Settings.notification.enabled
-        tweet_ids = favorites.map {|f| f[:target_object][:id] }
-        if tweet_ids.size > 0
-          TweetResponseNotificationJob.perform_later(tweet_ids)
-        end
+        tweet_ids = favorites.map {|f| f.dig(:target_object, :id) }
+        NotificationQueue.push(tweet_ids)
       end
 
       if unauthorizeds.size > 0

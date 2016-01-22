@@ -122,6 +122,10 @@
         display: block;
         margin: 0 5px 0 0;
 
+        &:last-child {
+            margin: 0;
+        }
+
         img, video {
             opacity: 1;
             width: 100%;
@@ -131,10 +135,6 @@
                 opacity: 1;
             }
         }
-    }
-
-    &:last-child {
-        margin: 0;
     }
 }
 

@@ -1,12 +1,13 @@
 Bundler.require
 require "yaml"
+require "erb"
 require "logger"
 require "event_channel"
 require "user_stream/client"
 require "collector_connection"
 require "user_connection"
 
-Settings = OpenStruct.new(YAML.load_file(File.expand_path("../../settings.yml", __FILE__)))
+Settings = OpenStruct.new(YAML.load(ERB.new(File.read(File.expand_path("../../settings.yml", __FILE__))).result))
 
 class WorkerNode
   class << self

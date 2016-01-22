@@ -10,7 +10,8 @@ class CollectorConnection < EM::Connection
   def connection_completed
     log(:info, "Connection established, trying to authenticate...")
     send_message(event: :auth,
-                 data: { secret_key: Settings.secret_key })
+                 data: { secret_key: Settings.secret_key,
+                         tag: Settings.tag })
   end
 
   def unbind

@@ -1,4 +1,5 @@
 secret_key: secret_key
+tag: worker0
 collector_host: localhost
 collector_port: 42106
 log_level: info

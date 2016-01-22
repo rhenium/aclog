@@ -18,7 +18,7 @@
         <template v-for="(index, val) in active_nodes">
           <tr v-if="nodes[val]">
             <td>{{index}}</td>
-            <td>#{{val}}</td>
+            <td>#{{val}} ({{tag(val)}})</td>
             <td>Running</td>
             <td>{{uptime(val)}}</td>
           </tr>
@@ -32,7 +32,7 @@
         <template v-for="(index, val) in inactive_nodes">
           <tr>
             <td>-</td>
-            <td>#{{val}}</td>
+            <td>#{{val}} ({{tag(val)}})</td>
             <td>Idle</td>
             <td>-</td>
           </tr>
@@ -60,6 +60,9 @@ export default {
     };
   },
   methods: {
+    tag(i) {
+      return this.nodes[i].tag;
+    },
     uptime(i) {
       var diff = Math.floor(Date.now() / 1000) - this.nodes[i].activated_at;
       if (diff < 5 * 60) {

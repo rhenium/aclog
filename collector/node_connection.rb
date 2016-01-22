@@ -2,7 +2,7 @@ require "set"
 
 module Collector
   class NodeConnection < EM::Connection
-    attr_reader :connection_id, :activated_at
+    attr_reader :connection_id, :activated_at, :tag
 
     @@_id = 0
 
@@ -14,6 +14,7 @@ module Collector
       @activated_at = nil
       @queue = queue
       @heartbeats = Set.new
+      @tag = nil
     end
 
     def unbind
@@ -110,6 +111,7 @@ module Collector
     def authenticate_node(data)
       if data.key?(:secret_key) && Settings.collector.secret_key == data[:secret_key]
         @authenticated = true
+        @tag = data[:tag]
         log(:info, "Connection authenticated.")
         send_message(event: :auth, data: nil)
         NodeManager.register(self)

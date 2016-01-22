@@ -11,12 +11,13 @@ module Collector
     def status
       nodes = {}
       NodeManager.node_connections.each {|node|
-        nodes[node.connection_id] = { activated_at: (a = node.activated_at) && a.to_i }
+        nodes[node.connection_id] = { activated_at: node.activated_at.to_i,
+                                      tag: node.tag }
       }
 
       { started_at: Daemon.start_time.to_i,
         nodes: nodes,
-        active_node_ids: NodeManager.active_connections.map {|n| n && n.connection_id },
+        active_node_ids: NodeManager.active_connections.map {|n| n&.connection_id },
         inactive_node_ids: NodeManager.inactive_connections.map {|n| n.connection_id } }
     end
   end

@@ -3,6 +3,7 @@ class EventChannel
     def setup
       return if @dalli
       @dalli = Dalli::Client.new(Settings.memcached, namespace: "aclog-worker-node")
+      @dalli.alive!
       @channel = EM::Channel.new
     end
 

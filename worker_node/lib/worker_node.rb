@@ -5,7 +5,6 @@ require "event_channel"
 require "user_stream/client"
 require "collector_connection"
 require "user_connection"
-require "oj"
 
 Settings = OpenStruct.new(YAML.load_file(File.expand_path("../../settings.yml", __FILE__)))
 
@@ -22,7 +21,7 @@ class WorkerNode
 
         stop = proc do
           Thread.new {
-            WorkerNode.logger.info "Exiting..."
+            logger.info "Exiting..."
             connection.exit
             EM.add_timer(0.1) { EM.stop }
           }.join

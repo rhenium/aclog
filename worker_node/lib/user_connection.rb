@@ -7,20 +7,20 @@ class UserConnection
 
   def start
     @client.connect
-    log(:debug, "Connect")
+    log(:debug, "start")
   end
 
   def update(hash)
     if @client.update_if_necessary(setup_options(hash))
-      log(:info, "Updated connection")
+      log(:debug, "update")
     else
-      log(:debug, "Token not changed")
+      log(:debug, "no change")
     end
   end
 
   def stop
     @client.stop
-    log(:info, "Stop: #{@account_id}")
+    log(:debug, "stop")
   end
 
   private
@@ -28,10 +28,11 @@ class UserConnection
     client = UserStream::Client.new(setup_options(msg))
 
     client.on_error do |error|
-      if error == Errno::ETIMEDOUT
+      case error
+      when Errno::ETIMEDOUT
         log(:warn, "Stalled")
         EM.add_timer(5) { client.reconnect }
-      elsif error = Errno::ECONNRESET
+      when Errno::ECONNRESET
         log(:warn, "Connection reset")
         EM.add_timer(5) { client.reconnect }
       else
@@ -40,7 +41,7 @@ class UserConnection
     end
     client.on_service_unavailable do |message|
       log(:warn, "Service unavailable")
-      EM.add_timer(60) { client.reconnect }
+      EM.add_timer(10) { client.reconnect }
     end
     client.on_unauthorized do |message|
       log(:warn, "Unauthorized")
@@ -49,11 +50,11 @@ class UserConnection
       stop
     end
     client.on_enhance_your_calm do |message|
-      log(:warn, "420: #{message}")
+      log(:warn, "enhance_your_calm: #{message}")
       EM.add_timer(60) { client.reconnect }
     end
     client.on_disconnected do
-      log(:warn, "Disconnected")
+      log(:warn, "disconnected")
       EM.add_timer(5) { client.reconnect }
     end
 
@@ -75,7 +76,7 @@ class UserConnection
           # scrub_geo, limit, unknown message
         end
       rescue => e
-        log(:warn, "Item processing error: (#{e}): #{json}")
+        log(:error, "Item processing error: (#{e}): #{json}")
       end
     end
 

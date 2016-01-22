@@ -76,9 +76,8 @@ class CollectorConnection < EM::Connection
   end
 
   def stop_streams
-    @streams.each do |id, stream|
-      stream.stop
-    end
+    @streams.each { |id, stream| stream.stop }
+    @streams.clear
   end
 
   def send_message(data)

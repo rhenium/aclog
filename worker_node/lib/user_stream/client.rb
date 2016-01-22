@@ -37,7 +37,7 @@ module UserStream
 
     def connect
       error = nil
-      errorbuf = ""
+      errorbuf = +""
       buftok = BufferedTokenizer.new("\r\n")
       @http = setup_connection
 
@@ -88,6 +88,8 @@ module UserStream
     def method_missing(name, &block)
       if /^on_.+/ =~ name.to_s
         @callbacks[name.to_s.sub(/^on_/, "").to_sym] = block
+      else
+        super(name, &block)
       end
     end
 

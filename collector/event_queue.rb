@@ -1,7 +1,7 @@
 module Collector
   class EventQueue
-    def initialize
-      @dalli = Dalli::Client.new(Settings.cache.memcached, namespace: "aclog-collector:")
+    def initialize(dalli)
+      @dalli = dalli
       @queue_mutex = Mutex.new
 
       @queue_user = Queue.new
@@ -11,6 +11,14 @@ module Collector
       @queue_unfavorite = Queue.new
       @queue_delete = Queue.new
       @queue_unauthorized = Queue.new
+    end
+
+    def self.start(dalli)
+      instance = self.new(dalli)
+      EM.add_periodic_timer(Settings.collector.flush_interval) do
+        instance.flush
+      end
+      instance
     end
 
     def flush

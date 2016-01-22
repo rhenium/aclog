@@ -14,6 +14,9 @@ module Collector
         @start_time = Time.now
         set_loggers
 
+        dalli = Dalli::Client.new(Settings.cache.memcached, namespace: "aclog-collector:")
+        dalli.alive!
+
         EM.run do
           sock_path = File.join(Rails.root, "tmp", "sockets", "collector.sock")
           File.delete(sock_path) if File.exist?(sock_path)
@@ -21,11 +24,8 @@ module Collector
           control.listen(MessagePack::RPC::UNIXServerTransport.new(sock_path), Collector::ControlServer.new)
           EM.defer { control.run }
 
-          event_queue = Collector::EventQueue.new
-          EM.add_periodic_timer(Settings.collector.flush_interval) do
-            event_queue.flush
-          end
-          NotificationQueue.start
+          event_queue = EventQueue.start(dalli)
+          NotificationQueue.start(dalli)
 
           nodes = EM.start_server("0.0.0.0", Settings.collector.server_port, Collector::NodeConnection, event_queue)
 

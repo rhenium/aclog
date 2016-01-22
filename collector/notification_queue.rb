@@ -1,7 +1,15 @@
 module Collector
   class NotificationQueue
-    def initialize
+    def initialize(dalli)
+      @dalli = dalli
       @queue = Queue.new # not EM::Queue
+      @thresholds = Settings.notification.favorites.freeze
+      @clients = Settings.notification.accounts.map { |hash|
+        Twitter::REST::Client.new(consumer_key: Settings.notification.consumer.key,
+                                  consumer_secret: Settings.notification.consumer.secret,
+                                  access_token: hash.token,
+                                  access_token_secret: hash.secret)
+      }.freeze
     end
 
     def run
@@ -11,8 +19,11 @@ module Collector
         ids = @queue.pop
         next if ids.empty?
 
-        Tweet.where(id: ids).includes(user: :account).each do |tweet|
-          perform_tweet(tweet)
+        Tweet.where(id: ids).joins(user: :account).each do |tweet|
+          acc = tweet.user&.account
+          if acc&.active? && acc&.notification_enabled?
+            perform_tweet(tweet)
+          end
         end
       end
     end
@@ -23,47 +34,28 @@ module Collector
 
     private
     def perform_tweet(tweet)
-      last_count = Rails.cache.read("notification/tweets/#{tweet.id}/favorites_count")
-      Rails.cache.write("notification/tweets/#{tweet.id}/favorites_count", [last_count || 0, tweet.favorites_count].max)
+      last_count = @dalli.get("notification/tweets/#{tweet.id}/favorites_count")
+      @dalli.set("notification/tweets/#{tweet.id}/favorites_count", [last_count || 0, tweet.favorites_count].max)
 
-      if last_count
-        t_count = Settings.notification.favorites.select { |m| last_count < m && m <= tweet.favorites_count }.last
-      else
-        t_count = Settings.notification.favorites.include?(tweet.favorites_count) && tweet.favorites_count
-      end
-
-      if t_count
-        notify(tweet, "#{t_count}likes!")
+      if last_count && (t_count = @thresholds.select { |m| last_count < m && m <= tweet.favorites_count }.last) ||
+          @thresholds.include?(t_count = tweet.favorites_count)
+        post("@#{tweet.user.screen_name} #{t_count}likes! #{tweet_url(tweet)}", tweet.id)
       end
     end
 
-    def notify(tweet, text)
-      user = tweet.user
-      account = user.account
-
-      if account && account.active? && account.notification_enabled?
-        post("@#{user.screen_name} #{text} #{Settings.base_url}/i/#{tweet.id}", tweet.id)
-      end
+    def tweet_url(tweet)
+      "#{Settings.base_url}/i/#{tweet.id}"
     end
 
     def post(text, reply_to = 0)
-      Settings.notification.accounts.each do |hash|
+      @clients.each do |client|
         begin
-          client(hash).update(text, in_reply_to_status_id: reply_to)
+          client.update(text, in_reply_to_status_id: reply_to)
           break
         rescue Twitter::Error::Forbidden => e
-          raise e unless e.message = "User is over daily status update limit."
+          raise e unless e.message == "User is over daily status update limit."
         end
       end
-    end
-
-    def client(acc)
-      @_client ||= {}
-      @_client[acc] ||= 
-        Twitter::REST::Client.new(consumer_key: Settings.notification.consumer.key,
-                                  consumer_secret: Settings.notification.consumer.secret,
-                                  access_token: acc.token,
-                                  access_token_secret: acc.secret)
     end
 
     class << self
@@ -75,8 +67,8 @@ module Collector
         @queue or raise(ArgumentError, "NotificationQueue is not initialized")
       end
 
-      def start
-        @queue = NotificationQueue.new
+      def start(dalli)
+        @queue = NotificationQueue.new(dalli)
         EM.defer { @queue.run }
       end
     end

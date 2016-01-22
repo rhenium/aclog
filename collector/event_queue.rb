@@ -4,13 +4,13 @@ module Collector
       @dalli = dalli
       @queue_mutex = Mutex.new
 
-      @queue_user = Queue.new
-      @queue_tweet = Queue.new
-      @queue_favorite = Queue.new
-      @queue_retweet = Queue.new
-      @queue_unfavorite = Queue.new
-      @queue_delete = Queue.new
-      @queue_unauthorized = Queue.new
+      @queue_user = []
+      @queue_tweet = []
+      @queue_favorite = []
+      @queue_retweet = []
+      @queue_unfavorite = []
+      @queue_delete = []
+      @queue_unauthorized = []
     end
 
     def self.start(dalli)
@@ -22,26 +22,27 @@ module Collector
     end
 
     def flush
-      users = tweets = favorites = retweets = unfavorites = deletes = unauthorizeds = nil
-
-      @queue_mutex.synchronize do
-        users = @queue_user.size.times.map { @queue_user.deq }
-        tweets = @queue_tweet.size.times.map { @queue_tweet.deq }
-        favorites = @queue_favorite.size.times.map { @queue_favorite.deq }
-        retweets = @queue_retweet.size.times.map { @queue_retweet.deq }
-        unfavorites = @queue_unfavorite.size.times.map { @queue_unfavorite.deq }
-        deletes = @queue_delete.size.times.map { @queue_delete.deq }
-        unauthorizeds = @queue_unauthorized.size.times.map { @queue_unauthorized.deq }
+      @queue_mutex.lock
+      begin
+        users, @queue_user = @queue_user, []
+        tweets, @queue_tweet = @queue_tweet, []
+        favorites, @queue_favorite = @queue_favorite, []
+        retweets, @queue_retweet = @queue_retweet, []
+        unfavorites, @queue_unfavorite = @queue_unfavorite, []
+        deletes, @queue_delete = @queue_delete, []
+        unauthorizeds, @queue_unauthorized = @queue_unauthorized, []
+      ensure
+        @queue_mutex.unlock
       end
 
-      users.reverse!.uniq! {|i| i[:id] }
-      tweets.reverse!.uniq! {|i| i[:id] }
+      users.reverse!.uniq! { |i| i[:id] }
+      tweets.reverse!.uniq! { |i| i[:id] }
 
       User.create_or_update_bulk_from_json(users)
       Tweet.create_bulk_from_json(tweets)
       Favorite.create_bulk_from_json(favorites)
+      Favorite.delete_bulk_from_json(unfavorites) # TODO: race?
       Retweet.create_bulk_from_json(retweets)
-      Favorite.delete_bulk_from_json(unfavorites)
 
       if deletes.size > 0
         Tweet.destroy_bulk_from_json(deletes)
@@ -49,12 +50,11 @@ module Collector
       end
 
       if Settings.notification.enabled
-        tweet_ids = favorites.map {|f| f.dig(:target_object, :id) }
-        NotificationQueue.push(tweet_ids)
+        NotificationQueue.push(favorites.map { |f| f.dig(:target_object, :id) })
       end
 
       if unauthorizeds.size > 0
-        AccountTokenVerificationJob.perform_later(unauthorizeds.map {|u| u[:id] })
+        AccountTokenVerificationJob.perform_later(unauthorizeds.map { |u| u[:id] })
       end
     end
 
@@ -95,7 +95,7 @@ module Collector
     end
 
     def push_unauthorized(unauthorized)
-      @queue_unauthorized << unauthorized[:data]
+      @queue_mutex.synchronize { @queue_unauthorized << unauthorized[:data] }
     end
 
     private
@@ -112,7 +112,7 @@ module Collector
         end
       end
 
-      yield
+      @queue_mutex.synchronize { yield }
     end
   end
 end

@@ -1,14 +1,14 @@
 default: &default
-  base_url:           "http://example.com/" # base url
-  consumer:
-    key:              "consumer key of collector (register)"
-    secret:           "consumer secret"
+  base_url:           "http://localhost:3002/" # base url
+  consumer: # consumer key used by collector. Change this.
+    key:              "JVkX2Uy0Qtigsh0GiG5Lw"
+    secret:           "vfkPvOkzKUGuZ4xKtFAVvlAKoL3u2grxchuQEBvE"
 
   collector:
     server_port:      42106
-    secret_key:       "secret key to authorize workers"
-    nodes_count:      1 # workers count
-    flush_interval:   3
+    secret_key:       "secret_key" # to authenticate worker nodes
+    nodes_count:      1 # worker nodes count
+    flush_interval:   3 # INSERT records every N seconds
 
   notification:
     enabled:          false
@@ -19,9 +19,9 @@ default: &default
       - token:        "access token of notification account"
         secret:       "access token secret"
     favorites:
-      - 50
+      - 2
+      - 10
       - 100
-      - 250
 
   tweets:
     count:

@@ -47,6 +47,11 @@ class CollectorConnection < EM::Connection
       log(:info, "Connection authenticated.")
     when "error"
       log(:error, "Error: #{msg[:data]}")
+    when "activate"
+      log(:info, "Node activated")
+      msg.dig(:data, :accounts)&.each { |a|
+        register_account(a)
+      }
     when "register"
       register_account(msg[:data])
     when "unregister"

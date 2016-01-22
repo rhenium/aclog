@@ -40,11 +40,11 @@ class UserConnection
       end
     end
     client.on_service_unavailable do |message|
-      log(:warn, "Service unavailable")
+      log(:info, "Service unavailable")
       EM.add_timer(10) { client.reconnect }
     end
     client.on_unauthorized do |message|
-      log(:warn, "Unauthorized")
+      log(:info, "Unauthorized")
       EventChannel << { event: :unauthorized,
                         data: { id: msg[:id], user_id: msg[:user_id] } }
       stop
@@ -97,7 +97,7 @@ class UserConnection
     }
   end
 
-  def on_user(json, timestamp = nil)
+  def on_user(json, timestamp)
     log(:debug, "user-#{json[:id]} (#{timestamp})") if $VERBOSE
     EventChannel << { event: :user,
                       identifier: "user-#{json[:id]}",
@@ -115,22 +115,22 @@ class UserConnection
                       data: compact_tweet(json) }
   end
 
-  def on_retweet(json, timestamp = nil)
-    timestamp ||= json[:timestamp_ms].to_i
-    log(:debug, "retweet-#{json[:id]} (#{timestamp})") if $VERBOSE
-    on_user(json[:user], timestamp)
-    on_tweet(json[:retweeted_status], timestamp)
+  def on_retweet(json)
+    log(:debug, "retweet-#{json[:id]}") if $VERBOSE
+    timestamp_ = json[:timestamp_ms].to_i
+    on_user(json[:user], timestamp_)
+    on_tweet(json[:retweeted_status], timestamp_)
     EventChannel << { event: :retweet,
                       identifier: "retweet-#{json[:id]}",
-                      version: timestamp,
+                      version: 0,
                       data: { id: json[:id],
                               user: { id: json.dig(:user, :id) },
                               retweeted_status: { id: json.dig(:retweeted_status, :id),
                                                   user: { id: json.dig(:retweeted_status, :user, :id) } } } }
   end
 
-  def on_event_tweet(json, timestamp = nil)
-    timestamp ||= (json[:timestamp_ms] || (Time.parse(json[:created_at]).to_i * 1000)).to_i
+  def on_event_tweet(json)
+    timestamp = (json[:timestamp_ms] || (Time.parse(json[:created_at]).to_i * 1000)).to_i
     log(:debug, "#{json[:event]}-#{json.dig(:source, :id)}-#{json.dig(:target_object, :id)} (#{timestamp})") if $VERBOSE
     on_user(json[:source], timestamp)
     on_user(json[:target], timestamp)
@@ -143,12 +143,11 @@ class UserConnection
                               target_object: { id: json.dig(:target_object, :id) } } }
   end
 
-  def on_delete(json, timestamp = nil)
-    timestamp ||= json[:timestamp_ms].to_i
-    log(:debug, "delete-#{json.dig(:delete, :status, :id)} (#{timestamp})") if $VERBOSE
+  def on_delete(json)
+    log(:debug, "delete-#{json.dig(:delete, :status, :id)}") if $VERBOSE
     EventChannel << { event: :delete,
                       identifier: "delete-#{json.dig(:delete, :status, :id)}",
-                      version: timestamp,
+                      version: 0,
                       data: json }
   end
 

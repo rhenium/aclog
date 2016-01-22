@@ -53,7 +53,10 @@
 }
 
 .status-head {
-    margin-left: 68px;
+    @media (max-width: 768px) {
+        margin-left: 68px;
+        min-height: 48px;
+    }
 
     @media (min-width: 768px) {
         margin-left: 0;

@@ -1,10 +1,12 @@
 <template>
   <div class="sidebar" v-if="!user"><partial name="loading-box"></partial></div>
   <div class="sidebar" v-else>
-    <div>
-      <p><img alt="@{{user.screen_name}}" class="img-rounded twitter-icon" height="64" v-bind:src="profile_image_url_full" width="64" /></p>
-      <p>@{{user.screen_name}}</p>
-      <p><a class="aclogicon aclogicon-twitter" href="https://twitter.com/{{user.screen_name}}"></a></p>
+    <div class="sidebar-info">
+      <div class="sidebar-userbasic">
+        <p><img alt="@{{user.screen_name}}" class="img-rounded twitter-icon" height="64" v-bind:src="profile_image_url_full" width="64" /></p>
+        <p>@{{user.screen_name}}</p>
+        <p><a class="aclogicon aclogicon-twitter" href="https://twitter.com/{{user.screen_name}}"></a></p>
+      </div>
       <div class="user-stats">
         <template v-if="user.registered">
           <partial name="loading-box" v-if="!stats"></partial>

@@ -62,10 +62,14 @@
         .sidebar-flex {
             display: flex;
 
-            .list-group {
+            > * {
                 flex: auto;
                 width: 100%;
+            }
+
+            .list-group {
                 margin-right: 15px;
+
                 &:last-child {
                     margin-right: 0;
                 }

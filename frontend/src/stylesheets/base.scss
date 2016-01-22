@@ -97,6 +97,9 @@ pre {
     background-color: transparent;
     border-color: #cecac7;
     border-width: 0 0 1px 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 
     &:first-child,
     &:last-child {

@@ -52,17 +52,6 @@
     }
 }
 
-.status-head {
-    @media (max-width: 768px) {
-        margin-left: 68px;
-        min-height: 48px;
-    }
-
-    @media (min-width: 768px) {
-        margin-left: 0;
-    }
-}
-
 .status-head,
 .status-foot {
     @include clearfix;
@@ -81,27 +70,41 @@
     }
 }
 
-.status-head .user {
-    @media (min-width: 768px) {
-        float: left;
-    }
-}
-
-.status-head .time {
-    display: block;
-    margin-top: 2px;
-    font-size: 12px;
-
-    @media (min-width: 768px) {
-        float: right;
-        margin-top: 0;
+.status-head {
+    @media (max-width: 768px) {
+        margin-left: 68px;
+        min-height: 48px;
     }
 
-    .source {
-        display: inline-block;
-        margin-left: 5px;
-        font-size: 20px;
-        vertical-align: bottom;
+    @media (min-width: 768px) {
+        display: flex;
+        margin-left: 0;
+    }
+
+    .user {
+        @media (min-width: 768px) {
+            flex-grow: 1;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }
+
+    .time {
+        margin-top: 2px;
+        font-size: 12px;
+
+        @media (min-width: 768px) {
+            margin-top: 0;
+            white-space: nowrap;
+        }
+
+        .source {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 20px;
+            vertical-align: bottom;
+        }
     }
 }
 

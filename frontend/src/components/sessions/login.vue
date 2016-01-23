@@ -6,13 +6,14 @@
 
 <script>
 import aclog from "aclog";
+import utils from "utils";
 
 export default {
   route: {
     canReuse() { return false; },
     data(tr) {
       this.$root.updateTitle("Authenticating...");
-      var callback = location.protocol + "//" + location.host + "/i/callback?redirect_after_login=" + encodeURIComponent(this.$route.query.redirect_after_login);
+      const callback = utils.getCurrentBaseUrl() + "/i/callback?redirect_after_login=" + encodeURIComponent(this.$route.query.redirect_after_login);
       aclog.sessions.redirect(callback).then(res => {
         location.href = res.redirect;
       }).catch(err => {

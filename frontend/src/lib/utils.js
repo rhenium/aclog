@@ -17,4 +17,7 @@ export default {
   escapeHTML(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   },
+  getCurrentBaseUrl() {
+    return location.protocol + "//" + location.host;
+  }
 };

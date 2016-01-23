@@ -22,12 +22,13 @@
 
 <script>
 import aclog from "aclog";
+import utils from "utils";
 
 export default {
   methods: {
     submit(e) {
       e.preventDefault();
-      var callback = location.protocol + "//" + location.host + "/i/optout/callback";
+      const callback = utils.getCurrentBaseUrl() + "/i/optout/callback";
       aclog.optout.redirect(callback).then(res => {
         location.href = res.redirect;
       }).catch(err => {

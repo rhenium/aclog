@@ -1,4 +1,4 @@
-import Settings from "../settings";
+import Settings from "../../settings";
 import Storage from "storage";
 
 var encodeQuery = (params) => {

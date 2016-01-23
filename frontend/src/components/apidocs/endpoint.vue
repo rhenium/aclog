@@ -41,7 +41,7 @@
 <script>
 import ApidocsSidebar from "./sidebar.vue";
 import aclog from "aclog";
-import Settings from "../../settings";
+import utils from "utils";
 
 export default {
   components: { "apidocs-sidebar": ApidocsSidebar },
@@ -53,7 +53,7 @@ export default {
   },
   computed: {
     endpoint_url() {
-      return Settings.apiPrefix + "/api/" + this.endpoint.path + ".json";
+      return utils.getCurrentBaseUrl() + "/api/" + this.endpoint.path + ".json";
     },
     example_url() {
       var params = this.endpoint.example_params;

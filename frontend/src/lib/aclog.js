@@ -2,7 +2,7 @@ import Settings from "../../settings";
 import Storage from "storage";
 import utils from "utils";
 
-var encodeQuery = (params) => {
+var encodeQuery = params => {
   if (!params) return "";
   var keys = Object.keys(params);
   if (keys.length === 0) return "";
@@ -10,8 +10,23 @@ var encodeQuery = (params) => {
   return keys.map(key => [key, params[key]].map(encodeURIComponent).join("=")).join("&");
 }
 
-var continueRequest = promise => {
-  return promise.then(res => res.json().then(json => [res, json])).then(xx => {
+var request = (method, endpoint, params, body) => {
+  if (Settings.debug) console.log("[API Request] " + method + " " + endpoint + " query: " + encodeQuery(params) + " body: " + encodeQuery(body));
+  var url = utils.getCurrentBaseUrl() + "/i/api/" + endpoint + ".json";
+  var opts = {
+    method: method,
+    credentials: "include",
+    headers: { },
+  };
+
+  if (method === "post") {
+    opts.headers["content-type"] = "application/x-www-form-urlencoded; charset=UTF-8";
+    opts.body = encodeQuery(Object.assign({ authenticity_token: Storage.store.authenticity_token }, body));
+  } else {
+    url += "?" + encodeQuery(params);
+  }
+
+  return fetch(url, opts).then(res => res.json().then(json => [res, json])).then(xx => {
     var [res, json] = xx;
     if (res.status >= 400) {
       var error = new Error(res.statusText);
@@ -24,27 +39,8 @@ var continueRequest = promise => {
   });
 };
 
-var get = (endpoint, params) => {
-  if (Settings.debug) console.log("[API Request] " + endpoint + " query: " + encodeQuery(params));
-  var url = utils.getCurrentBaseUrl() + "/i/api/" + endpoint + ".json?" + encodeQuery(params);
-  return continueRequest(fetch(url, {
-    method: "get",
-    credentials: "include",
-  }));
-}
-
-var post = (endpoint, body) => {
-  if (Settings.debug) console.log("[API Request] " + endpoint + " body: " + encodeQuery(body));
-  var url = utils.getCurrentBaseUrl() + "/i/api/" + endpoint + ".json";
-  return continueRequest(fetch(url, {
-    method: "post",
-    credentials: "include",
-    headers: {
-      "content-type": "application/x-www-form-urlencoded; charset=UTF-8"
-    },
-    body: encodeQuery(Object.assign({ authenticity_token: Storage.store.authenticity_token }, body))
-  }));
-}
+var get = (endpoint, params) => request("get", endpoint, params, null);
+var post = (endpoint, body) => request("post", endpoint, null, body);
 
 export default {
   users: {

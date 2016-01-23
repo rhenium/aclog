@@ -17,23 +17,13 @@ class Tweet < ActiveRecord::Base
 
   scope :max_id, ->(id) { where("tweets.id <= ?", id.to_i) if id }
   scope :since_id, ->(id) { where("tweets.id > ?", id.to_i) if id }
+  scope :not_reacted_than, ->(last_count, last_id) { where("reactions_count < ? OR (reactions_count = ? AND id < ?)", last_count, last_count, last_id) if last_count }
   scope :page, ->(page, page_per) { limit(page_per).offset((page - 1) * page_per) }
 
   scope :order_by_id, -> { order(id: :desc) }
-  scope :order_by_reactions, -> { order(reactions_count: :desc) }
+  scope :order_by_reactions, -> { order(reactions_count: :desc, id: :desc) }
 
   scope :favorited_by, ->(user) { joins(:favorites).where(favorites: { user: user }) }
-
-  # should be called in last
-  scope :paginate, ->(params) {
-    page_per = params[:count] ? [params[:count].to_i, Settings.tweets.count.max].min : Settings.tweets.count.default
-
-    if !params[:page] && self.all.order_values.all? {|o| !o.is_a?(String) && o.expr.name == :id }
-      limit(page_per).max_id(params[:max_id]).since_id(params[:since_id])
-    else
-      page([params[:page].to_i, 1].max, page_per)
-    end
-  }
 
   class << self
     # Builds a new instance of Tweet and initialize with JSON data from Twitter API.

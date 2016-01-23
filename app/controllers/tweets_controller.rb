@@ -27,39 +27,39 @@ class TweetsController < ApplicationController
   end
 
   def user_best
-    @tweets = @user.tweets.reacted.parse_recent(params[:recent]).order_by_reactions.paginate(params)
-    render_tweets
+    @tweets = @user.tweets.reacted.parse_recent(params[:recent]).order_by_reactions
+    render_tweets(:reactions_count)
   end
 
   def user_timeline
-    @tweets = @user.tweets.reacted(params[:reactions]).order_by_id.paginate(params)
-    render_tweets
+    @tweets = @user.tweets.reacted(params[:reactions]).order_by_id
+    render_tweets(:id)
   end
 
   def user_favorites
-    @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("favorites.id DESC").includes(user: :account).paginate(params)
-    render_tweets
+    @tweets = Tweet.reacted(params[:reactions]).favorited_by(@user).order("favorites.id DESC").includes(user: :account)
+    render_tweets(:page)
   end
 
   def user_favorited_by
     @source_user = authorize! User.find(screen_name: params[:source_screen_name])
-    @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order("favorites.tweet_id DESC").paginate(params)
-    render_tweets
+    @tweets = @user.tweets.reacted(params[:reactions]).favorited_by(@source_user).order("favorites.tweet_id DESC")
+    render_tweets(:id)
   end
 
   def all_best
-    @tweets = Tweet.reacted.parse_recent(params[:recent]).order_by_reactions.includes(user: :account).paginate(params)
-    render_tweets
+    @tweets = Tweet.reacted.parse_recent(params[:recent]).order_by_reactions.includes(user: :account)
+    render_tweets(:reactions_count)
   end
 
   def all_timeline
-    @tweets = Tweet.reacted(params[:reactions]).order_by_id.includes(user: :account).paginate(params)
-    render_tweets
+    @tweets = Tweet.reacted(params[:reactions]).order_by_id.includes(user: :account)
+    render_tweets(:id)
   end
 
   def filter
-    @tweets = Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.includes(user: :account).paginate(params)
-    render_tweets
+    @tweets = Tweet.recent((params[:period] || 7).days).filter_by_query(params[:q].to_s).order_by_id.includes(user: :account)
+    render_tweets(:id)
   end
 
   private
@@ -77,27 +77,37 @@ class TweetsController < ApplicationController
       statuses: sts }
   end
 
-  def render_tweets
+  def paginate_tweets(type)
+    qhash = Rack::Utils.parse_query(request.query_string)
+    page_per = params[:count] ? [params[:count].to_i, Settings.tweets.count.max].min : Settings.tweets.count.default
+
+    case type
+    when :id
+      @tweets = @tweets.limit(page_per).max_id(params[:max_id]).since_id(params[:since_id])
+      { prev: qhash.merge(since_id: @tweets.first.id.to_s, max_id: ""),
+        next: qhash.merge(since_id: "", max_id: (@tweets.last.id - 1).to_s) }
+    when :reactions_count
+      @tweets = @tweets.limit(page_per).not_reacted_than(params[:last_reactions], params[:last_id])
+      { next: qhash.merge(last_reactions: @tweets.last.reactions_count, last_id: @tweets.last.id.to_s) }
+    when :page
+      page = [params[:page].to_i, 1].max
+      @tweets = @tweets.page(page, page_per)
+      { prev: page == 1 ? nil : params.merge(page: page - 1),
+        next: params.merge(page: page + 1) }
+    end
+  end
+
+  def render_tweets(pagination)
+    qhash = paginate_tweets(pagination)
+
     if request.format.atom?
-      return render("tweets")
+      render "tweets"
+    else
+      qhash.merge!(user: @user.as_json(methods: :registered),
+                   statuses: @tweets.map(&method(:transform_tweet)))
+
+      render_json data: qhash
     end
-
-    hash = {
-      user: @user.as_json(methods: :registered),
-      statuses: @tweets.map(&method(:transform_tweet)) }
-
-    if @tweets.length > 0
-      if !params[:page] && @tweets.order_values.all? {|o| !o.is_a?(String) && o.expr.name == :id }
-        hash[:prev] = params.dup.tap {|h| h.delete(:max_id) }.merge!(since_id: @tweets.first.id.to_s)
-        hash[:next] = params.dup.tap {|h| h.delete(:since_id) }.merge!(max_id: (@tweets.last.id - 1).to_s)
-      else
-        page = [params[:page].to_i, 1].max
-        hash[:prev] = page == 1 ? nil : params.merge(page: page - 1)
-        hash[:next] = params.merge(page: page + 1)
-      end
-    end
-
-    render_json data: hash
   end
 
   def transform_tweet(tweet)

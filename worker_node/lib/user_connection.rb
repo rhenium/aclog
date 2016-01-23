@@ -28,15 +28,14 @@ class UserConnection
     client = UserStream::Client.new(setup_options(msg))
 
     client.on_error do |error|
+      EM.add_timer(5) { client.reconnect } # TODO
       case error
-      when Errno::ETIMEDOUT
+      when "Errno::ETIMEDOUT"
         log(:warn, "Stalled")
-        EM.add_timer(5) { client.reconnect }
-      when Errno::ECONNRESET
+      when "Errno::ECONNRESET"
         log(:warn, "Connection reset")
-        EM.add_timer(5) { client.reconnect }
       else
-        log(:error, "Unknown error: #{error}")
+        log(:error, "Unknown error: #{error.inspect}")
       end
     end
     client.on_service_unavailable do |message|

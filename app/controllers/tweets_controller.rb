@@ -12,14 +12,16 @@ class TweetsController < ApplicationController
       TweetUpdateJob.perform_later(t.id) unless bot_request?
       t
     rescue ActiveRecord::RecordNotFound
-      Tweet.update_from_twitter(params[:id], current_user).first || (raise Aclog::Exceptions::TweetNotFound, params[:id])
+      Tweet.update_from_twitter(params[:id], current_user)
+      Tweet.find(params[:id])
     end
     @user = authorize! @tweet.user
     render_show
   end
 
   def update
-    @tweet = authorize! Tweet.update_from_twitter(params[:id], current_user).first
+    Tweet.update_from_twitter(params[:id], current_user)
+    @tweet = authorize! Tweet.find(params[:id])
     @user = @tweet.user
     render_show
   end

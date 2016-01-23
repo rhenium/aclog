@@ -87,54 +87,57 @@ class Tweet < ActiveRecord::Base
     def update_from_twitter(ids, current_user = nil)
       client = (current_user ? current_user.account : Account.random).client
 
-      if ids.is_a?(Array)
-        ids.map!(&:to_i)
-      else
-        ids = [ids.to_i]
-      end
-      ids.reject! {|id| id <= 0 }
-      
-      unless ids.size > 0
-        raise Aclog::Exceptions::TweetNotFound, "specify at least one valid status ID"
-      end
+      ids = [ids] unless Array === ids
+      ids = ids.map { |id| id.to_i }.select { |id| id > 0 }
+      raise Aclog::Exceptions::TweetNotFound, "specify at least one valid status ID" if ids.empty?
 
       currents = Tweet.where(id: ids).eager_load(:user).to_a # query immediately
+      currenth = currents.map { |t| [t.id, t] }.to_h
 
       begin
-        if ids.size == 1
-          sts = [client.status(ids.first)]
-        else
-          sts = client.statuses(ids)
-        end
-      rescue Twitter::Error::NotFound
+        sts = client.statuses(ids).map { |st| st.retweet? ? st.retweeted_status : st }
+      rescue Twitter::Error::NotFound, Twitter::Error::Forbidden
         sts = []
       end
 
-      sts.map! {|st| st.retweet? ? st.retweeted_status : st }
+      User.create_or_update_bulk_from_json(sts.map { |st| st.attrs[:user] })
 
-      User.create_or_update_bulk_from_json(sts.map {|st| st.attrs[:user] })
-      Tweet.create_bulk_from_json(sts.map {|st| st.attrs })
+      newjsons = sts.reject { |st| currenth[st.id] }.map { |st| st.attrs }
+      Tweet.create_bulk_from_json(newjsons)
 
-      tweets = Tweet.where(id: sts.map(&:id)).each do |tweet|
-        st = sts.find {|s| s.id == tweet.id }
+      exsts = sts.select { |st| currenth[st.id] }
+      Tweet.where(id: exsts.map(&:id)).zip(exsts) do |tweet, st|
         tweet.update(text: extract_entities(st.attrs),
                      source: st.attrs[:source],
-                     in_reply_to_id: (tweet.in_reply_to_id || st.attrs[:in_reply_to_status_id]))
+                     in_reply_to_id: (tweet.in_reply_to_id || st.attrs[:in_reply_to_status_id]),
+                     favorites_count: st.attrs[:favorite_count].to_i,
+                     retweets_count: st.attrs[:retweet_count].to_i,
+                     reactions_count: st.attrs[:favorite_count].to_i + st.attrs[:retweet_count].to_i)
       end
 
-      tobedelete = currents.reject {|tw| tw.user.protected? || sts.any? {|st| st.id == tw.id } }
-      tbdusers = client.users(tobedelete.map {|tw| tw.user_id }) rescue []
+      stsids = Set.new(sts.map(&:id))
+      check_deleted(currents.reject { |t| stsids.include?(t.id) }, current_user)
+    end
 
-      tobedelete.each do |tweet|
-        if tbdusers.any? {|u| u.id == tweet.user_id }
-          tweet.destroy
-        else
-          # TORIAEZU protected
+    def check_deleted(tweets, current_user = nil)
+      client = (current_user ? current_user.account : Account.random).client
+
+      user_cache = {}
+
+      tweets.each { |tweet|
+        begin
+          client.status(tweet.id)
+        rescue Twitter::Error::Forbidden
           tweet.user.update(protected: true)
+        rescue Twitter::Error::NotFound
+          u = user_cache[tweet.user.id] ||= (client.user(tweet.user.id) rescue :not_found)
+          if u == :not_found
+            tweet.user.update(protected: true)
+          else
+            tweet.destroy
+          end
         end
-      end
-
-      tweets
+      }
     end
 
     # Parses /\d+[dwmy]/ style query and returns recent tweets (Relation) in specified period.

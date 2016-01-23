@@ -1,5 +1,6 @@
 import Settings from "../../settings";
 import Storage from "storage";
+import utils from "utils";
 
 var encodeQuery = (params) => {
   if (!params) return "";
@@ -25,7 +26,7 @@ var continueRequest = promise => {
 
 var get = (endpoint, params) => {
   if (Settings.debug) console.log("[API Request] " + endpoint + " query: " + encodeQuery(params));
-  var url = Settings.backendPrefix + "/i/api/" + endpoint + ".json?" + encodeQuery(params);
+  var url = utils.getCurrentBaseUrl() + "/i/api/" + endpoint + ".json?" + encodeQuery(params);
   return continueRequest(fetch(url, {
     method: "get",
     credentials: "include",
@@ -34,7 +35,7 @@ var get = (endpoint, params) => {
 
 var post = (endpoint, body) => {
   if (Settings.debug) console.log("[API Request] " + endpoint + " body: " + encodeQuery(body));
-  var url = Settings.backendPrefix + "/i/api/" + endpoint + ".json";
+  var url = utils.getCurrentBaseUrl() + "/i/api/" + endpoint + ".json";
   return continueRequest(fetch(url, {
     method: "post",
     credentials: "include",

@@ -3,7 +3,7 @@ class ApidocsController < ApplicationController
     apidocs = Rails.cache.fetch("apidocs/all") do
       nss = {}
       Api.routes.each { |route|
-        next if route.route_ignore
+        next if route.route_nodoc
         next if route.route_method == "HEAD"
         namespace = route.route_namespace.sub(/^\//, "")
         nss[namespace] ||= []

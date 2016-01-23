@@ -61,7 +61,7 @@ class Api < Grape::API
   mount ApiTweets
   mount ApiUsers
 
-  route :any, "*path", ignore: true do
+  route :any, "*path", nodoc: true do
     raise Aclog::Exceptions::NotFound
   end
 end

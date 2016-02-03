@@ -16,7 +16,7 @@ Vue.mixin({
     }
   }
 });
-Vue.component("tweet", require("./components/tweet.vue"));
+Vue.component("tweet", require("./components/tweets/tweet.vue"));
 Vue.partial("loading-box", '<div class="loading-box"><img class="loading-image" src="/assets/loading.gif" /></div>');
 Vue.partial("profile-image", '<a v-link="\'/\' + user.screen_name" title="{{user.name}} (@{{user.screen_name}})"><img alt="@{{user.screen_name}}" class="twitter-icon" v-bind:src="user.profile_image_url" v-on:error="placeholderImage" /></a>');
 Vue.component("profile-image", Vue.extend({ props: ["user"], template: '<partial name="profile-image"></partial>' }));

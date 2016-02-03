@@ -7,7 +7,7 @@
       </div>
       <div class="col-sm-9 col-md-7 col-lg-6">
         <div class="statuses" v-el:tweets>
-          <tweet v-for="tweet in statuses" v-bind:tweet="tweet"></tweet>
+          <tweet v-for="tweet in statuses" v-bind:tweet="tweet" v-bind:list-idx="$index"></tweet>
           <partial name="loading-box" v-if="loading"></partial>
         </div>
       </div>
@@ -82,7 +82,7 @@ export default {
   ready: function() {
     var content = this.$els.tweets;
     this.scrollListener = () => {
-      if ((content.getBoundingClientRect().top + content.clientHeight -  window.innerHeight) < 100) {
+      if ((content.getBoundingClientRect().top + content.clientHeight - window.innerHeight) < 100) {
         this.loadNext();
       }
     };

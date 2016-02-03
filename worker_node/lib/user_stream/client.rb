@@ -63,8 +63,13 @@ module UserStream
         end
 
         buftok.extract(chunk).each do |line|
-          json = Oj.load(line)
-          callback(:item, json) if json
+          begin
+            json = Oj.load(line)
+            callback(:item, json) if json
+          rescue => e
+            log(:fatal, "broken JSON?: #{e}")
+            log(:fatal, line)
+          end
         end
       end
 

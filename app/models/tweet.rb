@@ -95,8 +95,9 @@ class Tweet < ActiveRecord::Base
       newjsons = sts.reject { |st| currenth[st.id] }.map { |st| st.attrs }
       Tweet.create_bulk_from_json(newjsons)
 
-      exsts = sts.select { |st| currenth[st.id] }
-      Tweet.where(id: exsts.map(&:id)).zip(exsts) do |tweet, st|
+      exsts = sts.select { |st| currenth[st.id] }.map { |st| [st.id, st] }.to_h
+      Tweet.where(id: exsts.keys) do |tweet|
+        st = exsts[tweet.id]
         tweet.update(text: extract_entities(st.attrs),
                      source: st.attrs[:source],
                      in_reply_to_id: (tweet.in_reply_to_id || st.attrs[:in_reply_to_status_id]),

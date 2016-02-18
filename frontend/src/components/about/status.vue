@@ -15,7 +15,7 @@
         </tr>
       </thead>
       <tbody>
-        <template v-for="(index, val) in active_nodes">
+        <template v-for="(index, val) in active_nodes" track-by="$index">
           <tr v-if="nodes[val]">
             <td>{{index}}</td>
             <td>#{{val}} ({{tag(val)}})</td>

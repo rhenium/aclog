@@ -6,7 +6,7 @@ is a web application that tracks users' retweeting and favoriting on Twitter in 
 * has scalable structure: capable of handling over 6k users = 6k simultaneous UserStream connections.
 
 ## Status
-* Working on [aclog.koba789.com](http://aclog.koba789.com)
+* Working on [aclog.rhe.jp](https://aclog.rhe.jp/)
 
 ## Features
 * Collecting likes and retweets via Twitter Streaming API

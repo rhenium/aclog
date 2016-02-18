@@ -6,7 +6,7 @@
         aclog
       </h1>
       <div class="tweet-button">
-        <a href="https://twitter.com/intent/tweet?text=Twitter+%E5%88%86%E6%9E%90%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9+-+aclog&amp;url=http%3A%2F%2Faclog.koba789.com%2F" target="_blank">
+        <a href="https://twitter.com/intent/tweet?text=Twitter+%E5%88%86%E6%9E%90%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9+-+aclog&amp;url=https%3A%2F%2Faclog.rhe.jp%2F" target="_blank">
           <i></i>
           <span>ツイート</span>
         </a>

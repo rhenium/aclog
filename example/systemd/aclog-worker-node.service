@@ -1,6 +1,6 @@
 [Unit]
 Description=aclog collector worker daemon
-After=network.target
+After=memcached.service network.target
 
 [Service]
 User=aclog

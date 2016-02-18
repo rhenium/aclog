@@ -1,6 +1,6 @@
 [Unit]
 Description=aclog delayed_job daemon
-After=network.target
+After=mysqld.service memcached.service network.target
 
 [Service]
 User=aclog

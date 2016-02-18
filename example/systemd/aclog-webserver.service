@@ -1,6 +1,6 @@
 [Unit]
 Description=aclog webserver daemon
-After=network.target
+After=mysqld.service memcached.service network.target
 
 [Service]
 User=aclog
